@@ -982,8 +982,8 @@ if(typeof QRCode === 'undefined'){
         <div class="form-group"><label>代表者名</label><input type="text" id="set-owner" placeholder="例：田中 太郎"></div>
       </div>
       <div class="form-row cols2">
-        <div class="form-group"><label>電話番号</label><input type="text" id="set-tel" placeholder="例：011-234-5678" oninput="autoTel(this)"></div>
-        <div class="form-group"><label>FAX番号</label><input type="text" id="set-fax" placeholder="例：011-234-5679" oninput="autoTel(this)"></div>
+        <div class="form-group"><label>電話番号</label><input type="text" id="set-tel" placeholder="例：011-234-5678" oninput="autoTel(this)" onblur="autoTel(this)"></div>
+        <div class="form-group"><label>FAX番号</label><input type="text" id="set-fax" placeholder="例：011-234-5679" oninput="autoTel(this)" onblur="autoTel(this)"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>メールアドレス</label><input type="text" id="set-email" placeholder="例：info@example.com"></div>
@@ -1406,7 +1406,7 @@ if(typeof QRCode === 'undefined'){
             </div>
           </div>
           <div class="form-row cols2" style="margin-bottom:8px">
-            <div class="form-group"><label>電話番号</label><input type="text" id="nc-tel" placeholder="090-1234-5678" oninput="autoTel(this)"></div>
+            <div class="form-group"><label>電話番号</label><input type="text" id="nc-tel" placeholder="090-1234-5678" oninput="autoTel(this)" onblur="autoTel(this)"></div>
             <div class="form-group"></div>
           </div>
           <div class="form-row cols3" style="margin-bottom:8px">
@@ -1564,12 +1564,12 @@ if(typeof QRCode === 'undefined'){
         </div>
       </div>
       <div class="form-group"><label>電話番号</label>
-        <input type="text" id="cust-tel" placeholder="例：090-1234-5678" oninput="autoTel(this)">
+        <input type="text" id="cust-tel" placeholder="例：090-1234-5678" oninput="autoTel(this)" onblur="autoTel(this)">
       </div>
     </div>
     <div class="form-row cols2">
       <div class="form-group"><label>FAX番号</label>
-        <input type="text" id="cust-fax" placeholder="例：011-234-5679" oninput="autoTel(this)">
+        <input type="text" id="cust-fax" placeholder="例：011-234-5679" oninput="autoTel(this)" onblur="autoTel(this)">
       </div>
       <div class="form-group"><label>担当部署</label><input type="text" id="cust-dept" placeholder="例：営業部"></div>
     </div>
@@ -2436,27 +2436,33 @@ function toHalf(str){
 // ===== 電話・FAX 自動フォーマット =====
 // 全角変換 + 数字以外除去 + ハイフン自動挿入
 function autoTel(input){
+  // 全角→半角変換し、数字とハイフン以外を除去
   const raw=toHalf(input.value);
-  const digits=raw.replace(/[^0-9]/g,'');
+  // 数字のみ抽出（最大11桁）
+  const digits=raw.replace(/[^0-9]/g,'').slice(0,11);
+  if(!digits){ input.value=''; return; }
+
+  // 前回と同じdigitsなら再変換しない（二重変換防止）
+  const prevDigits=(input.dataset.prevDigits||'');
+  if(digits===prevDigits) return;
+  input.dataset.prevDigits=digits;
+
   let v=digits;
   if(digits.length===11){
-    // 携帯・IP電話: 080/090/070-XXXX-XXXX
     v=digits.slice(0,3)+'-'+digits.slice(3,7)+'-'+digits.slice(7);
   } else if(digits.length===10){
     if(digits.startsWith('0120')||digits.startsWith('0800')||digits.startsWith('0570')){
-      // フリーダイヤル等: 0120-XXX-XXX
       v=digits.slice(0,4)+'-'+digits.slice(4,7)+'-'+digits.slice(7);
-    } else if(/^0[5-9][0-9]/.test(digits)&&!digits.startsWith('06')&&!digits.startsWith('03')){
-      // 4桁市外局番: 0155-XX-XXXX など
+    } else if(digits.startsWith('0155')||digits.startsWith('0166')||digits.startsWith('0143')||digits.startsWith('0144')||digits.startsWith('0145')||digits.startsWith('0123')||digits.startsWith('0135')||digits.startsWith('0136')||digits.startsWith('0138')||digits.startsWith('0152')||digits.startsWith('0153')||digits.startsWith('0156')||digits.startsWith('0157')||digits.startsWith('0158')||digits.startsWith('0162')||digits.startsWith('0163')||digits.startsWith('0164')||digits.startsWith('0165')||digits.startsWith('0167')){
+      // 北海道の4桁市外局番
       v=digits.slice(0,4)+'-'+digits.slice(4,6)+'-'+digits.slice(6);
     } else {
-      // 3桁市外局番: 011-XXX-XXXX / 03-XXXX-XXXX など
       v=digits.slice(0,3)+'-'+digits.slice(3,6)+'-'+digits.slice(6);
     }
   } else if(digits.length===9){
-    // 2桁市外局番: 03-XXXX-XXXX(9桁) など
     v=digits.slice(0,2)+'-'+digits.slice(2,6)+'-'+digits.slice(6);
   }
+  // 入力途中（桁が揃っていない）はそのまま表示
   input.value=v;
 }
 
