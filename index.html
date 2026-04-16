@@ -289,7 +289,7 @@ tr:hover td{background:var(--bg)}
 
 /* LOGO CROP — 正しい実装 */
 /* crop-stageはposition:relativeで画像を基準にoverlay要素を配置 */
-.crop-stage{position:relative;border-radius:8px;overflow:hidden;line-height:0;touch-action:none;cursor:crosshair;background:#666}
+.crop-stage{position:relative;border-radius:8px;overflow:hidden;line-height:0;touch-action:none;cursor:crosshair;background:#f0f0f0;min-height:180px}
 .crop-stage img{display:block;width:100%;height:auto;pointer-events:none;user-select:none;border-radius:8px}
 /* 暗幕overlayを4枚に分割（上・下・左・右）— 歪みなし */
 .crop-mask-top,.crop-mask-bottom,.crop-mask-left,.crop-mask-right{
@@ -439,15 +439,15 @@ select{appearance:auto}
 .backup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
 .backup-icon{font-size:28px;width:40px;text-align:center}
 
-.preview-doc{background:white;max-width:640px;margin:0 auto;padding:42px;border-radius:var(--radius);border:1px solid var(--border);font-family:'Noto Serif JP',serif;color:#111}
+.preview-doc{background:white;max-width:640px;margin:0 auto;padding:42px;border-radius:var(--radius);border:1px solid var(--border);font-family:'Noto Serif JP',serif;color:#111;overflow-x:hidden}
 .preview-doc h2{font-size:22px;font-weight:600;text-align:center;margin-bottom:18px;border-bottom:2px solid #111;padding-bottom:11px}
 .preview-meta{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 .preview-to .company{font-size:16px;font-weight:600}
 .preview-from{font-size:12px;text-align:right;line-height:1.9}
 .preview-logo{max-width:100px;max-height:50px;object-fit:contain;display:block;margin-left:auto;margin-bottom:5px}
-.preview-table{width:100%;border-collapse:collapse;margin-bottom:15px;font-size:12px}
-.preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #DDD}
-.preview-table td{padding:6px 9px;border:1px solid #DDD}
+.preview-table{width:100%;border-collapse:collapse;margin-bottom:15px;font-size:12px;table-layout:fixed;word-break:break-word}
+.preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #DDD;overflow:hidden}
+.preview-table td{padding:6px 9px;border:1px solid #DDD;overflow:hidden}
 .preview-total table{margin-left:auto;font-size:13px}
 .preview-total td{padding:4px 7px}
 .preview-total .grand{font-size:16px;font-weight:700;border-top:2px solid #111}
@@ -548,6 +548,11 @@ select{appearance:auto}
 .mobile-drawer{display:none}
 
 @media(max-width:768px){
+  .preview-doc{padding:10px!important;font-size:11px!important}
+  .preview-doc table{font-size:10px!important}
+  .preview-doc th,.preview-doc td{padding:4px 5px!important}
+  .preview-meta{flex-direction:column!important}
+
   /* Hide desktop sidebar */
   .sidebar{display:none}
   /* Show hamburger */
@@ -748,7 +753,6 @@ if(typeof QRCode === 'undefined'){
     <div class="nav-item" onclick="showPage('templates',this)"><span class="nav-icon">📦</span><span class="nav-label">作業テンプレート</span><span class="nav-tooltip">作業テンプレート</span></div>
     <div class="nav-item" onclick="showPage('payments',this)"><span class="nav-icon">💴</span><span class="nav-label">入金管理</span><span class="nav-tooltip">入金管理</span></div>
     <div class="nav-item" onclick="showPage('staff-report',this)"><span class="nav-icon">📊</span><span class="nav-label">スタッフ実績</span><span class="nav-tooltip">スタッフ実績</span></div>
-    <div class="nav-item" onclick="showPage('branches',this)"><span class="nav-icon">🏢</span><span class="nav-label">拠点・支店</span><span class="nav-tooltip">拠点・支店</span></div>
     <div class="nav-item" onclick="showPage('csv-export',this)"><span class="nav-icon">📤</span><span class="nav-label">CSVエクスポート</span><span class="nav-tooltip">CSVエクスポート</span></div>
     <div class="nav-item" onclick="showPage('expenses',this)"><span class="nav-icon">💸</span><span class="nav-label">経費管理</span><span class="nav-tooltip">経費管理</span></div>
     <div class="nav-item" onclick="showPage('backup',this)"><span class="nav-icon">🗄️</span><span class="nav-label">バックアップ</span><span class="nav-tooltip">バックアップ</span></div>
@@ -1021,6 +1025,15 @@ if(typeof QRCode === 'undefined'){
         <div class="form-group"><label>アラート（期限前何日）</label><input type="number" id="set-alertdays" placeholder="7" min="1" max="30"></div>
       </div>
 
+      <!-- デフォルト税率 -->
+      <div class="section-title" style="margin-bottom:12px">デフォルト税率</div>
+      <div class="form-row cols2">
+        <div class="form-group">
+          <label>品目追加時の初期税率</label>
+          <select id="set-defaultTax" style="padding:9px 12px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none"></select>
+        </div>
+      </div>
+
       <!-- 備考 -->
       <div class="section-title" style="margin-bottom:12px">書類の備考・定型文</div>
       <div class="form-row">
@@ -1132,7 +1145,7 @@ if(typeof QRCode === 'undefined'){
 </div>
 
 <!-- BRANCHES -->
-<div id="page-branches" class="page">
+<div id="page-branches" class="page" style="display:none">
   <div class="main-header">
     <h2>🏢 拠点・支店管理</h2>
     <div class="header-actions">
@@ -1614,7 +1627,46 @@ if(typeof QRCode === 'undefined'){
       <div class="form-group"><label>時間</label><input type="time" id="job-time"></div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>顧客名</label><input type="text" id="job-customer" list="customer-datalist" placeholder="顧客名を入力"></div>
+      <div class="form-group">
+        <label>顧客名</label>
+        <div style="display:flex;gap:6px">
+          <select id="job-customer-select" onchange="onJobCustSelect(this)"
+            style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none">
+            <option value="">（顧客を選択）</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="toggleJobNewCust()" title="新規顧客を登録">＋ 新規</button>
+        </div>
+        <input type="text" id="job-customer" style="display:none">
+        <!-- 新規顧客入力エリア -->
+        <div id="job-new-cust-area" style="display:none;margin-top:8px;background:var(--surface2);border-radius:8px;padding:10px">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">＋ 新規顧客を登録</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div class="form-group" style="margin:0"><label>敬称</label>
+              <select id="job-nc-honorific" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
+                <option value="御中">御中</option><option value="様">様</option><option value="殿">殿</option><option value="">なし</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0"><label>顧客名 ＊</label>
+              <input type="text" id="job-nc-name" placeholder="例：山田 太郎"
+                style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div class="form-group" style="margin:0"><label>電話番号</label>
+              <input type="text" id="job-nc-tel" placeholder="090-1234-5678" oninput="autoTel(this)"
+                style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
+            </div>
+            <div class="form-group" style="margin:0"><label>住所</label>
+              <input type="text" id="job-nc-address" placeholder="例：千歳市〇〇"
+                style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            <button class="btn btn-secondary btn-sm" onclick="toggleJobNewCust()">キャンセル</button>
+            <button class="btn btn-primary btn-sm" onclick="saveJobNewCust()">💾 登録して選択</button>
+          </div>
+        </div>
+      </div>
       <div class="form-group"><label>カテゴリ</label><select id="job-category"><option value="">（カテゴリ）</option><option>引越し・運搬</option><option>清掃・片付け</option><option>修理・修繕</option><option>電気・設備</option><option>庭・外構</option><option>買い物・代行</option><option>介護・生活支援</option><option>その他</option></select></div>
     </div>
     <div class="form-row"><div class="form-group"><label>作業内容 ＊</label><input type="text" id="job-title" placeholder="例：エアコン取り付け"></div></div>
@@ -2191,7 +2243,6 @@ function renderHome(){
       {icon:'📅',label:'作業カレンダー',action:"showPage('calendar')"},
       {icon:'💸',label:'経費管理',action:"showPage('expenses')"},
       {icon:'📦',label:'テンプレート',action:"showPage('templates')"},
-      {icon:'🏢',label:'拠点管理',action:"showPage('branches')"},
       {icon:'📤',label:'CSVエクスポート',action:"showPage('csv-export')"},
       {icon:'🗄️',label:'バックアップ',action:"showPage('backup')"},
       {icon:'⚙️',label:'会社設定',action:"showPage('settings')"},
@@ -2385,21 +2436,26 @@ function toHalf(str){
 // ===== 電話・FAX 自動フォーマット =====
 // 全角変換 + 数字以外除去 + ハイフン自動挿入
 function autoTel(input){
-  const pos=input.selectionStart;
   const raw=toHalf(input.value);
   const digits=raw.replace(/[^0-9]/g,'');
   let v=digits;
   if(digits.length===11){
-    // 携帯: 090-xxxx-xxxx
+    // 携帯・IP電話: 080/090/070-XXXX-XXXX
     v=digits.slice(0,3)+'-'+digits.slice(3,7)+'-'+digits.slice(7);
   } else if(digits.length===10){
-    if(digits.startsWith('0120')||digits.startsWith('0800')){
+    if(digits.startsWith('0120')||digits.startsWith('0800')||digits.startsWith('0570')){
+      // フリーダイヤル等: 0120-XXX-XXX
       v=digits.slice(0,4)+'-'+digits.slice(4,7)+'-'+digits.slice(7);
+    } else if(/^0[5-9][0-9]/.test(digits)&&!digits.startsWith('06')&&!digits.startsWith('03')){
+      // 4桁市外局番: 0155-XX-XXXX など
+      v=digits.slice(0,4)+'-'+digits.slice(4,6)+'-'+digits.slice(6);
     } else {
+      // 3桁市外局番: 011-XXX-XXXX / 03-XXXX-XXXX など
       v=digits.slice(0,3)+'-'+digits.slice(3,6)+'-'+digits.slice(6);
     }
   } else if(digits.length===9){
-    v=digits.slice(0,2)+'-'+digits.slice(2,5)+'-'+digits.slice(5);
+    // 2桁市外局番: 03-XXXX-XXXX(9桁) など
+    v=digits.slice(0,2)+'-'+digits.slice(2,6)+'-'+digits.slice(6);
   }
   input.value=v;
 }
@@ -2409,6 +2465,7 @@ function autoTel(input){
 function autoZip(input, addrId, statusId){
   const raw=toHalf(input.value);
   let digits=raw.replace(/[^0-9]/g,'').slice(0,7);
+  if(!digits){ input.value=''; return; }  // 空なら何もしない
   let v=digits;
   if(digits.length>3) v=digits.slice(0,3)+'-'+digits.slice(3);
   input.value=v;
@@ -2734,7 +2791,7 @@ function quickSave(){
 }
 
 // ===== DATE FILTER LOGIC =====
-const dfState={quotes:{mode:'all',from:'',to:''},invoices:{mode:'all',from:'',to:''},receipts:{mode:'all',from:'',to:''}};
+const dfState={quotes:{mode:'all',from:'',to:''},invoices:{mode:'all',from:'',to:''},receipts:{mode:'month',from:'',to:''}};
 
 function buildDocPages(){
   ['quotes','invoices','receipts'].forEach(id=>{
@@ -2864,7 +2921,7 @@ function renderDocRows(tbodyId,list,showType){
     const statusBadge=st
       ?`<span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;background:${st.bg};color:${st.color};white-space:nowrap">${st.label}</span>`
       :`<span class="badge badge-draft">${d.status||'下書き'}</span>`;
-    return`<tr>
+    return`<tr style="cursor:pointer" onclick="previewDoc('${d.id}')" title="クリックでプレビュー">
     <td style="font-family:monospace;font-size:12px">${d.number}</td>
     ${showType?`<td><span class="badge ${tc[d.type]||''}">${d.type}</span></td>`:''}
     <td><a href="#" onclick="openCustDetail('${(d.customer||'').replace(/'/g,"\\'")}');return false" style="color:var(--accent);text-decoration:none;font-weight:500">${d.customer||'—'}</a></td>
@@ -2998,27 +3055,31 @@ function openInlineNewCust(){
 function closeInlineNewCust(){document.getElementById('inline-new-cust').style.display='none';}
 function saveInlineNewCust(){
   const name=document.getElementById('nc-name').value.trim();
-  if(!name){alert('顧客名を入力してください');return;}
+  if(!name){showToast('顧客名を入力してください','#C0392B');return;}
   const contacts=[];
-  const cName=document.getElementById('nc-contact').value.trim();
-  if(cName)contacts.push({name:cName,role:document.getElementById('nc-role').value.trim(),tel:'',email:''});
-  const c={
+  const cName=document.getElementById('nc-contact')?.value.trim()||'';
+  if(cName)contacts.push({name:cName,role:document.getElementById('nc-role')?.value.trim()||'',tel:'',email:''});
+  const newCust={
     id:'cust-'+Date.now(),
     name,
     honorific:document.getElementById('nc-honorific')?.value||'御中',
-    tel:document.getElementById('nc-tel').value,
+    tel:document.getElementById('nc-tel')?.value||'',
     fax:document.getElementById('nc-fax')?.value||'',
-    email:document.getElementById('nc-email').value,
-    zip:document.getElementById('nc-zip').value,
-    address:document.getElementById('nc-address').value,
-    dept:document.getElementById('nc-dept').value,
+    email:document.getElementById('nc-email')?.value||'',
+    zip:document.getElementById('nc-zip')?.value||'',
+    address:document.getElementById('nc-address')?.value||'',
+    dept:document.getElementById('nc-dept')?.value||'',
+    category:'',
     memo:'',contacts
   };
-  customers.push(c);persist();updateCustomerDatalist();
-  selectedCustId=c.id;renderSelectedCust(c);
+  customers.push(newCust);
+  persist();
+  updateCustomerDatalist();
+  selectedCustId=newCust.id;
+  renderSelectedCust(newCust);
   closeInlineNewCust();
   renderCustomerList();
-  showToast(`顧客「${name} ${c.honorific}」を登録しました ✓`);
+  showToast(`顧客「${name} ${newCust.honorific}」を登録しました ✓`);
 }
 
 // ===== MAP MODAL =====
@@ -3067,7 +3128,8 @@ function persistTaxRates(){localStorage.setItem('customTaxRates',JSON.stringify(
 
 function taxOptions(selected){
   const rates=customTaxRates.filter(r=>r.enabled);
-  const def=rates[0]?.value||'10';
+  // デフォルト税率: settings.defaultTax が設定されていればそれを使用
+  const def=settings?.defaultTax||rates[0]?.value||'10';
   return rates.map(r=>`<option value="${r.value}" ${(selected||def)===r.value?'selected':''}>${r.label}</option>`).join('');
 }
 function taxRate(v){
@@ -3365,10 +3427,17 @@ function openCustDetail(idOrName,byId){
             </div>`:''}
           </div>
         </div>
-        ${mapUrl?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-          <a href="${mapUrl}" target="_blank" class="map-btn">📍 地図を開く</a>
-          ${dirUrl?`<a href="${dirUrl}" target="_blank" class="map-btn">🚗 経路を確認</a>`:''}
-          <button class="map-btn" onclick="openMapModal('${c.id}')">📐 距離・詳細</button>
+        ${mapUrl?`<div style="margin-bottom:10px">
+          <iframe
+            src="https://www.google.com/maps?q=${encodeURIComponent(c.address)}&output=embed"
+            width="100%" height="180" style="border:0;border-radius:8px;margin-bottom:8px"
+            allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a href="${mapUrl}" target="_blank" class="map-btn">📍 地図を開く</a>
+            ${dirUrl?`<a href="${dirUrl}" target="_blank" class="map-btn">🚗 経路を確認</a>`:''}
+            <button class="map-btn" onclick="openMapModal('${c.id}')">📐 距離・詳細</button>
+          </div>
         </div>`:''}
         <div class="detail-section">
           <h4>担当者 (${(c.contacts||[]).length}名)</h4>
@@ -3518,9 +3587,52 @@ function renderJobList(){
       <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteJob('${j.id}'))">削除</button>
     </td></tr>`).join('');
 }
-function openJobModal(date){editingJobId=null;document.getElementById('job-modal-title').textContent='作業を追加';document.getElementById('job-date').value=date||today();document.getElementById('job-time').value='';document.getElementById('job-customer').value='';document.getElementById('job-title').value='';document.getElementById('job-category').value='';document.getElementById('job-memo').value='';document.getElementById('job-modal').classList.add('open');}
-function editJob(id){const j=jobs.find(x=>x.id===id);if(!j)return;editingJobId=id;document.getElementById('job-modal-title').textContent='作業を編集';document.getElementById('job-date').value=j.date;document.getElementById('job-time').value=j.time||'';document.getElementById('job-customer').value=j.customer||'';document.getElementById('job-title').value=j.title;document.getElementById('job-category').value=j.category||'';document.getElementById('job-memo').value=j.memo||'';document.getElementById('job-modal').classList.add('open');}
-function saveJob(){const title=document.getElementById('job-title').value.trim();if(!title){alert('作業内容を入力してください');return;}const j={id:editingJobId||('job-'+Date.now()),date:document.getElementById('job-date').value,time:document.getElementById('job-time').value,customer:document.getElementById('job-customer').value,title,category:document.getElementById('job-category').value,memo:document.getElementById('job-memo').value};if(editingJobId){jobs[jobs.findIndex(x=>x.id===editingJobId)]=j;}else jobs.push(j);persist();closeModal('job-modal');renderCalendar();showToast('作業予定を保存しました ✓');}
+function openJobModal(date){
+  editingJobId=null;
+  document.getElementById('job-modal-title').textContent='作業を追加';
+  document.getElementById('job-date').value=date||today();
+  document.getElementById('job-time').value='';
+  document.getElementById('job-customer').value='';
+  document.getElementById('job-title').value='';
+  document.getElementById('job-category').value='';
+  document.getElementById('job-memo').value='';
+  buildJobCustSelect('');
+  document.getElementById('job-new-cust-area').style.display='none';
+  document.getElementById('job-modal').classList.add('open');
+}
+function editJob(id){
+  const j=jobs.find(x=>x.id===id);if(!j)return;
+  editingJobId=id;
+  document.getElementById('job-modal-title').textContent='作業を編集';
+  document.getElementById('job-date').value=j.date;
+  document.getElementById('job-time').value=j.time||'';
+  document.getElementById('job-customer').value=j.customer||'';
+  document.getElementById('job-title').value=j.title;
+  document.getElementById('job-category').value=j.category||'';
+  document.getElementById('job-memo').value=j.memo||'';
+  buildJobCustSelect(j.customer||'');
+  document.getElementById('job-new-cust-area').style.display='none';
+  document.getElementById('job-modal').classList.add('open');
+}
+function saveJob(){
+  const title=document.getElementById('job-title').value.trim();
+  if(!title){showToast('作業内容を入力してください','#C0392B');return;}
+  const sel=document.getElementById('job-customer-select');
+  const custName=sel?.value||document.getElementById('job-customer')?.value||'';
+  const j={
+    id:editingJobId||('job-'+Date.now()),
+    date:document.getElementById('job-date').value,
+    time:document.getElementById('job-time').value,
+    customer:custName,
+    title,
+    category:document.getElementById('job-category').value,
+    memo:document.getElementById('job-memo').value
+  };
+  if(editingJobId){jobs[jobs.findIndex(x=>x.id===editingJobId)]=j;}
+  else jobs.push(j);
+  persist();closeModal('job-modal');renderCalendar();
+  showToast('作業予定を保存しました ✓');
+}
 function deleteJob(id){
   const j=jobs.find(x=>x.id===id);if(!j)return;
   pushUndo({type:'job',data:JSON.parse(JSON.stringify(j)),label:`作業「${j.title}」を削除しました`});
@@ -3590,7 +3702,8 @@ function renderReport(){
 function renderTemplates(){const el=document.getElementById('template-list');if(!el)return;if(!templates.length){el.innerHTML=`<div style="text-align:center;color:var(--text3);padding:40px">テンプレートがありません。追加ボタンから作成してください。</div>`;return;}el.innerHTML=templates.map(t=>`<div class="tmpl-card"><div style="font-size:22px;width:34px;text-align:center">📋</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${t.name}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${t.category||'カテゴリなし'}　${t.lines.length}項目　${fmt(t.lines.reduce((s,l)=>s+l.qty*l.price,0))}</div></div><div style="display:flex;gap:5px"><button class="btn btn-secondary btn-sm" onclick="editTemplate('${t.id}')">編集</button><button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteTemplate('${t.id}'))">削除</button></div></div>`).join('');}
 function openTemplateModal(){editingTmplId=null;document.getElementById('tmpl-modal-title').textContent='テンプレート追加';document.getElementById('tmpl-name').value='';document.getElementById('tmpl-category').value='';document.getElementById('tmpl-lines-container').innerHTML='';addTmplLine();document.getElementById('template-modal').classList.add('open');}
 function editTemplate(id){const t=templates.find(x=>x.id===id);if(!t)return;editingTmplId=id;document.getElementById('tmpl-modal-title').textContent='テンプレートを編集';document.getElementById('tmpl-name').value=t.name;document.getElementById('tmpl-category').value=t.category||'';document.getElementById('tmpl-lines-container').innerHTML='';(t.lines||[]).forEach(l=>addTmplLine(l));document.getElementById('template-modal').classList.add('open');}
-function addTmplLine(data){const c=document.getElementById('tmpl-lines-container');const uid='tl'+Date.now()+Math.random().toString(36).slice(2,5);const d=document.createElement('div');d.className='line-item';d.id=uid;d.innerHTML=`<div class="drag-handle">☰</div><input type="text" placeholder="品目" value="${(data?.name||'').replace(/"/g,'&quot;')}"><input type="number" value="${data?.qty||1}" min="0"><input type="number" value="${data?.price||''}" placeholder="0"><select><option value="10" ${(!data||data.tax==='10')?'selected':''}>10%</option><option value="8" ${data?.tax==='8'?'selected':''}>8%</option><option value="0" ${data?.tax==='0'?'selected':''}>非課税</option></select><div class="line-total">¥0</div><button class="del-btn" onclick="document.getElementById('${uid}').remove()">✕</button>`;c.appendChild(d);}
+function addTmplLine(data){const c=document.getElementById('tmpl-lines-container');const uid='tl'+Date.now()+Math.random().toString(36).slice(2,5);const d=document.createElement('div');d.className='line-item';d.id=uid;d.style.gridTemplateColumns='24px 3fr 60px 100px 80px 80px 34px';
+  d.innerHTML=`<div class="drag-handle">☰</div><input type="text" placeholder="品目・作業内容" value="${(data?.name||'').replace(/"/g,'&quot;')}"><input type="number" value="${data?.qty||1}" min="0"><input type="number" value="${data?.price||''}" placeholder="0"><select>${taxOptions(data?.tax)}</select><div class="line-total">¥0</div><button class="del-btn" onclick="document.getElementById('${uid}').remove()">✕</button>`;c.appendChild(d);}
 function getTmplLines(){return Array.from(document.querySelectorAll('#tmpl-lines-container .line-item')).map(row=>{const ins=row.querySelectorAll('input,select');return{name:ins[0].value,qty:parseFloat(ins[1].value)||0,price:parseFloat(ins[2].value)||0,tax:ins[3].value};}).filter(l=>l.name);}
 function saveTemplate(){const name=document.getElementById('tmpl-name').value.trim();if(!name){alert('テンプレート名を入力してください');return;}const t={id:editingTmplId||('tmpl-'+Date.now()),name,category:document.getElementById('tmpl-category').value,lines:getTmplLines()};if(editingTmplId){templates[templates.findIndex(x=>x.id===editingTmplId)]=t;}else templates.push(t);persist();closeModal('template-modal');renderTemplates();showToast('テンプレートを保存しました ✓');}
 function deleteTemplate(id){pushUndo({type:"template",data:JSON.parse(JSON.stringify(templates.find(x=>x.id===id)||{})),label:"テンプレートを削除しました"});templates=templates.filter(x=>x.id!==id);persist();renderTemplates();showToast("テンプレートを削除しました");}
@@ -3634,8 +3747,8 @@ function openCropModal(){
     const iw=img.offsetWidth||img.naturalWidth;
     const ih=img.offsetHeight||img.naturalHeight;
     if(!iw||!ih)return;
-    let bw=Math.min(iw*0.8,ih*3*0.8),bh=bw/3;
-    if(bh>ih*0.85){bh=ih*0.85;bw=bh*3;}
+    let bw=Math.min(iw*0.9,ih*3*0.9),bh=bw/3;
+    if(bh>ih*0.9){bh=ih*0.9;bw=bh*3;}
     cropState={x:(iw-bw)/2,y:(ih-bh)/2,w:bw,h:bh,aspectW:3,aspectH:1,dragging:null,imgW:iw,imgH:ih};
     updateCropSel();updateCropPreviews();updateCropSizeInfo();
   };
@@ -3697,15 +3810,14 @@ function updateCropPreviews(){
     const canvas=document.getElementById(id);if(!canvas)return;
     const dw=canvas.width,dh=canvas.height;
     const ctx=canvas.getContext('2d');
-    ctx.clearRect(0,0,dw,dh);
-    // Draw with correct aspect ratio (letterbox if needed)
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,dw,dh);
     const srcAR=sw/sh,dstAR=dw/dh;
     let dx=0,dy=0,drawW=dw,drawH=dh;
     if(srcAR>dstAR){drawH=dw/srcAR;dy=(dh-drawH)/2;}
     else{drawW=dh*srcAR;dx=(dw-drawW)/2;}
     const tempImg=new Image();
     tempImg.onload=()=>{
-      ctx.clearRect(0,0,dw,dh);
+      ctx.fillStyle='#ffffff';ctx.fillRect(0,0,dw,dh);
       ctx.drawImage(tempImg,sx,sy,sw,sh,dx,dy,drawW,drawH);
     };
     tempImg.src=cropOriginal;
@@ -3802,10 +3914,29 @@ function loadSettings(){
   ['company','owner','tel','fax','email','zip','address','bank','account','notes','paydays','alertdays'].forEach(k=>{
     const el=document.getElementById('set-'+k);if(el)el.value=settings[k]||'';
   });
+  // defaultTax セレクトを構築
+  const dtEl=document.getElementById('set-defaultTax');
+  if(dtEl){ dtEl.innerHTML=taxOptions(settings.defaultTax||'10'); }
 }
 function saveSettings(){
   ['company','owner','tel','fax','email','zip','address','bank','account','notes','paydays','alertdays'].forEach(k=>{
     settings[k]=document.getElementById('set-'+k)?.value||'';
+  });
+  // defaultTax を保存
+  const dtEl=document.getElementById('set-defaultTax');
+  if(dtEl) settings.defaultTax=dtEl.value;
+  // 郵便番号を正規化（不正な値を除去）
+  if(settings.zip){
+    const zd=toHalf(settings.zip).replace(/[^0-9]/g,'').slice(0,7);
+    settings.zip=zd.length>3?zd.slice(0,3)+'-'+zd.slice(3):zd;
+  }
+  // Tel/FAXはautoTelで正規化してから保存
+  ['tel','fax'].forEach(k=>{
+    if(settings[k]){
+      const digits=toHalf(settings[k]).replace(/[^0-9]/g,'');
+      if(digits.length===11) settings[k]=digits.slice(0,3)+'-'+digits.slice(3,7)+'-'+digits.slice(7);
+      else if(digits.length===10) settings[k]=digits.slice(0,3)+'-'+digits.slice(3,6)+'-'+digits.slice(6);
+    }
   });
   persist();
   const msg=document.getElementById('settings-saved');
@@ -5325,6 +5456,58 @@ function downloadQR(){
 
 // ===== UNDO TOAST (body-level) =====
 // Already defined above — ensure body gets the undo toast div
+
+// ===== カレンダー顧客選択ヘルパー =====
+function buildJobCustSelect(selectedName){
+  const sel=document.getElementById('job-customer-select');
+  if(!sel)return;
+  sel.innerHTML='<option value="">（顧客を選択）</option>'
+    +customers.map(c=>`<option value="${c.name}" ${c.name===selectedName?'selected':''}>${c.name}${c.honorific?' '+c.honorific:''}</option>`).join('');
+  if(selectedName) sel.value=selectedName;
+}
+
+function onJobCustSelect(sel){
+  // 隠しinputにも同期
+  const hi=document.getElementById('job-customer');
+  if(hi) hi.value=sel.value;
+}
+
+function toggleJobNewCust(){
+  const area=document.getElementById('job-new-cust-area');
+  if(!area)return;
+  const show=area.style.display==='none';
+  area.style.display=show?'block':'none';
+  if(show){
+    document.getElementById('job-nc-name')?.focus();
+  }
+}
+
+function saveJobNewCust(){
+  const name=document.getElementById('job-nc-name')?.value.trim();
+  if(!name){showToast('顧客名を入力してください','#C0392B');return;}
+  const honorific=document.getElementById('job-nc-honorific')?.value||'御中';
+  const newCust={
+    id:'cust-'+Date.now(),
+    name,honorific,
+    tel:document.getElementById('job-nc-tel')?.value||'',
+    address:document.getElementById('job-nc-address')?.value||'',
+    fax:'',email:'',zip:'',dept:'',category:'',memo:'',contacts:[]
+  };
+  customers.push(newCust);
+  persist();
+  updateCustomerDatalist();
+  // セレクトに追加して選択
+  buildJobCustSelect(name);
+  const hi=document.getElementById('job-customer');
+  if(hi) hi.value=name;
+  // 新規入力エリアをリセット・非表示
+  document.getElementById('job-nc-name').value='';
+  document.getElementById('job-nc-tel').value='';
+  document.getElementById('job-nc-address').value='';
+  document.getElementById('job-new-cust-area').style.display='none';
+  showToast(`顧客「${name} ${honorific}」を登録しました ✓`);
+}
+
 // ===== MOBILE DRAWER =====
 const NAV_ITEMS=[
   {section:'メイン'},
@@ -5342,7 +5525,6 @@ const NAV_ITEMS=[
   {id:'templates',icon:'📦',label:'作業テンプレート'},
   {id:'payments',icon:'💴',label:'入金管理'},
   {id:'staff-report',icon:'📊',label:'スタッフ実績'},
-  {id:'branches',icon:'🏢',label:'拠点・支店'},
   {id:'csv-export',icon:'📤',label:'CSVエクスポート'},
   {id:'expenses',icon:'💸',label:'経費管理'},
   {id:'backup',icon:'🗄️',label:'バックアップ'},
