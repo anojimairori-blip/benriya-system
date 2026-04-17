@@ -738,7 +738,7 @@ if(typeof QRCode === 'undefined'){
     </div>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-item" id="nav-bulletin" onclick="showPage('bulletin',this)" style="background:var(--accent-light);border-left:3px solid var(--accent);margin-bottom:4px"><span class="nav-icon">📌</span><span class="nav-label">掲示板</span><span class="nav-tooltip">掲示板</span><span id="bulletin-badge" style="display:none;background:var(--red);color:white;font-size:10px;font-weight:700;padding:1px 5px;border-radius:99px;margin-left:auto"></span></div>
+    <div class="nav-item" id="nav-bulletin" onclick="showPage('bulletin',this)" style="background:var(--accent);color:white;border-radius:8px;margin:4px 8px 8px;padding:10px 12px;font-weight:700"><span class="nav-icon">📌</span><span class="nav-label" style="color:white">掲示板</span><span class="nav-tooltip">掲示板</span><span id="bulletin-badge" style="display:none;background:white;color:var(--accent);font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;margin-left:auto"></span></div>
     <div class="nav-section">メイン</div>
     <div class="nav-item" onclick="showPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">ホーム</span><span class="nav-tooltip">ホーム</span></div>
     <div class="nav-item" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">ダッシュボード</span><span class="nav-tooltip">ダッシュボード</span></div>
@@ -2236,6 +2236,70 @@ let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
 const APP_VERSION='v2.1';
+const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/benriya-system/main/index.html';
+
+// ===== バージョンチェック =====
+async function checkForUpdate(){
+  try{
+    const res=await fetch(VERSION_CHECK_URL+'?nocache='+Date.now());
+    if(!res.ok) return;
+    const text=await res.text();
+    const m=text.match(/const APP_VERSION='([^']+)'/);
+    if(!m) return;
+    const latest=m[1];
+    if(latest!==APP_VERSION){
+      showUpdateBanner(latest);
+    }
+  }catch(e){
+    // ネットワークエラーは無視
+  }
+}
+
+function showUpdateBanner(latest){
+  const existing=document.getElementById('update-banner');
+  if(existing) return;
+  const banner=document.createElement('div');
+  banner.id='update-banner';
+  banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#F39C12,#E67E22);color:white;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 2px 12px rgba(0,0,0,.2);font-family:inherit';
+  banner.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">🔄</span>
+      <div>
+        <div style="font-size:13px;font-weight:700">新しいバージョン ${latest} があります</div>
+        <div style="font-size:11px;opacity:.85">現在：${APP_VERSION} → 最新：${latest}　画面を更新すると最新版になります</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button onclick="hardReload()" style="background:white;color:#E67E22;border:none;padding:7px 16px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">
+        🔄 今すぐ更新
+      </button>
+      <button onclick="dismissUpdateBanner()" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.4);padding:7px 12px;border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer">
+        後で
+      </button>
+    </div>`;
+  document.body.prepend(banner);
+  // メインコンテンツを少し下げる
+  const app=document.getElementById('app-main');
+  if(app) app.style.paddingTop='52px';
+}
+
+function hardReload(){
+  // キャッシュを完全にクリアしてリロード
+  if('caches' in window){
+    caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).then(()=>{
+      window.location.reload(true);
+    });
+  } else {
+    window.location.reload(true);
+  }
+}
+
+function dismissUpdateBanner(){
+  const banner=document.getElementById('update-banner');
+  if(banner) banner.remove();
+  const app=document.getElementById('app-main');
+  if(app) app.style.paddingTop='';
+}
 let sysTitle=localStorage.getItem('sysTitle_v4')||'便利屋\n書類システム';
 let adminPin=localStorage.getItem('adminPin')||'1234'; // 初回ログイン後に必ず変更してください
 let isAdminUnlocked=false;
@@ -4350,6 +4414,9 @@ function initAppAfterAuth(){
   renderHome(); showPage('home',null,true);
   const ht=document.getElementById('home-title-h2');
   if(ht) ht.textContent=sysTitle.replace(/\n/,' ');
+  // バージョンチェック（起動30秒後に実行・毎時チェック）
+  setTimeout(checkForUpdate, 30000);
+  setInterval(checkForUpdate, 3600000); // 1時間ごと
 }
 
 
