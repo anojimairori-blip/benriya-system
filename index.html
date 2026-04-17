@@ -724,7 +724,7 @@ if(typeof QRCode === 'undefined'){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version">v20 Firebase</div>
+    <div class="logo-version" id="sidebar-version">v2.1</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -873,6 +873,18 @@ if(typeof QRCode === 'undefined'){
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')">＋ 見積書</button>
       <button class="btn btn-blue btn-sm" onclick="openNewDoc('請求書')">＋ 請求書</button>
       <button class="btn btn-primary btn-sm" onclick="openNewDoc('領収書')">＋ 領収書</button>
+    </div>
+  </div>
+  <div id="home-version-banner" style="background:linear-gradient(135deg,var(--accent-light),var(--surface2));border:1px solid var(--accent-light);border-radius:10px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">🔖</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.1</div>
+        <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年4月</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);text-align:right">
+      便利屋書類システム<br>Powered by Firebase
     </div>
   </div>
   <div class="content">
@@ -2223,6 +2235,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
+const APP_VERSION='v2.1';
 let sysTitle=localStorage.getItem('sysTitle_v4')||'便利屋\n書類システム';
 let adminPin=localStorage.getItem('adminPin')||'1234'; // 初回ログイン後に必ず変更してください
 let isAdminUnlocked=false;
