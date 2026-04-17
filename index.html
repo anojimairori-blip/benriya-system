@@ -2,6 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="page-title">便利屋 書類発行システム</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
@@ -738,7 +741,7 @@ if(typeof QRCode === 'undefined'){
     </div>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-item" id="nav-bulletin" onclick="showPage('bulletin',this)" style="background:var(--accent);color:white;border-radius:8px;margin:4px 8px 8px;padding:10px 12px;font-weight:700"><span class="nav-icon">📌</span><span class="nav-label" style="color:white">掲示板</span><span class="nav-tooltip">掲示板</span><span id="bulletin-badge" style="display:none;background:white;color:var(--accent);font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;margin-left:auto"></span></div>
+    <div class="nav-item" id="nav-bulletin" onclick="showPage('bulletin',this)" style="background:#E67E22;color:white;border-radius:8px;margin:4px 8px 8px;padding:10px 12px;font-weight:700"><span class="nav-icon">📌</span><span class="nav-label" style="color:white">掲示板</span><span class="nav-tooltip">掲示板</span><span id="bulletin-badge" style="display:none;background:white;color:#E67E22;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;margin-left:auto"></span></div>
     <div class="nav-section">メイン</div>
     <div class="nav-item" onclick="showPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">ホーム</span><span class="nav-tooltip">ホーム</span></div>
     <div class="nav-item" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">ダッシュボード</span><span class="nav-tooltip">ダッシュボード</span></div>
@@ -5861,8 +5864,10 @@ function buildMobileDrawer(){
   nav.innerHTML=NAV_ITEMS.map(item=>{
     if(item.section) return `<div class="nav-section">${item.section}</div>`;
     const onclick=item.admin?`requireAdmin('employees',this)`:`showPageMobile('${item.id}',this)`;
-    return `<div class="nav-item" data-page="${item.id}" onclick="${onclick}">
-      <span class="nav-icon">${item.icon}</span><span>${item.label}</span>
+    const style=item.id==='bulletin'?' style="background:#E67E22;border-radius:8px;margin:4px 8px;font-weight:700"':'';
+    const labelStyle=item.id==='bulletin'?' style="color:white"':'';
+    return `<div class="nav-item" data-page="${item.id}" onclick="${onclick}"${style}>
+      <span class="nav-icon">${item.icon}</span><span${labelStyle}>${item.label}</span>
     </div>`;
   }).join('');
 }
