@@ -673,6 +673,15 @@ if(typeof QRCode === 'undefined'){
   window._fbReady = true;
   document.dispatchEvent(new Event('fb-ready'));
 </script>
+<script>
+// Service Worker登録（キャッシュ強制無効化）
+if('serviceWorker' in navigator){
+  // 既存のService Workerを全て削除
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(r=>r.unregister());
+  });
+}
+</script>
 </head>
 <body>
 
@@ -2241,10 +2250,20 @@ let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
 const APP_VERSION='v2.1';
 const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/benriya-system/main/index.html';
 
+// ページ起動時に前回バージョンと比較（即時チェック）
+(function(){
+  const lastVer=localStorage.getItem('last_app_version');
+  if(lastVer && lastVer!==APP_VERSION){
+    // バージョンが変わっていたら即座にバナー予約
+    window._showUpdateBannerOnLoad=lastVer;
+  }
+  localStorage.setItem('last_app_version', APP_VERSION);
+})();
+
 // ===== バージョンチェック =====
 async function checkForUpdate(){
   try{
-    const res=await fetch(VERSION_CHECK_URL+'?nocache='+Date.now());
+    const res=await fetch(VERSION_CHECK_URL+'?nocache='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
     if(!res.ok) return;
     const text=await res.text();
     const m=text.match(/const APP_VERSION='([^']+)'/);
@@ -4379,6 +4398,11 @@ async function _doRemoveAccessEmail(email){
 
 // アプリ初期化（Firebase認証後またはローカルモード）
 function initAppAfterAuth(){
+  // 前回と異なるバージョンで起動した場合はバナー表示
+  if(window._showUpdateBannerOnLoad){
+    showToast('✅ システムが v'+APP_VERSION+' に更新されました！', '#27AE60');
+    window._showUpdateBannerOnLoad=null;
+  }
   loadSidebarTitle(); loadSettings(); loadLogo();
   renderAll(); buildMonthlyChart(); initReportYears(); initSrYears();
   renderCalendar(); renderTemplates(); renderAlerts();
@@ -4417,9 +4441,9 @@ function initAppAfterAuth(){
   renderHome(); showPage('home',null,true);
   const ht=document.getElementById('home-title-h2');
   if(ht) ht.textContent=sysTitle.replace(/\n/,' ');
-  // バージョンチェック（起動30秒後に実行・毎時チェック）
-  setTimeout(checkForUpdate, 30000);
-  setInterval(checkForUpdate, 3600000); // 1時間ごと
+  // バージョンチェック（起動5秒後・以降30分ごと）
+  setTimeout(checkForUpdate, 5000);
+  setInterval(checkForUpdate, 1800000); // 30分ごと
 }
 
 
