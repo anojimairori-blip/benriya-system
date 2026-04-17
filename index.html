@@ -982,8 +982,8 @@ if(typeof QRCode === 'undefined'){
         <div class="form-group"><label>代表者名</label><input type="text" id="set-owner" placeholder="例：田中 太郎"></div>
       </div>
       <div class="form-row cols2">
-        <div class="form-group"><label>電話番号</label><input type="text" id="set-tel" placeholder="例：011-234-5678" oninput="autoTel(this)" onblur="autoTel(this)"></div>
-        <div class="form-group"><label>FAX番号</label><input type="text" id="set-fax" placeholder="例：011-234-5679" oninput="autoTel(this)" onblur="autoTel(this)"></div>
+        <div class="form-group"><label>電話番号</label><input type="text" id="set-tel" placeholder="例：011-234-5678" onblur="autoTel(this)"></div>
+        <div class="form-group"><label>FAX番号</label><input type="text" id="set-fax" placeholder="例：011-234-5679" onblur="autoTel(this)"></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>メールアドレス</label><input type="text" id="set-email" placeholder="例：info@example.com"></div>
@@ -1406,7 +1406,7 @@ if(typeof QRCode === 'undefined'){
             </div>
           </div>
           <div class="form-row cols2" style="margin-bottom:8px">
-            <div class="form-group"><label>電話番号</label><input type="text" id="nc-tel" placeholder="090-1234-5678" oninput="autoTel(this)" onblur="autoTel(this)"></div>
+            <div class="form-group"><label>電話番号</label><input type="text" id="nc-tel" placeholder="090-1234-5678" onblur="autoTel(this)"></div>
             <div class="form-group"></div>
           </div>
           <div class="form-row cols3" style="margin-bottom:8px">
@@ -1564,12 +1564,12 @@ if(typeof QRCode === 'undefined'){
         </div>
       </div>
       <div class="form-group"><label>電話番号</label>
-        <input type="text" id="cust-tel" placeholder="例：090-1234-5678" oninput="autoTel(this)" onblur="autoTel(this)">
+        <input type="text" id="cust-tel" placeholder="例：090-1234-5678" onblur="autoTel(this)">
       </div>
     </div>
     <div class="form-row cols2">
       <div class="form-group"><label>FAX番号</label>
-        <input type="text" id="cust-fax" placeholder="例：011-234-5679" oninput="autoTel(this)" onblur="autoTel(this)">
+        <input type="text" id="cust-fax" placeholder="例：011-234-5679" onblur="autoTel(this)">
       </div>
       <div class="form-group"><label>担当部署</label><input type="text" id="cust-dept" placeholder="例：営業部"></div>
     </div>
@@ -1653,7 +1653,7 @@ if(typeof QRCode === 'undefined'){
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
             <div class="form-group" style="margin:0"><label>電話番号</label>
-              <input type="text" id="job-nc-tel" placeholder="090-1234-5678" oninput="autoTel(this)"
+              <input type="text" id="job-nc-tel" placeholder="090-1234-5678"
                 style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
             </div>
             <div class="form-group" style="margin:0"><label>住所</label>
@@ -1873,7 +1873,7 @@ if(typeof QRCode === 'undefined'){
       </div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>電話番号</label><input type="text" id="emp-tel" placeholder="例：090-1234-5678" oninput="autoTel(this)" onblur="autoTel(this)"></div>
+      <div class="form-group"><label>電話番号</label><input type="text" id="emp-tel" placeholder="例：090-1234-5678" onblur="autoTel(this)"></div>
       <div class="form-group"><label>メールアドレス</label><input type="text" id="emp-email" placeholder="例：tanaka@example.com"></div>
     </div>
     <div class="form-row cols2">
@@ -1960,8 +1960,8 @@ if(typeof QRCode === 'undefined'){
       </div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>電話番号</label><input type="text" id="br-tel" placeholder="例：011-234-5678" oninput="autoTel(this)" onblur="autoTel(this)"></div>
-      <div class="form-group"><label>FAX</label><input type="text" id="br-fax" placeholder="例：011-234-5679" oninput="autoTel(this)" onblur="autoTel(this)"></div>
+      <div class="form-group"><label>電話番号</label><input type="text" id="br-tel" placeholder="例：011-234-5678" onblur="autoTel(this)"></div>
+      <div class="form-group"><label>FAX</label><input type="text" id="br-fax" placeholder="例：011-234-5679" onblur="autoTel(this)"></div>
     </div>
     <div class="form-row"><div class="form-group"><label>住所</label><input type="text" id="br-address" placeholder="例：北海道札幌市中央区○○1-2-3"></div></div>
     <div class="form-row"><div class="form-group"><label>メモ</label><textarea id="br-memo" placeholder="備考など"></textarea></div></div>
@@ -2436,26 +2436,19 @@ function toHalf(str){
 // ===== 電話・FAX 自動フォーマット =====
 // 全角変換 + 数字以外除去 + ハイフン自動挿入
 function autoTel(input){
-  const raw=toHalf(input.value).replace(/[^0-9]/g,'').slice(0,11);
-  if(!raw){ input.value=''; input.dataset.prevDigits=''; return; }
-  if(raw===(input.dataset.prevDigits||'')) return;
-  input.dataset.prevDigits=raw;
-  let v=raw;
-  const len=raw.length;
-  if(len===11){
-    v=raw.slice(0,3)+'-'+raw.slice(3,7)+'-'+raw.slice(7);
-  } else if(len===10){
-    if(/^(0120|0800|0570|0990|0180)/.test(raw)){
-      v=raw.slice(0,4)+'-'+raw.slice(4,7)+'-'+raw.slice(7);
-    } else if(/^(0155|0156|0157|0158|0163|0164|0165|0166|0167|0123|0124|0125|0126|0133|0134|0135|0136|0137|0138|0139|0143|0144|0145)/.test(raw)){
-      v=raw.slice(0,4)+'-'+raw.slice(4,6)+'-'+raw.slice(6);
-    } else {
-      v=raw.slice(0,3)+'-'+raw.slice(3,6)+'-'+raw.slice(6);
-    }
-  } else if(len===9){
-    v=raw.slice(0,2)+'-'+raw.slice(2,6)+'-'+raw.slice(6);
+  // 数字だけ取り出して最大11桁
+  const d=toHalf(input.value).replace(/[^0-9]/g,'').slice(0,11);
+  if(!d){input.value='';return;}
+  let v=d;
+  if(d.length===11)      v=d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7);
+  else if(d.length===10){
+    if(/^(0120|0800|0570|0990|0180)/.test(d)) v=d.slice(0,4)+'-'+d.slice(4,7)+'-'+d.slice(7);
+    else if(/^(0155|0156|0157|0158|0163|0164|0165|0166|0167|0123|0124|0125|0126|0133|0134|0135|0136|0137|0138|0139|0143|0144|0145)/.test(d)) v=d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6);
+    else v=d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
   }
-  input.value=v;
+  else if(d.length===9)  v=d.slice(0,2)+'-'+d.slice(2,6)+'-'+d.slice(6);
+  // 変化がなければ何もしない（二重変換防止）
+  if(input.value!==v) input.value=v;
 }
 
 // ===== 郵便番号 自動フォーマット =====
@@ -3507,7 +3500,7 @@ function addContactField(data){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
       <div class="form-group"><label>担当者名</label><input type="text" value="${data?.name||''}" placeholder="例：田中 花子"></div>
       <div class="form-group"><label>役職・部署</label><input type="text" value="${data?.role||''}" placeholder="例：現場担当"></div>
-      <div class="form-group"><label>電話番号</label><input type="text" value="${data?.tel||''}" placeholder="例：090-1234-5678" oninput="autoTel(this)"></div>
+      <div class="form-group"><label>電話番号</label><input type="text" value="${data?.tel||''}" placeholder="例：090-1234-5678"></div>
       <div class="form-group"><label>メール</label><input type="text" value="${data?.email||''}" placeholder="例：tanaka@example.com"></div>
     </div>`;
   c.appendChild(div);
