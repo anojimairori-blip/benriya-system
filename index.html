@@ -152,6 +152,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .main{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;height:100vh}
 .main-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:11;gap:12px;flex-wrap:wrap}
 .main-header h2{font-size:16px;font-weight:700;white-space:nowrap}
+.btn-full-label{display:inline}
+.btn-short-label{display:none}
 .header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 /* HISTORY NAV BAR */
@@ -561,8 +563,16 @@ select{appearance:auto}
   /* Show hamburger */
   .hamburger{display:flex;align-items:center;justify-content:center}
   /* Mobile header adjustments */
-  .main-header{padding:0 10px;height:52px}
-  .main-header h2{font-size:14px}
+  .main-header{padding:0 8px;height:52px;flex-wrap:nowrap;overflow:hidden}
+  .main-header h2{font-size:13px;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+  .main-header .header-actions{flex-shrink:0;display:flex;gap:4px}
+  .main-header .header-actions .btn{padding:5px 8px;font-size:11px;white-space:nowrap}
+  /* モバイルでバージョンバナー強調 */
+  #home-version-banner{padding:12px 14px !important}
+  #home-version-banner .version-right{display:none}
+  /* モバイル：短縮ラベル表示 */
+  .btn-full-label{display:none}
+  .btn-short-label{display:inline}
   .nav-history-bar{padding:5px 10px;top:52px}
   /* Mobile drawer */
   .mobile-drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--accent);color:white;z-index:160;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden}
@@ -713,7 +723,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.3</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.3.2</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -739,7 +749,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.3</div>
+    <div class="logo-version" id="sidebar-version">v2.3.2</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -885,20 +895,20 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <h2 id="home-title-h2">📋 便利屋 書類システム</h2>
     <div class="header-actions">
-      <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')">＋ 見積書</button>
-      <button class="btn btn-blue btn-sm" onclick="openNewDoc('請求書')">＋ 請求書</button>
-      <button class="btn btn-primary btn-sm" onclick="openNewDoc('領収書')">＋ 領収書</button>
+      <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
+      <button class="btn btn-blue btn-sm" onclick="openNewDoc('請求書')"><span class="btn-full-label">＋ 請求書</span><span class="btn-short-label">＋請求</span></button>
+      <button class="btn btn-primary btn-sm" onclick="openNewDoc('領収書')"><span class="btn-full-label">＋ 領収書</span><span class="btn-short-label">＋領収</span></button>
     </div>
   </div>
   <div id="home-version-banner" style="background:linear-gradient(135deg,var(--accent-light),var(--surface2));border:1px solid var(--accent-light);border-radius:10px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">🔖</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.3</div>
-        <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年4月</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.3.2</div>
+        <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年04月17日</div>
       </div>
     </div>
-    <div style="font-size:11px;color:var(--text3);text-align:right">
+    <div class="version-right" style="font-size:11px;color:var(--text3);text-align:right">
       便利屋書類システム<br>Powered by Firebase
     </div>
   </div>
@@ -2266,7 +2276,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.3';
+const APP_VERSION='v2.3.2';
 const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/benriya-system/main/index.html';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -5132,22 +5142,27 @@ async function handleAiReceiptScan(ev){
 
     const d=result.data;
 
-    // フォームに自動入力
-    if(d.date) document.getElementById('exp-date').value=d.date;
-    if(d.category) document.getElementById('exp-category').value=d.category;
-    if(d.amount_pretax) document.getElementById('exp-amount').value=d.amount_pretax;
+    // フォームに自動入力（要素存在チェック付き）
+    const setVal=(id,val)=>{
+      if(val===undefined||val===null||val==='') return;
+      const el=document.getElementById(id);
+      if(el) el.value=val;
+    };
+
+    setVal('exp-date', d.date);
+    setVal('exp-category', d.category);
+    if(d.amount_pretax) setVal('exp-amount', d.amount_pretax);
     else if(d.amount_total){
-      // 税込しかわからない場合は税抜を逆算
       const rate=parseFloat(d.tax_rate||'10')/100;
-      document.getElementById('exp-amount').value=Math.round(d.amount_total/(1+rate));
+      setVal('exp-amount', Math.round(d.amount_total/(1+rate)));
     }
-    if(d.tax_rate) document.getElementById('exp-tax').value=d.tax_rate;
-    if(d.payment_method) document.getElementById('exp-payment').value=d.payment_method;
-    if(d.vendor||d.memo) document.getElementById('exp-desc').value=[d.vendor,d.memo].filter(Boolean).join(' / ');
-    if(d.memo&&d.vendor) document.getElementById('exp-memo').value=d.memo;
+    setVal('exp-tax', d.tax_rate);
+    setVal('exp-payment-method', d.payment_method);
+    if(d.vendor||d.memo) setVal('exp-desc', [d.vendor,d.memo].filter(Boolean).join(' / '));
+    if(d.memo&&d.vendor) setVal('exp-memo', d.memo);
 
     // 税込金額を再計算表示
-    if(typeof updateExpTotal==='function') updateExpTotal();
+    if(typeof calcExpTax==='function') calcExpTax();
 
     statusEl.style.background='#E6F2EA';
     statusEl.style.color='#2D5A3D';
