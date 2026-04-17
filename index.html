@@ -1873,7 +1873,7 @@ if(typeof QRCode === 'undefined'){
       </div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>電話番号</label><input type="text" id="emp-tel" placeholder="例：090-1234-5678"></div>
+      <div class="form-group"><label>電話番号</label><input type="text" id="emp-tel" placeholder="例：090-1234-5678" oninput="autoTel(this)" onblur="autoTel(this)"></div>
       <div class="form-group"><label>メールアドレス</label><input type="text" id="emp-email" placeholder="例：tanaka@example.com"></div>
     </div>
     <div class="form-row cols2">
@@ -1960,8 +1960,8 @@ if(typeof QRCode === 'undefined'){
       </div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>電話番号</label><input type="text" id="br-tel" placeholder="例：011-234-5678"></div>
-      <div class="form-group"><label>FAX</label><input type="text" id="br-fax" placeholder="例：011-234-5679"></div>
+      <div class="form-group"><label>電話番号</label><input type="text" id="br-tel" placeholder="例：011-234-5678" oninput="autoTel(this)" onblur="autoTel(this)"></div>
+      <div class="form-group"><label>FAX</label><input type="text" id="br-fax" placeholder="例：011-234-5679" oninput="autoTel(this)" onblur="autoTel(this)"></div>
     </div>
     <div class="form-row"><div class="form-group"><label>住所</label><input type="text" id="br-address" placeholder="例：北海道札幌市中央区○○1-2-3"></div></div>
     <div class="form-row"><div class="form-group"><label>メモ</label><textarea id="br-memo" placeholder="備考など"></textarea></div></div>
@@ -2436,33 +2436,25 @@ function toHalf(str){
 // ===== 電話・FAX 自動フォーマット =====
 // 全角変換 + 数字以外除去 + ハイフン自動挿入
 function autoTel(input){
-  // 全角→半角変換し、数字とハイフン以外を除去
-  const raw=toHalf(input.value);
-  // 数字のみ抽出（最大11桁）
-  const digits=raw.replace(/[^0-9]/g,'').slice(0,11);
-  if(!digits){ input.value=''; return; }
-
-  // 前回と同じdigitsなら再変換しない（二重変換防止）
-  const prevDigits=(input.dataset.prevDigits||'');
-  if(digits===prevDigits) return;
-  input.dataset.prevDigits=digits;
-
-  let v=digits;
-  if(digits.length===11){
-    v=digits.slice(0,3)+'-'+digits.slice(3,7)+'-'+digits.slice(7);
-  } else if(digits.length===10){
-    if(digits.startsWith('0120')||digits.startsWith('0800')||digits.startsWith('0570')){
-      v=digits.slice(0,4)+'-'+digits.slice(4,7)+'-'+digits.slice(7);
-    } else if(digits.startsWith('0155')||digits.startsWith('0166')||digits.startsWith('0143')||digits.startsWith('0144')||digits.startsWith('0145')||digits.startsWith('0123')||digits.startsWith('0135')||digits.startsWith('0136')||digits.startsWith('0138')||digits.startsWith('0152')||digits.startsWith('0153')||digits.startsWith('0156')||digits.startsWith('0157')||digits.startsWith('0158')||digits.startsWith('0162')||digits.startsWith('0163')||digits.startsWith('0164')||digits.startsWith('0165')||digits.startsWith('0167')){
-      // 北海道の4桁市外局番
-      v=digits.slice(0,4)+'-'+digits.slice(4,6)+'-'+digits.slice(6);
+  const raw=toHalf(input.value).replace(/[^0-9]/g,'').slice(0,11);
+  if(!raw){ input.value=''; input.dataset.prevDigits=''; return; }
+  if(raw===(input.dataset.prevDigits||'')) return;
+  input.dataset.prevDigits=raw;
+  let v=raw;
+  const len=raw.length;
+  if(len===11){
+    v=raw.slice(0,3)+'-'+raw.slice(3,7)+'-'+raw.slice(7);
+  } else if(len===10){
+    if(/^(0120|0800|0570|0990|0180)/.test(raw)){
+      v=raw.slice(0,4)+'-'+raw.slice(4,7)+'-'+raw.slice(7);
+    } else if(/^(0155|0156|0157|0158|0163|0164|0165|0166|0167|0123|0124|0125|0126|0133|0134|0135|0136|0137|0138|0139|0143|0144|0145)/.test(raw)){
+      v=raw.slice(0,4)+'-'+raw.slice(4,6)+'-'+raw.slice(6);
     } else {
-      v=digits.slice(0,3)+'-'+digits.slice(3,6)+'-'+digits.slice(6);
+      v=raw.slice(0,3)+'-'+raw.slice(3,6)+'-'+raw.slice(6);
     }
-  } else if(digits.length===9){
-    v=digits.slice(0,2)+'-'+digits.slice(2,6)+'-'+digits.slice(6);
+  } else if(len===9){
+    v=raw.slice(0,2)+'-'+raw.slice(2,6)+'-'+raw.slice(6);
   }
-  // 入力途中（桁が揃っていない）はそのまま表示
   input.value=v;
 }
 
