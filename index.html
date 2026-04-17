@@ -736,7 +736,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.1</div>
+    <div class="logo-version" id="sidebar-version">v2.2</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -891,7 +891,7 @@ if('serviceWorker' in navigator){
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">🔖</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.1</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.2</div>
         <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年4月</div>
       </div>
     </div>
@@ -2177,16 +2177,19 @@ if('serviceWorker' in navigator){
       </div>
     </div>
     <div class="form-row"><div class="form-group"><label>メモ・備考</label><textarea id="exp-memo" placeholder="領収書番号など"></textarea></div></div>
-    <!-- Receipt photo -->
+    <!-- Receipt photo + AI読み取り -->
     <div style="margin-top:4px">
       <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px">領収書写真</label>
       <input type="file" id="exp-receipt-file" accept="image/*" style="display:none" onchange="handleExpReceipt(event)">
+      <input type="file" id="exp-ai-scan-file" accept="image/*" capture="environment" style="display:none" onchange="handleAiReceiptScan(event)">
       <div id="exp-receipt-preview" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('exp-receipt-file').click()">📷 領収書を撮影・選択</button>
+        <button class="btn btn-primary btn-sm" onclick="document.getElementById('exp-ai-scan-file').click()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">🤖 AIで自動読み取り</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('exp-receipt-file').click()">📷 写真のみ添付</button>
         <span id="exp-receipt-name" style="font-size:12px;color:var(--text3)"></span>
         <img id="exp-receipt-thumb" style="display:none;width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer" onclick="viewExpReceiptThumb()" alt="領収書">
         <button id="exp-receipt-del" style="display:none" class="btn btn-danger btn-sm" onclick="clearExpReceipt()">削除</button>
       </div>
+      <div id="ai-scan-status" style="display:none;margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13px"></div>
     </div>
   </div>
   <div class="modal-footer">
@@ -2247,7 +2250,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.1';
+const APP_VERSION='v2.2';
 const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/benriya-system/main/index.html';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -5051,6 +5054,96 @@ function viewExpReceiptThumb(){
   document.getElementById('lightbox-img').src=currentExpenseReceipt;
   document.getElementById('lightbox-caption').textContent='領収書写真';
   document.getElementById('lightbox-modal').classList.add('open');
+}
+
+// ===== AIレシート読み取り =====
+async function handleAiReceiptScan(ev){
+  const file=ev.target.files[0];
+  if(!file)return;
+  if(file.size>5*1024*1024){
+    showToast('画像は5MB以下にしてください','#C0392B');
+    ev.target.value='';
+    return;
+  }
+
+  const statusEl=document.getElementById('ai-scan-status');
+  statusEl.style.display='block';
+  statusEl.style.background='var(--accent-light)';
+  statusEl.style.color='var(--accent)';
+  statusEl.innerHTML='🤖 <strong>AIが読み取り中...</strong>（5〜10秒程度）';
+
+  try{
+    // 画像をBase64に変換
+    const base64=await new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=e=>{
+        const result=e.target.result;
+        // data:image/jpeg;base64, を除去
+        const base64Only=result.split(',')[1];
+        resolve({base64:base64Only,full:result,type:file.type});
+      };
+      reader.onerror=reject;
+      reader.readAsDataURL(file);
+    });
+
+    // 写真として登録
+    currentExpenseReceipt=base64.full;
+    document.getElementById('exp-receipt-name').textContent='✓ AI読み取り完了';
+    const thumb=document.getElementById('exp-receipt-thumb');
+    const del=document.getElementById('exp-receipt-del');
+    if(thumb){thumb.src=currentExpenseReceipt;thumb.style.display='block';}
+    if(del) del.style.display='inline-flex';
+
+    // Cloudflare Workers経由でClaude APIに送信
+    const res=await fetch('/api/receipt-ocr',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        image:base64.base64,
+        mediaType:base64.type
+      })
+    });
+
+    const result=await res.json();
+
+    if(!res.ok||result.error){
+      statusEl.style.background='#FDE5DD';
+      statusEl.style.color='#C0392B';
+      statusEl.innerHTML='❌ <strong>読み取りエラー</strong><br>'+(result.error||'不明なエラー')+'<br><span style="font-size:11px">手動で入力してください</span>';
+      return;
+    }
+
+    const d=result.data;
+
+    // フォームに自動入力
+    if(d.date) document.getElementById('exp-date').value=d.date;
+    if(d.category) document.getElementById('exp-category').value=d.category;
+    if(d.amount_pretax) document.getElementById('exp-amount').value=d.amount_pretax;
+    else if(d.amount_total){
+      // 税込しかわからない場合は税抜を逆算
+      const rate=parseFloat(d.tax_rate||'10')/100;
+      document.getElementById('exp-amount').value=Math.round(d.amount_total/(1+rate));
+    }
+    if(d.tax_rate) document.getElementById('exp-tax').value=d.tax_rate;
+    if(d.payment_method) document.getElementById('exp-payment').value=d.payment_method;
+    if(d.vendor||d.memo) document.getElementById('exp-desc').value=[d.vendor,d.memo].filter(Boolean).join(' / ');
+    if(d.memo&&d.vendor) document.getElementById('exp-memo').value=d.memo;
+
+    // 税込金額を再計算表示
+    if(typeof updateExpTotal==='function') updateExpTotal();
+
+    statusEl.style.background='#E6F2EA';
+    statusEl.style.color='#2D5A3D';
+    statusEl.innerHTML='✅ <strong>読み取り完了！</strong> 内容を確認して保存してください';
+    setTimeout(()=>{statusEl.style.display='none';},5000);
+
+  }catch(e){
+    statusEl.style.background='#FDE5DD';
+    statusEl.style.color='#C0392B';
+    statusEl.innerHTML='❌ <strong>通信エラー</strong>: '+e.message;
+  }finally{
+    ev.target.value='';
+  }
 }
 
 function saveExpense(){
