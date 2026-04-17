@@ -738,6 +738,7 @@ if(typeof QRCode === 'undefined'){
     </div>
   </div>
   <nav class="sidebar-nav">
+    <div class="nav-item" id="nav-bulletin" onclick="showPage('bulletin',this)" style="background:var(--accent-light);border-left:3px solid var(--accent);margin-bottom:4px"><span class="nav-icon">📌</span><span class="nav-label">掲示板</span><span class="nav-tooltip">掲示板</span><span id="bulletin-badge" style="display:none;background:var(--red);color:white;font-size:10px;font-weight:700;padding:1px 5px;border-radius:99px;margin-left:auto"></span></div>
     <div class="nav-section">メイン</div>
     <div class="nav-item" onclick="showPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">ホーム</span><span class="nav-tooltip">ホーム</span></div>
     <div class="nav-item" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">ダッシュボード</span><span class="nav-tooltip">ダッシュボード</span></div>
@@ -775,6 +776,96 @@ if(typeof QRCode === 'undefined'){
 </div>
 
 <!-- HOME (起動画面) -->
+<!-- BULLETIN BOARD -->
+<div id="page-bulletin" class="page">
+  <div class="main-header">
+    <h2>📌 掲示板</h2>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="openBulletinModal()">＋ 新規投稿</button>
+    </div>
+  </div>
+  <div class="content">
+    <!-- お知らせ一覧 -->
+    <div id="bulletin-list"></div>
+  </div>
+</div>
+
+<!-- BULLETIN DETAIL MODAL -->
+<div class="modal-overlay" id="bulletin-detail-modal">
+<div class="modal" style="max-width:600px">
+  <div class="modal-header">
+    <h3 id="bulletin-detail-title">お知らせ</h3>
+    <button class="close-btn" onclick="closeModal('bulletin-detail-modal')">✕</button>
+  </div>
+  <div class="modal-body" id="bulletin-detail-body"></div>
+  <div class="modal-footer" id="bulletin-detail-footer">
+    <button class="btn btn-secondary" onclick="closeModal('bulletin-detail-modal')">閉じる</button>
+  </div>
+</div>
+</div>
+
+<!-- BULLETIN EDIT MODAL -->
+<div class="modal-overlay" id="bulletin-modal">
+<div class="modal" style="max-width:600px">
+  <div class="modal-header">
+    <h3 id="bulletin-modal-title">新規投稿</h3>
+    <button class="close-btn" onclick="closeModal('bulletin-modal')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group"><label>タイトル ＊</label><input type="text" id="bulletin-title"></div>
+    </div>
+    <div class="form-row cols2">
+      <div class="form-group">
+        <label>重要度</label>
+        <div style="display:flex;gap:4px;align-items:center;margin-top:4px" id="bulletin-stars-input">
+          <span class="bstar" data-v="1" onclick="setBulletinStar(1)" style="font-size:22px;cursor:pointer;opacity:0.3">★</span>
+          <span class="bstar" data-v="2" onclick="setBulletinStar(2)" style="font-size:22px;cursor:pointer;opacity:0.3">★</span>
+          <span class="bstar" data-v="3" onclick="setBulletinStar(3)" style="font-size:22px;cursor:pointer;opacity:0.3">★</span>
+          <span class="bstar" data-v="4" onclick="setBulletinStar(4)" style="font-size:22px;cursor:pointer;opacity:0.3">★</span>
+          <span class="bstar" data-v="5" onclick="setBulletinStar(5)" style="font-size:22px;cursor:pointer;opacity:0.3">★</span>
+          <span id="bulletin-star-label" style="font-size:12px;color:var(--text2);margin-left:6px">なし</span>
+        </div>
+        <input type="hidden" id="bulletin-priority" value="0">
+      </div>
+      <div class="form-group">
+        <label>カテゴリ</label>
+        <select id="bulletin-category" style="padding:9px 12px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none;width:100%">
+          <option value="">（なし）</option>
+          <option value="お知らせ">📢 お知らせ</option>
+          <option value="注意">⚠️ 注意</option>
+          <option value="緊急">🚨 緊急</option>
+          <option value="業務連絡">📋 業務連絡</option>
+          <option value="その他">📌 その他</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>本文</label>
+        <textarea id="bulletin-body" style="min-height:140px;line-height:1.7"></textarea>
+      </div>
+    </div>
+    <div class="form-row cols2">
+      <div class="form-group">
+        <label>掲載期限（任意）</label>
+        <input type="date" id="bulletin-expiry">
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:24px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+          <input type="checkbox" id="bulletin-pinned" style="width:15px;height:15px;accent-color:var(--accent)">
+          📌 上部に固定表示
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="closeModal('bulletin-modal')">キャンセル</button>
+    <button class="btn btn-primary" onclick="saveBulletin()">💾 投稿する</button>
+  </div>
+</div>
+</div>
+
 <div id="page-home" class="page active">
   <div class="main-header">
     <h2 id="home-title-h2">📋 便利屋 書類システム</h2>
@@ -978,15 +1069,15 @@ if(typeof QRCode === 'undefined'){
       <!-- 基本情報 -->
       <div class="section-title" style="margin-bottom:12px">基本情報</div>
       <div class="form-row cols2">
-        <div class="form-group"><label>会社名・屋号</label><input type="text" id="set-company" placeholder="例：なんでも便利屋 田中"></div>
-        <div class="form-group"><label>代表者名</label><input type="text" id="set-owner" placeholder="例：田中 太郎"></div>
+        <div class="form-group"><label>会社名・屋号</label><input type="text" id="set-company" placeholder="なんでも便利屋 田中"></div>
+        <div class="form-group"><label>代表者名</label><input type="text" id="set-owner" placeholder="田中 太郎"></div>
       </div>
       <div class="form-row cols2">
-        <div class="form-group"><label>電話番号</label><input type="text" id="set-tel" placeholder="例：011-234-5678" onblur="autoTel(this)"></div>
-        <div class="form-group"><label>FAX番号</label><input type="text" id="set-fax" placeholder="例：011-234-5679" onblur="autoTel(this)"></div>
+        <div class="form-group"><label>電話番号</label><input type="text" id="set-tel" placeholder="011-234-5678" onblur="autoTel(this)"></div>
+        <div class="form-group"><label>FAX番号</label><input type="text" id="set-fax" placeholder="011-234-5679" onblur="autoTel(this)"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>メールアドレス</label><input type="text" id="set-email" placeholder="例：info@example.com"></div>
+        <div class="form-group"><label>メールアドレス</label><input type="text" id="set-email" placeholder="info@example.com"></div>
       </div>
 
       <!-- 住所（郵便番号連動） -->
@@ -996,7 +1087,7 @@ if(typeof QRCode === 'undefined'){
           <label>郵便番号</label>
           <div style="display:flex;gap:6px;align-items:center">
             <span style="font-size:14px;color:var(--text2)">〒</span>
-            <input type="text" id="set-zip" placeholder="例：060-0001" maxlength="9"
+            <input type="text" id="set-zip" placeholder="" maxlength="9"
               style="flex:1" oninput="autoZip(this,'set-address','set-zip-status')">
             <button class="btn btn-secondary btn-sm" onclick="lookupZip('set-zip','set-address','set-zip-status')">住所を取得</button>
           </div>
@@ -1007,15 +1098,15 @@ if(typeof QRCode === 'undefined'){
       <div class="form-row">
         <div class="form-group">
           <label>住所</label>
-          <input type="text" id="set-address" placeholder="例：北海道札幌市中央区○○1-2-3">
+          <input type="text" id="set-address" placeholder="北海道札幌市中央区○○1-2-3">
         </div>
       </div>
 
       <!-- 振込先 -->
       <div class="section-title" style="margin-bottom:12px">振込先情報</div>
       <div class="form-row cols2">
-        <div class="form-group"><label>振込先銀行</label><input type="text" id="set-bank" placeholder="例：北洋銀行 札幌支店"></div>
-        <div class="form-group"><label>口座番号</label><input type="text" id="set-account" placeholder="例：普通 1234567 タナカタロウ"></div>
+        <div class="form-group"><label>振込先銀行</label><input type="text" id="set-bank" placeholder="北洋銀行 札幌支店"></div>
+        <div class="form-group"><label>口座番号</label><input type="text" id="set-account" placeholder="普通 1234567 タナカタロウ"></div>
       </div>
 
       <!-- アラート設定 -->
@@ -1025,19 +1116,11 @@ if(typeof QRCode === 'undefined'){
         <div class="form-group"><label>アラート（期限前何日）</label><input type="number" id="set-alertdays" placeholder="7" min="1" max="30"></div>
       </div>
 
-      <!-- デフォルト税率 -->
-      <div class="section-title" style="margin-bottom:12px">デフォルト税率</div>
-      <div class="form-row cols2">
-        <div class="form-group">
-          <label>品目追加時の初期税率</label>
-          <select id="set-defaultTax" style="padding:9px 12px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none"></select>
-        </div>
-      </div>
 
       <!-- 備考 -->
       <div class="section-title" style="margin-bottom:12px">書類の備考・定型文</div>
       <div class="form-row">
-        <div class="form-group"><textarea id="set-notes" placeholder="例：お支払いは請求書受領後14日以内にお願いします。" style="min-height:72px"></textarea></div>
+        <div class="form-group"><textarea id="set-notes" placeholder="お支払いは請求書受領後14日以内にお願いします。" style="min-height:72px"></textarea></div>
       </div>
 
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px">
@@ -1079,7 +1162,7 @@ if(typeof QRCode === 'undefined'){
         メールアドレスを追加するとそのアドレス<strong>のみ</strong>アクセスできるようになります。
       </div>
       <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-        <input type="email" id="access-email-input" placeholder="例：staff@gmail.com"
+        <input type="email" id="access-email-input" placeholder="staff@gmail.com"
           style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none"
           onkeydown="if(event.key==='Enter')addAccessEmail()">
         <button class="btn btn-primary" onclick="addAccessEmail()">＋ 追加</button>
@@ -1395,7 +1478,7 @@ if(typeof QRCode === 'undefined'){
         <div id="inline-new-cust" style="display:none;background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:8px">
           <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">＋ 新規顧客を登録</div>
           <div class="form-row cols2" style="margin-bottom:8px">
-            <div class="form-group"><label class="required">顧客名</label><input type="text" id="nc-name" placeholder="例：山田 太郎"></div>
+            <div class="form-group"><label>顧客名 ＊</label><input type="text" id="nc-name"></div>
             <div class="form-group"><label>敬称</label>
               <select id="nc-honorific">
                 <option value="御中">御中</option>
@@ -1405,17 +1488,17 @@ if(typeof QRCode === 'undefined'){
               </select>
             </div>
           </div>
-          <div class="form-row cols2" style="margin-bottom:8px">
-            <div class="form-group"><label>電話番号</label><input type="text" id="nc-tel" placeholder="090-1234-5678" onblur="autoTel(this)"></div>
-            <div class="form-group"></div>
-          </div>
           <div class="form-row cols3" style="margin-bottom:8px">
             <div class="form-group"><label>郵便番号</label>
               <div style="display:flex;gap:4px">
-                <input type="text" id="nc-zip" placeholder="060-0001" maxlength="9" oninput="autoZip(this,'nc-address',null)" style="flex:1">
+                <input type="text" id="nc-zip" maxlength="9" oninput="autoZip(this,'nc-address',null)" style="flex:1">
               </div>
             </div>
-            <div class="form-group" style="grid-column:span 2"><label>住所</label><input type="text" id="nc-address" placeholder="自動入力または手入力"></div>
+            <div class="form-group" style="grid-column:span 2"><label>住所</label><input type="text" id="nc-address"></div>
+          </div>
+          <div class="form-row cols2" style="margin-bottom:8px">
+            <div class="form-group"><label>電話番号</label><input type="text" id="nc-tel" onblur="autoTel(this)"></div>
+            <div class="form-group"></div>
           </div>
           <div style="display:flex;gap:6px;justify-content:flex-end">
             <button class="btn btn-secondary btn-sm" onclick="closeInlineNewCust()">キャンセル</button>
@@ -1437,7 +1520,7 @@ if(typeof QRCode === 'undefined'){
       <div class="form-section-title">書類情報</div>
       <div class="form-row cols2" style="margin-bottom:0">
         <div class="form-group"><label class="required">件名・作業内容</label>
-          <input type="text" id="doc-subject" placeholder="例：エアコン取り付け作業" list="subject-history">
+          <input type="text" id="doc-subject" placeholder="エアコン取り付け作業" list="subject-history">
           <datalist id="subject-history"></datalist>
         </div>
         <div class="form-group"><label>カテゴリ</label>
@@ -1532,8 +1615,9 @@ if(typeof QRCode === 'undefined'){
   <div class="modal-header"><h3 id="cust-modal-title">顧客情報</h3><button class="close-btn" onclick="closeModal('customer-modal')">✕</button></div>
   <div class="modal-body">
     <div class="form-row cols3">
+      <div class="form-group" style="grid-column:span 2"><label>顧客名・会社名 ＊</label><input type="text" id="cust-name"></div>
       <div class="form-group">
-        <label>敬称 ＊</label>
+        <label>敬称</label>
         <select id="cust-honorific" style="font-weight:700">
           <option value="御中">御中（法人）</option>
           <option value="様">様（個人）</option>
@@ -1543,7 +1627,16 @@ if(typeof QRCode === 'undefined'){
           <option value="">なし</option>
         </select>
       </div>
-      <div class="form-group"><label>顧客名・会社名 ＊</label><input type="text" id="cust-name" placeholder="例：鈴木 一郎 / ○○株式会社"></div>
+    </div>
+    <div class="form-row cols2">
+      <div class="form-group"><label>郵便番号</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="color:var(--text2)">〒</span>
+          <input type="text" id="cust-zip" maxlength="8" style="flex:1"
+            oninput="autoZip(this,'cust-address',null)">
+          <button class="btn btn-secondary btn-sm" onclick="lookupZip('cust-zip','cust-address',null)">住所取得</button>
+        </div>
+      </div>
       <div class="form-group"><label>カテゴリ</label>
         <select id="cust-category" onchange="syncHonorificFromCategory(this)">
           <option value="">（カテゴリ）</option>
@@ -1554,30 +1647,21 @@ if(typeof QRCode === 'undefined'){
         </select>
       </div>
     </div>
+    <div class="form-row"><div class="form-group"><label>住所</label><input type="text" id="cust-address" oninput="updateMapPreview()"></div></div>
     <div class="form-row cols2">
-      <div class="form-group"><label>郵便番号</label>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span style="color:var(--text2)">〒</span>
-          <input type="text" id="cust-zip" placeholder="例：060-0001" maxlength="8" style="flex:1"
-            oninput="autoZip(this,'cust-address',null)">
-          <button class="btn btn-secondary btn-sm" onclick="lookupZip('cust-zip','cust-address',null)">住所取得</button>
-        </div>
-      </div>
       <div class="form-group"><label>電話番号</label>
-        <input type="text" id="cust-tel" placeholder="例：090-1234-5678" onblur="autoTel(this)">
+        <input type="text" id="cust-tel" onblur="autoTel(this)">
+      </div>
+      <div class="form-group"><label>FAX番号</label>
+        <input type="text" id="cust-fax" onblur="autoTel(this)">
       </div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>FAX番号</label>
-        <input type="text" id="cust-fax" placeholder="例：011-234-5679" onblur="autoTel(this)">
-      </div>
-      <div class="form-group"><label>担当部署</label><input type="text" id="cust-dept" placeholder="例：営業部"></div>
+      <div class="form-group"><label>担当部署</label><input type="text" id="cust-dept"></div>
     </div>
-    <div class="form-row"><div class="form-group"><label>住所（マップ連携）</label><input type="text" id="cust-address" placeholder="例：北海道札幌市中央区○○町1-2-3" oninput="updateMapPreview()"></div></div>
-    <div class="map-container" id="map-preview" style="margin-bottom:12px"><div style="text-align:center"><div style="font-size:26px;margin-bottom:6px">📍</div><div>住所を入力するとマップリンクが表示されます</div></div></div>
     <div class="form-row cols2">
       <div class="form-group"><label>メールアドレス</label><input type="text" id="cust-email"></div>
-      <div class="form-group"><label>メモ・備考</label><textarea id="cust-memo" style="min-height:40px" placeholder="特記事項など"></textarea></div>
+      <div class="form-group"><label>メモ・備考</label><textarea id="cust-memo" style="min-height:40px" placeholder=""></textarea></div>
     </div>
     <div style="margin-top:6px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -1641,23 +1725,23 @@ if(typeof QRCode === 'undefined'){
         <div id="job-new-cust-area" style="display:none;margin-top:8px;background:var(--surface2);border-radius:8px;padding:10px">
           <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">＋ 新規顧客を登録</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div class="form-group" style="margin:0"><label>顧客名 ＊</label>
+              <input type="text" id="job-nc-name"
+                style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
+            </div>
             <div class="form-group" style="margin:0"><label>敬称</label>
               <select id="job-nc-honorific" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
                 <option value="御中">御中</option><option value="様">様</option><option value="殿">殿</option><option value="">なし</option>
               </select>
             </div>
-            <div class="form-group" style="margin:0"><label>顧客名 ＊</label>
-              <input type="text" id="job-nc-name" placeholder="例：山田 太郎"
-                style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
-            </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
             <div class="form-group" style="margin:0"><label>電話番号</label>
-              <input type="text" id="job-nc-tel" placeholder="090-1234-5678"
+              <input type="text" id="job-nc-tel" placeholder=""
                 style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
             </div>
             <div class="form-group" style="margin:0"><label>住所</label>
-              <input type="text" id="job-nc-address" placeholder="例：千歳市〇〇"
+              <input type="text" id="job-nc-address" placeholder="千歳市〇〇"
                 style="width:100%;padding:7px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px">
             </div>
           </div>
@@ -1669,7 +1753,7 @@ if(typeof QRCode === 'undefined'){
       </div>
       <div class="form-group"><label>カテゴリ</label><select id="job-category"><option value="">（カテゴリ）</option><option>引越し・運搬</option><option>清掃・片付け</option><option>修理・修繕</option><option>電気・設備</option><option>庭・外構</option><option>買い物・代行</option><option>介護・生活支援</option><option>その他</option></select></div>
     </div>
-    <div class="form-row"><div class="form-group"><label>作業内容 ＊</label><input type="text" id="job-title" placeholder="例：エアコン取り付け"></div></div>
+    <div class="form-row"><div class="form-group"><label>作業内容 ＊</label><input type="text" id="job-title" placeholder="エアコン取り付け"></div></div>
     <div class="form-row"><div class="form-group"><label>メモ</label><textarea id="job-memo" placeholder="備考など"></textarea></div></div>
   </div>
   <div class="modal-footer">
@@ -1685,7 +1769,7 @@ if(typeof QRCode === 'undefined'){
   <div class="modal-header"><h3 id="tmpl-modal-title">テンプレート追加</h3><button class="close-btn" onclick="closeModal('template-modal')">✕</button></div>
   <div class="modal-body">
     <div class="form-row cols2">
-      <div class="form-group"><label>テンプレート名 ＊</label><input type="text" id="tmpl-name" placeholder="例：エアコン取り付け標準"></div>
+      <div class="form-group"><label>テンプレート名 ＊</label><input type="text" id="tmpl-name" placeholder="エアコン取り付け標準"></div>
       <div class="form-group"><label>カテゴリ</label><select id="tmpl-category"><option value="">（カテゴリ）</option><option>引越し・運搬</option><option>清掃・片付け</option><option>修理・修繕</option><option>電気・設備</option><option>庭・外構</option><option>買い物・代行</option><option>介護・生活支援</option><option>その他</option></select></div>
     </div>
     <div class="line-items-header"><span></span><span>品目・作業内容</span><span>数量</span><span>単価</span><span>税率</span><span style="text-align:right">金額</span><span></span></div>
@@ -1856,8 +1940,8 @@ if(typeof QRCode === 'undefined'){
       </div>
       <div style="flex:1">
         <div class="form-row cols2">
-          <div class="form-group"><label>氏名 ＊</label><input type="text" id="emp-name" placeholder="例：田中 太郎"></div>
-          <div class="form-group"><label>役職・部署</label><input type="text" id="emp-role" placeholder="例：現場責任者"></div>
+          <div class="form-group"><label>氏名 ＊</label><input type="text" id="emp-name" placeholder="田中 太郎"></div>
+          <div class="form-group"><label>役職・部署</label><input type="text" id="emp-role" placeholder="現場責任者"></div>
         </div>
         <div class="form-row cols2">
           <div class="form-group"><label>雇用形態</label>
@@ -1873,18 +1957,18 @@ if(typeof QRCode === 'undefined'){
       </div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>電話番号</label><input type="text" id="emp-tel" placeholder="例：090-1234-5678" onblur="autoTel(this)"></div>
-      <div class="form-group"><label>メールアドレス</label><input type="text" id="emp-email" placeholder="例：tanaka@example.com"></div>
+      <div class="form-group"><label>電話番号</label><input type="text" id="emp-tel" placeholder="" onblur="autoTel(this)"></div>
+      <div class="form-group"><label>メールアドレス</label><input type="text" id="emp-email" placeholder="tanaka@example.com"></div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>LINE ID / LINEのURL</label><input type="text" id="emp-line" placeholder="例：tanaka_line または https://line.me/ti/p/xxx"></div>
-      <div class="form-group"><label>郵便番号</label><input type="text" id="emp-zip" placeholder="例：060-0001"></div>
+      <div class="form-group"><label>LINE ID / LINEのURL</label><input type="text" id="emp-line" placeholder="tanaka_line または https://line.me/ti/p/xxx"></div>
+      <div class="form-group"><label>郵便番号</label><input type="text" id="emp-zip" placeholder=""></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>住所</label><input type="text" id="emp-address" placeholder="例：北海道札幌市中央区○○1-2-3"></div>
+      <div class="form-group"><label>住所</label><input type="text" id="emp-address" placeholder="北海道札幌市中央区○○1-2-3"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>メモ・備考</label><textarea id="emp-memo" placeholder="特記事項など"></textarea></div>
+      <div class="form-group"><label>メモ・備考</label><textarea id="emp-memo" placeholder=""></textarea></div>
     </div>
   </div>
   <div class="modal-footer">
@@ -1954,16 +2038,16 @@ if(typeof QRCode === 'undefined'){
   <div class="modal-header"><h3 id="branch-modal-title">拠点を追加</h3><button class="close-btn" onclick="closeModal('branch-modal')">✕</button></div>
   <div class="modal-body">
     <div class="form-row cols2">
-      <div class="form-group"><label>拠点名 ＊</label><input type="text" id="br-name" placeholder="例：札幌本社"></div>
+      <div class="form-group"><label>拠点名 ＊</label><input type="text" id="br-name" placeholder="札幌本社"></div>
       <div class="form-group"><label>種別</label>
         <select id="br-type"><option value="本社">本社</option><option value="支店">支店</option><option value="営業所">営業所</option></select>
       </div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>電話番号</label><input type="text" id="br-tel" placeholder="例：011-234-5678" onblur="autoTel(this)"></div>
-      <div class="form-group"><label>FAX</label><input type="text" id="br-fax" placeholder="例：011-234-5679" onblur="autoTel(this)"></div>
+      <div class="form-group"><label>電話番号</label><input type="text" id="br-tel" placeholder="011-234-5678" onblur="autoTel(this)"></div>
+      <div class="form-group"><label>FAX</label><input type="text" id="br-fax" placeholder="011-234-5679" onblur="autoTel(this)"></div>
     </div>
-    <div class="form-row"><div class="form-group"><label>住所</label><input type="text" id="br-address" placeholder="例：北海道札幌市中央区○○1-2-3"></div></div>
+    <div class="form-row"><div class="form-group"><label>住所</label><input type="text" id="br-address" placeholder="北海道札幌市中央区○○1-2-3"></div></div>
     <div class="form-row"><div class="form-group"><label>メモ</label><textarea id="br-memo" placeholder="備考など"></textarea></div></div>
   </div>
   <div class="modal-footer">
@@ -2037,7 +2121,7 @@ if(typeof QRCode === 'undefined'){
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>内容・摘要 ＊</label><input type="text" id="exp-desc" placeholder="例：現場への交通費、ガソリン代"></div>
+      <div class="form-group"><label>内容・摘要 ＊</label><input type="text" id="exp-desc" placeholder="現場への交通費、ガソリン代"></div>
     </div>
     <div class="form-row cols3">
       <div class="form-group"><label>金額（税抜）</label><input type="number" id="exp-amount" placeholder="0" min="0" oninput="calcExpTax()"></div>
@@ -2065,7 +2149,7 @@ if(typeof QRCode === 'undefined'){
         <select id="exp-status"><option value="未精算">未精算</option><option value="精算済">精算済</option></select>
       </div>
       <div class="form-group"><label>関連書類番号</label>
-        <input type="text" id="exp-doc-ref" placeholder="例：INV-2604-001">
+        <input type="text" id="exp-doc-ref" placeholder="INV-2604-001">
       </div>
     </div>
     <div class="form-row"><div class="form-group"><label>メモ・備考</label><textarea id="exp-memo" placeholder="領収書番号など"></textarea></div></div>
@@ -2138,6 +2222,7 @@ let branches=JSON.parse(localStorage.getItem('branches_v6')||'[]');
 let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
+let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
 let sysTitle=localStorage.getItem('sysTitle_v4')||'便利屋\n書類システム';
 let adminPin=localStorage.getItem('adminPin')||'1234'; // 初回ログイン後に必ず変更してください
 let isAdminUnlocked=false;
@@ -2737,6 +2822,7 @@ function showPage(id, el, addToHistory=true){
   if(id==='staff-report') renderStaffReport();
   if(id==='branches') renderBranches();
   if(id==='expenses') renderExpenses();
+  if(id==='bulletin') renderBulletins();
   if(id==='backup') updateBackupStats();
   if(id==='dashboard') renderDashboard();
   if(id==='tax') renderTaxPage();
@@ -3400,8 +3486,13 @@ function openCustDetail(idOrName,byId){
       <div>
         <div class="detail-section" style="margin-bottom:10px">
           <h4>基本情報</h4>
-          <div class="detail-row"><span class="dl">敬称</span><span style="font-weight:700;color:var(--accent)">${honorific}</span></div>
-          ${[['電話',c.tel],['FAX',c.fax],['メール',c.email],['部署',c.dept],['住所',c.address],['郵便番号',c.zip],['カテゴリ',c.category]].map(([k,v])=>v?`<div class="detail-row"><span class="dl">${k}</span><span>${v}</span></div>`:'').join('')}
+          ${c.category?`<div class="detail-row"><span class="dl">カテゴリ</span><span>${c.category}</span></div>`:''}
+          ${c.zip?`<div class="detail-row"><span class="dl">郵便番号</span><span>${c.zip}</span></div>`:''}
+          ${c.address?`<div class="detail-row"><span class="dl">住所</span><span>${c.address}</span></div>`:''}
+          ${c.tel?`<div class="detail-row"><span class="dl">電話</span><span>${c.tel}</span></div>`:''}
+          ${c.fax?`<div class="detail-row"><span class="dl">FAX</span><span>${c.fax}</span></div>`:''}
+          ${c.email?`<div class="detail-row"><span class="dl">メール</span><span>${c.email}</span></div>`:''}
+          ${c.dept?`<div class="detail-row"><span class="dl">部署</span><span>${c.dept}</span></div>`:''}
           ${c.memo?`<div class="detail-row"><span class="dl">メモ</span><span style="color:var(--text2)">${c.memo}</span></div>`:''}
         </div>
         <!-- 表記サンプル -->
@@ -3418,18 +3509,10 @@ function openCustDetail(idOrName,byId){
             </div>`:''}
           </div>
         </div>
-        ${mapUrl?`<div style="margin-bottom:10px">
-          <iframe
-            src="https://www.google.com/maps?q=${encodeURIComponent(c.address)}&output=embed"
-            width="100%" height="180" style="border:0;border-radius:8px;margin-bottom:8px"
-            allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <a href="${mapUrl}" target="_blank" class="map-btn">📍 地図を開く</a>
+        ${mapUrl?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <a href="${mapUrl}" target="_blank" class="map-btn">📍 Googleマップで見る</a>
             ${dirUrl?`<a href="${dirUrl}" target="_blank" class="map-btn">🚗 経路を確認</a>`:''}
-            <button class="map-btn" onclick="openMapModal('${c.id}')">📐 距離・詳細</button>
-          </div>
-        </div>`:''}
+          </div>`:''}
         <div class="detail-section">
           <h4>担当者 (${(c.contacts||[]).length}名)</h4>
           ${(c.contacts||[]).length?c.contacts.map(ct=>`<div class="contact-card">
@@ -3498,10 +3581,10 @@ function addContactField(data){
   div.style.cssText='background:var(--surface2);border-radius:8px;padding:11px;margin-bottom:7px;position:relative';
   div.innerHTML=`<button onclick="document.getElementById('${uid}').remove()" style="position:absolute;top:7px;right:7px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px">✕</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-      <div class="form-group"><label>担当者名</label><input type="text" value="${data?.name||''}" placeholder="例：田中 花子"></div>
-      <div class="form-group"><label>役職・部署</label><input type="text" value="${data?.role||''}" placeholder="例：現場担当"></div>
-      <div class="form-group"><label>電話番号</label><input type="text" value="${data?.tel||''}" placeholder="例：090-1234-5678"></div>
-      <div class="form-group"><label>メール</label><input type="text" value="${data?.email||''}" placeholder="例：tanaka@example.com"></div>
+      <div class="form-group"><label>担当者名</label><input type="text" value="${data?.name||''}" placeholder="田中 花子"></div>
+      <div class="form-group"><label>役職・部署</label><input type="text" value="${data?.role||''}" placeholder="現場担当"></div>
+      <div class="form-group"><label>電話番号</label><input type="text" value="${data?.tel||''}" placeholder=""></div>
+      <div class="form-group"><label>メール</label><input type="text" value="${data?.email||''}" placeholder="tanaka@example.com"></div>
     </div>`;
   c.appendChild(div);
 }
@@ -3981,6 +4064,7 @@ async function fbLoadAll(uid){
     if(data.branches)   branches   = data.branches;
     if(data.payments)   payments   = data.payments;
     if(data.expenses)   expenses   = data.expenses;
+    if(data.bulletins)  bulletins  = data.bulletins;
     // docPhotosは大きいので別ドキュメントに保存
     const photoSnap = await F.getDoc(F.doc(F.db,'users',uid,'extra','photos'));
     if(photoSnap.exists()) docPhotos = photoSnap.data().docPhotos||{};
@@ -4007,6 +4091,7 @@ function persist(){
     localStorage.setItem('payments_v6',  JSON.stringify(payments));
     localStorage.setItem('docPhotos_v6', JSON.stringify(docPhotos));
     localStorage.setItem('expenses_v7',  JSON.stringify(expenses));
+  localStorage.setItem('bulletins_v1', JSON.stringify(bulletins));
   }catch(e){}
   // Firebaseにdebounce保存（300ms後）
   clearTimeout(_persistTimer);
@@ -4021,7 +4106,7 @@ async function _fbPersist(){
     const uid = currentUser.uid;
     await F.setDoc(F.doc(F.db,'users',uid),{
       docs, customers, settings, jobs, templates,
-      employees, branches, payments, expenses,
+      employees, branches, payments, expenses, bulletins,
       updatedAt: new Date().toISOString(),
       updatedBy: currentUser.email||uid
     });
@@ -4217,7 +4302,7 @@ function initAppAfterAuth(){
   loadSidebarTitle(); loadSettings(); loadLogo();
   renderAll(); buildMonthlyChart(); initReportYears(); initSrYears();
   renderCalendar(); renderTemplates(); renderAlerts();
-  renderEmployees(); renderBranches(); renderPayments(); renderExpenses();
+  renderEmployees(); renderBranches(); renderPayments(); renderExpenses(); renderBulletins();
   document.getElementById('doc-date').value = today();
   buildDocPages(); buildStaffSelect(); buildExpStaffSelect(); updateBackupStats();
   buildStatusSelect('doc-status', docStatuses[0]?.value||'下書き');
@@ -4986,6 +5071,7 @@ function importBackup(ev){
       if(data.payments)payments=data.payments;
       if(data.docPhotos)docPhotos=data.docPhotos;
       if(data.expenses)expenses=data.expenses;
+      if(data.bulletins)bulletins=data.bulletins;
       persist();loadSettings();loadLogo();renderAll();buildMonthlyChart();renderEmployees();renderBranches();renderExpenses();renderTemplates();
       if(statusEl){statusEl.style.color='var(--accent)';statusEl.textContent=`✓ 復旧完了：書類 ${docs.length}件、顧客 ${customers.length}件を読み込みました (${data.timestamp?new Date(data.timestamp).toLocaleString('ja-JP'):'不明'})`;}
       updateBackupStats();
@@ -5499,8 +5585,172 @@ function saveJobNewCust(){
   showToast(`顧客「${name} ${honorific}」を登録しました ✓`);
 }
 
+// ===== 掲示板 =====
+let editingBulletinId=null;
+let bulletinStarValue=0;
+
+const BULLETIN_CATS={
+  'お知らせ':'📢','注意':'⚠️','緊急':'🚨','業務連絡':'📋','その他':'📌',''	:'📌'
+};
+const STAR_LABELS=['','重要度低','やや重要','重要','かなり重要','最重要'];
+const STAR_COLORS=['','#95A5A6','#F39C12','#E67E22','#E74C3C','#C0392B'];
+
+function renderBulletins(){
+  const el=document.getElementById('bulletin-list');
+  if(!el) return;
+  const now=new Date().toISOString().split('T')[0];
+  // ピン留め→重要度降順→日付降順
+  const list=[...bulletins].sort((a,b)=>{
+    if(b.pinned!==a.pinned) return b.pinned?1:-1;
+    if(b.priority!==a.priority) return (b.priority||0)-(a.priority||0);
+    return (b.date||'').localeCompare(a.date||'');
+  });
+  updateBulletinBadge();
+  if(!list.length){
+    el.innerHTML='<div style="text-align:center;padding:48px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">📌</div><div>投稿はありません</div><div style="font-size:13px;margin-top:8px">右上の「＋ 新規投稿」ボタンで投稿できます</div></div>';
+    return;
+  }
+  el.innerHTML=list.map(b=>{
+    const expired=b.expiry&&b.expiry<now;
+    const stars='★'.repeat(b.priority||0)+'☆'.repeat(5-(b.priority||0));
+    const starColor=STAR_COLORS[b.priority||0]||'var(--text3)';
+    const catIcon=BULLETIN_CATS[b.category||'']||'📌';
+    return`<div onclick="openBulletinDetail('${b.id}')" style="cursor:pointer;background:var(--surface);border:1px solid ${b.pinned?'var(--accent)':expired?'var(--border)':'var(--border)'};border-radius:12px;padding:16px 20px;margin-bottom:12px;opacity:${expired?0.55:1};transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.08)'" onmouseout="this.style.boxShadow=''">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            ${b.pinned?'<span style="font-size:11px;background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:99px;font-weight:700">📌 固定</span>':''}
+            ${b.category?`<span style="font-size:11px;background:var(--surface2);color:var(--text2);padding:2px 8px;border-radius:99px">${catIcon} ${b.category}</span>`:''}
+            ${expired?'<span style="font-size:11px;background:#F5C6C2;color:var(--red);padding:2px 8px;border-radius:99px">期限切れ</span>':''}
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.title}</div>
+          <div style="font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:500px">${(b.body||'').replace(/\n/g,' ')}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          ${b.priority?`<div style="font-size:14px;color:${starColor};letter-spacing:1px;margin-bottom:4px">${stars}</div>`:''}
+          <div style="font-size:11px;color:var(--text3)">${b.date||''}</div>
+          <div style="font-size:11px;color:var(--text3)">${b.author||''}</div>
+        </div>
+      </div>
+      ${isAdminUnlocked?`<div style="display:flex;gap:6px;margin-top:10px;border-top:1px solid var(--border);padding-top:10px" onclick="event.stopPropagation()">
+        <button class="btn btn-secondary btn-sm" onclick="editBulletin('${b.id}')">✏️ 編集</button>
+        <button class="btn btn-secondary btn-sm" style="color:var(--red)" onclick="deleteBulletin('${b.id}')">🗑 削除</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function openBulletinDetail(id){
+  const b=bulletins.find(x=>x.id===id);
+  if(!b) return;
+  const stars='★'.repeat(b.priority||0)+'☆'.repeat(5-(b.priority||0));
+  const starColor=STAR_COLORS[b.priority||0]||'var(--text3)';
+  const catIcon=BULLETIN_CATS[b.category||'']||'📌';
+  document.getElementById('bulletin-detail-title').textContent=b.title;
+  document.getElementById('bulletin-detail-body').innerHTML=`
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      ${b.pinned?'<span style="font-size:12px;background:var(--accent-light);color:var(--accent);padding:2px 10px;border-radius:99px;font-weight:700">📌 固定</span>':''}
+      ${b.category?`<span style="font-size:12px;background:var(--surface2);color:var(--text2);padding:2px 10px;border-radius:99px">${catIcon} ${b.category}</span>`:''}
+    </div>
+    ${b.priority?`<div style="font-size:18px;color:${starColor};letter-spacing:2px;margin-bottom:12px">${stars} <span style="font-size:13px;vertical-align:middle">${STAR_LABELS[b.priority]}</span></div>`:''}
+    <div style="font-size:14px;line-height:1.9;color:var(--text);white-space:pre-wrap;background:var(--surface2);border-radius:8px;padding:16px;margin-bottom:14px">${b.body||''}</div>
+    <div style="font-size:12px;color:var(--text3);display:flex;gap:16px;flex-wrap:wrap">
+      <span>投稿日：${b.date||''}</span>
+      ${b.author?`<span>投稿者：${b.author}</span>`:''}
+      ${b.expiry?`<span>掲載期限：${b.expiry}</span>`:''}
+    </div>`;
+  document.getElementById('bulletin-detail-modal').classList.add('open');
+}
+
+function updateBulletinBadge(){
+  const badge=document.getElementById('bulletin-badge');
+  if(!badge) return;
+  const now=new Date().toISOString().split('T')[0];
+  const highPriority=bulletins.filter(b=>b.priority>=4&&(!b.expiry||b.expiry>=now)).length;
+  if(highPriority>0){
+    badge.textContent=highPriority;
+    badge.style.display='inline';
+  } else {
+    badge.style.display='none';
+  }
+}
+
+function openBulletinModal(){
+  editingBulletinId=null;
+  document.getElementById('bulletin-modal-title').textContent='新規投稿';
+  document.getElementById('bulletin-title').value='';
+  document.getElementById('bulletin-body').value='';
+  document.getElementById('bulletin-category').value='';
+  document.getElementById('bulletin-expiry').value='';
+  document.getElementById('bulletin-pinned').checked=false;
+  setBulletinStar(0);
+  document.getElementById('bulletin-modal').classList.add('open');
+}
+
+function editBulletin(id){
+  const b=bulletins.find(x=>x.id===id);
+  if(!b) return;
+  editingBulletinId=id;
+  document.getElementById('bulletin-modal-title').textContent='投稿を編集';
+  document.getElementById('bulletin-title').value=b.title||'';
+  document.getElementById('bulletin-body').value=b.body||'';
+  document.getElementById('bulletin-category').value=b.category||'';
+  document.getElementById('bulletin-expiry').value=b.expiry||'';
+  document.getElementById('bulletin-pinned').checked=b.pinned||false;
+  setBulletinStar(b.priority||0);
+  document.getElementById('bulletin-modal').classList.add('open');
+}
+
+function setBulletinStar(v){
+  bulletinStarValue=v;
+  document.getElementById('bulletin-priority').value=v;
+  document.querySelectorAll('.bstar').forEach(s=>{
+    const sv=parseInt(s.dataset.v);
+    s.style.opacity=sv<=v?'1':'0.25';
+    s.style.color=sv<=v?(STAR_COLORS[v]||'#F39C12'):'var(--text3)';
+  });
+  const labels=['なし','★ 重要度低','★★ やや重要','★★★ 重要','★★★★ かなり重要','★★★★★ 最重要'];
+  document.getElementById('bulletin-star-label').textContent=labels[v]||'なし';
+}
+
+function saveBulletin(){
+  const title=document.getElementById('bulletin-title').value.trim();
+  if(!title){showToast('タイトルを入力してください','#C0392B');return;}
+  const b={
+    id:editingBulletinId||('bul-'+Date.now()),
+    title,
+    body:document.getElementById('bulletin-body').value,
+    category:document.getElementById('bulletin-category').value,
+    priority:parseInt(document.getElementById('bulletin-priority').value)||0,
+    expiry:document.getElementById('bulletin-expiry').value,
+    pinned:document.getElementById('bulletin-pinned').checked,
+    date:today(),
+    author:currentUser?.displayName||currentUser?.email||'管理者',
+  };
+  if(editingBulletinId){
+    const idx=bulletins.findIndex(x=>x.id===editingBulletinId);
+    if(idx>=0) bulletins[idx]=b;
+  } else {
+    bulletins.unshift(b);
+  }
+  persist();
+  closeModal('bulletin-modal');
+  renderBulletins();
+  showToast(editingBulletinId?'投稿を更新しました ✓':'投稿しました ✓');
+}
+
+function deleteBulletin(id){
+  showConfirm('この投稿を削除しますか？',()=>{
+    bulletins=bulletins.filter(x=>x.id!==id);
+    persist();
+    renderBulletins();
+    showToast('削除しました');
+  });
+}
+
 // ===== MOBILE DRAWER =====
 const NAV_ITEMS=[
+  {id:'bulletin',icon:'📌',label:'掲示板'},
   {section:'メイン'},
   {id:'home',icon:'🏠',label:'ホーム'},
   {id:'dashboard',icon:'📊',label:'ダッシュボード'},
@@ -5604,27 +5854,42 @@ function renderTaxPage(){
 function renderTaxEditor(){
   const el=document.getElementById('tax-rate-editor');
   if(!el) return;
+  const currentDefault=settings?.defaultTax||customTaxRates.filter(r=>r.enabled)[0]?.value||'10';
   el.innerHTML=customTaxRates.map((r,i)=>`
-    <div style="display:flex;gap:8px;align-items:center;padding:10px 12px;margin-bottom:8px;background:var(--surface2);border-radius:8px;border:1px solid ${r.enabled?'var(--accent-light)':'var(--border)'}">
+    <div style="display:flex;gap:8px;align-items:center;padding:10px 12px;margin-bottom:8px;background:var(--surface2);border-radius:8px;border:1px solid ${r.value===currentDefault&&r.enabled?'var(--accent)':'var(--border)'}">
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0">
         <input type="checkbox" ${r.enabled?'checked':''} onchange="toggleTaxRate(${i},this.checked)"
           style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent)">
         <span style="font-size:12px;color:var(--text2)">${r.enabled?'有効':'無効'}</span>
       </label>
-      <input type="text" value="${r.label}" placeholder="表示名（例：15%）"
+      <input type="text" value="${r.label}"
         oninput="updateTaxRateField(${i},'label',this.value)"
         style="width:90px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-weight:700;outline:none;font-family:inherit">
-      <input type="number" value="${r.rate*100}" placeholder="0" min="0" max="100" step="0.1"
+      <input type="number" value="${r.rate*100}" min="0" max="100" step="0.1"
         oninput="updateTaxRateField(${i},'rate',parseFloat(this.value)/100)"
         style="width:80px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;outline:none;font-family:inherit;text-align:right">
       <span style="font-size:13px;color:var(--text3)">%</span>
-      <input type="text" value="${r.note||''}" placeholder="備考（例：標準税率）"
+      <input type="text" value="${r.note||''}"
         oninput="updateTaxRateField(${i},'note',this.value)"
         style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;font-family:inherit;color:var(--text2)">
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;white-space:nowrap;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid ${r.value===currentDefault&&r.enabled?'var(--accent)':'var(--border)'};background:${r.value===currentDefault&&r.enabled?'var(--accent-light)':'var(--surface)'};color:${r.value===currentDefault&&r.enabled?'var(--accent)':'var(--text2)'}">
+        <input type="radio" name="default-tax" value="${r.value}" ${r.value===currentDefault&&r.enabled?'checked':''}
+          ${!r.enabled?'disabled':''}
+          onchange="setDefaultTax('${r.value}')"
+          style="accent-color:var(--accent);cursor:pointer">
+        初期値
+      </label>
       <button onclick="moveTaxRate(${i},-1)" ${i===0?'disabled':''} style="padding:5px 7px;border:1px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer" title="上へ">↑</button>
       <button onclick="moveTaxRate(${i},1)" ${i===customTaxRates.length-1?'disabled':''} style="padding:5px 7px;border:1px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer" title="下へ">↓</button>
       <button onclick="removeTaxRate(${i})" style="padding:5px 8px;border:1px solid #F5C6C2;border-radius:5px;background:var(--red-light);color:var(--red);cursor:pointer" title="削除">✕</button>
     </div>`).join('');
+}
+
+function setDefaultTax(value){
+  settings.defaultTax=value;
+  persist();
+  renderTaxEditor();
+  showToast('初期税率を「'+( customTaxRates.find(r=>r.value===value)?.label||value)+'」に設定しました ✓');
 }
 
 function toggleTaxRate(i, enabled){
