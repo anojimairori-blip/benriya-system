@@ -723,7 +723,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.3.2</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.3.3</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -749,7 +749,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.3.2</div>
+    <div class="logo-version" id="sidebar-version">v2.3.3</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -904,7 +904,7 @@ if('serviceWorker' in navigator){
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">🔖</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.3.2</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.3.3</div>
         <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年04月17日</div>
       </div>
     </div>
@@ -2276,7 +2276,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.3.2';
+const APP_VERSION='v2.3.3';
 const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/benriya-system/main/index.html';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -3256,7 +3256,7 @@ function changeCust(){
 function openInlineNewCust(){
   document.getElementById('inline-new-cust').style.display='block';
   document.getElementById('cust-search-panel').style.display='none';
-  ['nc-name','nc-tel','nc-fax','nc-email','nc-zip','nc-address','nc-dept','nc-contact','nc-role'].forEach(id=>document.getElementById(id).value='');
+  ['nc-name','nc-tel','nc-fax','nc-email','nc-zip','nc-address','nc-dept','nc-contact','nc-role'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 function closeInlineNewCust(){document.getElementById('inline-new-cust').style.display='none';}
 function saveInlineNewCust(){
@@ -3679,8 +3679,8 @@ function openCustomerModal(){
   document.getElementById('cust-category').value='';
   document.getElementById('cust-honorific').value='御中';
   document.getElementById('contacts-container').innerHTML='';
-  document.getElementById('map-preview').innerHTML=`<div style="text-align:center"><div style="font-size:26px;margin-bottom:6px">📍</div><div>住所を入力するとマップリンクが表示されます</div></div>`;
-  addContactField();document.getElementById('customer-modal').classList.add('open');
+  addContactField();
+  document.getElementById('customer-modal').classList.add('open');
 }
 
 function editCustomer(id){
@@ -3693,7 +3693,7 @@ function editCustomer(id){
   document.getElementById('contacts-container').innerHTML='';
   (c.contacts||[]).forEach(ct=>addContactField(ct));
   if(!(c.contacts||[]).length)addContactField();
-  updateMapPreview();document.getElementById('customer-modal').classList.add('open');
+  document.getElementById('customer-modal').classList.add('open');
 }
 
 // カテゴリ変更で敬称を自動提案
@@ -3726,10 +3726,8 @@ function getContacts(){
 }
 
 function updateMapPreview(){
-  const addr=document.getElementById('cust-address').value.trim();
-  const el=document.getElementById('map-preview');
-  if(addr){const url=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;el.innerHTML=`<div style="text-align:center;padding:16px"><div style="font-size:28px;margin-bottom:8px">📍</div><div style="font-size:13px;color:var(--text2);margin-bottom:12px">${addr}</div><a href="${url}" target="_blank" class="map-btn">🗺️ Googleマップで確認</a></div>`;}
-  else{el.innerHTML=`<div style="text-align:center"><div style="font-size:26px;margin-bottom:6px">📍</div><div>住所を入力するとマップリンクが表示されます</div></div>`;}
+  // map-preview要素は廃止されたため、何もしない（呼び出し互換のため残す）
+  return;
 }
 
 function saveCustomer(){
@@ -4117,17 +4115,13 @@ function loadSettings(){
   ['company','owner','tel','fax','email','zip','address','bank','account','notes','paydays','alertdays'].forEach(k=>{
     const el=document.getElementById('set-'+k);if(el)el.value=settings[k]||'';
   });
-  // defaultTax セレクトを構築
-  const dtEl=document.getElementById('set-defaultTax');
-  if(dtEl){ dtEl.innerHTML=taxOptions(settings.defaultTax||'10'); }
+  // defaultTax は税率設定画面で管理
 }
 function saveSettings(){
   ['company','owner','tel','fax','email','zip','address','bank','account','notes','paydays','alertdays'].forEach(k=>{
     settings[k]=document.getElementById('set-'+k)?.value||'';
   });
-  // defaultTax を保存
-  const dtEl=document.getElementById('set-defaultTax');
-  if(dtEl) settings.defaultTax=dtEl.value;
+  // defaultTax は税率設定画面で保存
   // 郵便番号を正規化（不正な値を除去）
   if(settings.zip){
     const zd=toHalf(settings.zip).replace(/[^0-9]/g,'').slice(0,7);
