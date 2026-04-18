@@ -723,7 +723,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.3.4</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.4</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -749,7 +749,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.3.4</div>
+    <div class="logo-version" id="sidebar-version">v2.4</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -904,7 +904,7 @@ if('serviceWorker' in navigator){
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">🔖</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.3.4</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.4</div>
         <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年04月17日</div>
       </div>
     </div>
@@ -1252,6 +1252,10 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
+    <div style="background:var(--accent-light);color:var(--accent);padding:8px 14px;border-radius:8px;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:14px">ℹ️</span>
+      <span>売上は<strong>請求書・領収書</strong>のみを集計対象としています（見積書は集計対象外）</span>
+    </div>
     <div class="stats-grid" id="sr-stats"></div>
     <div class="card" style="margin-top:4px">
       <div style="padding:12px 14px;background:var(--surface2);display:grid;grid-template-columns:180px 80px 80px 80px 1fr;gap:8px;font-size:11px;font-weight:700;color:var(--text3)">
@@ -2276,7 +2280,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.3.4';
+const APP_VERSION='v2.4';
 const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/benriya-system/main/index.html';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -3182,7 +3186,16 @@ function openNewDoc(type,custName){
   document.getElementById('line-items-container').innerHTML='';
   addLineItem();calcTotals();
   buildStaffSelect();updateSubjectHistory();
-  const ss=document.getElementById('doc-staff-select');if(ss)ss.value='';
+  const ss=document.getElementById('doc-staff-select');
+  if(ss){
+    ss.value='';
+    // ログイン中ユーザーがemployeesにいたらデフォルト選択
+    const myName=currentUser?.displayName;
+    if(myName){
+      const me=employees.find(e=>e.name===myName);
+      if(me) ss.value=me.name;
+    }
+  }
   if(custName){const c=customers.find(x=>x.name===custName);if(c){selectedCustId=c.id;renderSelectedCust(c);}}
   document.getElementById('doc-modal').classList.add('open');
   setTimeout(()=>{document.getElementById('doc-subject')?.focus();},100);
@@ -4911,11 +4924,14 @@ function renderStaffReport(){
   if(rows){
     rows.innerHTML=entries.length?entries.map(e=>{
       const emp=employees.find(x=>x.name===e.name);
+      const isUnassigned=(e.name==='未割当');
       return`<div class="staff-row">
         <div style="display:flex;align-items:center;gap:8px">
           ${emp?.photo?`<img src="${emp.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`
+            :isUnassigned?`<div style="width:28px;height:28px;border-radius:50%;background:#FFE4D6;color:#E67E22;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">!</div>`
             :`<div style="width:28px;height:28px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${e.name.charAt(0)}</div>`}
           <span style="font-size:13px;font-weight:600">${e.name}</span>
+          ${isUnassigned?`<button onclick="showUnassignedDocs(${y},${m||'null'})" style="font-size:10px;padding:2px 8px;border-radius:99px;background:#E67E22;color:white;border:none;cursor:pointer;margin-left:4px">📋 一覧</button>`:''}
         </div>
         <div style="text-align:right;font-size:13px">${e.count}件</div>
         <div style="text-align:right;font-size:13px;font-weight:700">${fmt(e.total)}</div>
@@ -4939,6 +4955,50 @@ function renderStaffReport(){
     <div class="bar" style="height:${Math.max(Math.round(v/chartMax*100),v>0?4:0)}%;background:${i===new Date().getMonth()&&y===new Date().getFullYear()?'var(--accent)':'#A8D5B8'}"></div>
     <div class="bar-label">${months[i]}</div>
   </div>`).join('');
+}
+
+// 未割当書類の一覧表示
+function showUnassignedDocs(year, month){
+  const list=docs.filter(d=>{
+    if(!['請求書','領収書'].includes(d.type)) return false;
+    if(d.staff && d.staff.trim()) return false;
+    const dt=new Date(d.date);
+    if(dt.getFullYear()!==year) return false;
+    if(month && dt.getMonth()!==month-1) return false;
+    return true;
+  }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+
+  const html=`<div class="modal-overlay open" id="unassigned-modal" onclick="if(event.target===this)closeModal('unassigned-modal')">
+    <div class="modal" style="max-width:700px">
+      <div class="modal-header">
+        <h3>📋 担当未割当の書類（${list.length}件）</h3>
+        <button class="close-btn" onclick="closeModal('unassigned-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:60vh;overflow-y:auto">
+        <div style="background:#FFF8E7;color:#8B6914;padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:12px">
+          💡 各書類の「編集」ボタンから自社担当スタッフを設定してください
+        </div>
+        ${list.length?list.map(d=>{
+          const tc={'請求書':'badge-invoice','領収書':'badge-receipt'};
+          return`<div style="display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--border)">
+            <span class="badge ${tc[d.type]||''}" style="font-size:10px">${d.type}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.number} - ${d.subject||'（件名なし）'}</div>
+              <div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.customer||'—'} / ${d.date||''}</div>
+            </div>
+            <span style="font-size:13px;font-weight:700;flex-shrink:0">${fmt(d.grandTotal)}</span>
+            <button class="btn btn-secondary btn-sm" onclick="closeModal('unassigned-modal');setTimeout(()=>editDoc('${d.id}'),100)" style="flex-shrink:0">編集</button>
+          </div>`;
+        }).join(''):'<div style="text-align:center;color:var(--text3);padding:32px">該当する書類はありません</div>'}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('unassigned-modal')">閉じる</button>
+      </div>
+    </div>
+  </div>`;
+  // 既存があれば削除
+  document.getElementById('unassigned-modal')?.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
 }
 
 // ===== PHOTOS =====
