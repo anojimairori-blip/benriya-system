@@ -122,6 +122,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 /* ドラッグハンドル（管理メニュー並び替え用） */
 .nav-mgmt-row{position:relative}
+.nav-mgmt-row.nav-drop-before{box-shadow:0 -3px 0 0 #A8D5B8 inset, 0 0 0 0 transparent}
+.nav-mgmt-row.nav-drop-after{box-shadow:0 3px 0 0 #A8D5B8 inset, 0 0 0 0 transparent}
+.nav-mgmt-row.nav-drop-before::before{content:'';position:absolute;top:-2px;left:8px;right:8px;height:3px;background:#A8D5B8;border-radius:2px;box-shadow:0 0 6px rgba(168,213,184,.6);pointer-events:none}
+.nav-mgmt-row.nav-drop-after::after{content:'';position:absolute;bottom:-2px;left:8px;right:8px;height:3px;background:#A8D5B8;border-radius:2px;box-shadow:0 0 6px rgba(168,213,184,.6);pointer-events:none}
 .nav-drag-handle{margin-left:auto;padding:4px 8px;font-size:14px;color:rgba(255,255,255,.4);cursor:grab;border-radius:4px;flex-shrink:0;user-select:none;line-height:1;transition:color .15s,background .15s}
 .nav-mgmt-row:hover .nav-drag-handle{color:rgba(255,255,255,.85);background:rgba(255,255,255,.08)}
 .nav-drag-handle:hover{color:white !important;background:rgba(255,255,255,.18) !important}
@@ -764,7 +768,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.5</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.6</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -788,7 +792,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.5</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.6</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -823,7 +827,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.5</div>
+    <div class="logo-version" id="sidebar-version">v3.6</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -958,7 +962,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.5 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.6 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -1055,7 +1059,7 @@ if('serviceWorker' in navigator){
   </div>
   <div class="content">
     <div class="card" style="padding:16px;overflow-x:auto">
-      <div class="cal-header"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div>
+      <div class="cal-header"><span style="color:#5F6368">月</span><span style="color:#5F6368">火</span><span style="color:#5F6368">水</span><span style="color:#5F6368">木</span><span style="color:#5F6368">金</span><span style="color:#1A73E8">土</span><span style="color:#D93025">日</span></div>
       <div class="cal-grid" id="cal-grid"></div>
     </div>
     <div class="section-title" style="margin-top:18px">今月の作業</div>
@@ -2615,8 +2619,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.5';
-const APP_BUILD_TIME='2026/04/18 21:14';
+const APP_VERSION='v3.6';
+const APP_BUILD_TIME='2026/04/18 22:12';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4239,13 +4243,23 @@ function renderCalendar(){
   const grid=document.getElementById('cal-grid');if(!grid)return;
   const first=new Date(calYear,calMonth,1),last=new Date(calYear,calMonth+1,0);
   const ts=today();let html='';
-  for(let i=0;i<first.getDay();i++){const d=new Date(calYear,calMonth,1-first.getDay()+i);html+=`<div class="cal-day other-month"><div class="day-num">${d.getDate()}</div></div>`;}
+  // 月曜始まり: 日曜=0 を 6 にシフト、月曜=1 を 0 に
+  const firstDayMon=(first.getDay()+6)%7;
+  for(let i=0;i<firstDayMon;i++){
+    const d=new Date(calYear,calMonth,1-firstDayMon+i);
+    const dow=(d.getDay()+6)%7; // 月=0..日=6
+    const dowColor=dow===5?'#1A73E8':dow===6?'#D93025':'';
+    html+=`<div class="cal-day other-month"><div class="day-num" style="color:${dowColor||'var(--text3)'}">${d.getDate()}</div></div>`;
+  }
   for(let d=1;d<=last.getDate();d++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dt=new Date(calYear,calMonth,d);
+    const dow=(dt.getDay()+6)%7; // 月=0..日=6
+    const dowColor=dow===5?'#1A73E8':dow===6?'#D93025':'';
     const dj=jobs.filter(j=>j.date===ds);
     html+=`<div class="cal-day${ds===ts?' today':''}" onclick="openJobModal('${ds}')">
-      <div class="day-num">${d}</div>
-      ${dj.slice(0,2).map(j=>`<div class="cal-event type-job" onclick="event.stopPropagation();editJob('${j.id}')">${j.time?j.time+' ':''} ${j.title}</div>`).join('')}
+      <div class="day-num" style="${dowColor?`color:${dowColor}`:''}">${d}</div>
+      ${dj.slice(0,2).map(j=>`<div class="cal-event type-job" onclick="event.stopPropagation();editJob('${j.id}')">${j.time?j.time+' ':''} ${escAttr(j.title||'')}</div>`).join('')}
       ${dj.length>2?`<div style="font-size:9px;color:var(--text3)">+${dj.length-2}件</div>`:''}
     </div>`;
   }
@@ -6694,8 +6708,19 @@ function jobToGcalEvent(job){
   lines.push(`─────────`);
   lines.push(`Flexsys2026 ID: ${job.id}`);
   lines.push(`Flexsys2026 から自動同期`);
+  // タイトルを安全に組み立て（空文字・undefined防止）
+  const titleStr=String(job.title||'').trim();
+  const categoryStr=String(job.category||'').trim();
+  const customerStr=String(job.customer||'').trim();
+  let summary;
+  if(titleStr){
+    summary=categoryStr?`【${categoryStr}】${titleStr}`:titleStr;
+    if(customerStr) summary+=` - ${customerStr}`;
+  } else {
+    summary=customerStr?`作業 - ${customerStr}`:'作業予定';
+  }
   return {
-    summary: `【${job.category||'作業'}】${job.title}`+(job.customer?` - ${job.customer}`:''),
+    summary: summary,
     location: cust?.address||'',
     description: lines.join('\n'),
     start: {dateTime: start.toISOString(), timeZone: 'Asia/Tokyo'},
@@ -7210,8 +7235,13 @@ const DEFAULT_NAV_MANAGEMENT=[
 ];
 
 function getNavManagementOrder(){
-  // 保存された順序があれば使用、なければデフォルト順
-  const savedOrder=JSON.parse(localStorage.getItem('navMgmtOrder')||'null');
+  // 1. settings(Firebase同期される) → 2. localStorage → 3. デフォルト の順で取得
+  let savedOrder=null;
+  if(settings && Array.isArray(settings.navMgmtOrder)) {
+    savedOrder=settings.navMgmtOrder;
+  } else {
+    try{ savedOrder=JSON.parse(localStorage.getItem('navMgmtOrder')||'null'); }catch(e){}
+  }
   if(!savedOrder||!Array.isArray(savedOrder)) return DEFAULT_NAV_MANAGEMENT.slice();
   // 保存順をベースに、新規追加されたメニューも末尾に追加
   const map=Object.fromEntries(DEFAULT_NAV_MANAGEMENT.map(it=>[it.key,it]));
@@ -7222,22 +7252,31 @@ function getNavManagementOrder(){
 }
 
 function saveNavManagementOrder(items){
-  localStorage.setItem('navMgmtOrder', JSON.stringify(items.map(i=>i.key)));
+  const keys=items.map(i=>i.key);
+  // localStorage（即時反映）
+  localStorage.setItem('navMgmtOrder', JSON.stringify(keys));
+  // settings（Firebase同期される=他デバイス＆再ログイン後も復元）
+  if(settings){
+    settings.navMgmtOrder=keys;
+    persist();
+  }
 }
 
 function renderNavManagement(){
   const el=document.getElementById('nav-management');
   if(!el) return;
   const items=getNavManagementOrder();
-  el.innerHTML=items.map((it,i)=>`<div class="nav-item nav-mgmt-row" data-nav-key="${it.key}" data-nav-idx="${i}" onclick="${it.action}">
+  el.innerHTML=items.map((it,i)=>`<div class="nav-item nav-mgmt-row" data-nav-key="${it.key}" data-nav-idx="${i}" onclick="${it.action}" ondragover="onNavRowDragOver(event,${i})" ondrop="onNavRowDrop(event,${i})" ondragleave="onNavRowDragLeave(event)">
     <span class="nav-icon">${it.icon}</span>
     <span class="nav-label">${it.label}</span>
-    <span class="nav-drag-handle" draggable="true" title="ドラッグして並び替え" onclick="event.stopPropagation()" ondragstart="onNavDragStart(event,${i})" ondragover="onNavDragOver(event)" ondrop="onNavDrop(event,${i})" ondragend="onNavDragEnd(event)" ondragleave="onNavDragLeave(event)">☰</span>
+    <span class="nav-drag-handle" draggable="true" title="ドラッグして並び替え" onclick="event.stopPropagation()" ondragstart="onNavDragStart(event,${i})" ondragend="onNavDragEnd(event)">☰</span>
     <span class="nav-tooltip">${it.label}</span>
   </div>`).join('');
 }
 
 let _navDragSrc=null;
+let _navDropPos=null; // 'before' or 'after'
+
 function onNavDragStart(e,idx){
   _navDragSrc=idx;
   const row=e.currentTarget.closest('.nav-mgmt-row');
@@ -7247,22 +7286,64 @@ function onNavDragStart(e,idx){
     e.dataTransfer.setData('text/plain',idx);
   }
 }
-function onNavDragOver(e){
+
+// 行自体に dragover を仕掛けて挿入位置を計算
+function onNavRowDragOver(e, idx){
   e.preventDefault();
   if(e.dataTransfer) e.dataTransfer.dropEffect='move';
-  const row=e.currentTarget.closest('.nav-mgmt-row');
-  if(row) row.style.background='var(--accent-light)';
+  const row=e.currentTarget;
+  const rect=row.getBoundingClientRect();
+  const middleY=rect.top + rect.height/2;
+  const isBefore = e.clientY < middleY;
+  _navDropPos = isBefore ? 'before' : 'after';
+  // 全ての行のインジケーターをクリア
+  document.querySelectorAll('.nav-mgmt-row').forEach(el=>{
+    el.classList.remove('nav-drop-before','nav-drop-after');
+  });
+  // 自分にだけ追加
+  row.classList.add(isBefore?'nav-drop-before':'nav-drop-after');
   return false;
 }
-function onNavDragLeave(e){
-  const row=e.currentTarget.closest('.nav-mgmt-row');
-  if(row) row.style.background='';
+
+function onNavRowDragLeave(e){
+  // 子要素間の移動でブレる対策：related が同じ行内ならスキップ
+  const related=e.relatedTarget;
+  const row=e.currentTarget;
+  if(related && row.contains(related)) return;
+  row.classList.remove('nav-drop-before','nav-drop-after');
 }
+
+function onNavRowDrop(e, idx){
+  e.preventDefault();
+  e.stopPropagation();
+  // インジケーター削除
+  document.querySelectorAll('.nav-mgmt-row').forEach(el=>{
+    el.classList.remove('nav-drop-before','nav-drop-after');
+  });
+  if(_navDragSrc===null) return;
+  // 挿入先インデックス計算
+  let insertAt = idx + (_navDropPos==='after'?1:0);
+  if(insertAt > _navDragSrc) insertAt--; // 自身を取り出した分の補正
+  if(insertAt === _navDragSrc) return;
+  const items=getNavManagementOrder();
+  const [moved]=items.splice(_navDragSrc,1);
+  items.splice(insertAt,0,moved);
+  saveNavManagementOrder(items);
+  renderNavManagement();
+  renderNavOrderEditor();
+  buildMobileDrawer();
+  showToast(`「${moved.label}」を移動しました ✓`);
+}
+
+// 旧API互換（ハンドル要素から呼ばれる場合）
+function onNavDragOver(e){
+  e.preventDefault();
+  return false;
+}
+function onNavDragLeave(e){}
 function onNavDrop(e,idx){
   e.preventDefault();
   e.stopPropagation();
-  const row=e.currentTarget.closest('.nav-mgmt-row');
-  if(row) row.style.background='';
   if(_navDragSrc===null||_navDragSrc===idx) return;
   const items=getNavManagementOrder();
   const [moved]=items.splice(_navDragSrc,1);
@@ -7273,12 +7354,14 @@ function onNavDrop(e,idx){
   buildMobileDrawer();
   showToast(`「${moved.label}」を移動しました ✓`);
 }
+
 function onNavDragEnd(e){
   document.querySelectorAll('.nav-mgmt-row').forEach(el=>{
     el.style.opacity='';
-    el.style.background='';
+    el.classList.remove('nav-drop-before','nav-drop-after');
   });
   _navDragSrc=null;
+  _navDropPos=null;
 }
 
 // 設定画面用：メニュー順序エディタ
@@ -7688,23 +7771,34 @@ function generateSampleData(){
           const total=subtotal+tax10;
           const pre={'見積書':'EST','請求書':'INV','領収書':'REC'}[type];
           const ym=String(year).slice(2)+date.split('-')[1];
-          docs.push({
-            id:'sample-doc-'+Date.now()+'-'+type+'-'+i,
+          const docId='sample-doc-'+Date.now()+'-'+type+'-'+i+'-'+Math.random().toString(36).slice(2,6);
+          const newDoc={
+            id:docId,
             number:`${pre}-${ym}-${String(randInt(100,999))}`,
             type,
+            customerId:cust.id||'',
             customer:cust.name,
-            honorific:cust.honorific,
+            honorific:cust.honorific||'御中',
+            contact:'',
             date,
             dueDate:type==='請求書'?randomDate(year):'',
             subject,
             category:rand(SAMPLE_CATEGORIES),
             staff:rand(allStaff),
-            status:type==='見積書'?rand(['下書き','送付済','承認済']):type==='請求書'?rand(['発行済','入金待ち','入金済']):'発行済',
-            items:[{name:subject,qty:1,unit:'式',price:subtotal,amt:subtotal,tax:'10'}],
+            status:type==='見積書'?rand(['下書き','送付済','承認済']):type==='請求書'?rand(['発行済','送付済','入金待ち','入金済']):'発行済',
+            lines:[{name:subject,qty:1,unit:'式',price:subtotal,amt:subtotal,tax:'10'}],
             subtotal,tax10,tax8:0,grandTotal:total,
+            notes:'',
             memo:'[サンプル]',
+            createdAt:new Date().toISOString(),
+            createdBy:'sample',
+            createdByName:'サンプル生成',
+            updatedAt:new Date().toISOString(),
+            updatedBy:'sample',
+            updatedByName:'サンプル生成',
             _sample:true
-          });
+          };
+          docs.push(newDoc);
           added.docs++;
         }
       });
@@ -7776,6 +7870,11 @@ function generateSampleData(){
     renderAll&&renderAll();
     renderEmployees&&renderEmployees();
     renderExpenses&&renderExpenses();
+    renderCalendar&&renderCalendar();
+    renderPayments&&renderPayments();
+    buildMonthlyChart&&buildMonthlyChart();
+    if(typeof renderReport==='function') renderReport();
+    if(typeof renderStaffReport==='function') renderStaffReport();
     updateDeveloperInfo();
     showToast(`サンプルデータを生成しました ✓\n顧客:${added.customers} / 従業員:${added.employees} / 書類:${added.docs} / 経費:${added.expenses} / 作業:${added.jobs} / 入金:${added.payments}`);
   });
@@ -7805,6 +7904,11 @@ function deleteSampleData(){
     renderAll&&renderAll();
     renderEmployees&&renderEmployees();
     renderExpenses&&renderExpenses();
+    renderCalendar&&renderCalendar();
+    renderPayments&&renderPayments();
+    buildMonthlyChart&&buildMonthlyChart();
+    if(typeof renderReport==='function') renderReport();
+    if(typeof renderStaffReport==='function') renderStaffReport();
     updateDeveloperInfo();
     showToast(`サンプルデータを削除しました 🗑\n顧客:${removed.c} / 従業員:${removed.e} / 書類:${removed.d} / 経費:${removed.x} / 作業:${removed.j}`);
   });
