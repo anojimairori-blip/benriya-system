@@ -5,6 +5,9 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp; frame-src https://flexsysv2026.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="page-title">便利屋 書類発行システム</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
@@ -723,7 +726,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.4.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.5</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -749,7 +752,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.4.1</div>
+    <div class="logo-version" id="sidebar-version">v2.5</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -904,7 +907,7 @@ if('serviceWorker' in navigator){
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">🔖</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.4.1</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.5</div>
         <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年04月17日</div>
       </div>
     </div>
@@ -2280,8 +2283,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.4.1';
-const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/benriya-system/main/index.html';
+const APP_VERSION='v2.5';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -2293,10 +2295,14 @@ const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/ben
   localStorage.setItem('last_app_version', APP_VERSION);
 })();
 
-// ===== バージョンチェック =====
+// ===== バージョンチェック（GitHub API経由：CORS対応） =====
+const GITHUB_API_URL='https://api.github.com/repos/anojimairori-blip/benriya-system/contents/index.html';
+
 async function checkForUpdate(){
   try{
-    const res=await fetch(VERSION_CHECK_URL+'?nocache='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+    const res=await fetch(GITHUB_API_URL+'?ref=main&_='+Date.now(),{
+      headers:{'Accept':'application/vnd.github.v3.raw'}
+    });
     if(!res.ok) return;
     const text=await res.text();
     const m=text.match(/const APP_VERSION='([^']+)'/);
@@ -3354,7 +3360,7 @@ function persistTaxRates(){localStorage.setItem('customTaxRates',JSON.stringify(
 function taxOptions(selected){
   const rates=customTaxRates.filter(r=>r.enabled);
   // デフォルト税率: settings.defaultTax が設定されていればそれを使用
-  const def=settings?.defaultTax||rates[0]?.value||'10';
+  const def=settings?.defaultTax??rates[0]?.value??'10';
   return rates.map(r=>`<option value="${r.value}" ${(selected||def)===r.value?'selected':''}>${r.label}</option>`).join('');
 }
 function taxRate(v){
@@ -6164,7 +6170,7 @@ function renderTaxPage(){
 function renderTaxEditor(){
   const el=document.getElementById('tax-rate-editor');
   if(!el) return;
-  const currentDefault=settings?.defaultTax||customTaxRates.filter(r=>r.enabled)[0]?.value||'10';
+  const currentDefault=settings?.defaultTax??customTaxRates.filter(r=>r.enabled)[0]?.value??'10';
   el.innerHTML=customTaxRates.map((r,i)=>`
     <div style="display:flex;gap:8px;align-items:center;padding:10px 12px;margin-bottom:8px;background:var(--surface2);border-radius:8px;border:1px solid ${r.value===currentDefault&&r.enabled?'var(--accent)':'var(--border)'}">
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0">
