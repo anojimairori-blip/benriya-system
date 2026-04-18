@@ -723,7 +723,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.3.3</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.3.4</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -749,7 +749,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.3.3</div>
+    <div class="logo-version" id="sidebar-version">v2.3.4</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -904,7 +904,7 @@ if('serviceWorker' in navigator){
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">🔖</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.3.3</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.3.4</div>
         <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年04月17日</div>
       </div>
     </div>
@@ -2276,7 +2276,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.3.3';
+const APP_VERSION='v2.3.4';
 const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/benriya-system/main/index.html';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -2655,11 +2655,16 @@ function autoTel(input){
   let v=d;
   if(d.length===11)      v=d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7);
   else if(d.length===10){
+    // フリーダイヤル等（4桁市外局番）
     if(/^(0120|0800|0570|0990|0180)/.test(d)) v=d.slice(0,4)+'-'+d.slice(4,7)+'-'+d.slice(7);
-    else if(/^(0155|0156|0157|0158|0163|0164|0165|0166|0167|0123|0124|0125|0126|0133|0134|0135|0136|0137|0138|0139|0143|0144|0145)/.test(d)) v=d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6);
+    // 4桁市外局番（北海道地方）
+    else if(/^(0123|0124|0125|0126|0133|0134|0135|0136|0137|0138|0139|0142|0143|0144|0145|0146|0152|0153|0154|0155|0156|0157|0158|0162|0163|0164|0165|0166|0167)/.test(d)) v=d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6);
+    // 2桁市外局番（東京03、大阪06）
+    else if(/^(03|06)/.test(d)) v=d.slice(0,2)+'-'+d.slice(2,6)+'-'+d.slice(6);
+    // 通常の3桁市外局番
     else v=d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
   }
-  else if(d.length===9)  v=d.slice(0,2)+'-'+d.slice(2,6)+'-'+d.slice(6);
+  else if(d.length===9)  v=d.slice(0,2)+'-'+d.slice(2,5)+'-'+d.slice(5);
   // 変化がなければ何もしない（二重変換防止）
   if(input.value!==v) input.value=v;
 }
@@ -3482,6 +3487,22 @@ function convertDoc(id,toType){
   const c=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
   selectedCustId=c?.id||null;
   if(c)renderSelectedCust(c);else document.getElementById('selected-cust-card').style.display='none';
+  // 自社担当スタッフを引き継ぎ
+  buildStaffSelect();
+  const ss=document.getElementById('doc-staff-select');
+  if(ss&&d.staff) ss.value=d.staff;
+  // 顧客担当者を引き継ぎ
+  setTimeout(()=>{
+    const ds=document.getElementById('doc-contact');
+    if(ds&&d.contact) ds.value=d.contact;
+  },100);
+  // 支払期限の自動計算（請求書の場合）
+  if(toType==='請求書'){
+    const days=settings.payDays||14;
+    const due=new Date();due.setDate(due.getDate()+days);
+    const dueEl=document.getElementById('doc-due');
+    if(dueEl) dueEl.value=due.toISOString().split('T')[0];
+  }
   document.getElementById('line-items-container').innerHTML='';
   (d.lines||[]).forEach(l=>addLineItem(l));calcTotals();
   document.getElementById('doc-modal').classList.add('open');
