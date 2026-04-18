@@ -777,7 +777,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.2</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.3</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -812,7 +812,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.2</div>
+    <div class="logo-version" id="sidebar-version">v3.3</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -837,10 +837,7 @@ if('serviceWorker' in navigator){
     <div class="nav-section">管理</div>
     <div id="nav-management"><!-- 動的生成: renderNavManagement() --></div>
     <div class="nav-section">設定</div>
-    <div class="nav-item" onclick="showPage('settings',this)"><span class="nav-icon">⚙️</span><span class="nav-label">会社設定</span><span class="nav-tooltip">会社設定</span></div>
-    <div class="nav-item" onclick="showPage('tax',this)"><span class="nav-icon">🧾</span><span class="nav-label">税率設定</span><span class="nav-tooltip">税率設定</span></div>
-    <div class="nav-item" onclick="requireAdmin('employees',this)"><span class="nav-icon">👤</span><span class="nav-label">従業員管理</span><span class="nav-tooltip">従業員管理</span></div>
-    <div class="nav-item" id="nav-developer" onclick="requireDeveloper(this)" style="display:none"><span class="nav-icon">🛠️</span><span class="nav-label">開発者ツール</span><span class="nav-tooltip">開発者ツール</span></div>
+    <div class="nav-item" onclick="requireAdminAccess('settings',this)"><span class="nav-icon">⚙️</span><span class="nav-label">各種設定</span><span class="nav-tooltip">各種設定（管理者専用）</span></div>
   </nav>
 </div>
 
@@ -950,7 +947,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.2 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.3 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -1097,6 +1094,7 @@ if('serviceWorker' in navigator){
       <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
     </div>
     <div class="card" style="max-width:640px;padding:24px">
 
@@ -1249,6 +1247,7 @@ if('serviceWorker' in navigator){
       <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')" style="background:var(--accent);color:white;border-color:var(--accent)">👤 従業員管理</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
     </div>
     <div style="background:var(--gold-light);border:1px solid #F0D080;border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--gold)">
       🔐 この画面は管理者専用です。従業員の個人情報が含まれるため、取り扱いにご注意ください。
@@ -1371,6 +1370,7 @@ if('serviceWorker' in navigator){
       <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')" style="background:var(--accent);color:white;border-color:var(--accent)">📤 CSVエクスポート</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
     </div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:20px">freee・弥生・マネーフォワードなどの会計ソフトに取り込めるCSVを出力します。</p>
     <div class="form-row cols2" style="max-width:500px;margin-bottom:20px">
@@ -1454,6 +1454,7 @@ if('serviceWorker' in navigator){
       <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
     </div>
     <div class="card" style="max-width:640px;padding:22px">
       <div class="section-title" style="margin-bottom:6px">消費税率の管理</div>
@@ -1511,6 +1512,15 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
+    <!-- 管理メニュータブ -->
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()" style="background:var(--accent);color:white;border-color:var(--accent)">🛠️ 開発者ツール</button>
+    </div>
     <div style="background:#FFF8E7;border:1px solid #F0D080;border-radius:var(--radius);padding:14px 16px;margin-bottom:18px;font-size:13px;color:#8B6914">
       ⚠️ このページは開発者・テスト用です。サンプルデータの生成・削除を行うと既存データに影響を与える可能性があります。
     </div>
@@ -1611,6 +1621,7 @@ if('serviceWorker' in navigator){
       <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('backup')" style="background:var(--accent);color:white;border-color:var(--accent)">🗄️ バックアップ</button>
       <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
     </div>
     <div style="max-width:580px">
       <div style="background:var(--blue-light);border:1px solid #B0D0F0;border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--blue)">
@@ -2197,8 +2208,12 @@ if('serviceWorker' in navigator){
       <div class="form-group"><label>メールアドレス</label><input type="text" id="emp-email" placeholder="tanaka@example.com"></div>
     </div>
     <div class="form-row cols2">
+      <div class="form-group"><label>Googleアカウント <span style="font-size:10px;color:var(--text3);font-weight:400">（システムログイン用）</span></label><input type="email" id="emp-google" placeholder="tanaka@gmail.com"></div>
       <div class="form-group"><label>LINE ID / LINEのURL</label><input type="text" id="emp-line" placeholder="tanaka_line または https://line.me/ti/p/xxx"></div>
+    </div>
+    <div class="form-row cols2">
       <div class="form-group"><label>郵便番号</label><input type="text" id="emp-zip" placeholder=""></div>
+      <div class="form-group"></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label>住所</label><input type="text" id="emp-address" placeholder="北海道札幌市中央区○○1-2-3"></div>
@@ -2529,8 +2544,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.2';
-const APP_BUILD_TIME='2026/04/18 20:15';
+const APP_VERSION='v3.3';
+const APP_BUILD_TIME='2026/04/18 20:40';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4940,17 +4955,25 @@ function renderEmployees(){
     return`<div class="emp-card">
       ${e.photo?`<img src="${e.photo}" class="emp-avatar" alt="${e.name}">`:`<div class="emp-avatar-placeholder">${e.name?e.name.charAt(0):'?'}</div>`}
       <div class="emp-info">
-        <div class="emp-name">${e.name}</div>
+        <div class="emp-name">${e.name} ${e.isAdmin?'<span style="font-size:10px;background:var(--gold);color:white;padding:2px 7px;border-radius:99px;margin-left:6px;font-weight:700">👑 管理者</span>':''}</div>
         <div class="emp-role">${[e.role,e.type].filter(Boolean).join('　/　')}</div>
         <div class="emp-meta">
           ${e.tel?`<div class="emp-meta-item">📞 <a href="tel:${e.tel}" style="color:var(--blue);text-decoration:none">${e.tel}</a></div>`:''}
           ${e.email?`<div class="emp-meta-item">✉️ <a href="mailto:${e.email}" style="color:var(--blue);text-decoration:none">${e.email}</a></div>`:''}
+          ${e.google?`<div class="emp-meta-item" style="color:var(--accent);font-weight:600">🔐 Google: ${e.google}</div>`:''}
           ${e.birthday?`<div class="emp-meta-item">🎂 ${e.birthday}（${age}歳）</div>`:''}
           ${e.address?`<div class="emp-meta-item">📍 ${e.address}</div>`:''}
           ${e.zip?`<div class="emp-meta-item">〒 ${e.zip}</div>`:''}
           ${e.memo?`<div class="emp-meta-item" style="grid-column:1/-1">📝 ${e.memo}</div>`:''}
         </div>
         ${lineUrl?`<div style="margin-top:8px"><a href="${lineUrl}" class="line-contact-btn" target="_blank">💬 LINEで連絡する</a></div>`:''}
+        ${e.google?`<div style="margin-top:10px;padding:10px;background:var(--surface2);border-radius:8px">
+          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">🛡️ アクセス権限</div>
+          <label style="display:inline-flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;margin-right:12px">
+            <input type="checkbox" ${e.isAdmin?'checked':''} onchange="toggleEmpPermission('${e.id}','isAdmin',this.checked)">
+            <span>👑 管理者（全設定アクセス可）</span>
+          </label>
+        </div>`:''}
       </div>
       <div class="emp-actions">
         <button class="btn btn-secondary btn-sm" onclick="editEmployee('${e.id}')">編集</button>
@@ -4964,7 +4987,7 @@ function renderEmployees(){
 function openEmpModal(){
   editingEmpId=null;
   document.getElementById('emp-modal-title').textContent='従業員を追加';
-  ['emp-name','emp-role','emp-tel','emp-email','emp-line','emp-zip','emp-address','emp-memo','emp-birthday'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['emp-name','emp-role','emp-tel','emp-email','emp-google','emp-line','emp-zip','emp-address','emp-memo','emp-birthday'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('emp-type').value='正社員';
   document.getElementById('emp-photo-preview').innerHTML='👤';
   document.getElementById('emp-photo-preview').style.background='var(--surface2)';
@@ -4975,7 +4998,7 @@ function editEmployee(id){
   const e=employees.find(x=>x.id===id);if(!e)return;
   editingEmpId=id;
   document.getElementById('emp-modal-title').textContent='従業員情報を編集';
-  ['name','role','tel','email','line','zip','address','memo','birthday'].forEach(k=>{const el=document.getElementById('emp-'+k);if(el)el.value=e[k]||'';});
+  ['name','role','tel','email','google','line','zip','address','memo','birthday'].forEach(k=>{const el=document.getElementById('emp-'+k);if(el)el.value=e[k]||'';});
   document.getElementById('emp-type').value=e.type||'正社員';
   const prev=document.getElementById('emp-photo-preview');
   if(e.photo){prev.innerHTML=`<img src="${e.photo}" style="width:80px;height:80px;border-radius:50%;object-fit:cover">`;}
@@ -5006,6 +5029,7 @@ function saveEmployee(){
     type:document.getElementById('emp-type').value,
     tel:document.getElementById('emp-tel').value,
     email:document.getElementById('emp-email').value,
+    google:document.getElementById('emp-google').value.trim().toLowerCase(),
     line:document.getElementById('emp-line').value,
     zip:document.getElementById('emp-zip').value,
     address:document.getElementById('emp-address').value,
@@ -6690,9 +6714,7 @@ const NAV_ITEMS=[
   {id:'expenses',icon:'💸',label:'経費管理'},
   {id:'backup',icon:'🗄️',label:'バックアップ'},
   {section:'設定'},
-  {id:'settings',icon:'⚙️',label:'会社設定'},
-  {id:'tax',icon:'🧾',label:'税率設定'},
-  {id:'employees',icon:'👤',label:'従業員管理',admin:true},
+  {id:'settings',icon:'⚙️',label:'各種設定',adminAccess:true},
 ];
 
 // ===== ナビゲーション管理メニュー（並び替え可能） =====
@@ -6799,6 +6821,43 @@ function showExpenseStatDrilldown(rangeType){
       break;
   }
   _renderDrilldownExpenses(title, filterDesc, list);
+}
+
+// ===== 権限管理 =====
+function isCurrentUserAdmin(){
+  if(!currentUser) return false;
+  if((currentUser.email||'').toLowerCase()===DEVELOPER_EMAIL.toLowerCase()) return true;
+  const myGoogle=(currentUser.email||'').toLowerCase();
+  const emp=employees.find(e=>(e.google||'').toLowerCase()===myGoogle);
+  return !!(emp&&emp.isAdmin);
+}
+
+function requireAdminAccess(pageId, el){
+  if(isCurrentUserAdmin()){
+    showPage(pageId, el);
+    return;
+  }
+  // 開発者ページは別ロジック
+  if(pageId==='developer'){
+    requireDeveloper(el);
+    return;
+  }
+  // 従業員管理ページは PIN フォールバック
+  if(pageId==='employees'){
+    requireAdmin('employees', el);
+    return;
+  }
+  showToast('🔒 この画面には管理者権限が必要です。従業員管理で「管理者」チェックを付けたGoogleアカウントでログインしてください。','#C0392B');
+}
+
+function toggleEmpPermission(empId, key, checked){
+  const e=employees.find(x=>x.id===empId);
+  if(!e) return;
+  e[key]=checked;
+  persist();
+  renderEmployees();
+  showDeveloperMenu();
+  showToast(`権限を更新しました ✓`);
 }
 
 // ===== ドリルダウン（一覧→詳細プレビュー） =====
@@ -7254,7 +7313,7 @@ function buildMobileDrawer(){
     }
     // 管理セクション内のアイテムは上で既に出力済みなのでスキップ
     if(mgmtKeys.has(item.id)) return;
-    const onclick=item.admin?`requireAdmin('employees',this)`:`showPageMobile('${item.id}',this)`;
+    const onclick=item.adminAccess?`requireAdminAccess('${item.id}',this)`:item.admin?`requireAdmin('employees',this)`:`showPageMobile('${item.id}',this)`;
     const style=item.id==='bulletin'?' style="background:#E67E22;border-radius:8px;margin:4px 8px;font-weight:700"':'';
     const labelStyle=item.id==='bulletin'?' style="color:white"':'';
     html+=`<div class="nav-item" data-page="${item.id}" onclick="${onclick}"${style}>
