@@ -799,7 +799,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.8</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.8.1</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -823,7 +823,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.8</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.8.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -858,7 +858,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.8</div>
+    <div class="logo-version" id="sidebar-version">v3.8.1</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -993,7 +993,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.8 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.8.1 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -2669,8 +2669,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.8';
-const APP_BUILD_TIME='2026/04/18 22:32';
+const APP_VERSION='v3.8.1';
+const APP_BUILD_TIME='2026/04/18 22:38';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -8185,21 +8185,15 @@ function generateSampleData(){
     }
 
     persist();
-    // フィルターを全て「すべて」にリセット（生成データが見えるように）
+    // 全フィルターを「すべて」にリセット
     if(typeof dfState==='object'){
       ['quotes','invoices','receipts'].forEach(k=>{
         if(dfState[k]) dfState[k].mode='all';
-        // ボタンUIも更新
-        document.querySelectorAll(`#dfbar-${k} .df-btn`).forEach(btn=>btn.classList.remove('active'));
-        const allBtn=document.querySelector(`#dfbar-${k} .df-btn[data-mode="all"]`);
-        if(allBtn) allBtn.classList.add('active');
-        // 検索・状態フィルタもクリア
-        const sf=document.getElementById('filter-'+k);
-        if(sf) sf.value='';
-        const stf=document.getElementById('status-filter-'+k);
-        if(stf) stf.value='';
       });
     }
+    // 各書類ページのUIを完全に再生成（最も確実な方法）
+    if(typeof buildDocPages==='function') buildDocPages();
+    // 描画
     renderAll&&renderAll();
     renderEmployees&&renderEmployees();
     renderExpenses&&renderExpenses();
@@ -8209,7 +8203,17 @@ function generateSampleData(){
     if(typeof renderReport==='function') renderReport();
     if(typeof renderStaffReport==='function') renderStaffReport();
     updateDeveloperInfo();
-    showToast(`サンプルデータを生成しました ✓\n顧客:${added.customers} / 従業員:${added.employees} / 書類:${added.docs} / 経費:${added.expenses} / 作業:${added.jobs} / 入金:${added.payments}\n\nフィルターを「すべて」にリセットしました`);
+    // デバッグ: 生成結果を console に出力
+    try{
+      console.log('[Sample Data Generated]',{
+        added,
+        totals:{docs:docs.length,customers:customers.length,employees:employees.length,expenses:expenses.length,jobs:jobs.length},
+        sampleQuotes:docs.filter(d=>d.type==='見積書'&&d._sample).length,
+        sampleInvoices:docs.filter(d=>d.type==='請求書'&&d._sample).length,
+        sampleReceipts:docs.filter(d=>d.type==='領収書'&&d._sample).length
+      });
+    }catch(e){}
+    showToast(`✓ サンプルデータを生成しました\n見積:${docs.filter(d=>d.type==='見積書'&&d._sample).length} / 請求:${docs.filter(d=>d.type==='請求書'&&d._sample).length} / 領収:${docs.filter(d=>d.type==='領収書'&&d._sample).length}\n顧客:${added.customers} / 経費:${added.expenses} / 作業:${added.jobs}`);
   });
 }
 
