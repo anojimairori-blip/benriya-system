@@ -726,7 +726,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.5.2</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.5.3</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -752,7 +752,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.5.2</div>
+    <div class="logo-version" id="sidebar-version">v2.5.3</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -907,7 +907,7 @@ if('serviceWorker' in navigator){
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">🔖</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.5.2</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.5.3</div>
         <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年04月17日</div>
       </div>
     </div>
@@ -2306,7 +2306,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.5.2';
+const APP_VERSION='v2.5.3';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4250,7 +4250,18 @@ async function fbLoadAll(uid){
     if(data.employees)  employees  = data.employees;
     if(data.branches)   branches   = data.branches;
     if(data.payments)   payments   = data.payments;
-    if(data.expenses)   expenses   = data.expenses;
+    if(data.expenses){
+      // Firebase上は画像が __local_only__ プレースホルダーになっているため、
+      // ローカルの実画像データとマージする
+      const localExpenses = JSON.parse(localStorage.getItem('expenses_v7')||'[]');
+      const localMap = {};
+      localExpenses.forEach(e=>{ if(e.id&&e.receiptPhoto&&e.receiptPhoto!=='__local_only__') localMap[e.id]=e.receiptPhoto; });
+      expenses = data.expenses.map(e=>{
+        const copy = {...e};
+        if(copy.receiptPhoto==='__local_only__') copy.receiptPhoto = localMap[copy.id]||'';
+        return copy;
+      });
+    }
     if(data.bulletins)  bulletins  = data.bulletins;
     // docPhotosは大きいので別ドキュメントに保存
     const photoSnap = await F.getDoc(F.doc(F.db,'users',uid,'extra','photos'));
@@ -4291,9 +4302,30 @@ async function _fbPersist(){
   showSync();
   try{
     const uid = currentUser.uid;
+
+    // 画像データを除外したexpensesを作成（Firestoreは配列内のネストを許可しない）
+    // receiptPhotoはローカルのみ保管、Firestoreにはメタ情報のみ
+    const expensesForFB = expenses.map(e=>{
+      const copy = {...e};
+      // 画像データを除去（サイズ大＋Firestoreの配列ネスト制約）
+      if(copy.receiptPhoto) copy.receiptPhoto = '__local_only__';
+      if(copy.receiptPhotos) delete copy.receiptPhotos;
+      return copy;
+    });
+
+    // docs内の写真フィールドも除外
+    const docsForFB = docs.map(d=>{
+      const copy = {...d};
+      if(copy.photos) delete copy.photos;
+      return copy;
+    });
+
     await F.setDoc(F.doc(F.db,'users',uid),{
-      docs, customers, settings, jobs, templates,
-      employees, branches, payments, expenses, bulletins,
+      docs: docsForFB,
+      customers, settings, jobs, templates,
+      employees, branches, payments,
+      expenses: expensesForFB,
+      bulletins,
       updatedAt: new Date().toISOString(),
       updatedBy: currentUser.email||uid
     });
