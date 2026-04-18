@@ -770,7 +770,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.8</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.8.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -805,7 +805,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.8</div>
+    <div class="logo-version" id="sidebar-version">v2.8.1</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -951,7 +951,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v2.8 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v2.8.1 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -2258,7 +2258,7 @@ if('serviceWorker' in navigator){
     </div>
     <div class="form-row cols2">
       <div class="form-group"><label>状態</label>
-        <select id="exp-status"><option value="未精算">未精算</option><option value="精算済">精算済</option></select>
+        <select id="exp-status"><option value="精算済">精算済</option><option value="未精算">未精算</option></select>
       </div>
       <div class="form-group"><label>関連書類番号</label>
         <input type="text" id="exp-doc-ref" placeholder="INV-2604-001">
@@ -2347,8 +2347,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.8';
-const APP_BUILD_TIME='2026/04/18 18:51';
+const APP_VERSION='v2.8.1';
+const APP_BUILD_TIME='2026/04/18 19:07';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5247,7 +5247,7 @@ function openExpenseModal(id){
     document.getElementById('exp-tax').value='10';
     document.getElementById('exp-payment-method').value='現金';
     document.getElementById('exp-staff').value='';
-    document.getElementById('exp-status').value='未精算';
+    document.getElementById('exp-status').value='精算済';
     document.getElementById('exp-receipt-name').textContent='';
     const thumb=document.getElementById('exp-receipt-thumb');
     const del=document.getElementById('exp-receipt-del');
@@ -5575,9 +5575,9 @@ function renderExpenses(){
     <td>${e.staff||'—'}</td>
     <td><span class="badge ${sc[e.status]||'badge-draft'}">${e.status}</span></td>
     <td style="white-space:nowrap;display:flex;gap:3px;padding:6px 8px">
-      ${e.receipt?`<button class="btn btn-secondary btn-sm" onclick="viewExpReceipt('${e.id}')">📷</button>`:''}
-      <button class="btn btn-secondary btn-sm" onclick="openExpenseModal('${e.id}')">編集</button>
-      <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteExpense('${e.id}'))">削除</button>
+      ${e.receipt?`<button class="btn btn-secondary btn-sm" onclick="viewExpReceipt('${e.id}')" title="領収書を表示">👁 表示</button>`:''}
+      <button class="btn btn-secondary btn-sm" onclick="openExpenseModal('${e.id}')" title="編集">✏️ 編集</button>
+      <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteExpense('${e.id}'))" title="削除">🗑 削除</button>
     </td>
   </tr>`).join('');
 }
