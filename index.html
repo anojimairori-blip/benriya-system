@@ -5,9 +5,11 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://*.firebasestorage.app https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp https://api.qrserver.com; frame-src https://flexsysv2026.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://*.firebasestorage.app https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp https://api.qrserver.com; frame-src https://flexsysv2026.firebaseapp.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="geolocation=(self), camera=(self), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="page-title">便利屋 書類発行システム</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
@@ -890,6 +892,8 @@ select{appearance:auto}
 </style>
 <!-- QR Code library (CDN with offline fallback) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+  integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"
   onerror=""></script>
 <script>
 // Offline fallback: simple canvas-based QR placeholder
@@ -970,10 +974,16 @@ if('serviceWorker' in navigator){
 }
 </script>
 <!-- FullCalendar (Phase A: 月表示+ドラッグ) -->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"
+  integrity="sha384-qibYXUYNRM4rzVM/jrnpVTzX6pFnjUokUGlYllI2fJQ/9pK1KqyFlD0wR4VlR3Dv"
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!-- html2pdf for PDF export -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/ja.global.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+  integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/ja.global.min.js"
+  integrity="sha384-mBcHSuG3w3rP9ElOVo2iZqcV2BlXdVgV+bw0R2Aqwyxt9xTsWjB8/gLRZ+5hFwK7"
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -981,7 +991,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.11.1</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.13</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1005,7 +1015,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.11.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.13</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1040,7 +1050,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.11.1</div>
+    <div class="logo-version" id="sidebar-version">v3.13</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1499,11 +1509,11 @@ if('serviceWorker' in navigator){
         <div class="form-group"><label>代表者名</label><input type="text" id="set-owner" placeholder="田中 太郎"></div>
       </div>
       <div class="form-row cols2">
-        <div class="form-group"><label>電話番号</label><input type="text" id="set-tel" placeholder="011-234-5678" onblur="autoTel(this)"></div>
-        <div class="form-group"><label>FAX番号</label><input type="text" id="set-fax" placeholder="011-234-5679" onblur="autoTel(this)"></div>
+        <div class="form-group"><label>電話番号</label><input type="tel" id="set-tel" inputmode="tel" autocomplete="tel" placeholder="011-234-5678" onblur="autoTel(this)"></div>
+        <div class="form-group"><label>FAX番号</label><input type="tel" id="set-fax" inputmode="tel" placeholder="011-234-5679" onblur="autoTel(this)"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>メールアドレス</label><input type="text" id="set-email" placeholder="info@example.com"></div>
+        <div class="form-group"><label>メールアドレス</label><input type="email" id="set-email" autocomplete="email" placeholder="info@example.com"></div>
       </div>
 
       <!-- 住所（郵便番号連動） -->
@@ -1513,7 +1523,7 @@ if('serviceWorker' in navigator){
           <label>郵便番号</label>
           <div style="display:flex;gap:6px;align-items:center">
             <span style="font-size:14px;color:var(--text2)">〒</span>
-            <input type="text" id="set-zip" placeholder="" maxlength="9"
+            <input type="text" id="set-zip" placeholder="" maxlength="9" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{3}-?[0-9]{4}"
               style="flex:1" oninput="autoZip(this,'set-address','set-zip-status')">
             <button class="btn btn-secondary btn-sm" onclick="lookupZip('set-zip','set-address','set-zip-status')">住所を取得</button>
           </div>
@@ -2233,7 +2243,7 @@ if('serviceWorker' in navigator){
       <div class="form-group"><label>郵便番号</label>
         <div style="display:flex;gap:6px;align-items:center">
           <span style="color:var(--text2)">〒</span>
-          <input type="text" id="cust-zip" maxlength="8" style="flex:1"
+          <input type="text" id="cust-zip" maxlength="8" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{3}-?[0-9]{4}" style="flex:1"
             oninput="autoZip(this,'cust-address',null)">
           <button class="btn btn-secondary btn-sm" onclick="lookupZip('cust-zip','cust-address',null)">住所取得</button>
         </div>
@@ -2251,17 +2261,17 @@ if('serviceWorker' in navigator){
     <div class="form-row"><div class="form-group"><label>住所</label><input type="text" id="cust-address" oninput="updateMapPreview()"></div></div>
     <div class="form-row cols2">
       <div class="form-group"><label>電話番号</label>
-        <input type="text" id="cust-tel" onblur="autoTel(this)">
+        <input type="tel" id="cust-tel" inputmode="tel" autocomplete="tel" onblur="autoTel(this)">
       </div>
       <div class="form-group"><label>FAX番号</label>
-        <input type="text" id="cust-fax" onblur="autoTel(this)">
+        <input type="tel" id="cust-fax" inputmode="tel" onblur="autoTel(this)">
       </div>
     </div>
     <div class="form-row cols2">
       <div class="form-group"><label>担当部署</label><input type="text" id="cust-dept"></div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>メールアドレス</label><input type="text" id="cust-email"></div>
+      <div class="form-group"><label>メールアドレス</label><input type="email" id="cust-email" autocomplete="email" placeholder="example@domain.com"></div>
       <div class="form-group"><label>メモ・備考</label><textarea id="cust-memo" style="min-height:40px" placeholder=""></textarea></div>
     </div>
     <div style="margin-top:6px">
@@ -2610,15 +2620,15 @@ if('serviceWorker' in navigator){
       </div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>電話番号</label><input type="text" id="emp-tel" placeholder="" onblur="autoTel(this)"></div>
-      <div class="form-group"><label>メールアドレス</label><input type="text" id="emp-email" placeholder="tanaka@example.com"></div>
+      <div class="form-group"><label>電話番号</label><input type="tel" id="emp-tel" inputmode="tel" autocomplete="tel" placeholder="" onblur="autoTel(this)"></div>
+      <div class="form-group"><label>メールアドレス</label><input type="email" id="emp-email" autocomplete="email" placeholder="tanaka@example.com"></div>
     </div>
     <div class="form-row cols2">
       <div class="form-group"><label>Googleアカウント <span style="font-size:10px;color:var(--text3);font-weight:400">（システムログイン用）</span></label><input type="email" id="emp-google" placeholder="tanaka@gmail.com"></div>
       <div class="form-group"><label>LINE ID / LINEのURL</label><input type="text" id="emp-line" placeholder="tanaka_line または https://line.me/ti/p/xxx"></div>
     </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>郵便番号</label><input type="text" id="emp-zip" placeholder=""></div>
+      <div class="form-group"><label>郵便番号</label><input type="text" id="emp-zip" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{3}-?[0-9]{4}" maxlength="8" placeholder=""></div>
       <div class="form-group"></div>
     </div>
     <div class="form-row">
@@ -2641,13 +2651,13 @@ if('serviceWorker' in navigator){
   <div class="modal-header"><h3>🔐 管理者PINを変更</h3><button class="close-btn" onclick="closeModal('pin-change-modal')">✕</button></div>
   <div class="modal-body">
     <div class="form-row">
-      <div class="form-group"><label>現在のPIN（4桁）</label><input type="password" id="pin-old" placeholder="現在のPIN" maxlength="4" style="letter-spacing:.3em;font-size:18px"></div>
+      <div class="form-group"><label>現在のPIN（4桁以上の数字）</label><input type="password" id="pin-old" placeholder="現在のPIN" maxlength="8" minlength="4" inputmode="numeric" pattern="[0-9]{4,}" autocomplete="current-password" style="letter-spacing:.3em;font-size:18px"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>新しいPIN（4桁）</label><input type="password" id="pin-new" placeholder="新しいPIN" maxlength="4" style="letter-spacing:.3em;font-size:18px"></div>
+      <div class="form-group"><label>新しいPIN（4桁以上）</label><input type="password" id="pin-new" placeholder="新しいPIN" maxlength="8" minlength="4" inputmode="numeric" pattern="[0-9]{4,}" autocomplete="new-password" style="letter-spacing:.3em;font-size:18px"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>新しいPIN（確認）</label><input type="password" id="pin-confirm" placeholder="確認用PIN" maxlength="4" style="letter-spacing:.3em;font-size:18px"></div>
+      <div class="form-group"><label>新しいPIN（確認）</label><input type="password" id="pin-confirm" placeholder="確認用PIN" maxlength="8" minlength="4" inputmode="numeric" pattern="[0-9]{4,}" autocomplete="new-password" style="letter-spacing:.3em;font-size:18px"></div>
     </div>
     <div id="pin-change-error" style="color:var(--red);font-size:13px;min-height:18px"></div>
   </div>
@@ -3055,8 +3065,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.11.1';
-const APP_BUILD_TIME='2026/04/19 01:12';
+const APP_VERSION='v3.13';
+const APP_BUILD_TIME='2026/04/19 05:10';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4016,15 +4026,17 @@ function renderDocRows(tbodyId,list,showType){
   tbody.innerHTML=list.map(d=>{
     const st=docStatuses.find(x=>x.value===d.status);
     const statusBadge=st
-      ?`<span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;background:${st.bg};color:${st.color};white-space:nowrap">${st.label}</span>`
-      :`<span class="badge badge-draft">${d.status||'下書き'}</span>`;
+      ?`<span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;background:${escAttr(st.bg)};color:${escAttr(st.color)};white-space:nowrap">${escAttr(st.label)}</span>`
+      :`<span class="badge badge-draft">${escAttr(d.status||'下書き')}</span>`;
+    // onclick文字列のJSリテラル安全化
+    const custForJs=(d.customer||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'\\r');
     return`<tr style="cursor:pointer" onclick="previewDoc('${d.id}')" title="クリックでプレビュー">
-    <td style="font-family:monospace;font-size:12px">${d.number}</td>
-    ${showType?`<td><span class="badge ${tc[d.type]||''}">${d.type}</span></td>`:''}
-    <td><a href="#" onclick="openCustDetail('${(d.customer||'').replace(/'/g,"\\'")}');return false" style="color:var(--accent);text-decoration:none;font-weight:500">${d.customer||'—'}</a></td>
-    <td style="color:var(--text2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.subject||'—'}</td>
-    ${!showType?`<td>${d.category?`<span class="badge" style="background:${CATS[d.category]||'#999'}20;color:${CATS[d.category]||'#999'};font-size:10px">${d.category}</span>`:'—'}</td>`:''}
-    <td style="white-space:nowrap">${d.date}</td>
+    <td style="font-family:monospace;font-size:12px">${escAttr(d.number||'')}</td>
+    ${showType?`<td><span class="badge ${tc[d.type]||''}">${escAttr(d.type||'')}</span></td>`:''}
+    <td><a href="#" onclick="openCustDetail('${custForJs}');return false" style="color:var(--accent);text-decoration:none;font-weight:500">${escAttr(d.customer||'—')}</a></td>
+    <td style="color:var(--text2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(d.subject||'—')}</td>
+    ${!showType?`<td>${d.category?`<span class="badge" style="background:${CATS[d.category]||'#999'}20;color:${CATS[d.category]||'#999'};font-size:10px">${escAttr(d.category)}</span>`:'—'}</td>`:''}
+    <td style="white-space:nowrap">${escAttr(d.date||'')}</td>
     <td style="text-align:right;font-weight:500">${fmt(d.grandTotal)}</td>
     <td>${statusBadge}</td>
     <td style="white-space:nowrap;display:flex;gap:3px;padding:6px 8px;flex-wrap:wrap">
@@ -4675,6 +4687,9 @@ function escAttr(s){
   if(s==null) return '';
   return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+// HTMLコンテンツエスケープ（textContentの代替・XSS対策）
+// escAttr と同じ処理だが用途を明確にするための別名
+const escHtml = escAttr;
 
 function renderCustomerList(){
   const search=(document.getElementById('cust-search')?.value||'').toLowerCase();
@@ -4685,7 +4700,8 @@ function renderCustomerList(){
   tbody.innerHTML=list.map(c=>{
     const count=docs.filter(d=>d.customer===c.name||d.customerId===c.id).length;
     const mc=(c.contacts||[])[0];
-    const escName=c.name.replace(/'/g,"\\'");
+    // JS文字列に安全に埋め込むためのエスケープ（\ ' " 改行 タブ 全てエスケープ）
+    const escName=(c.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t');
     return`<tr>
       <td style="white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis">
         <a href="#" onclick="openCustDetail('${c.id}',true);return false" style="color:var(--accent);font-weight:700;text-decoration:none">${escAttr(c.name)}</a>
@@ -5559,7 +5575,7 @@ function renderReport(){
 }
 
 // ===== TEMPLATES =====
-function renderTemplates(){const el=document.getElementById('template-list');if(!el)return;if(!templates.length){el.innerHTML=`<div style="text-align:center;color:var(--text3);padding:40px">テンプレートがありません。追加ボタンから作成してください。</div>`;return;}el.innerHTML=templates.map(t=>`<div class="tmpl-card"><div style="font-size:22px;width:34px;text-align:center">📋</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${t.name}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${t.category||'カテゴリなし'}　${t.lines.length}項目　${fmt(t.lines.reduce((s,l)=>s+l.qty*l.price,0))}</div></div><div style="display:flex;gap:5px"><button class="btn btn-secondary btn-sm" onclick="editTemplate('${t.id}')">編集</button><button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteTemplate('${t.id}'))">削除</button></div></div>`).join('');}
+function renderTemplates(){const el=document.getElementById('template-list');if(!el)return;if(!templates.length){el.innerHTML=`<div style="text-align:center;color:var(--text3);padding:40px">テンプレートがありません。追加ボタンから作成してください。</div>`;return;}el.innerHTML=templates.map(t=>`<div class="tmpl-card"><div style="font-size:22px;width:34px;text-align:center">📋</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${escAttr(t.name||'')}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${escAttr(t.category||'カテゴリなし')}　${(t.lines||[]).length}項目　${fmt((t.lines||[]).reduce((s,l)=>s+(Number(l.qty)||0)*(Number(l.price)||0),0))}</div></div><div style="display:flex;gap:5px"><button class="btn btn-secondary btn-sm" onclick="editTemplate('${t.id}')">編集</button><button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteTemplate('${t.id}'))">削除</button></div></div>`).join('');}
 function openTemplateModal(){editingTmplId=null;document.getElementById('tmpl-modal-title').textContent='テンプレート追加';document.getElementById('tmpl-name').value='';document.getElementById('tmpl-category').value='';document.getElementById('tmpl-lines-container').innerHTML='';addTmplLine();document.getElementById('template-modal').classList.add('open');}
 function editTemplate(id){const t=templates.find(x=>x.id===id);if(!t)return;editingTmplId=id;document.getElementById('tmpl-modal-title').textContent='テンプレートを編集';document.getElementById('tmpl-name').value=t.name;document.getElementById('tmpl-category').value=t.category||'';document.getElementById('tmpl-lines-container').innerHTML='';(t.lines||[]).forEach(l=>addTmplLine(l));document.getElementById('template-modal').classList.add('open');}
 function addTmplLine(data){const c=document.getElementById('tmpl-lines-container');const uid='tl'+Date.now()+Math.random().toString(36).slice(2,5);const d=document.createElement('div');d.className='line-item';d.id=uid;d.style.gridTemplateColumns='24px 3fr 60px 100px 80px 80px 34px';
@@ -5817,6 +5833,8 @@ async function fbLogin(){
     try{
       const cred=F.GoogleAuthProvider.credentialFromResult(result);
       if(cred?.accessToken){
+        // メモリ優先（XSS耐性）＋ sessionStorage（ページリロード復元用）
+        window._gcalToken = { token: cred.accessToken, at: Date.now() };
         sessionStorage.setItem('google_access_token', cred.accessToken);
         sessionStorage.setItem('google_token_at', String(Date.now()));
       }
@@ -5833,6 +5851,8 @@ async function fbLogout(){
     if(!F) return;
     if(fbUnsubscribe){ fbUnsubscribe(); fbUnsubscribe=null; }
     closeDrawer();
+    // Gcal トークンを完全破棄（メモリ+sessionStorage）
+    if(typeof clearGcalToken==='function') clearGcalToken();
     await F.signOut(F.auth);
     showToast('ログアウトしました', '#27AE60');
   });
@@ -5965,9 +5985,32 @@ function persist(){
   _persistTimer = setTimeout(()=>_fbPersist(), 300);
 }
 
+// 重要な保存時に使う: debounceをキャンセルして即座にFirestoreに保存し、完了まで待つ
+async function persistNow(){
+  // localStorage保存（同期）
+  try{
+    localStorage.setItem('docs_v4',      JSON.stringify(docs));
+    localStorage.setItem('customers_v4', JSON.stringify(customers));
+    localStorage.setItem('settings_v4',  JSON.stringify(settings));
+    localStorage.setItem('jobs_v4',      JSON.stringify(jobs));
+    localStorage.setItem('templates_v4', JSON.stringify(templates));
+    localStorage.setItem('employees_v4', JSON.stringify(employees));
+    localStorage.setItem('branches_v6',  JSON.stringify(branches));
+    localStorage.setItem('payments_v6',  JSON.stringify(payments));
+    localStorage.setItem('docPhotos_v6', JSON.stringify(docPhotos));
+    localStorage.setItem('expenses_v7',  JSON.stringify(expenses));
+    localStorage.setItem('bulletins_v1', JSON.stringify(bulletins));
+  }catch(e){}
+  // 待機中のdebounceをキャンセル
+  clearTimeout(_persistTimer);
+  _persistTimer = null;
+  // Firestoreに即保存（完了まで待つ）
+  return await _fbPersist();
+}
+
 async function _fbPersist(){
   const F = window._FB;
-  if(!F||!currentUser) return;
+  if(!F||!currentUser) return { ok:false, error:'not logged in' };
   showSync();
   try{
     const uid = currentUser.uid;
@@ -6001,6 +6044,7 @@ async function _fbPersist(){
     const sizeBytes = new Blob([JSON.stringify(payload)]).size;
     const SIZE_LIMIT = 900 * 1024; // 900KB（Firestore 1MB上限の90%で安全マージン）
 
+    let chunkCount = 0;
     if(sizeBytes < SIZE_LIMIT){
       // 通常保存（サイズOK）
       await F.setDoc(F.doc(F.db,'users',uid), payload);
@@ -6010,7 +6054,7 @@ async function _fbPersist(){
         const deletePromises=[];
         chunksSnap.forEach(d=>deletePromises.push(F.deleteDoc(d.ref)));
         if(deletePromises.length) await Promise.all(deletePromises);
-      }catch(e){}
+      }catch(e){ console.warn('Old chunks cleanup skipped:', e.message); }
     } else {
       // サイズ超過 → docs だけ分割して別コレクションに保存
       console.warn(`[persist] Size ${(sizeBytes/1024).toFixed(0)}KB exceeds limit, splitting docs`);
@@ -6027,17 +6071,20 @@ async function _fbPersist(){
       for(let i=0; i<docsForFB.length; i+=CHUNK_SIZE){
         chunks.push(docsForFB.slice(i, i+CHUNK_SIZE));
       }
+      chunkCount = chunks.length;
       // 既存チャンクを削除
       try{
         const existingChunks = await F.getDocs(F.collection(F.db,'users',uid,'docChunks'));
-        existingChunks.forEach(d=>F.deleteDoc(d.ref));
-      }catch(e){}
-      // 新しいチャンクを保存
-      await Promise.all(chunks.map((chunk,idx)=>
-        F.setDoc(F.doc(F.db,'users',uid,'docChunks','chunk_'+String(idx).padStart(4,'0')),{
-          docs: chunk, chunkIndex: idx, totalChunks: chunks.length
-        })
-      ));
+        const deletePromises=[];
+        existingChunks.forEach(d=>deletePromises.push(F.deleteDoc(d.ref)));
+        if(deletePromises.length) await Promise.all(deletePromises);
+      }catch(e){ console.warn('Chunk cleanup skipped:', e.message); }
+      // 新しいチャンクを保存（順次でエラー発生時を検知）
+      for(let idx=0; idx<chunks.length; idx++){
+        await F.setDoc(F.doc(F.db,'users',uid,'docChunks','chunk_'+String(idx).padStart(4,'0')),{
+          docs: chunks[idx], chunkIndex: idx, totalChunks: chunks.length
+        });
+      }
       console.log(`[persist] Saved ${docsForFB.length} docs in ${chunks.length} chunks`);
     }
 
@@ -6045,9 +6092,11 @@ async function _fbPersist(){
     if(Object.keys(docPhotos).length > 0){
       await F.setDoc(F.doc(F.db,'users',uid,'extra','photos'),{ docPhotos });
     }
+    return { ok:true, sizeBytes, chunkCount };
   }catch(e){
     console.error('FB save error:',e);
     showToast(`同期エラー（ローカル保存済み）: ${e.message}`,'#E67E22');
+    return { ok:false, error:e.message };
   }finally{
     hideSync();
   }
@@ -6252,6 +6301,8 @@ function initAppAfterAuth(){
     showToast('✅ システムが v'+APP_VERSION+' に更新されました！', '#27AE60');
     window._showUpdateBannerOnLoad=null;
   }
+  // 起動時マイグレーション（旧データとの互換性）
+  if(typeof migratePaymentsToArray==='function') migratePaymentsToArray();
   // ヘッダーのバージョン表示を更新
   const hv=document.getElementById('home-header-version');
   if(hv) hv.textContent=APP_VERSION+' · '+APP_BUILD_TIME;
@@ -6343,31 +6394,84 @@ function pinDel(){pinBuffer=pinBuffer.slice(0,-1);updatePinDots();}
 function pinCancel(){document.getElementById('admin-lock').style.display='none';pinBuffer='';updatePinDots();}
 function updatePinDots(){for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d)d.classList.toggle('filled',i<pinBuffer.length);}}
 function checkPin(){
-  if(pinBuffer===adminPin){
-    isAdminUnlocked=true;
-    document.getElementById('admin-lock').style.display='none';
-    if(pendingAdminPage){showPage(pendingAdminPage,pendingAdminEl);pendingAdminPage=null;pendingAdminEl=null;}
-    renderEmployees();
-  }else{
-    document.getElementById('pin-error').textContent='PINが違います。もう一度お試しください。';
-    pinBuffer='';updatePinDots();
-    const box=document.querySelector('.admin-lock-box');
-    if(box){box.classList.add('shake');setTimeout(()=>box.classList.remove('shake'),400);}
-  }
+  _verifyPin(pinBuffer).then(ok=>{
+    if(ok){
+      isAdminUnlocked=true;
+      document.getElementById('admin-lock').style.display='none';
+      if(pendingAdminPage){showPage(pendingAdminPage,pendingAdminEl);pendingAdminPage=null;pendingAdminEl=null;}
+      renderEmployees();
+      // デフォルトPINのままなら変更を促す
+      if(isDefaultPin()){
+        setTimeout(()=>{
+          showToast('⚠️ PINがデフォルト「1234」のままです。会社設定から変更してください。','#E67E22');
+        },1000);
+      }
+    }else{
+      document.getElementById('pin-error').textContent='PINが違います。もう一度お試しください。';
+      pinBuffer='';updatePinDots();
+      const box=document.querySelector('.admin-lock-box');
+      if(box){box.classList.add('shake');setTimeout(()=>box.classList.remove('shake'),400);}
+    }
+  });
 }
 function lockAdmin(){isAdminUnlocked=false;showPage('dashboard',null);}
 
-function changePin(){
+async function changePin(){
   const old=document.getElementById('pin-old').value;
   const nw=document.getElementById('pin-new').value;
   const cf=document.getElementById('pin-confirm').value;
   const err=document.getElementById('pin-change-error');
-  if(old!==adminPin){err.textContent='現在のPINが違います';return;}
-  if(!/^\d{4}$/.test(nw)){err.textContent='新しいPINは4桁の数字を入力してください';return;}
+  const okOld=await _verifyPin(old);
+  if(!okOld){err.textContent='現在のPINが違います';return;}
+  if(!/^\d{4,}$/.test(nw)){err.textContent='新しいPINは4桁以上の数字を入力してください';return;}
+  if(nw==='1234'){err.textContent='デフォルトPIN「1234」は使用できません';return;}
   if(nw!==cf){err.textContent='確認用PINが一致しません';return;}
-  adminPin=nw;localStorage.setItem('adminPin',adminPin);
+  // ハッシュ化して保存
+  const newHash=await _hashPin(nw);
+  localStorage.setItem('adminPinHash', newHash);
+  localStorage.removeItem('adminPin'); // 平文を削除
   err.textContent='';closeModal('pin-change-modal');
-  alert('PINを変更しました。');
+  showToast('✓ PINを変更しました','#10B981');
+}
+
+// ===== PIN認証（SHA-256ハッシュ化） =====
+// 旧: adminPin は平文 / 新: adminPinHash は SHA-256(pin + salt)
+// 互換性: 既存の平文PINがあれば初回チェック時に自動でハッシュ化移行
+const PIN_SALT = 'flexsys2026-admin-salt-v1';
+
+async function _hashPin(pin){
+  const data = new TextEncoder().encode(pin + PIN_SALT);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// PINを検証（平文保存と新ハッシュ保存の両方をサポート）
+async function _verifyPin(inputPin){
+  // 新形式（ハッシュ）
+  const storedHash = localStorage.getItem('adminPinHash');
+  if(storedHash){
+    const inputHash = await _hashPin(inputPin);
+    return inputHash === storedHash;
+  }
+  // 旧形式（平文）: デフォルト"1234"も含む
+  const storedPlain = localStorage.getItem('adminPin') || '1234';
+  if(inputPin === storedPlain){
+    // 認証成功 → 自動でハッシュ化して移行
+    const newHash = await _hashPin(inputPin);
+    localStorage.setItem('adminPinHash', newHash);
+    localStorage.removeItem('adminPin'); // 平文は削除
+    console.log('[migration] PIN hashed and migrated');
+    return true;
+  }
+  return false;
+}
+
+// 初期PINチェック（"1234"のままなら警告）
+function isDefaultPin(){
+  const plain = localStorage.getItem('adminPin');
+  const hashed = localStorage.getItem('adminPinHash');
+  if(!hashed && (!plain || plain==='1234')) return true;
+  return false;
 }
 
 // ===== EMPLOYEES =====
@@ -6384,22 +6488,24 @@ function renderEmployees(){
   if(!employees.length){list.innerHTML=`<div style="text-align:center;color:var(--text3);padding:40px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)">従業員が登録されていません。「＋ 従業員追加」から登録してください。</div>`;return;}
   list.innerHTML=employees.map(e=>{
     const age=e.birthday?Math.floor((new Date()-new Date(e.birthday))/(365.25*864e5)):'—';
-    const lineUrl=e.line?(e.line.startsWith('http')?e.line:`https://line.me/ti/p/~${e.line}`):'';
+    const lineUrlRaw=e.line?(e.line.startsWith('http')?e.line:`https://line.me/ti/p/~${e.line}`):'';
+    // URLインジェクション対策: http(s)のみ許可
+    const lineUrl=lineUrlRaw && /^https?:\/\//.test(lineUrlRaw)?lineUrlRaw:'';
     return`<div class="emp-card">
-      ${e.photo?`<img src="${e.photo}" class="emp-avatar" alt="${e.name}">`:`<div class="emp-avatar-placeholder">${e.name?e.name.charAt(0):'?'}</div>`}
+      ${e.photo?`<img src="${escAttr(e.photo)}" class="emp-avatar" alt="${escAttr(e.name||'')}">`:`<div class="emp-avatar-placeholder">${escAttr(e.name?e.name.charAt(0):'?')}</div>`}
       <div class="emp-info">
-        <div class="emp-name">${e.name} ${e.isAdmin?'<span style="font-size:10px;background:var(--gold);color:white;padding:2px 7px;border-radius:99px;margin-left:6px;font-weight:700">👑 管理者</span>':''}</div>
-        <div class="emp-role">${[e.role,e.type].filter(Boolean).join('　/　')}</div>
+        <div class="emp-name">${escAttr(e.name||'')} ${e.isAdmin?'<span style="font-size:10px;background:var(--gold);color:white;padding:2px 7px;border-radius:99px;margin-left:6px;font-weight:700">👑 管理者</span>':''}</div>
+        <div class="emp-role">${escAttr([e.role,e.type].filter(Boolean).join('　/　'))}</div>
         <div class="emp-meta">
-          ${e.tel?`<div class="emp-meta-item">📞 <a href="tel:${e.tel}" style="color:var(--blue);text-decoration:none">${e.tel}</a></div>`:''}
-          ${e.email?`<div class="emp-meta-item">✉️ <a href="mailto:${e.email}" style="color:var(--blue);text-decoration:none">${e.email}</a></div>`:''}
-          ${e.google?`<div class="emp-meta-item" style="color:var(--accent);font-weight:600">🔐 Google: ${e.google}</div>`:''}
-          ${e.birthday?`<div class="emp-meta-item">🎂 ${e.birthday}（${age}歳）</div>`:''}
-          ${e.address?`<div class="emp-meta-item">📍 ${e.address}</div>`:''}
-          ${e.zip?`<div class="emp-meta-item">〒 ${e.zip}</div>`:''}
+          ${e.tel?`<div class="emp-meta-item">📞 <a href="tel:${escAttr(e.tel)}" style="color:var(--blue);text-decoration:none">${escAttr(e.tel)}</a></div>`:''}
+          ${e.email?`<div class="emp-meta-item">✉️ <a href="mailto:${escAttr(e.email)}" style="color:var(--blue);text-decoration:none">${escAttr(e.email)}</a></div>`:''}
+          ${e.google?`<div class="emp-meta-item" style="color:var(--accent);font-weight:600">🔐 Google: ${escAttr(e.google)}</div>`:''}
+          ${e.birthday?`<div class="emp-meta-item">🎂 ${escAttr(e.birthday)}（${age}歳）</div>`:''}
+          ${e.address?`<div class="emp-meta-item">📍 ${escAttr(e.address)}</div>`:''}
+          ${e.zip?`<div class="emp-meta-item">〒 ${escAttr(e.zip)}</div>`:''}
           ${e.memo?`<div class="emp-meta-item" style="grid-column:1/-1">📝 ${escAttr(e.memo)}</div>`:''}
         </div>
-        ${lineUrl?`<div style="margin-top:8px"><a href="${lineUrl}" class="line-contact-btn" target="_blank">💬 LINEで連絡する</a></div>`:''}
+        ${lineUrl?`<div style="margin-top:8px"><a href="${escAttr(lineUrl)}" class="line-contact-btn" target="_blank" rel="noopener noreferrer">💬 LINEで連絡する</a></div>`:''}
         ${e.google?`<div style="margin-top:10px;padding:10px;background:var(--surface2);border-radius:8px">
           <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">🛡️ アクセス権限</div>
           <label style="display:inline-flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;margin-right:12px">
@@ -6505,7 +6611,27 @@ function getPaymentStatus(doc){
   return '一部入金';
 }
 function getPaymentTotal(docId){
-  return (payments[docId]||[]).reduce((s,p)=>s+(p.amount||0),0);
+  // 旧データ互換: 単一オブジェクト or 配列 どちらも受け付ける
+  let list=payments[docId];
+  if(!list) list=[];
+  else if(!Array.isArray(list)) list=[list];
+  return list.reduce((s,p)=>s+(Number(p.amount)||Number(p.paidAmount)||0),0);
+}
+
+// 起動時マイグレーション: payments の非配列値を配列に変換
+function migratePaymentsToArray(){
+  if(!payments || typeof payments!=='object') return;
+  let migrated=0;
+  for(const docId in payments){
+    if(payments[docId] && !Array.isArray(payments[docId])){
+      payments[docId]=[payments[docId]];
+      migrated++;
+    }
+  }
+  if(migrated>0){
+    console.log(`[migration] payments: ${migrated} entries normalized to array`);
+    try{localStorage.setItem('payments_v6', JSON.stringify(payments));}catch(e){}
+  }
 }
 
 function renderPayments(){
@@ -8006,8 +8132,9 @@ function updateResetPinDots(){
     if(d) d.classList.toggle('filled',i<resetPinBuffer.length);
   }
 }
-function executeReset(){
-  if(resetPinBuffer!==adminPin){
+async function executeReset(){
+  const ok=await _verifyPin(resetPinBuffer);
+  if(!ok){
     document.getElementById('reset-pin-error').textContent='PINが違います';
     resetPinBuffer='';updateResetPinDots();
     const box=document.querySelector('#reset-modal .admin-lock-box');
@@ -8977,7 +9104,21 @@ function setGcalCalendarId(id){
   localStorage.setItem('gcalCalendarId', id||'primary');
 }
 function getGcalAccessToken(){
-  return sessionStorage.getItem('google_access_token')||'';
+  // メモリ優先（XSS耐性）、なければsessionStorageから復元
+  if(window._gcalToken?.token) return window._gcalToken.token;
+  const token = sessionStorage.getItem('google_access_token')||'';
+  if(token){
+    // メモリにも読み込む
+    window._gcalToken = { token, at: parseInt(sessionStorage.getItem('google_token_at')||'0') };
+  }
+  return token;
+}
+
+// トークンを完全に破棄
+function clearGcalToken(){
+  window._gcalToken = null;
+  sessionStorage.removeItem('google_access_token');
+  sessionStorage.removeItem('google_token_at');
 }
 
 // 作業をGoogleカレンダーのイベントに変換
@@ -9053,7 +9194,7 @@ async function callGcalApi(path, method, body){
   });
   if(!res.ok){
     if(res.status===401){
-      sessionStorage.removeItem('google_access_token');
+      clearGcalToken();
       throw new Error('認証期限切れ。一度ログアウトして再ログインしてください。');
     }
     const errText=await res.text();
@@ -10003,7 +10144,7 @@ function randomTime(){
 }
 
 function generateSampleData(){
-  showConfirm('サンプルデータを生成します。\n既存のデータは保持されますが、テスト用データが大量に追加されます。\nよろしいですか？',()=>{
+  showConfirm('サンプルデータを生成します。\n既存のデータは保持されますが、テスト用データが大量に追加されます。\nよろしいですか？',async ()=>{
     const year=parseInt(document.getElementById('dev-year').value);
     const count=parseInt(document.getElementById('dev-count').value);
     const opts={
@@ -10175,7 +10316,9 @@ function generateSampleData(){
       });
     }
 
-    persist();
+    // persist を await して Firestore 保存の完了を待つ
+    showToast('💾 Firebaseに保存中...', '#3B82F6');
+    const saveResult = await persistNow();
     // 全フィルターを「すべて」にリセット
     if(typeof dfState==='object'){
       ['quotes','invoices','receipts'].forEach(k=>{
@@ -10201,10 +10344,23 @@ function generateSampleData(){
         totals:{docs:docs.length,customers:customers.length,employees:employees.length,expenses:expenses.length,jobs:jobs.length},
         sampleQuotes:docs.filter(d=>d.type==='見積書'&&d._sample).length,
         sampleInvoices:docs.filter(d=>d.type==='請求書'&&d._sample).length,
-        sampleReceipts:docs.filter(d=>d.type==='領収書'&&d._sample).length
+        sampleReceipts:docs.filter(d=>d.type==='領収書'&&d._sample).length,
+        saveResult
       });
     }catch(e){}
-    showToast(`✓ サンプルデータを生成しました\n見積:${docs.filter(d=>d.type==='見積書'&&d._sample).length} / 請求:${docs.filter(d=>d.type==='請求書'&&d._sample).length} / 領収:${docs.filter(d=>d.type==='領収書'&&d._sample).length}\n顧客:${added.customers} / 経費:${added.expenses} / 作業:${added.jobs}`);
+    // 結果メッセージに保存状態を明示
+    let resultMsg=`✓ サンプルデータを生成しました\n見積:${docs.filter(d=>d.type==='見積書'&&d._sample).length} / 請求:${docs.filter(d=>d.type==='請求書'&&d._sample).length} / 領収:${docs.filter(d=>d.type==='領収書'&&d._sample).length}\n顧客:${added.customers} / 経費:${added.expenses} / 作業:${added.jobs}`;
+    if(saveResult?.ok){
+      if(saveResult.chunkCount>0){
+        resultMsg+=`\n💾 Firebase保存: OK (${saveResult.chunkCount}チャンクに分割・${(saveResult.sizeBytes/1024).toFixed(0)}KB)`;
+      } else {
+        resultMsg+=`\n💾 Firebase保存: OK (${(saveResult.sizeBytes/1024).toFixed(0)}KB)`;
+      }
+      showToast(resultMsg,'#10B981');
+    } else {
+      resultMsg+=`\n⚠️ Firebase保存失敗: ${saveResult?.error||'不明'}\nローカルのみに保存（再ログインで消える可能性あり）`;
+      showToast(resultMsg,'#C0392B');
+    }
   });
 }
 
