@@ -799,7 +799,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.7</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.8</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -823,7 +823,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.7</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.8</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -858,7 +858,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.7</div>
+    <div class="logo-version" id="sidebar-version">v3.8</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -993,7 +993,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.7 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.8 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -2009,12 +2009,23 @@ if('serviceWorker' in navigator){
 
 <!-- JOB MODAL -->
 <div class="modal-overlay" id="job-modal">
-<div class="modal" style="max-width:480px">
+<div class="modal" style="max-width:520px">
   <div class="modal-header"><h3 id="job-modal-title">作業を追加</h3><button class="close-btn" onclick="closeModal('job-modal')">✕</button></div>
   <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group" style="margin:0">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="job-allday" onchange="toggleJobAllDay()" style="width:16px;height:16px"> 終日
+        </label>
+      </div>
+    </div>
     <div class="form-row cols2">
-      <div class="form-group"><label>日付 ＊</label><input type="date" id="job-date"></div>
-      <div class="form-group"><label>時間</label><input type="time" id="job-time"></div>
+      <div class="form-group"><label>開始日 ＊</label><input type="date" id="job-date"></div>
+      <div class="form-group" id="job-time-wrap"><label>開始時刻</label><input type="time" id="job-time"></div>
+    </div>
+    <div class="form-row cols2">
+      <div class="form-group"><label>終了日</label><input type="date" id="job-end-date"></div>
+      <div class="form-group" id="job-end-time-wrap"><label>終了時刻</label><input type="time" id="job-end-time"></div>
     </div>
     <div class="form-row cols2">
       <div class="form-group">
@@ -2063,6 +2074,7 @@ if('serviceWorker' in navigator){
     <div class="form-row"><div class="form-group"><label>メモ</label><textarea id="job-memo" placeholder="備考など"></textarea></div></div>
   </div>
   <div class="modal-footer">
+    <button class="btn btn-danger" id="job-delete-btn" onclick="deleteJobFromModal()" style="display:none;margin-right:auto">🗑 削除</button>
     <button class="btn btn-secondary" onclick="closeModal('job-modal')">キャンセル</button>
     <button class="btn btn-primary" onclick="saveJob()">💾 保存する</button>
   </div>
@@ -2657,8 +2669,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.7';
-const APP_BUILD_TIME='2026/04/18 22:20';
+const APP_VERSION='v3.8';
+const APP_BUILD_TIME='2026/04/18 22:32';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4292,24 +4304,44 @@ function jobsToFcEvents(){
   return jobs.map(j=>{
     const cat=j.category||'';
     const color=CATS[cat]||'#5BAD7E';
-    const startTime=j.time||'09:00';
-    const ev={
+    const isAllDay=!!j.allDay || !j.time;
+    const startStr=isAllDay?j.date:(j.date+'T'+(j.time||'09:00')+':00');
+    let endStr=null;
+    if(j.endDate || j.endTime){
+      if(isAllDay){
+        // 終日の場合、FullCalendarはend exclusiveなので+1日
+        if(j.endDate){
+          const ed=new Date(j.endDate);
+          ed.setDate(ed.getDate()+1);
+          endStr=ed.toISOString().split('T')[0];
+        }
+      } else {
+        const ed=j.endDate||j.date;
+        const et=j.endTime||j.time;
+        if(et) endStr=ed+'T'+et+':00';
+      }
+    } else if(!isAllDay && j.time){
+      // 時間のみ: デフォルト1時間
+      const [h,m]=j.time.split(':').map(Number);
+      const endDt=new Date(j.date+'T'+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00');
+      endDt.setHours(endDt.getHours()+1);
+      endStr=endDt.toISOString();
+    }
+    const titleParts=[];
+    if(!isAllDay && j.time) titleParts.push(j.time);
+    titleParts.push(j.title||'(無題)');
+    if(j.customer) titleParts.push('/ '+j.customer);
+    return {
       id:j.id,
-      title:(j.time?j.time+' ':'')+(j.title||'(無題)')+(j.customer?' / '+j.customer:''),
-      start:j.date+(j.time?'T'+j.time+':00':''),
-      allDay:!j.time,
+      title:titleParts.join(' '),
+      start:startStr,
+      end:endStr,
+      allDay:isAllDay,
       backgroundColor:color,
       borderColor:color,
       textColor:'#fff',
       extendedProps:{job:j}
     };
-    if(j.time){
-      const [h,m]=j.time.split(':').map(Number);
-      const endDt=new Date(j.date+'T'+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00');
-      endDt.setHours(endDt.getHours()+1);
-      ev.end=endDt.toISOString();
-    }
-    return ev;
   });
 }
 
@@ -4344,13 +4376,21 @@ function renderCalendar(){
       headerToolbar:{
         left:'prev,next today',
         center:'title',
-        right:'dayGridMonth,listMonth'
+        right:'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
       },
       buttonText:{
         today:'今日',
         month:'月',
+        week:'週',
+        day:'日',
         list:'リスト'
       },
+      slotMinTime:'06:00:00',
+      slotMaxTime:'22:00:00',
+      slotDuration:'00:30:00',
+      allDaySlot:true,
+      allDayText:'終日',
+      nowIndicator:true,
       dayCellClassNames:(arg)=>{
         const dow=arg.date.getDay();
         if(dow===6) return ['fc-day-sat-color'];
@@ -4358,44 +4398,79 @@ function renderCalendar(){
         return [];
       },
       events:jobsToFcEvents(),
-      editable:true, // ドラッグ&ドロップ有効
+      editable:true,
       eventStartEditable:true,
-      eventDurationEditable:false, // Phase A は時間幅変更なし
+      eventDurationEditable:true, // 時間幅変更も可能に
       dayMaxEvents:3,
       moreLinkText:n=>'+'+n+'件',
-      // 日付クリック → 新規作業追加
       dateClick:(info)=>{
         openJobModal(info.dateStr);
       },
-      // 予定クリック → 編集
       eventClick:(info)=>{
         const job=info.event.extendedProps.job;
         if(job?.id) editJob(job.id);
       },
-      // 予定ドロップ（日付移動）
       eventDrop:async (info)=>{
         const job=info.event.extendedProps.job;
         if(!job){info.revert();return;}
+        const newStart=info.event.start;
+        const newDate=newStart.toISOString().split('T')[0];
+        const newTime=info.event.allDay?'':String(newStart.getHours()).padStart(2,'0')+':'+String(newStart.getMinutes()).padStart(2,'0');
         const oldDate=job.date;
-        const newDate=info.event.startStr.split('T')[0];
-        if(oldDate===newDate){info.revert();return;}
-        showConfirm(
-          `「${job.title}」を ${oldDate} → ${newDate} に移動しますか？`,
+        const oldTime=job.time||'';
+        if(oldDate===newDate && oldTime===newTime){info.revert();return;}
+        const msg=info.event.allDay
+          ? `「${job.title}」を ${oldDate} → ${newDate} に移動しますか？`
+          : `「${job.title}」を ${oldDate} ${oldTime} → ${newDate} ${newTime} に移動しますか？`;
+        showConfirm(msg,
           ()=>{
             const idx=jobs.findIndex(x=>x.id===job.id);
             if(idx<0){info.revert();return;}
             jobs[idx].date=newDate;
+            jobs[idx].time=newTime;
+            jobs[idx].allDay=info.event.allDay;
+            // 終了日時も移動分シフト
+            if(info.event.end){
+              jobs[idx].endDate=info.event.end.toISOString().split('T')[0];
+              if(!info.event.allDay){
+                jobs[idx].endTime=String(info.event.end.getHours()).padStart(2,'0')+':'+String(info.event.end.getMinutes()).padStart(2,'0');
+              }
+            }
             stampAudit(jobs[idx], false);
             persist();
             renderJobList();
-            // Gcal 同期
             if(typeof isGcalEnabled==='function' && isGcalEnabled()){
               syncJobToGcal(jobs[idx]).catch(e=>console.warn('Gcal sync failed:',e));
             }
-            showToast(`✓ ${newDate} に移動しました`);
+            showToast(`✓ 移動しました`);
           },
           ()=>{ info.revert(); }
         );
+      },
+      // 期間サイズ変更
+      eventResize:(info)=>{
+        const job=info.event.extendedProps.job;
+        if(!job){info.revert();return;}
+        const idx=jobs.findIndex(x=>x.id===job.id);
+        if(idx<0){info.revert();return;}
+        if(info.event.end){
+          if(info.event.allDay){
+            // 終日の場合、Gcal同様 end exclusive なので-1日
+            const ed=new Date(info.event.end);
+            ed.setDate(ed.getDate()-1);
+            jobs[idx].endDate=ed.toISOString().split('T')[0];
+          } else {
+            jobs[idx].endDate=info.event.end.toISOString().split('T')[0];
+            jobs[idx].endTime=String(info.event.end.getHours()).padStart(2,'0')+':'+String(info.event.end.getMinutes()).padStart(2,'0');
+          }
+        }
+        stampAudit(jobs[idx], false);
+        persist();
+        renderJobList();
+        if(typeof isGcalEnabled==='function' && isGcalEnabled()){
+          syncJobToGcal(jobs[idx]).catch(e=>console.warn('Gcal sync failed:',e));
+        }
+        showToast('✓ 期間を変更しました');
       },
       // 月切替時に下のリストも更新
       datesSet:(info)=>{
@@ -4461,17 +4536,28 @@ function renderJobList(){
       <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteJob('${j.id}'))">削除</button>
     </td></tr>`).join('');
 }
+function toggleJobAllDay(){
+  const allDay=document.getElementById('job-allday').checked;
+  document.getElementById('job-time-wrap').style.display=allDay?'none':'block';
+  document.getElementById('job-end-time-wrap').style.display=allDay?'none':'block';
+}
+
 function openJobModal(date){
   editingJobId=null;
   document.getElementById('job-modal-title').textContent='作業を追加';
   document.getElementById('job-date').value=date||today();
   document.getElementById('job-time').value='';
+  document.getElementById('job-end-date').value='';
+  document.getElementById('job-end-time').value='';
+  document.getElementById('job-allday').checked=false;
   document.getElementById('job-customer').value='';
   document.getElementById('job-title').value='';
   document.getElementById('job-category').value='';
   document.getElementById('job-memo').value='';
   buildJobCustSelect('');
   document.getElementById('job-new-cust-area').style.display='none';
+  document.getElementById('job-delete-btn').style.display='none';
+  toggleJobAllDay();
   document.getElementById('job-modal').classList.add('open');
 }
 function editJob(id){
@@ -4480,24 +4566,41 @@ function editJob(id){
   document.getElementById('job-modal-title').textContent='作業を編集';
   document.getElementById('job-date').value=j.date;
   document.getElementById('job-time').value=j.time||'';
+  document.getElementById('job-end-date').value=j.endDate||'';
+  document.getElementById('job-end-time').value=j.endTime||'';
+  document.getElementById('job-allday').checked=!!j.allDay;
   document.getElementById('job-customer').value=j.customer||'';
   document.getElementById('job-title').value=j.title;
   document.getElementById('job-category').value=j.category||'';
   document.getElementById('job-memo').value=j.memo||'';
   buildJobCustSelect(j.customer||'');
   document.getElementById('job-new-cust-area').style.display='none';
+  document.getElementById('job-delete-btn').style.display='inline-flex';
+  toggleJobAllDay();
   document.getElementById('job-modal').classList.add('open');
+}
+function deleteJobFromModal(){
+  if(!editingJobId) return;
+  const j=jobs.find(x=>x.id===editingJobId);if(!j) return;
+  showConfirm(`「${j.title}」を削除しますか？\n${isGcalEnabled()&&j.gcalEventId?'Googleカレンダーからも削除されます。':''}`,()=>{
+    deleteJob(editingJobId);
+    closeModal('job-modal');
+  });
 }
 function saveJob(){
   const title=document.getElementById('job-title').value.trim();
   if(!title){showToast('作業内容を入力してください','#C0392B');return;}
+  const allDay=document.getElementById('job-allday').checked;
   const sel=document.getElementById('job-customer-select');
   const custName=sel?.value||document.getElementById('job-customer')?.value||'';
   const existing=editingJobId?jobs.find(x=>x.id===editingJobId):null;
   const j={
     id:editingJobId||('job-'+Date.now()),
     date:document.getElementById('job-date').value,
-    time:document.getElementById('job-time').value,
+    time:allDay?'':document.getElementById('job-time').value,
+    endDate:document.getElementById('job-end-date').value||'',
+    endTime:allDay?'':(document.getElementById('job-end-time').value||''),
+    allDay,
     customer:custName,
     title,
     category:document.getElementById('job-category').value,
@@ -4510,7 +4613,6 @@ function saveJob(){
   else jobs.push(j);
   persist();closeModal('job-modal');renderCalendar();
   showToast('作業予定を保存しました ✓');
-  // Googleカレンダー連携
   if(isGcalEnabled()){
     syncJobToGcal(j).catch(e=>console.warn('Gcal sync failed:',e));
   }
@@ -4518,7 +4620,6 @@ function saveJob(){
 function deleteJob(id){
   const j=jobs.find(x=>x.id===id);if(!j)return;
   pushUndo({type:'job',data:JSON.parse(JSON.stringify(j)),label:`作業「${j.title}」を削除しました`});
-  // Googleカレンダーからも削除
   if(isGcalEnabled() && j.gcalEventId){
     deleteJobFromGcal(j.gcalEventId).catch(e=>console.warn('Gcal delete failed:',e));
   }
@@ -5221,6 +5322,13 @@ function initAppAfterAuth(){
   const hv=document.getElementById('home-header-version');
   if(hv) hv.textContent=APP_VERSION+' · '+APP_BUILD_TIME;
   loadSidebarTitle(); loadSettings(); loadLogo();
+  // settings側にテーマがあれば優先（Firebase同期済み）
+  if(settings && settings.appTheme && settings.appTheme!==currentTheme){
+    currentTheme=settings.appTheme;
+    localStorage.setItem('appTheme',currentTheme);
+    if(currentTheme==='default') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme',currentTheme);
+  }
   renderNavManagement();
   showDeveloperMenu();
   renderAll(); buildMonthlyChart(); initReportYears(); initSrYears();
@@ -6775,10 +6883,14 @@ let currentTheme=localStorage.getItem('appTheme')||'default';
 function applyTheme(name, el){
   currentTheme=name;
   localStorage.setItem('appTheme',name);
+  // Firebase同期もする（全デバイスで反映）
+  if(settings){
+    settings.appTheme=name;
+    persist();
+  }
   const root=document.documentElement;
   if(name==='default') root.removeAttribute('data-theme');
   else root.setAttribute('data-theme',name);
-  // Update active swatch
   document.querySelectorAll('.theme-swatch').forEach(s=>{
     s.classList.toggle('active', s.dataset.theme===name);
   });
@@ -6879,10 +6991,6 @@ function getGcalAccessToken(){
 
 // 作業をGoogleカレンダーのイベントに変換
 function jobToGcalEvent(job){
-  const startTime=job.time||'09:00';
-  const [h,m]=startTime.split(':').map(Number);
-  const start=new Date(`${job.date}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00`);
-  const end=new Date(start.getTime()+60*60*1000); // 1時間枠
   const cust=job.customer?customers.find(c=>c.name===job.customer):null;
   const lines=[];
   if(job.customer) lines.push(`顧客: ${job.customer}`);
@@ -6891,7 +6999,7 @@ function jobToGcalEvent(job){
   lines.push(`─────────`);
   lines.push(`Flexsys2026 ID: ${job.id}`);
   lines.push(`Flexsys2026 から自動同期`);
-  // タイトルを安全に組み立て（空文字・undefined防止）
+  // タイトルを安全に組み立て
   const titleStr=String(job.title||'').trim();
   const categoryStr=String(job.category||'').trim();
   const customerStr=String(job.customer||'').trim();
@@ -6902,14 +7010,41 @@ function jobToGcalEvent(job){
   } else {
     summary=customerStr?`作業 - ${customerStr}`:'作業予定';
   }
-  return {
+
+  const isAllDay=!!job.allDay || !job.time;
+  const event={
     summary: summary,
     location: cust?.address||'',
     description: lines.join('\n'),
-    start: {dateTime: start.toISOString(), timeZone: 'Asia/Tokyo'},
-    end: {dateTime: end.toISOString(), timeZone: 'Asia/Tokyo'},
     extendedProperties: {private: {flexsysJobId: job.id}}
   };
+
+  if(isAllDay){
+    // 終日イベント
+    const startDate=job.date;
+    let endDate=job.endDate||job.date;
+    // GcalはendDate exclusive
+    const ed=new Date(endDate);
+    ed.setDate(ed.getDate()+1);
+    endDate=ed.toISOString().split('T')[0];
+    event.start={date: startDate};
+    event.end={date: endDate};
+  } else {
+    // 時間付き
+    const [h,m]=(job.time||'09:00').split(':').map(Number);
+    const start=new Date(`${job.date}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00`);
+    let end;
+    if(job.endTime){
+      const [eh,em]=job.endTime.split(':').map(Number);
+      const ed=job.endDate||job.date;
+      end=new Date(`${ed}T${String(eh).padStart(2,'0')}:${String(em).padStart(2,'0')}:00`);
+    } else {
+      end=new Date(start.getTime()+60*60*1000); // 1時間枠
+    }
+    event.start={dateTime: start.toISOString(), timeZone: 'Asia/Tokyo'};
+    event.end={dateTime: end.toISOString(), timeZone: 'Asia/Tokyo'};
+  }
+  return event;
 }
 
 // Calendar API呼び出し（共通）
@@ -8050,6 +8185,21 @@ function generateSampleData(){
     }
 
     persist();
+    // フィルターを全て「すべて」にリセット（生成データが見えるように）
+    if(typeof dfState==='object'){
+      ['quotes','invoices','receipts'].forEach(k=>{
+        if(dfState[k]) dfState[k].mode='all';
+        // ボタンUIも更新
+        document.querySelectorAll(`#dfbar-${k} .df-btn`).forEach(btn=>btn.classList.remove('active'));
+        const allBtn=document.querySelector(`#dfbar-${k} .df-btn[data-mode="all"]`);
+        if(allBtn) allBtn.classList.add('active');
+        // 検索・状態フィルタもクリア
+        const sf=document.getElementById('filter-'+k);
+        if(sf) sf.value='';
+        const stf=document.getElementById('status-filter-'+k);
+        if(stf) stf.value='';
+      });
+    }
     renderAll&&renderAll();
     renderEmployees&&renderEmployees();
     renderExpenses&&renderExpenses();
@@ -8059,7 +8209,7 @@ function generateSampleData(){
     if(typeof renderReport==='function') renderReport();
     if(typeof renderStaffReport==='function') renderStaffReport();
     updateDeveloperInfo();
-    showToast(`サンプルデータを生成しました ✓\n顧客:${added.customers} / 従業員:${added.employees} / 書類:${added.docs} / 経費:${added.expenses} / 作業:${added.jobs} / 入金:${added.payments}`);
+    showToast(`サンプルデータを生成しました ✓\n顧客:${added.customers} / 従業員:${added.employees} / 書類:${added.docs} / 経費:${added.expenses} / 作業:${added.jobs} / 入金:${added.payments}\n\nフィルターを「すべて」にリセットしました`);
   });
 }
 
