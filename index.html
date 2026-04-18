@@ -723,7 +723,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.4</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.4.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -749,7 +749,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.4</div>
+    <div class="logo-version" id="sidebar-version">v2.4.1</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -904,7 +904,7 @@ if('serviceWorker' in navigator){
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">🔖</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.4</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.4.1</div>
         <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年04月17日</div>
       </div>
     </div>
@@ -2280,7 +2280,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.4';
+const APP_VERSION='v2.4.1';
 const VERSION_CHECK_URL='https://raw.githubusercontent.com/anojimairori-blip/benriya-system/main/index.html';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -3240,20 +3240,21 @@ function renderSelectedCust(c){
   const distHtml=c.address&&myAddr?`<span class="distance-badge" onclick="openMapModal('${c.id}')" title="地図・距離を表示">📍 距離・地図を表示</span>`:'';
   document.getElementById('selected-cust-card').style.display='block';
   document.getElementById('selected-cust-card').innerHTML=`
-    <div class="cust-info-card">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-        <div class="cust-name-big" style="margin:0"><span class="cust-name-text">${c.name}</span><span style="font-size:12px;font-weight:500;margin-left:6px;background:var(--accent-light);color:var(--accent);padding:1px 7px;border-radius:99px">${c.honorific||'御中'}</span></div>
-        <button class="btn btn-secondary btn-sm" onclick="changeCust()" style="padding:3px 10px;font-size:11px">🔄 別の顧客に変更</button>
+    <div class="cust-info-card" style="padding:10px 12px;line-height:1.6">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+        <div class="cust-name-big" style="margin:0;font-size:14px"><span class="cust-name-text">${c.name}</span><span style="font-size:11px;font-weight:500;margin-left:5px;background:white;color:var(--accent);padding:1px 7px;border-radius:99px;border:1px solid #B8D8C4">${c.honorific||'御中'}</span></div>
+        <button class="btn btn-secondary btn-sm" onclick="changeCust()" style="padding:2px 8px;font-size:10px;margin-left:auto">🔄 変更</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 16px">
-        ${c.zip?`<span>〒 ${c.zip}</span>`:''}
+      <div style="font-size:11.5px;color:var(--text2)">
+        ${c.zip?`〒${c.zip}　`:''}${c.address||''}
+      </div>
+      <div style="font-size:11.5px;color:var(--text2);display:flex;gap:14px;flex-wrap:wrap">
         ${c.tel?`<span>📞 ${c.tel}</span>`:''}
-        ${c.fax?`<span>FAX: ${c.fax}</span>`:''}
-        ${c.dept?`<span>🏢 ${c.dept}</span>`:''}
-        ${c.address?`<span style="grid-column:1/-1">📍 ${c.address}</span>`:''}
-        ${c.email?`<span>✉️ ${c.email}</span>`:''}
+        ${c.fax?`<span>FAX ${c.fax}</span>`:''}
+        ${c.email?`<span>✉ ${c.email}</span>`:''}
       </div>
-      ${distHtml?`<div style="margin-top:8px">${distHtml}</div>`:''}
+      ${c.dept?`<div style="font-size:11px;color:var(--text3);margin-top:2px">🏢 ${c.dept}</div>`:''}
+      ${distHtml?`<div style="margin-top:6px">${distHtml}</div>`:''}
     </div>`;
   // contacts
   if(c.contacts&&c.contacts.length){
