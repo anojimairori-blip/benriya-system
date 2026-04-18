@@ -619,7 +619,8 @@ select{appearance:auto}
 .audit-line{font-size:10px !important;color:#999;margin-top:6px;line-height:1.4}
 @media print{
   .preview-subject{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .audit-line{color:#999 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* 印刷時は監査情報を非表示 */
+  .audit-line{display:none !important}
 }
 .preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #DDD;overflow:hidden}
 .preview-table td{padding:6px 9px;border:1px solid #DDD;overflow:hidden}
@@ -890,6 +891,8 @@ if('serviceWorker' in navigator){
 </script>
 <!-- FullCalendar (Phase A: 月表示+ドラッグ) -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<!-- html2pdf for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/ja.global.min.js"></script>
 </head>
 <body>
@@ -898,7 +901,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.9.8</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.9.9</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -922,7 +925,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.9.8.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.9.9.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -957,7 +960,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.9.8</div>
+    <div class="logo-version" id="sidebar-version">v3.9.9</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1092,7 +1095,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.9.8.1 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.9.9.1 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -2093,10 +2096,11 @@ if('serviceWorker' in navigator){
 <div class="modal" style="max-width:400px">
   <div class="modal-header"><h3>共有・送信</h3><button class="close-btn" onclick="closeModal('share-modal')">✕</button></div>
   <div class="modal-body">
-    <div class="share-option" onclick="sharePrint()"><span class="share-icon">🖨️</span><div><div style="font-weight:700">印刷・PDF保存</div><div style="font-size:12px;color:var(--text2)">ブラウザで印刷またはPDF保存</div></div></div>
-    <div class="share-option" onclick="shareEmail()"><span class="share-icon">✉️</span><div><div style="font-weight:700">メールで送る</div><div style="font-size:12px;color:var(--text2)">メールアプリを起動して送信</div></div></div>
-    <div class="share-option" onclick="shareLine()"><span class="share-icon">💬</span><div><div style="font-weight:700">LINEで送る</div></div></div>
-    <div class="share-option" onclick="copyLink()"><span class="share-icon">🔗</span><div><div style="font-weight:700">リンクをコピー</div></div></div>
+    <div class="share-option" onclick="sharePrint()"><span class="share-icon">🖨️</span><div><div style="font-weight:700">印刷</div><div style="font-size:12px;color:var(--text2)">ブラウザで印刷</div></div></div>
+    <div class="share-option" onclick="sharePDF()"><span class="share-icon">📄</span><div><div style="font-weight:700">PDFをダウンロード</div><div style="font-size:12px;color:var(--text2)">端末に PDF を保存</div></div></div>
+    <div class="share-option" onclick="shareNative()"><span class="share-icon">📲</span><div><div style="font-weight:700">PDFを共有（LINE/メール等）</div><div style="font-size:12px;color:var(--text2)">アプリを選択して PDF を送信</div></div></div>
+    <div class="share-option" onclick="shareEmail()"><span class="share-icon">✉️</span><div><div style="font-weight:700">メール本文のみ</div><div style="font-size:12px;color:var(--text2)">PDFは手動で添付が必要</div></div></div>
+    <div class="share-option" onclick="sharePdfQr()"><span class="share-icon">📷</span><div><div style="font-weight:700">QRコード（PDF受取り用）</div><div style="font-size:12px;color:var(--text2)">相手が読み取ってPDFを受取</div></div></div>
   </div>
 </div>
 </div>
@@ -2895,8 +2899,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.9.8';
-const APP_BUILD_TIME='2026/04/18 23:35';
+const APP_VERSION='v3.9.9';
+const APP_BUILD_TIME='2026/04/19 00:04';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4318,70 +4322,185 @@ function previewDoc(id){
 // ===== SHARE =====
 function shareDoc(){closeModal('preview-modal');document.getElementById('share-modal').classList.add('open');}
 function sharePrint(){closeModal('share-modal');window.print();}
+
+// ===== PDF生成 共通ヘルパー =====
+async function _generatePdfBlob(){
+  // 監査情報を一時的に非表示にしてPDF化（印刷時と同じ見た目）
+  const previewDoc=document.querySelector('#preview-body .preview-doc');
+  if(!previewDoc) throw new Error('プレビューが開かれていません');
+  const auditLines=previewDoc.querySelectorAll('.audit-line');
+  auditLines.forEach(el=>el.style.display='none');
+
+  if(typeof html2pdf==='undefined') throw new Error('PDFライブラリが読み込まれていません');
+
+  const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
+  const fname=d?`${d.type}_${d.number||'doc'}.pdf`:'document.pdf';
+
+  const opt={
+    margin: [10,10,10,10],
+    filename: fname,
+    image: { type:'jpeg', quality:0.95 },
+    html2canvas: { scale:2, useCORS:true, allowTaint:false, backgroundColor:'#ffffff', logging:false },
+    jsPDF: { unit:'mm', format:'a4', orientation:'portrait', compress:true }
+  };
+
+  try{
+    const worker = html2pdf().set(opt).from(previewDoc);
+    const blob = await worker.output('blob');
+    return { blob, filename: fname };
+  } finally {
+    // 監査情報を元に戻す
+    auditLines.forEach(el=>el.style.display='');
+  }
+}
+
+// ② PDFをローカルダウンロード
+async function sharePDF(){
+  closeModal('share-modal');
+  showToast('📄 PDFを生成中...', '#3B82F6');
+  try{
+    const {blob, filename} = await _generatePdfBlob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    showToast('✓ PDFをダウンロードしました', '#10B981');
+  }catch(e){
+    console.error('PDF error:',e);
+    showToast('PDFの生成に失敗しました: '+e.message, '#C0392B');
+  }
+}
+
+// ③④ PDFをネイティブ共有（Web Share API Level 2）
+async function shareNative(){
+  closeModal('share-modal');
+  showToast('📄 PDFを生成中...', '#3B82F6');
+  try{
+    const {blob, filename} = await _generatePdfBlob();
+    const file=new File([blob], filename, { type:'application/pdf' });
+    const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
+    const shareData={
+      files:[file],
+      title:d?`${d.type} ${d.number}`:'書類',
+      text:d?`${d.type}をお送りします。\n金額: ${fmt(d.grandTotal)}\n${settings.company||''}`:''
+    };
+    // ファイル共有対応チェック
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share(shareData);
+      showToast('✓ 共有しました', '#10B981');
+    } else if(navigator.share){
+      // ファイル不可だがテキスト共有は可能
+      await navigator.share({title:shareData.title, text:shareData.text});
+      // ついでにPDFも手元にDL
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url; a.download=filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      showToast('✓ テキスト共有済み。PDFは手元にダウンロードされました', '#10B981');
+    } else {
+      // デスクトップ系: ダウンロードして手動でアップロード
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url; a.download=filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      showToast('📁 PDFをダウンロードしました。LINEやメールに手動でドラッグしてください', '#F59E0B');
+    }
+  }catch(e){
+    if(e.name==='AbortError'){
+      // ユーザーがキャンセル - エラー扱いにしない
+      return;
+    }
+    console.error('Share error:',e);
+    showToast('共有に失敗しました: '+e.message, '#C0392B');
+  }
+}
+
+// メール共有（本文のみ）
 function shareEmail(){
   const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
   const cust=d?(d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer)):null;
   const honorific=(cust?.honorific!=null)?cust.honorific:'御中';
   const sub=d?encodeURIComponent(`【${d.type}】${d.subject||d.number}`):'';
-  const body=encodeURIComponent(d?`${d.customer} ${honorific}\n\n${d.type}をお送りします。\n金額：${fmt(d.grandTotal)}\n\n${settings.company||''}`:'');
+  const body=encodeURIComponent(d?`${d.customer} ${honorific}\n\n${d.type}をお送りします。\n金額：${fmt(d.grandTotal)}\n\n※PDFは別途共有ボタンから送信します。\n\n${settings.company||''}`:'');
   window.location.href=`mailto:?subject=${sub}&body=${body}`;
   closeModal('share-modal');
+  showToast('💡 PDFは「PDFを共有」ボタンから別途送信してください', '#F59E0B');
 }
-function shareLine(){
-  const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
-  if(!d){closeModal('share-modal');return;}
 
-  const company=settings.company||'';
-  const subject=d.subject||d.number;
-  const message=`【${d.type}】${subject}\n金額：${fmt(d.grandTotal)}\n${company?'\nFrom: '+company:''}`;
-  const encodedMsg=encodeURIComponent(message);
-
+// ② PDF受け取り用QRコード（PDFをBase64でdata:URLにしてQR化は容量的に不可）
+// → QR化: 書類情報＋ダウンロード手順を案内するテキスト
+async function sharePdfQr(){
   closeModal('share-modal');
+  const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
+  if(!d){showToast('書類が選択されていません','#C0392B');return;}
 
-  // モバイル判定
-  const isMobile=isMobileDevice();
-
-  if(isMobile){
-    // スマホ: LINEアプリの友達選択画面を直接呼び出し
-    // line:// スキームを優先、失敗したら https にフォールバック
-    const lineAppUrl=`line://msg/text/${encodedMsg}`;
-    const lineWebUrl=`https://line.me/R/share?text=${encodedMsg}`;
-
-    // line:// を試す
-    const link=document.createElement('a');
-    link.href=lineAppUrl;
-    link.style.display='none';
-    document.body.appendChild(link);
-
-    // タイマーで起動失敗を検知してWebフォールバック
-    const startTime=Date.now();
-    const fallbackTimer=setTimeout(()=>{
-      if(Date.now()-startTime<2500){
-        // LINEアプリが起動しなかった→Web版を開く
-        window.open(lineWebUrl,'_blank');
+  showToast('📄 PDFを生成中...', '#3B82F6');
+  try{
+    const {blob, filename} = await _generatePdfBlob();
+    // PDFをBlobからdata:URLに変換
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const dataUrl=reader.result; // data:application/pdf;base64,...
+      // PDFサイズチェック（QRに収まる容量:だいたい2KB以下が限界）
+      if(dataUrl.length>2500){
+        // データURLが大きすぎるのでQRでは不可
+        // 代わりに「いったんDLして、それをLINE等で共有してください」UIを出す
+        _showPdfShareHelper(blob, filename, d);
+      } else {
+        // 2KB以下ならQR化可能（超小さいPDFのみ）
+        _showPdfQrModal(dataUrl, d);
       }
-    },1500);
-
-    link.click();
-    setTimeout(()=>document.body.removeChild(link),100);
-
-    // ページがbackgroundに行ったらキャンセル（LINE起動成功）
-    document.addEventListener('visibilitychange',function vh(){
-      if(document.hidden){
-        clearTimeout(fallbackTimer);
-        document.removeEventListener('visibilitychange',vh);
-      }
-    });
-  } else {
-    // PC: LINE Webクライアントの友達選択画面（共有シート相当）
-    // share?text 形式は友達/グループ選択UIを表示
-    const lineShareUrl=`https://line.me/R/share?text=${encodedMsg}`;
-    window.open(lineShareUrl,'_blank','width=500,height=700');
+    };
+    reader.readAsDataURL(blob);
+  }catch(e){
+    console.error(e);
+    showToast('PDFの生成に失敗しました: '+e.message,'#C0392B');
   }
-
-  showToast('💬 LINEを起動しました', '#06C755');
 }
-function copyLink(){navigator.clipboard.writeText(window.location.href).then(()=>{alert('URLをコピーしました');closeModal('share-modal');});}
+
+// PDFが大きいときの代替UI
+function _showPdfShareHelper(blob, filename, d){
+  const url=URL.createObjectURL(blob);
+  const container=document.getElementById('qr-container');
+  const info=document.getElementById('qr-doc-info');
+  info.innerHTML=
+    `<div style="font-weight:700;font-size:14px;margin-bottom:4px">${escAttr(d.type)}　${escAttr(d.number)}</div>`+
+    `<div style="color:var(--accent);font-weight:700;font-size:15px">${fmt(d.grandTotal)}</div>`+
+    `<div style="color:var(--text3);font-size:11px;margin-top:8px;text-align:left;background:var(--surface2);padding:10px;border-radius:6px;line-height:1.6">
+      <strong>📱 共有方法:</strong><br>
+      1. 下の「PDFダウンロード」をクリック<br>
+      2. LINE・メール等のアプリで「ファイル添付」<br>
+      3. ダウンロードしたPDFを選択して送信<br><br>
+      <strong>※QRコードでは PDF 容量が大きすぎるため、直接共有を推奨します。</strong>
+    </div>`;
+  container.innerHTML=`<div style="width:240px;height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface2);border-radius:8px;padding:20px;text-align:center;border:2px dashed var(--border)">
+    <div style="font-size:48px;margin-bottom:12px">📄</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">PDF準備完了</div>
+    <a href="${url}" download="${filename}" class="btn btn-primary btn-sm" style="text-decoration:none">💾 PDFダウンロード</a>
+  </div>`;
+  container._pdfUrl=url; // あとでrevokeするため
+  document.getElementById('qr-modal').classList.add('open');
+}
+
+// 2KB以下のPDFをQR化（現実的にはほぼ発生しない）
+function _showPdfQrModal(dataUrl, d){
+  const container=document.getElementById('qr-container');
+  const info=document.getElementById('qr-doc-info');
+  info.innerHTML=
+    `<div style="font-weight:700;font-size:14px;margin-bottom:4px">${escAttr(d.type)}　${escAttr(d.number)}</div>`+
+    `<div style="color:var(--accent);font-weight:700;font-size:15px">${fmt(d.grandTotal)}</div>`+
+    `<div style="color:var(--text3);font-size:11px;margin-top:4px">スマホで読み取ると PDF が開きます</div>`;
+  container.innerHTML='<div style="width:240px;height:240px;display:flex;align-items:center;justify-content:center">生成中...</div>';
+  const apiUrl=`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&ecc=L&data=${encodeURIComponent(dataUrl)}`;
+  const img=new Image();
+  img.onload=()=>{container.innerHTML=''; img.style.cssText='width:240px;height:240px;border-radius:8px;display:block'; container.appendChild(img);};
+  img.onerror=()=>{showToast('QR生成に失敗しました','#C0392B');};
+  img.src=apiUrl;
+  document.getElementById('qr-modal').classList.add('open');
+}
 
 // ===== CUSTOMERS =====
 function updateCustomerDatalist(){document.getElementById('customer-datalist').innerHTML=customers.map(c=>`<option value="${escAttr(c.name)}">`).join('');}
