@@ -753,7 +753,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">便利屋 書類システム</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.4</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -777,7 +777,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.3</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.4</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -812,7 +812,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.3</div>
+    <div class="logo-version" id="sidebar-version">v3.4</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -947,7 +947,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.3 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.4 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -956,6 +956,11 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
+    <!-- ログインユーザー情報＋最終更新 -->
+    <div id="home-user-info" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--text2)">
+      <div style="display:flex;align-items:center;gap:6px"><span>👤 ログイン中:</span><strong id="home-current-user" style="color:var(--accent)">-</strong></div>
+      <div style="display:flex;align-items:center;gap:6px"><span>✏️ 最終更新:</span><span id="home-last-update">-</span></div>
+    </div>
     <!-- Mini stats -->
     <div class="stats-grid" id="home-stats" style="margin-bottom:20px"></div>
     <!-- Menu grid -->
@@ -2544,8 +2549,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.3';
-const APP_BUILD_TIME='2026/04/18 20:40';
+const APP_VERSION='v3.4';
+const APP_BUILD_TIME='2026/04/18 20:55';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -2693,6 +2698,33 @@ function renderHome(){
     if(d.type==='請求書'&&d.status==='送付済'){unpaidAmt+=amt;unpaidC++;}
   });
   const hs=document.getElementById('home-stats');
+  // ログインユーザーと最終更新を表示
+  const hcu=document.getElementById('home-current-user');
+  if(hcu){
+    const u=getAuditUser();
+    hcu.textContent=`${u.name} (${u.email||'-'})`;
+  }
+  const hlu=document.getElementById('home-last-update');
+  if(hlu){
+    // 全データから最新の updatedAt を探す
+    let latest=null;
+    const checkAudit=(arr,typeName)=>{
+      arr.forEach(x=>{
+        if(x.updatedAt && (!latest || x.updatedAt > latest.updatedAt)){
+          latest={...x, _type:typeName};
+        }
+      });
+    };
+    checkAudit(docs,'書類');
+    checkAudit(customers,'顧客');
+    checkAudit(employees,'従業員');
+    checkAudit(expenses,'経費');
+    if(latest){
+      hlu.innerHTML=`<strong>${latest.updatedByName||latest.updatedBy||'-'}</strong> が <strong>${latest._type}</strong> を更新 (${formatDateTime(latest.updatedAt)})`;
+    } else {
+      hlu.textContent='更新履歴なし';
+    }
+  }
   if(hs) hs.innerHTML=`
     <div class="stat-card accent" style="cursor:pointer" onclick="showDocsDrilldown('today')">
       <div class="stat-label">TODAY 本日売上</div><div class="stat-value">${fmt(todayAmt)}</div><div class="stat-sub">クリックで一覧表示 →</div>
@@ -3550,7 +3582,8 @@ function changeCust(){
 // ===== INLINE NEW CUSTOMER =====
 function openInlineNewCust(){
   document.getElementById('inline-new-cust').style.display='block';
-  document.getElementById('cust-search-panel').style.display='none';
+  const csp=document.getElementById('cust-search-panel');
+  if(csp) csp.style.display='none';
   ['nc-name','nc-tel','nc-fax','nc-email','nc-zip','nc-address','nc-dept','nc-contact','nc-role'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 function closeInlineNewCust(){document.getElementById('inline-new-cust').style.display='none';}
@@ -3712,6 +3745,9 @@ function saveDoc(){
     createdAt:existing?.createdAt||new Date().toISOString()
   };
   if(!d.customer&&selectedCustId){const c=customers.find(x=>x.id===selectedCustId);if(c)d.customer=c.name;}
+  // 監査情報を保持（既存のcreatedBy/createdAtは維持）
+  if(existing){d.createdBy=existing.createdBy;d.createdByName=existing.createdByName;}
+  stampAudit(d, !existing);
   if(editingDocId){docs[docs.findIndex(x=>x.id===editingDocId)]=d;}else docs.push(d);
   persist();currentPreviewDocId=d.id;closeModal('doc-modal');renderAll();buildMonthlyChart();
   showToast(`${d.type}を保存しました ✓`);
@@ -3839,6 +3875,10 @@ function previewDoc(id){
     ${d.type==='請求書'&&s.bank?`<div class="preview-notes"><strong>お振込先：</strong>${s.bank}　${s.account||''}</div>`:''}
     ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${d.notes}</div>`:''}
     ${d.type==='領収書'?`<div style="text-align:right;margin-top:12px"><div class="stamp">領収済</div></div>`:''}
+    <div class="no-print" style="margin-top:18px;padding:10px 14px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text3);line-height:1.6">
+      ${d.createdByName||d.createdBy?`📝 作成: ${d.createdByName||d.createdBy} (${formatDateTime(d.createdAt)})<br>`:''}
+      ${d.updatedByName||d.updatedBy?`✏️ 最終更新: ${d.updatedByName||d.updatedBy} (${formatDateTime(d.updatedAt)})`:''}
+    </div>
   </div>`;
   document.getElementById('preview-modal').classList.add('open');
 }
@@ -4114,6 +4154,9 @@ function saveCustomer(){
     category:document.getElementById('cust-category').value,
     contacts:getContacts()
   };
+  const existingCust=editingCustId?customers.find(x=>x.id===editingCustId):null;
+  if(existingCust){c.createdBy=existingCust.createdBy;c.createdByName=existingCust.createdByName;c.createdAt=existingCust.createdAt;}
+  stampAudit(c, !existingCust);
   if(editingCustId){customers[customers.findIndex(x=>x.id===editingCustId)]=c;}else customers.push(c);
   persist();closeModal('customer-modal');renderAll();showToast('顧客情報を保存しました ✓');
 }
@@ -4474,7 +4517,6 @@ async function lookupZip(zipId, addrId, statusId){
 // 後方互換エイリアス
 function onSetZipInput(input){autoZip(input,'set-address','set-zip-status');}
 function onCustZipInput(input){autoZip(input,'cust-address',null);}
-function onNcZipInput(input){autoZip(input,'nc-address',null);}
 
 
 // ===== SETTINGS =====
@@ -4488,6 +4530,8 @@ function saveSettings(){
   ['company','owner','tel','fax','email','zip','address','bank','account','notes','paydays','alertdays'].forEach(k=>{
     settings[k]=document.getElementById('set-'+k)?.value||'';
   });
+  // 監査情報
+  stampAudit(settings, !settings.createdAt);
   // defaultTax は税率設定画面で保存
   // 郵便番号を正規化（不正な値を除去）
   if(settings.zip){
@@ -4586,6 +4630,49 @@ async function fbLoadAll(uid){
 
 // Firestoreにメインデータを保存（debounce付き）
 let _persistTimer = null;
+// ===== 変更履歴トラッキング =====
+// 各エンティティに _meta(updatedBy, updatedAt, createdBy, createdAt)を付与
+function getAuditUser(){
+  if(!currentUser) return {email:'unknown',name:'未ログイン'};
+  // 従業員リストから氏名を取得
+  const myGoogle=(currentUser.email||'').toLowerCase();
+  const emp=employees.find(e=>(e.google||'').toLowerCase()===myGoogle);
+  return {
+    email:currentUser.email||'',
+    name:emp?.name||currentUser.displayName||currentUser.email||'不明'
+  };
+}
+
+function stampAudit(entity, isNew){
+  if(!entity || typeof entity!=='object') return entity;
+  const user=getAuditUser();
+  const now=new Date().toISOString();
+  if(isNew){
+    entity.createdBy=user.email;
+    entity.createdByName=user.name;
+    entity.createdAt=now;
+  }
+  entity.updatedBy=user.email;
+  entity.updatedByName=user.name;
+  entity.updatedAt=now;
+  return entity;
+}
+
+function formatAuditInfo(entity){
+  if(!entity) return '';
+  const updatedBy=entity.updatedByName||entity.updatedBy||'-';
+  const updatedAt=entity.updatedAt?formatDateTime(entity.updatedAt):'-';
+  return `最終更新: ${updatedBy} (${updatedAt})`;
+}
+
+function formatDateTime(iso){
+  if(!iso) return '-';
+  try{
+    const d=new Date(iso);
+    return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }catch(e){return iso;}
+}
+
 function persist(){
   // localStorage にも保存（オフライン対応）
   try{
@@ -4662,7 +4749,13 @@ function initFirebaseAuth(){
   }
   // ログイン画面を表示
   const ls = document.getElementById('login-screen');
-  if(ls){ ls.style.display='flex'; document.getElementById('app') && (document.querySelector('.app').style.display='none'); }
+  if(ls){
+    // タイトルを動的に Flexsys + バージョンに更新
+    const lt=document.getElementById('login-title');
+    if(lt) lt.textContent='Flexsys2026 '+APP_VERSION;
+    ls.style.display='flex';
+    document.getElementById('app') && (document.querySelector('.app').style.display='none');
+  }
 
   F.onAuthStateChanged(F.auth, async (user)=>{
     const appEl = document.getElementById('app-main');
@@ -5037,6 +5130,9 @@ function saveEmployee(){
     memo:document.getElementById('emp-memo').value,
     photo
   };
+  const existingEmp=editingEmpId?employees.find(x=>x.id===editingEmpId):null;
+  if(existingEmp){e.createdBy=existingEmp.createdBy;e.createdByName=existingEmp.createdByName;e.createdAt=existingEmp.createdAt;e.isAdmin=existingEmp.isAdmin;}
+  stampAudit(e, !existingEmp);
   if(editingEmpId){employees[employees.findIndex(x=>x.id===editingEmpId)]=e;}else employees.push(e);
   persist();closeModal('emp-modal');renderEmployees();buildStaffSelect();showToast('従業員情報を保存しました ✓');
 }
@@ -5851,6 +5947,9 @@ function saveExpense(){
     memo:document.getElementById('exp-memo').value,
     receipt:currentExpenseReceipt
   };
+  const existingExp=editingExpenseId?expenses.find(x=>x.id===editingExpenseId):null;
+  if(existingExp){e.createdBy=existingExp.createdBy;e.createdByName=existingExp.createdByName;e.createdAt=existingExp.createdAt;}
+  stampAudit(e, !existingExp);
   if(editingExpenseId){expenses[expenses.findIndex(x=>x.id===editingExpenseId)]=e;}
   else expenses.push(e);
   persist();closeModal('expense-modal');renderExpenses();showToast('経費を保存しました ✓');
@@ -6543,43 +6642,64 @@ function renderBulletins(){
   const el=document.getElementById('bulletin-list');
   if(!el) return;
   const now=new Date().toISOString().split('T')[0];
-  // ピン留め→重要度降順→日付降順
-  const list=[...bulletins].sort((a,b)=>{
+  // メイン投稿のみ抽出（parentIdなし）
+  const mains=bulletins.filter(b=>!b.parentId).sort((a,b)=>{
     if(b.pinned!==a.pinned) return b.pinned?1:-1;
     if(b.priority!==a.priority) return (b.priority||0)-(a.priority||0);
     return (b.date||'').localeCompare(a.date||'');
   });
   updateBulletinBadge();
-  if(!list.length){
+  if(!mains.length){
     el.innerHTML='<div style="text-align:center;padding:48px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">📌</div><div>投稿はありません</div><div style="font-size:13px;margin-top:8px">右上の「＋ 新規投稿」ボタンで投稿できます</div></div>';
     return;
   }
-  el.innerHTML=list.map(b=>{
+  const isAdmin=isCurrentUserAdmin();
+  el.innerHTML=mains.map(b=>{
     const expired=b.expiry&&b.expiry<now;
     const stars='★'.repeat(b.priority||0)+'☆'.repeat(5-(b.priority||0));
     const starColor=STAR_COLORS[b.priority||0]||'var(--text3)';
     const catIcon=BULLETIN_CATS[b.category||'']||'📌';
-    return`<div onclick="openBulletinDetail('${b.id}')" style="cursor:pointer;background:var(--surface);border:1px solid ${b.pinned?'var(--accent)':expired?'var(--border)':'var(--border)'};border-radius:12px;padding:16px 20px;margin-bottom:12px;opacity:${expired?0.55:1};transition:box-shadow .15s" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.08)'" onmouseout="this.style.boxShadow=''">
-      <div style="display:flex;align-items:flex-start;gap:12px">
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-            ${b.pinned?'<span style="font-size:11px;background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:99px;font-weight:700">📌 固定</span>':''}
-            ${b.category?`<span style="font-size:11px;background:var(--surface2);color:var(--text2);padding:2px 8px;border-radius:99px">${catIcon} ${b.category}</span>`:''}
-            ${expired?'<span style="font-size:11px;background:#F5C6C2;color:var(--red);padding:2px 8px;border-radius:99px">期限切れ</span>':''}
+    const replies=bulletins.filter(r=>r.parentId===b.id).sort((a,b)=>(a.postedAt||'').localeCompare(b.postedAt||''));
+    const gpsLink=b.gps?`<a href="https://www.google.com/maps?q=${b.gps.lat},${b.gps.lng}" target="_blank" onclick="event.stopPropagation()" style="color:var(--blue);text-decoration:none;font-size:11px">📍 位置</a>`:'';
+    const postedTime=b.postedAt?formatDateTime(b.postedAt):b.date;
+    return`<div style="background:var(--surface);border:1px solid ${b.pinned?'var(--accent)':'var(--border)'};border-radius:12px;padding:16px 20px;margin-bottom:12px;opacity:${expired?0.55:1}">
+      <div onclick="openBulletinDetail('${b.id}')" style="cursor:pointer">
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+              ${b.pinned?'<span style="font-size:11px;background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:99px;font-weight:700">📌 固定</span>':''}
+              ${b.category?`<span style="font-size:11px;background:var(--surface2);color:var(--text2);padding:2px 8px;border-radius:99px">${catIcon} ${b.category}</span>`:''}
+              ${expired?'<span style="font-size:11px;background:#F5C6C2;color:var(--red);padding:2px 8px;border-radius:99px">期限切れ</span>':''}
+            </div>
+            <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${escAttr(b.title)}</div>
+            <div style="font-size:13px;color:var(--text2);max-width:600px">${(b.body||'').replace(/\n/g,'<br>').slice(0,200)}${(b.body||'').length>200?'…':''}</div>
           </div>
-          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.title}</div>
-          <div style="font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:500px">${(b.body||'').replace(/\n/g,' ')}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          ${b.priority?`<div style="font-size:14px;color:${starColor};letter-spacing:1px;margin-bottom:4px">${stars}</div>`:''}
-          <div style="font-size:11px;color:var(--text3)">${b.date||''}</div>
-          <div style="font-size:11px;color:var(--text3)">${b.author||''}</div>
+          <div style="text-align:right;flex-shrink:0">
+            ${b.priority?`<div style="font-size:14px;color:${starColor};letter-spacing:1px;margin-bottom:4px">${stars}</div>`:''}
+            <div style="font-size:11px;color:var(--text3)">${postedTime}</div>
+            <div style="font-size:11px;color:var(--text3)">👤 ${b.author||''}</div>
+            ${b.authorEmail?`<div style="font-size:10px;color:var(--text3)">${b.authorEmail}</div>`:''}
+            ${gpsLink?`<div style="margin-top:3px">${gpsLink}</div>`:''}
+          </div>
         </div>
       </div>
-      ${isAdminUnlocked?`<div style="display:flex;gap:6px;margin-top:10px;border-top:1px solid var(--border);padding-top:10px" onclick="event.stopPropagation()">
-        <button class="btn btn-secondary btn-sm" onclick="editBulletin('${b.id}')">✏️ 編集</button>
-        <button class="btn btn-secondary btn-sm" style="color:var(--red)" onclick="deleteBulletin('${b.id}')">🗑 削除</button>
+      <!-- 返信ツリー -->
+      ${replies.length?`<div style="margin-top:12px;padding-left:14px;border-left:2px solid var(--border)">
+        ${replies.map(r=>`<div style="background:var(--surface2);border-radius:8px;padding:10px 12px;margin-bottom:6px">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:4px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+            <span><strong>↳ ${r.author||'-'}</strong> <span style="opacity:0.6">${r.authorEmail||''}</span></span>
+            <span style="font-size:10px;color:var(--text3)">${formatDateTime(r.postedAt)} ${r.gps?`<a href="https://www.google.com/maps?q=${r.gps.lat},${r.gps.lng}" target="_blank" style="color:var(--blue);margin-left:4px">📍</a>`:''}</span>
+          </div>
+          <div style="font-size:13px;color:var(--text)">${escAttr(r.body||'').replace(/\n/g,'<br>')}</div>
+          ${isAdmin?`<button class="btn btn-secondary btn-sm" onclick="deleteBulletin('${r.id}')" style="margin-top:6px;font-size:10px;color:var(--red)">🗑 返信削除</button>`:''}
+        </div>`).join('')}
       </div>`:''}
+      <!-- アクションバー -->
+      <div style="display:flex;gap:6px;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="replyToBulletin('${b.id}')">💬 返信 ${replies.length?`(${replies.length})`:''}</button>
+        ${isAdmin?`<button class="btn btn-secondary btn-sm" onclick="editBulletin('${b.id}')">✏️ 編集</button>
+        <button class="btn btn-secondary btn-sm" style="color:var(--red)" onclick="deleteBulletin('${b.id}')">🗑 削除</button>`:''}
+      </div>
     </div>`;
   }).join('');
 }
@@ -6660,6 +6780,7 @@ function setBulletinStar(v){
 function saveBulletin(){
   const title=document.getElementById('bulletin-title').value.trim();
   if(!title){showToast('タイトルを入力してください','#C0392B');return;}
+  const user=getAuditUser();
   const b={
     id:editingBulletinId||('bul-'+Date.now()),
     title,
@@ -6669,23 +6790,125 @@ function saveBulletin(){
     expiry:document.getElementById('bulletin-expiry').value,
     pinned:document.getElementById('bulletin-pinned').checked,
     date:today(),
-    author:currentUser?.displayName||currentUser?.email||'管理者',
+    postedAt:new Date().toISOString(),
+    author:user.name,
+    authorEmail:user.email,
+    parentId:null, // メイン投稿
+    gps:null
   };
+  // 既存のbulletinから保持
   if(editingBulletinId){
+    const ex=bulletins.find(x=>x.id===editingBulletinId);
+    if(ex){
+      b.postedAt=ex.postedAt;
+      b.author=ex.author;
+      b.authorEmail=ex.authorEmail;
+      b.gps=ex.gps;
+      b.parentId=ex.parentId||null;
+      b.replies=ex.replies||[];
+    }
     const idx=bulletins.findIndex(x=>x.id===editingBulletinId);
     if(idx>=0) bulletins[idx]=b;
+    persist();
+    closeModal('bulletin-modal');
+    renderBulletins();
+    showToast('投稿を更新しました ✓');
+    return;
+  }
+
+  // GPS取得を試みる
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos=>{
+        b.gps={lat:pos.coords.latitude, lng:pos.coords.longitude, accuracy:pos.coords.accuracy};
+        bulletins.unshift(b);
+        persist();
+        closeModal('bulletin-modal');
+        renderBulletins();
+        showToast('投稿しました ✓ (GPS位置情報を含む)');
+      },
+      err=>{
+        // GPS拒否されても投稿は実行
+        bulletins.unshift(b);
+        persist();
+        closeModal('bulletin-modal');
+        renderBulletins();
+        showToast('投稿しました ✓');
+      },
+      {timeout:5000, maximumAge:60000}
+    );
   } else {
     bulletins.unshift(b);
+    persist();
+    closeModal('bulletin-modal');
+    renderBulletins();
+    showToast('投稿しました ✓');
   }
-  persist();
-  closeModal('bulletin-modal');
-  renderBulletins();
-  showToast(editingBulletinId?'投稿を更新しました ✓':'投稿しました ✓');
+}
+
+// 返信を投稿
+function replyToBulletin(parentId){
+  const b=bulletins.find(x=>x.id===parentId);
+  if(!b) return;
+  showInputDialog('返信内容を入力',(text)=>{
+    if(!text||!text.trim()) return;
+    const user=getAuditUser();
+    const reply={
+      id:'bul-reply-'+Date.now(),
+      title:'',
+      body:text.trim(),
+      parentId:parentId,
+      postedAt:new Date().toISOString(),
+      author:user.name,
+      authorEmail:user.email,
+      date:today()
+    };
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        pos=>{reply.gps={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy};bulletins.push(reply);persist();renderBulletins();showToast('返信しました ✓');},
+        ()=>{bulletins.push(reply);persist();renderBulletins();showToast('返信しました ✓');},
+        {timeout:5000}
+      );
+    } else {
+      bulletins.push(reply);
+      persist();
+      renderBulletins();
+      showToast('返信しました ✓');
+    }
+  });
+}
+
+// 簡易テキスト入力ダイアログ
+function showInputDialog(label, onOk){
+  const html=`<div class="modal-overlay open" id="input-dialog-modal" onclick="if(event.target===this)closeModal('input-dialog-modal')">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header"><h3>${label}</h3><button class="close-btn" onclick="closeModal('input-dialog-modal')">✕</button></div>
+      <div class="modal-body">
+        <textarea id="input-dialog-text" rows="4" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;resize:vertical" placeholder="返信を書く..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('input-dialog-modal')">キャンセル</button>
+        <button class="btn btn-primary" onclick="
+          const t=document.getElementById('input-dialog-text').value;
+          window._inputDialogOnOk && window._inputDialogOnOk(t);
+          closeModal('input-dialog-modal');
+        ">送信</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('input-dialog-modal')?.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
+  window._inputDialogOnOk=onOk;
+  setTimeout(()=>document.getElementById('input-dialog-text')?.focus(),100);
 }
 
 function deleteBulletin(id){
-  showConfirm('この投稿を削除しますか？',()=>{
-    bulletins=bulletins.filter(x=>x.id!==id);
+  if(!isCurrentUserAdmin()){
+    showToast('🔒 管理者のみ削除できます','#C0392B');
+    return;
+  }
+  showConfirm('この投稿を削除しますか？\n（返信もすべて削除されます）',()=>{
+    bulletins=bulletins.filter(x=>x.id!==id && x.parentId!==id);
     persist();
     renderBulletins();
     showToast('削除しました');
@@ -6751,7 +6974,42 @@ function renderNavManagement(){
   const el=document.getElementById('nav-management');
   if(!el) return;
   const items=getNavManagementOrder();
-  el.innerHTML=items.map(it=>`<div class="nav-item" onclick="${it.action}"><span class="nav-icon">${it.icon}</span><span class="nav-label">${it.label}</span><span class="nav-tooltip">${it.label}</span></div>`).join('');
+  el.innerHTML=items.map((it,i)=>`<div class="nav-item nav-draggable" draggable="true" data-nav-key="${it.key}" data-nav-idx="${i}" onclick="${it.action}" ondragstart="onNavDragStart(event,${i})" ondragover="onNavDragOver(event)" ondrop="onNavDrop(event,${i})" ondragend="onNavDragEnd(event)" ondragleave="onNavDragLeave(event)"><span class="nav-icon">${it.icon}</span><span class="nav-label">${it.label}</span><span class="nav-tooltip">${it.label}</span></div>`).join('');
+}
+
+let _navDragSrc=null;
+function onNavDragStart(e,idx){
+  _navDragSrc=idx;
+  e.currentTarget.style.opacity='0.5';
+  if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',idx);}
+}
+function onNavDragOver(e){
+  e.preventDefault();
+  if(e.dataTransfer) e.dataTransfer.dropEffect='move';
+  e.currentTarget.style.background='var(--accent-light)';
+  return false;
+}
+function onNavDragLeave(e){
+  e.currentTarget.style.background='';
+}
+function onNavDrop(e,idx){
+  e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.style.background='';
+  if(_navDragSrc===null||_navDragSrc===idx) return;
+  const items=getNavManagementOrder();
+  const [moved]=items.splice(_navDragSrc,1);
+  items.splice(idx,0,moved);
+  saveNavManagementOrder(items);
+  renderNavManagement();
+  renderNavOrderEditor();
+  buildMobileDrawer();
+  showToast(`「${moved.label}」を移動しました ✓`);
+}
+function onNavDragEnd(e){
+  e.currentTarget.style.opacity='';
+  document.querySelectorAll('.nav-draggable').forEach(el=>el.style.background='');
+  _navDragSrc=null;
 }
 
 // 設定画面用：メニュー順序エディタ
@@ -7458,9 +7716,12 @@ function saveTaxRates(){
     if(!r.value||seen.has(r.value)) r.value='tax-'+Date.now()+Math.random().toString(36).slice(2,4);
     seen.add(r.value);
   });
+  // 税率設定のaudit情報を別途保存
+  const user=getAuditUser();
+  const meta={updatedBy:user.email,updatedByName:user.name,updatedAt:new Date().toISOString()};
+  localStorage.setItem('customTaxRates_meta',JSON.stringify(meta));
   persistTaxRates();
   showToast('税率設定を保存しました ✓');
-  // 明細の選択肢を再構築
   document.querySelectorAll('#line-items-container .line-item select').forEach(sel=>{
     const cur=sel.value;
     sel.innerHTML=taxOptions(cur);
