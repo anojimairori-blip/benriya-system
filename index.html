@@ -802,10 +802,94 @@ select{appearance:auto}
 .mobile-drawer{display:none}
 
 @media(max-width:768px){
-  .preview-doc{padding:10px!important;font-size:11px!important}
+  .preview-doc{padding:14px!important;font-size:11px!important}
   .preview-doc table{font-size:10px!important}
   .preview-doc th,.preview-doc td{padding:4px 5px!important}
-  .preview-meta{flex-direction:column!important}
+  .preview-meta{flex-direction:column!important;gap:10px !important}
+
+  /* スマホ プレビュー: タイトルと件名のサイズを適正化 */
+  .preview-doc h2{font-size:20px !important;letter-spacing:3px !important;margin:6px 0 14px !important}
+  .preview-doc .doc-number{font-size:11px !important}
+
+  /* 件名ブロック */
+  .preview-subject{padding:6px 10px !important;font-size:13px !important;margin:10px 0 !important}
+  .preview-subject .ps-label{font-size:10px !important}
+  .preview-subject .ps-text{font-size:13px !important;font-weight:600}
+
+  /* 顧客名ブロック */
+  .preview-to .company{font-size:15px !important;padding-bottom:3px !important;margin-bottom:5px !important}
+
+  /* 会社情報ブロック: 要素を小さくまとめる */
+  .preview-from{font-size:10px !important;line-height:1.4 !important;text-align:left !important}
+  .preview-from p{margin:1px 0 !important}
+  .preview-from strong{font-size:12px}
+  .preview-from img{max-width:70px !important;max-height:40px !important}
+
+  /* テーブル横スクロール回避 */
+  .preview-doc table{display:table !important;table-layout:fixed;width:100%}
+  .preview-doc th:nth-child(1){width:auto}
+  .preview-doc th:nth-child(2),.preview-doc th:nth-child(3){width:36px}
+  .preview-doc th:nth-child(4),.preview-doc th:nth-child(5){width:58px}
+
+  /* モバイル: 書類一覧テーブルをカード形式に（レスポンシブ） */
+  .card table{display:block;width:100%}
+  .card table thead{display:none}
+  .card table tbody{display:block}
+  .card table tr{
+    display:block;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card table tr:hover{background:var(--accent-light)}
+  .card table td{
+    display:block;
+    padding:3px 0 !important;
+    border:none !important;
+    font-size:12px;
+    text-align:left !important;
+    max-width:none !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+  }
+  /* 書類番号を見出し風に */
+  .card table td:first-child{
+    font-size:11px;
+    color:var(--text3);
+    font-family:monospace;
+    padding-bottom:4px !important;
+  }
+  /* アクションボタン群: 横スクロールで全表示 */
+  .card table td:last-child{
+    display:flex !important;
+    gap:4px;
+    flex-wrap:wrap;
+    margin-top:8px;
+    padding-top:8px !important;
+    border-top:1px solid var(--border) !important;
+    justify-content:flex-start;
+  }
+  .card table td .btn, .card table td button{
+    font-size:11px !important;
+    padding:5px 9px !important;
+    min-height:30px;
+  }
+  .btn-photo-action{
+    font-size:11px !important;
+    padding:5px 9px !important;
+  }
+  /* 日付フィルタバーを縦スクロール対応 */
+  .date-filter-bar{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:4px;
+  }
+  .date-filter-bar .df-btn{flex-shrink:0;white-space:nowrap}
 
   /* Hide desktop sidebar */
   .sidebar{display:none}
@@ -991,7 +1075,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.15</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.15.2</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1015,7 +1099,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.15</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.15.2</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1050,7 +1134,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.15</div>
+    <div class="logo-version" id="sidebar-version">v3.15.2</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -3088,8 +3172,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.15';
-const APP_BUILD_TIME='2026/04/19 06:55';
+const APP_VERSION='v3.15.2';
+const APP_BUILD_TIME='2026/04/19 07:19';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3925,6 +4009,10 @@ function getDfDates(id){
 }
 
 function renderDocPageFiltered(pageId,type){
+  // tbody が未生成の場合は buildDocPages を先に実行
+  if(!document.getElementById(pageId+'-body')){
+    if(typeof buildDocPages==='function') buildDocPages();
+  }
   const {from,to}=getDfDates(pageId);
   const search=(document.getElementById('filter-'+pageId)?.value||'').toLowerCase();
   const statusFilter=document.getElementById('status-filter-'+pageId)?.value||'';
@@ -6584,11 +6672,11 @@ function initAppAfterAuth(){
   if(typeof applyDocColors==='function') applyDocColors();
   renderNavManagement();
   showDeveloperMenu();
+  buildDocPages(); buildStaffSelect(); buildExpStaffSelect(); updateBackupStats();
   renderAll(); buildMonthlyChart(); initReportYears(); initSrYears();
   renderCalendar(); renderTemplates(); renderAlerts();
   renderEmployees(); renderBranches(); renderPayments(); renderExpenses(); renderBulletins();
   document.getElementById('doc-date').value = today();
-  buildDocPages(); buildStaffSelect(); buildExpStaffSelect(); updateBackupStats();
   buildStatusSelect('doc-status', docStatuses[0]?.value||'下書き');
   const now=new Date(), y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,'0');
   const df=document.getElementById('csv-from'), dt2=document.getElementById('csv-to');
@@ -9605,7 +9693,32 @@ async function shareDocLink(method){
   const msg=`${d?.customer||''} ${honor}\n\n${d?.type||''}をお送りします。\n金額: ${fmt(d?.grandTotal||0)}\n\n下記リンクからご確認・PDFダウンロードできます（期限付き）:\n${url}\n\n${settings.company||''}`;
 
   if(method==='line'){
-    window.open(`https://line.me/R/share?text=${encodeURIComponent(msg)}`,'_blank');
+    // モバイルとPCで挙動を変える
+    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if(isMobile){
+      // モバイル: LINEアプリが起動し、友達選択→送信
+      const lineUrl=`https://line.me/R/share?text=${encodeURIComponent(msg)}`;
+      window.location.href=lineUrl;
+    } else {
+      // PC: URLをコピーしてLINE PC版に手動貼り付けを促す
+      try{
+        await navigator.clipboard.writeText(msg);
+        showToast('✓ 共有テキストをコピーしました。LINE PC版で貼り付けてください','#06C755');
+        // LINE PC版のダウンロードページも開く（初めて使う人向け）
+        if(confirm('共有テキストをクリップボードにコピーしました。\n\nLINE PC版を起動しますか？\n\n[OK] LINE PC版のトーク画面を開く\n[キャンセル] 何もしない')){
+          // LINE PCの起動プロトコル（インストール済みの場合のみ動作）
+          window.location.href='line://';
+          setTimeout(()=>{
+            // 起動しなかった場合のフォールバック - LINE Web版を開く
+            if(confirm('LINEアプリが起動しませんでしたか？\nLINE Web版を開きますか？')){
+              window.open('https://web.line.me/','_blank');
+            }
+          }, 2000);
+        }
+      }catch(e){
+        showToast('コピー失敗。PDFダウンロードしてLINEに添付してください','#E67E22');
+      }
+    }
   } else if(method==='email'){
     const sub=encodeURIComponent(`【${d?.type||'書類'}】${d?.number||''}`);
     window.location.href=`mailto:?subject=${sub}&body=${encodeURIComponent(msg)}`;
