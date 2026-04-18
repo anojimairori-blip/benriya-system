@@ -991,7 +991,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.13</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.14.1</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1015,7 +1015,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.13</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.14.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1050,7 +1050,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.13</div>
+    <div class="logo-version" id="sidebar-version">v3.14.1</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -2225,6 +2225,29 @@ if('serviceWorker' in navigator){
 <div class="modal" style="max-width:700px">
   <div class="modal-header"><h3 id="cust-modal-title">顧客情報</h3><button class="close-btn" onclick="closeModal('customer-modal')">✕</button></div>
   <div class="modal-body">
+
+    <!-- 貼り付けパーサー -->
+    <details style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:14px">
+      <summary style="cursor:pointer;font-weight:700;color:var(--accent);font-size:13px;user-select:none">📋 貼り付けで自動入力（クリックで開く）</summary>
+      <div style="margin-top:10px">
+        <p style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5">名刺・メール署名・お客様情報などをまるごと貼り付けると、自動で各欄に振り分けます。<br>
+        認識ラベル例：「会社名」「氏名」「〒/郵便」「住所」「TEL/電話」「FAX」「Email/メール」</p>
+        <textarea id="cust-paste-area" rows="5" placeholder="例：
+会社名：○○商事株式会社
+氏名：田中 太郎
+〒064-0923
+住所：北海道札幌市中央区南23条西9丁目1-1
+TEL：011-123-4567
+FAX：011-123-4568
+Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;resize:vertical;min-height:100px"></textarea>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+          <button type="button" class="btn btn-primary btn-sm" onclick="parseAndFillCustomer()">🔎 解析して自動入力</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('cust-paste-area').value=''">クリア</button>
+          <span id="cust-paste-status" style="font-size:11px;color:var(--text3);align-self:center"></span>
+        </div>
+      </div>
+    </details>
+
     <div class="form-row cols3">
       <div class="form-group" style="grid-column:span 2"><label>顧客名・会社名 ＊</label><input type="text" id="cust-name"></div>
       <div class="form-group">
@@ -3065,8 +3088,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.13';
-const APP_BUILD_TIME='2026/04/19 05:10';
+const APP_VERSION='v3.14.1';
+const APP_BUILD_TIME='2026/04/19 06:35';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4822,6 +4845,9 @@ function openCustomerModal(){
   document.getElementById('cust-honorific').value='御中';
   document.getElementById('contacts-container').innerHTML='';
   addContactField();
+  // 貼り付けエリアもクリア
+  const paste=document.getElementById('cust-paste-area'); if(paste) paste.value='';
+  const pst=document.getElementById('cust-paste-status'); if(pst) pst.textContent='';
   document.getElementById('customer-modal').classList.add('open');
 }
 
@@ -4850,21 +4876,225 @@ function addContactField(data){
   const uid='ct'+Date.now()+Math.random().toString(36).slice(2,5);
   const div=document.createElement('div');div.id=uid;
   div.style.cssText='background:var(--surface2);border-radius:8px;padding:11px;margin-bottom:7px;position:relative';
-  div.innerHTML=`<button onclick="document.getElementById('${uid}').remove()" style="position:absolute;top:7px;right:7px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px">✕</button>
+
+  // 従業員（社員）のプルダウン選択肢を作る
+  const empOptions=(typeof employees!=='undefined'?employees:[])
+    .filter(e=>e && e.name)
+    .map(e=>`<option value="${escAttr(e.id)}" data-tel="${escAttr(e.tel||'')}" data-name="${escAttr(e.name)}">${escAttr(e.name)}${e.role?' ('+escAttr(e.role)+')':''}</option>`)
+    .join('');
+
+  // 既存データがあれば fromEmpId（従業員ID）を復元
+  const selectedEmpId=data?.empId||'';
+  const matchedEmp=selectedEmpId?(employees||[]).find(e=>e.id===selectedEmpId):null;
+  const initName=data?.name||matchedEmp?.name||'';
+  const initTel=data?.tel||matchedEmp?.tel||'';
+
+  div.innerHTML=`<button onclick="document.getElementById('${uid}').remove()" style="position:absolute;top:7px;right:7px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px" title="削除">✕</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-      <div class="form-group"><label>担当者名</label><input type="text" value="${data?.name||''}" placeholder="田中 花子"></div>
-      <div class="form-group"><label>役職・部署</label><input type="text" value="${data?.role||''}" placeholder="現場担当"></div>
-      <div class="form-group"><label>電話番号</label><input type="text" value="${data?.tel||''}" placeholder=""></div>
-      <div class="form-group"><label>メール</label><input type="text" value="${data?.email||''}" placeholder="tanaka@example.com"></div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>従業員から選択（任意）</label>
+        <select class="ct-emp-select" onchange="onContactEmpSelect(this,'${uid}')">
+          <option value="">（従業員を選択、または下で直接入力）</option>
+          ${empOptions}
+        </select>
+      </div>
+      <div class="form-group"><label>担当者名</label><input type="text" class="ct-name" value="${escAttr(initName)}" placeholder="田中 花子"></div>
+      <div class="form-group"><label>役職・部署</label><input type="text" class="ct-role" value="${escAttr(data?.role||'')}" placeholder="現場担当"></div>
+      <div class="form-group"><label>携帯番号</label><input type="tel" class="ct-tel" inputmode="tel" value="${escAttr(initTel)}" placeholder="" onblur="autoTel(this)"></div>
+      <div class="form-group"><label>メール</label><input type="email" class="ct-email" value="${escAttr(data?.email||'')}" placeholder="tanaka@example.com"></div>
     </div>`;
+
   c.appendChild(div);
+
+  // 既存データで従業員が選択されていた場合はプルダウンを復元
+  if(selectedEmpId){
+    const sel=div.querySelector('.ct-emp-select');
+    if(sel) sel.value=selectedEmpId;
+  }
+}
+
+// 従業員プルダウン選択時に名前・携帯番号を自動補完
+function onContactEmpSelect(selectEl, containerId){
+  const container=document.getElementById(containerId);
+  if(!container) return;
+  const opt=selectEl.selectedOptions[0];
+  if(!opt || !opt.value) return;
+  const name=opt.dataset.name||'';
+  const tel=opt.dataset.tel||'';
+  const nameInput=container.querySelector('.ct-name');
+  const telInput=container.querySelector('.ct-tel');
+  if(nameInput) nameInput.value=name;
+  if(telInput){
+    telInput.value=tel;
+    // ハイフン自動整形
+    if(typeof autoTel==='function') autoTel(telInput);
+  }
 }
 
 function getContacts(){
   return Array.from(document.querySelectorAll('#contacts-container > div')).map(div=>{
-    const ins=div.querySelectorAll('input');
-    return{name:ins[0].value.trim(),role:ins[1].value.trim(),tel:ins[2].value.trim(),email:ins[3].value.trim()};
-  }).filter(c=>c.name);
+    const sel=div.querySelector('.ct-emp-select');
+    const empId=sel?sel.value:'';
+    return{
+      empId: empId||'',
+      name: (div.querySelector('.ct-name')?.value||'').trim(),
+      role: (div.querySelector('.ct-role')?.value||'').trim(),
+      tel:  (div.querySelector('.ct-tel')?.value||'').trim(),
+      email:(div.querySelector('.ct-email')?.value||'').trim()
+    };
+  }).filter(c=>c.name||c.empId);
+}
+
+// ===== 貼り付け文字列から顧客情報を自動解析 =====
+function parseAndFillCustomer(){
+  const area=document.getElementById('cust-paste-area');
+  const status=document.getElementById('cust-paste-status');
+  if(!area) return;
+  const raw=area.value.trim();
+  if(!raw){
+    if(status) status.textContent='⚠️ テキストを貼り付けてください';
+    return;
+  }
+
+  // 行単位で走査
+  const lines=raw.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const result={name:'',zip:'',address:'',tel:'',fax:'',email:'',memo:''};
+
+  // ラベル別の検出パターン
+  const patterns={
+    name:    /^(?:会社名|社名|店舗名|屋号|顧客名|氏名|お名前|名前|宛名|Name|お客様名)[\s:：=\-･・]*/i,
+    zip:     /^(?:〒|郵便番号|Zip|Postal[\s\-]?Code?)[\s:：=\-･・]*/i,
+    address: /^(?:住所|所在地|Address|Addr|送付先|住所１|住所2)[\s:：=\-･・]*/i,
+    tel:     /^(?:TEL|電話|電話番号|℡|Tel\.?|Phone|Mobile|携帯)[\s:：=\-･・]*/i,
+    fax:     /^(?:FAX|ファックス|ＦＡＸ|Fax\.?)[\s:：=\-･・]*/i,
+    email:   /^(?:E[\-\s]?mail|メール|メールアドレス|Email|E-Mail|@)[\s:：=\-･・]*/i,
+  };
+
+  // ラベルなし自動検出用
+  const zipLooseRe=/(?:〒\s*)?(\d{3}[\s\-]?\d{4})/;
+  const telLooseRe=/(\(?0\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{3,4}|0\d{9,10}|\+81[\s\-]?\d[\s\-]?\d{4}[\s\-]?\d{4})/;
+  const emailLooseRe=/([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})/;
+
+  let addrLines=[];
+
+  for(const line of lines){
+    let matched=false;
+    // ラベルマッチ
+    for(const [key, pat] of Object.entries(patterns)){
+      if(pat.test(line)){
+        let value=line.replace(pat,'').trim();
+        // さらに「：」「:」を取り除く
+        value=value.replace(/^[:：\s]+/,'').trim();
+        if(!value) { matched=true; break; }
+        if(key==='name'){
+          if(!result.name) result.name=value;
+        } else if(key==='zip'){
+          const m=value.match(/\d{3}[\s\-]?\d{4}/);
+          if(m) result.zip=m[0].replace(/\s/g,'');
+        } else if(key==='address'){
+          addrLines.push(value);
+        } else if(key==='tel'){
+          const m=value.match(telLooseRe);
+          if(m) result.tel=m[1];
+        } else if(key==='fax'){
+          const m=value.match(telLooseRe);
+          if(m) result.fax=m[1];
+        } else if(key==='email'){
+          const m=value.match(emailLooseRe);
+          if(m) result.email=m[1];
+        }
+        matched=true;
+        break;
+      }
+    }
+    if(matched) continue;
+
+    // ラベルなし: 自動判定
+    // 1) メール
+    const em=line.match(emailLooseRe);
+    if(em && !result.email){ result.email=em[1]; continue; }
+
+    // 2) 郵便番号（行に含まれている）
+    const zm=line.match(zipLooseRe);
+    if(zm && !result.zip){
+      result.zip=zm[1].replace(/\s/g,'');
+      // 同じ行に住所っぽいテキストが続いていれば拾う
+      const rest=line.replace(zm[0],'').trim();
+      if(rest && /[都道府県市区町村]/.test(rest)) addrLines.push(rest);
+      continue;
+    }
+
+    // 3) 電話番号
+    const tm=line.match(telLooseRe);
+    if(tm){
+      // FAX の方がまだ無くて、既に電話が入っていたら FAX として扱う
+      if(!result.tel) result.tel=tm[1];
+      else if(!result.fax) result.fax=tm[1];
+      continue;
+    }
+
+    // 4) 住所（都道府県・市区町村の含まれる行）
+    if(/[都道府県市区町村]/.test(line) && line.length>3){
+      addrLines.push(line);
+      continue;
+    }
+
+    // 5) 1行目でまだ名前がなければ、最初の行を名前として採用
+    if(!result.name){
+      result.name=line;
+      continue;
+    }
+
+    // 6) その他はメモに
+    if(result.memo) result.memo+='\n'+line;
+    else result.memo=line;
+  }
+
+  if(addrLines.length) result.address=addrLines.join(' ');
+
+  // 入力欄に反映
+  let applied=0;
+  const fill=(id,val)=>{
+    if(!val) return;
+    const el=document.getElementById(id);
+    if(el){ el.value=val; applied++; }
+  };
+  fill('cust-name', result.name);
+  fill('cust-zip', result.zip);
+  fill('cust-address', result.address);
+  fill('cust-tel', result.tel);
+  fill('cust-fax', result.fax);
+  fill('cust-email', result.email);
+
+  // 既存のメモがあれば追記、無ければ上書き
+  if(result.memo){
+    const memoEl=document.getElementById('cust-memo');
+    if(memoEl){
+      if(memoEl.value.trim()) memoEl.value = memoEl.value.trim()+'\n'+result.memo;
+      else memoEl.value = result.memo;
+      applied++;
+    }
+  }
+
+  // ハイフン整形
+  if(typeof autoTel==='function'){
+    const telEl=document.getElementById('cust-tel');
+    const faxEl=document.getElementById('cust-fax');
+    if(telEl && telEl.value) autoTel(telEl);
+    if(faxEl && faxEl.value) autoTel(faxEl);
+  }
+  if(typeof autoZip==='function'){
+    const zipEl=document.getElementById('cust-zip');
+    if(zipEl && zipEl.value) autoZip(zipEl,'cust-address',null);
+  }
+
+  if(status){
+    if(applied>0) status.textContent=`✓ ${applied}項目を自動入力しました`;
+    else status.textContent='⚠️ 認識できませんでした。ラベルを追加してください';
+  }
+  if(typeof showToast==='function' && applied>0){
+    showToast(`✓ ${applied}項目を自動入力`, '#10B981');
+  }
 }
 
 function updateMapPreview(){
@@ -6031,8 +6261,29 @@ async function _fbPersist(){
       return copy;
     });
 
+    // Firestore は undefined を保存できないので再帰的に除去
+    const sanitize = (obj)=>{
+      if(obj===null || obj===undefined) return null;
+      if(Array.isArray(obj)) return obj.map(sanitize).filter(v=>v!==undefined);
+      if(typeof obj==='object'){
+        // Date 等のクラスインスタンスは ISO 文字列に
+        if(obj instanceof Date) return obj.toISOString();
+        const out={};
+        for(const k in obj){
+          if(!Object.prototype.hasOwnProperty.call(obj,k)) continue;
+          const v=obj[k];
+          if(v===undefined) continue; // undefined フィールドは削除
+          out[k]=sanitize(v);
+        }
+        return out;
+      }
+      // プリミティブ（string / number / boolean）はそのまま
+      if(typeof obj==='number' && !isFinite(obj)) return null; // NaN/Infinity も除外
+      return obj;
+    };
+
     // サイズ見積もり（Firestoreの1MB制限回避）
-    const payload = {
+    const rawPayload = {
       docs: docsForFB,
       customers, settings, jobs, templates,
       employees, branches, payments,
@@ -6041,6 +6292,8 @@ async function _fbPersist(){
       updatedAt: new Date().toISOString(),
       updatedBy: currentUser.email||uid
     };
+    // undefined や Date を除去してクリーンなpayloadを作成
+    const payload = sanitize(rawPayload);
     const sizeBytes = new Blob([JSON.stringify(payload)]).size;
     const SIZE_LIMIT = 900 * 1024; // 900KB（Firestore 1MB上限の90%で安全マージン）
 
@@ -6090,7 +6343,7 @@ async function _fbPersist(){
 
     // 写真データは別保存（サイズ大）
     if(Object.keys(docPhotos).length > 0){
-      await F.setDoc(F.doc(F.db,'users',uid,'extra','photos'),{ docPhotos });
+      await F.setDoc(F.doc(F.db,'users',uid,'extra','photos'),{ docPhotos: sanitize(docPhotos) });
     }
     return { ok:true, sizeBytes, chunkCount };
   }catch(e){
