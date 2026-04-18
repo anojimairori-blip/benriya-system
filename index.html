@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp; frame-src https://flexsysv2026.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp; frame-src https://flexsysv2026.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -382,6 +382,34 @@ tr:hover td{background:var(--bg)}
 .cal-day .day-num{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:2px}
 .cal-day.today .day-num{color:var(--accent)}
 .cal-event{font-size:10px;padding:1px 4px;border-radius:3px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== FullCalendar カスタムテーマ ===== */
+.fc{font-family:inherit;font-size:13px}
+.fc .fc-toolbar-title{font-size:18px;font-weight:700;color:var(--text)}
+.fc .fc-button{background:var(--surface);color:var(--text);border:1px solid var(--border);font-size:12px;padding:6px 12px;text-transform:none;box-shadow:none;font-weight:500}
+.fc .fc-button:hover{background:var(--surface2);border-color:var(--accent);color:var(--accent)}
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active{background:var(--accent);color:white;border-color:var(--accent)}
+.fc .fc-button-primary:disabled{background:var(--surface2);color:var(--text3)}
+.fc .fc-col-header-cell-cushion{padding:6px 4px;color:#5F6368;font-weight:600;text-decoration:none}
+.fc .fc-day-sat-color .fc-col-header-cell-cushion,
+.fc .fc-day-sat-color .fc-daygrid-day-number{color:#1A73E8}
+.fc .fc-day-sun-color .fc-col-header-cell-cushion,
+.fc .fc-day-sun-color .fc-daygrid-day-number{color:#D93025}
+.fc .fc-daygrid-day-number{padding:6px 8px;color:var(--text);text-decoration:none;font-weight:500}
+.fc .fc-day-today{background:rgba(168,213,184,0.15) !important}
+.fc .fc-day-today .fc-daygrid-day-number{background:var(--accent);color:white;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:4px}
+.fc-event{border-radius:4px;font-size:11px;padding:2px 4px;cursor:pointer;border:none}
+.fc-event:hover{filter:brightness(1.1)}
+.fc-daygrid-event{margin:1px 2px}
+.fc .fc-daygrid-day-frame{min-height:80px}
+.fc-daygrid-more-link{color:var(--accent);font-weight:600;font-size:10px}
+@media(max-width:768px){
+  .fc .fc-toolbar{flex-wrap:wrap;gap:6px}
+  .fc .fc-toolbar-title{font-size:15px}
+  .fc .fc-button{font-size:11px;padding:4px 8px}
+  .fc .fc-daygrid-day-frame{min-height:50px}
+}
 .cal-event.type-job{background:var(--accent-light);color:var(--accent)}
 
 /* SHARE */
@@ -761,6 +789,9 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+<!-- FullCalendar (Phase A: 月表示+ドラッグ) -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/ja.global.min.js"></script>
 </head>
 <body>
 
@@ -768,7 +799,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.6</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.7</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -792,7 +823,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.6</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.7</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -827,7 +858,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.6</div>
+    <div class="logo-version" id="sidebar-version">v3.7</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -962,7 +993,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.6 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.7 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -1051,16 +1082,23 @@ if('serviceWorker' in navigator){
     <h2>📅 作業カレンダー</h2>
     <div class="header-actions">
       <button class="btn btn-secondary btn-sm" onclick="openGcalSettingsModal()" title="Googleカレンダー連携">📅 Google連携</button>
-      <button class="btn btn-secondary btn-sm" onclick="calPrev()">◀</button>
-      <span id="cal-label" style="font-size:14px;font-weight:700;padding:0 6px"></span>
-      <button class="btn btn-secondary btn-sm" onclick="calNext()">▶</button>
       <button class="btn btn-primary btn-sm" onclick="openJobModal()">＋ 作業追加</button>
     </div>
   </div>
   <div class="content">
-    <div class="card" style="padding:16px;overflow-x:auto">
-      <div class="cal-header"><span style="color:#5F6368">月</span><span style="color:#5F6368">火</span><span style="color:#5F6368">水</span><span style="color:#5F6368">木</span><span style="color:#5F6368">金</span><span style="color:#1A73E8">土</span><span style="color:#D93025">日</span></div>
-      <div class="cal-grid" id="cal-grid"></div>
+    <div class="card" style="padding:16px">
+      <!-- FullCalendar コンテナ -->
+      <div id="fullcalendar-el"></div>
+      <!-- フォールバック（FullCalendar未読込時の従来UI） -->
+      <div id="legacy-calendar-fallback" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <button class="btn btn-secondary btn-sm" onclick="calPrev()">◀</button>
+          <span id="cal-label" style="font-size:14px;font-weight:700;padding:0 6px"></span>
+          <button class="btn btn-secondary btn-sm" onclick="calNext()">▶</button>
+        </div>
+        <div class="cal-header"><span style="color:#5F6368">月</span><span style="color:#5F6368">火</span><span style="color:#5F6368">水</span><span style="color:#5F6368">木</span><span style="color:#5F6368">金</span><span style="color:#1A73E8">土</span><span style="color:#D93025">日</span></div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
     </div>
     <div class="section-title" style="margin-top:18px">今月の作業</div>
     <div class="card"><table><thead><tr><th>日付</th><th>顧客名</th><th>作業内容</th><th>カテゴリ</th><th>時間</th><th></th></tr></thead><tbody id="job-list-body"></tbody></table></div>
@@ -2619,8 +2657,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.6';
-const APP_BUILD_TIME='2026/04/18 22:12';
+const APP_VERSION='v3.7';
+const APP_BUILD_TIME='2026/04/18 22:20';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3307,6 +3345,14 @@ function showPage(id, el, addToHistory=true){
   // ページ固有の初期化フック
   if(id==='settings') renderNavOrderEditor();
   if(id==='developer') updateDeveloperInfo();
+  if(id==='calendar'){
+    // FullCalendar はページが非表示状態だと幅0で初期化される。
+    // 表示後に updateSize して再描画。
+    setTimeout(()=>{
+      if(_fc){_fc.updateSize();_fc.render();}
+      else renderCalendar();
+    },50);
+  }
   // Mobile drawer sync
   document.querySelectorAll('#mobile-drawer-nav .nav-item').forEach(n=>{
     n.classList.toggle('active', n.dataset.page===id);
@@ -4238,23 +4284,152 @@ function deleteCustomer(id){
 }
 
 // ===== CALENDAR =====
+// FullCalendarインスタンス保持
+let _fc=null;
+
+// jobs配列をFullCalendar用イベントに変換
+function jobsToFcEvents(){
+  return jobs.map(j=>{
+    const cat=j.category||'';
+    const color=CATS[cat]||'#5BAD7E';
+    const startTime=j.time||'09:00';
+    const ev={
+      id:j.id,
+      title:(j.time?j.time+' ':'')+(j.title||'(無題)')+(j.customer?' / '+j.customer:''),
+      start:j.date+(j.time?'T'+j.time+':00':''),
+      allDay:!j.time,
+      backgroundColor:color,
+      borderColor:color,
+      textColor:'#fff',
+      extendedProps:{job:j}
+    };
+    if(j.time){
+      const [h,m]=j.time.split(':').map(Number);
+      const endDt=new Date(j.date+'T'+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':00');
+      endDt.setHours(endDt.getHours()+1);
+      ev.end=endDt.toISOString();
+    }
+    return ev;
+  });
+}
+
+// 月の表示中で job-list 用に calMonth/calYear を同期
+function _syncCalMonthFromFc(){
+  if(!_fc) return;
+  const d=_fc.getDate();
+  calYear=d.getFullYear();
+  calMonth=d.getMonth();
+}
+
 function renderCalendar(){
+  const el=document.getElementById('fullcalendar-el');
+  const fallback=document.getElementById('legacy-calendar-fallback');
+  // FullCalendar が読込まれていなければ従来UIにフォールバック
+  if(typeof FullCalendar==='undefined' || !el){
+    if(el) el.style.display='none';
+    if(fallback) fallback.style.display='block';
+    renderLegacyCalendar();
+    return;
+  }
+  if(fallback) fallback.style.display='none';
+  el.style.display='block';
+
+  if(!_fc){
+    // 初回: FullCalendarを作成
+    _fc=new FullCalendar.Calendar(el,{
+      initialView:'dayGridMonth',
+      locale:'ja',
+      firstDay:1, // 月曜始まり
+      height:'auto',
+      headerToolbar:{
+        left:'prev,next today',
+        center:'title',
+        right:'dayGridMonth,listMonth'
+      },
+      buttonText:{
+        today:'今日',
+        month:'月',
+        list:'リスト'
+      },
+      dayCellClassNames:(arg)=>{
+        const dow=arg.date.getDay();
+        if(dow===6) return ['fc-day-sat-color'];
+        if(dow===0) return ['fc-day-sun-color'];
+        return [];
+      },
+      events:jobsToFcEvents(),
+      editable:true, // ドラッグ&ドロップ有効
+      eventStartEditable:true,
+      eventDurationEditable:false, // Phase A は時間幅変更なし
+      dayMaxEvents:3,
+      moreLinkText:n=>'+'+n+'件',
+      // 日付クリック → 新規作業追加
+      dateClick:(info)=>{
+        openJobModal(info.dateStr);
+      },
+      // 予定クリック → 編集
+      eventClick:(info)=>{
+        const job=info.event.extendedProps.job;
+        if(job?.id) editJob(job.id);
+      },
+      // 予定ドロップ（日付移動）
+      eventDrop:async (info)=>{
+        const job=info.event.extendedProps.job;
+        if(!job){info.revert();return;}
+        const oldDate=job.date;
+        const newDate=info.event.startStr.split('T')[0];
+        if(oldDate===newDate){info.revert();return;}
+        showConfirm(
+          `「${job.title}」を ${oldDate} → ${newDate} に移動しますか？`,
+          ()=>{
+            const idx=jobs.findIndex(x=>x.id===job.id);
+            if(idx<0){info.revert();return;}
+            jobs[idx].date=newDate;
+            stampAudit(jobs[idx], false);
+            persist();
+            renderJobList();
+            // Gcal 同期
+            if(typeof isGcalEnabled==='function' && isGcalEnabled()){
+              syncJobToGcal(jobs[idx]).catch(e=>console.warn('Gcal sync failed:',e));
+            }
+            showToast(`✓ ${newDate} に移動しました`);
+          },
+          ()=>{ info.revert(); }
+        );
+      },
+      // 月切替時に下のリストも更新
+      datesSet:(info)=>{
+        _syncCalMonthFromFc();
+        renderJobList();
+      }
+    });
+    _fc.render();
+  } else {
+    // 既存インスタンス: イベントだけ差し替え
+    _fc.removeAllEvents();
+    _fc.addEventSource(jobsToFcEvents());
+  }
+  _syncCalMonthFromFc();
+  renderJobList();
+}
+
+// 旧UI用（FullCalendar失敗時のフォールバック）
+function renderLegacyCalendar(){
   const label=document.getElementById('cal-label');if(label)label.textContent=`${calYear}年 ${calMonth+1}月`;
   const grid=document.getElementById('cal-grid');if(!grid)return;
   const first=new Date(calYear,calMonth,1),last=new Date(calYear,calMonth+1,0);
   const ts=today();let html='';
-  // 月曜始まり: 日曜=0 を 6 にシフト、月曜=1 を 0 に
   const firstDayMon=(first.getDay()+6)%7;
   for(let i=0;i<firstDayMon;i++){
     const d=new Date(calYear,calMonth,1-firstDayMon+i);
-    const dow=(d.getDay()+6)%7; // 月=0..日=6
+    const dow=(d.getDay()+6)%7;
     const dowColor=dow===5?'#1A73E8':dow===6?'#D93025':'';
     html+=`<div class="cal-day other-month"><div class="day-num" style="color:${dowColor||'var(--text3)'}">${d.getDate()}</div></div>`;
   }
   for(let d=1;d<=last.getDate();d++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const dt=new Date(calYear,calMonth,d);
-    const dow=(dt.getDay()+6)%7; // 月=0..日=6
+    const dow=(dt.getDay()+6)%7;
     const dowColor=dow===5?'#1A73E8':dow===6?'#D93025':'';
     const dj=jobs.filter(j=>j.date===ds);
     html+=`<div class="cal-day${ds===ts?' today':''}" onclick="openJobModal('${ds}')">
@@ -4265,8 +4440,16 @@ function renderCalendar(){
   }
   grid.innerHTML=html;renderJobList();
 }
-function calPrev(){if(calMonth===0){calYear--;calMonth=11;}else calMonth--;renderCalendar();}
-function calNext(){if(calMonth===11){calYear++;calMonth=0;}else calMonth++;renderCalendar();}
+function calPrev(){
+  if(_fc){_fc.prev();return;}
+  if(calMonth===0){calYear--;calMonth=11;}else calMonth--;
+  renderCalendar();
+}
+function calNext(){
+  if(_fc){_fc.next();return;}
+  if(calMonth===11){calYear++;calMonth=0;}else calMonth++;
+  renderCalendar();
+}
 function renderJobList(){
   const tbody=document.getElementById('job-list-body');if(!tbody)return;
   const mj=jobs.filter(j=>{const dt=new Date(j.date);return dt.getFullYear()===calYear&&dt.getMonth()===calMonth;}).sort((a,b)=>a.date.localeCompare(b.date));
