@@ -194,6 +194,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .tax-actions{display:flex;gap:4px;flex-shrink:0}
 .tax-act-btn{padding:5px 7px;border:1px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;min-width:30px;min-height:30px}
 .tax-act-del{border-color:#F5C6C2;background:var(--red-light);color:var(--red)}
+
+/* ===== メニュー並び順エディタ ===== */
+.nav-order-row{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
+.nav-order-num{display:inline-block;min-width:24px;text-align:center;font-size:11px;color:var(--text3);font-weight:700;background:var(--surface);padding:2px 6px;border-radius:99px}
+.nav-order-icon{font-size:18px}
+.nav-order-label{flex:1;font-size:13px;font-weight:600}
+.nav-order-actions{display:flex;gap:4px;flex-shrink:0}
 .btn-danger{background:var(--red-light);color:var(--red);border:1px solid #F5C6C2}.btn-danger:hover{background:#F5C6C2}
 .btn-gold{background:var(--gold-light);color:var(--gold);border:1px solid #F0D080}.btn-gold:hover{background:#F0D080}
 .btn-blue{background:var(--blue-light);color:var(--blue);border:1px solid #B0D0F0}.btn-blue:hover{background:#B0D0F0}
@@ -770,7 +777,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.8.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.0</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -805,7 +812,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.8.1</div>
+    <div class="logo-version" id="sidebar-version">v3.0</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -828,20 +835,12 @@ if('serviceWorker' in navigator){
     <div class="nav-item" onclick="showPage('invoices',this)"><span class="nav-icon">📋</span><span class="nav-label">請求書</span><span class="nav-tooltip">請求書</span></div>
     <div class="nav-item" onclick="showPage('receipts',this)"><span class="nav-icon">🧾</span><span class="nav-label">領収書</span><span class="nav-tooltip">領収書</span></div>
     <div class="nav-section">管理</div>
-    <div class="nav-item" onclick="showPage('customers',this)"><span class="nav-icon">👥</span><span class="nav-label">顧客管理</span><span class="nav-tooltip">顧客管理</span></div>
-    <div class="nav-item" onclick="showPage('calendar',this)"><span class="nav-icon">📅</span><span class="nav-label">作業カレンダー</span><span class="nav-tooltip">作業カレンダー</span></div>
-    <div class="nav-item" onclick="showPage('alerts',this)"><span class="nav-icon">🔔</span><span class="nav-label">支払いアラート</span><span class="nav-tooltip">支払いアラート</span></div>
-    <div class="nav-item" onclick="showPage('report',this)"><span class="nav-icon">📈</span><span class="nav-label">年次レポート</span><span class="nav-tooltip">年次レポート</span></div>
-    <div class="nav-item" onclick="showPage('templates',this)"><span class="nav-icon">📦</span><span class="nav-label">作業テンプレート</span><span class="nav-tooltip">作業テンプレート</span></div>
-    <div class="nav-item" onclick="showPage('payments',this)"><span class="nav-icon">💴</span><span class="nav-label">入金管理</span><span class="nav-tooltip">入金管理</span></div>
-    <div class="nav-item" onclick="showPage('staff-report',this)"><span class="nav-icon">📊</span><span class="nav-label">スタッフ実績</span><span class="nav-tooltip">スタッフ実績</span></div>
-    <div class="nav-item" onclick="showPage('csv-export',this)"><span class="nav-icon">📤</span><span class="nav-label">CSVエクスポート</span><span class="nav-tooltip">CSVエクスポート</span></div>
-    <div class="nav-item" onclick="showPage('expenses',this)"><span class="nav-icon">💸</span><span class="nav-label">経費管理</span><span class="nav-tooltip">経費管理</span></div>
-    <div class="nav-item" onclick="showPage('backup',this)"><span class="nav-icon">🗄️</span><span class="nav-label">バックアップ</span><span class="nav-tooltip">バックアップ</span></div>
+    <div id="nav-management"><!-- 動的生成: renderNavManagement() --></div>
     <div class="nav-section">設定</div>
     <div class="nav-item" onclick="showPage('settings',this)"><span class="nav-icon">⚙️</span><span class="nav-label">会社設定</span><span class="nav-tooltip">会社設定</span></div>
     <div class="nav-item" onclick="showPage('tax',this)"><span class="nav-icon">🧾</span><span class="nav-label">税率設定</span><span class="nav-tooltip">税率設定</span></div>
     <div class="nav-item" onclick="requireAdmin('employees',this)"><span class="nav-icon">👤</span><span class="nav-label">従業員管理</span><span class="nav-tooltip">従業員管理</span></div>
+    <div class="nav-item" id="nav-developer" onclick="requireDeveloper(this)" style="display:none"><span class="nav-icon">🛠️</span><span class="nav-label">開発者ツール</span><span class="nav-tooltip">開発者ツール</span></div>
   </nav>
 </div>
 
@@ -951,7 +950,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v2.8.1 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.0 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -1091,6 +1090,14 @@ if('serviceWorker' in navigator){
 <div id="page-settings" class="page">
   <div class="main-header"><h2>⚙️ 会社設定</h2></div>
   <div class="content">
+    <!-- 管理メニュータブ -->
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')" style="background:var(--accent);color:white;border-color:var(--accent)">⚙️ 会社設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
+    </div>
     <div class="card" style="max-width:640px;padding:24px">
 
       <!-- テーマ -->
@@ -1213,6 +1220,16 @@ if('serviceWorker' in navigator){
         <span id="settings-saved" style="display:none;color:var(--accent);font-size:13px">✓ 保存しました</span>
       </div>
     </div>
+
+    <!-- メニュー並び順カスタマイズ -->
+    <div class="card" style="max-width:640px;padding:24px;margin-top:18px">
+      <div class="section-title" style="margin-bottom:6px">📋 メニュー「管理」セクションの並び順</div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">↑↓ボタンで左サイドバーの「管理」メニューの順番を変更できます。変更は即座に反映されます。</p>
+      <div id="nav-order-editor"></div>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="resetNavOrder()">🔄 デフォルト順に戻す</button>
+      </div>
+    </div>
   </div>
 </div>
 <!-- EMPLOYEES (Admin only) -->
@@ -1225,6 +1242,14 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
+    <!-- 管理メニュータブ -->
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')" style="background:var(--accent);color:white;border-color:var(--accent)">👤 従業員管理</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
+    </div>
     <div style="background:var(--gold-light);border:1px solid #F0D080;border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--gold)">
       🔐 この画面は管理者専用です。従業員の個人情報が含まれるため、取り扱いにご注意ください。
     </div>
@@ -1339,6 +1364,14 @@ if('serviceWorker' in navigator){
 <div id="page-csv-export" class="page">
   <div class="main-header"><h2>📤 CSVエクスポート</h2></div>
   <div class="content">
+    <!-- 管理メニュータブ -->
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')" style="background:var(--accent);color:white;border-color:var(--accent)">📤 CSVエクスポート</button>
+    </div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:20px">freee・弥生・マネーフォワードなどの会計ソフトに取り込めるCSVを出力します。</p>
     <div class="form-row cols2" style="max-width:500px;margin-bottom:20px">
       <div class="form-group"><label>期間（開始）</label><input type="date" id="csv-from"></div>
@@ -1375,6 +1408,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <h2>💸 経費管理</h2>
     <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" onclick="openExpExportModal()">📤 エクスポート</button>
       <button class="btn btn-primary" onclick="openExpenseModal()">＋ 経費を追加</button>
     </div>
   </div>
@@ -1413,6 +1447,14 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
+    <!-- 管理メニュータブ -->
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')" style="background:var(--accent);color:white;border-color:var(--accent)">🧾 税率設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
+    </div>
     <div class="card" style="max-width:640px;padding:22px">
       <div class="section-title" style="margin-bottom:6px">消費税率の管理</div>
       <p style="font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.7">
@@ -1460,10 +1502,116 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
+<!-- DEVELOPER TOOLS (限定アクセス) -->
+<div id="page-developer" class="page">
+  <div class="main-header">
+    <h2>🛠️ 開発者ツール <span style="font-size:11px;background:#7B68EE;color:white;padding:2px 8px;border-radius:99px;font-weight:600;margin-left:6px">限定アクセス</span></h2>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" onclick="lockDeveloper()">🔒 ロック</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="background:#FFF8E7;border:1px solid #F0D080;border-radius:var(--radius);padding:14px 16px;margin-bottom:18px;font-size:13px;color:#8B6914">
+      ⚠️ このページは開発者・テスト用です。サンプルデータの生成・削除を行うと既存データに影響を与える可能性があります。
+    </div>
+
+    <div class="card" style="max-width:680px;padding:24px">
+      <div class="section-title" style="margin-bottom:6px">📊 サンプルデータ生成</div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">デモ・テスト用にランダムなサンプルデータを生成します。月・日・時間はランダムに分散されます。</p>
+
+      <div class="form-row cols2" style="margin-bottom:14px">
+        <div class="form-group"><label>対象期間（年）</label>
+          <select id="dev-year">
+            <option value="2026" selected>2026年</option>
+            <option value="2025">2025年</option>
+            <option value="2024">2024年</option>
+          </select>
+        </div>
+        <div class="form-group"><label>生成件数</label>
+          <select id="dev-count">
+            <option value="10">10件</option>
+            <option value="30" selected>30件</option>
+            <option value="50">50件</option>
+            <option value="100">100件</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom:8px;font-size:13px;font-weight:600;color:var(--text2)">生成する項目を選択：</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:18px">
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface2);border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="dev-gen-customers" checked> <span style="font-size:13px">👥 顧客（10件）</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface2);border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="dev-gen-employees" checked> <span style="font-size:13px">👤 従業員（5件）</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface2);border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="dev-gen-quotes" checked> <span style="font-size:13px">📝 見積書</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface2);border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="dev-gen-invoices" checked> <span style="font-size:13px">📋 請求書</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface2);border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="dev-gen-receipts" checked> <span style="font-size:13px">🧾 領収書</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface2);border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="dev-gen-expenses" checked> <span style="font-size:13px">💸 経費</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface2);border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="dev-gen-jobs" checked> <span style="font-size:13px">📅 作業実績</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface2);border-radius:6px;cursor:pointer">
+          <input type="checkbox" id="dev-gen-payments" checked> <span style="font-size:13px">💴 入金記録</span>
+        </label>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="generateSampleData()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">⚡ サンプルデータ生成</button>
+        <button class="btn btn-danger" onclick="deleteSampleData()">🗑 サンプルデータ削除</button>
+      </div>
+    </div>
+
+    <div class="card" style="max-width:680px;padding:24px;margin-top:18px">
+      <div class="section-title" style="margin-bottom:6px">🔧 開発者情報</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <div><strong>バージョン:</strong> <span id="dev-info-version"></span></div>
+        <div><strong>ビルド日時:</strong> <span id="dev-info-build"></span></div>
+        <div><strong>ログインユーザー:</strong> <span id="dev-info-user"></span></div>
+        <div><strong>localStorage 使用量:</strong> <span id="dev-info-storage"></span></div>
+        <div><strong>データ件数:</strong> <span id="dev-info-counts"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 開発者認証モーダル -->
+<div class="modal-overlay" id="dev-auth-modal">
+<div class="modal" style="max-width:420px">
+  <div class="modal-header"><h3>🔐 開発者認証</h3><button class="close-btn" onclick="closeModal('dev-auth-modal')">✕</button></div>
+  <div class="modal-body">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">開発者ツールにアクセスするにはパスワードを入力してください。<br><span style="font-size:11px;color:var(--text3)">※ 許可されたGoogleアカウント（a.nojima.irori@gmail.com）でも自動アクセス可能</span></p>
+    <input type="password" id="dev-auth-pin" placeholder="開発者パスワード" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px" onkeypress="if(event.key==='Enter')checkDeveloperPin()">
+    <div id="dev-auth-error" style="color:var(--red);font-size:12px;margin-top:8px;min-height:18px"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="closeModal('dev-auth-modal')">キャンセル</button>
+    <button class="btn btn-primary" onclick="checkDeveloperPin()">認証</button>
+  </div>
+</div>
+</div>
+
 <!-- BACKUP -->
 <div id="page-backup" class="page">
   <div class="main-header"><h2>🗄️ バックアップ・復旧</h2></div>
   <div class="content">
+    <!-- 管理メニュータブ -->
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
+      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')" style="background:var(--accent);color:white;border-color:var(--accent)">🗄️ バックアップ</button>
+      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
+    </div>
     <div style="max-width:580px">
       <div style="background:var(--blue-light);border:1px solid #B0D0F0;border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--blue)">
         💡 定期的にバックアップを取ることをお勧めします。すべてのデータ（書類・顧客・従業員・設定など）を1つのファイルに保存できます。
@@ -2237,11 +2385,9 @@ if('serviceWorker' in navigator){
     </div>
     <div class="form-row cols3">
       <div class="form-group"><label>金額（税抜）</label><input type="number" id="exp-amount" placeholder="0" min="0" oninput="calcExpTax()"></div>
-      <div class="form-group"><label>税率</label>
+      <div class="form-group"><label>税率 <span style="font-size:10px;color:var(--text3);font-weight:400">（税率設定にあるすべての税率を表示・共通です）</span></label>
         <select id="exp-tax" onchange="calcExpTax()">
-          <option value="10">10%（標準）</option>
-          <option value="8">8%（軽減）</option>
-          <option value="0">非課税</option>
+          <!-- 動的生成: buildExpTaxSelect() -->
         </select>
       </div>
       <div class="form-group"><label>税込金額</label><input type="text" id="exp-total-display" readonly style="background:var(--surface2);font-weight:700"></div>
@@ -2269,6 +2415,42 @@ if('serviceWorker' in navigator){
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('expense-modal')">キャンセル</button>
     <button class="btn btn-primary" onclick="saveExpense()">💾 保存する</button>
+  </div>
+</div>
+</div>
+
+<!-- EXPENSE EXPORT MODAL -->
+<div class="modal-overlay" id="exp-export-modal">
+<div class="modal" style="max-width:560px">
+  <div class="modal-header"><h3>📤 経費データをエクスポート</h3><button class="close-btn" onclick="closeModal('exp-export-modal')">✕</button></div>
+  <div class="modal-body">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">freee・弥生・マネーフォワード・MFクラウド等の会計ソフトに取り込めるCSVを出力します。</p>
+    <div class="form-row cols2" style="margin-bottom:14px">
+      <div class="form-group"><label>期間（開始）</label><input type="date" id="exp-csv-from"></div>
+      <div class="form-group"><label>期間（終了）</label><input type="date" id="exp-csv-to"></div>
+    </div>
+    <div class="section-title" style="margin-bottom:8px">エクスポート形式</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-secondary" style="text-align:left;padding:12px 14px" onclick="exportExpenseCSV('standard')">
+        <strong>📋 標準形式（汎用CSV）</strong><br>
+        <span style="font-size:11px;color:var(--text3)">日付・カテゴリ・内容・金額・税率・支払方法・状態など全項目</span>
+      </button>
+      <button class="btn btn-secondary" style="text-align:left;padding:12px 14px" onclick="exportExpenseCSV('freee')">
+        <strong>🟢 freee形式</strong><br>
+        <span style="font-size:11px;color:var(--text3)">freee会計に直接インポート可能なフォーマット</span>
+      </button>
+      <button class="btn btn-secondary" style="text-align:left;padding:12px 14px" onclick="exportExpenseCSV('yayoi')">
+        <strong>🔵 弥生会計形式</strong><br>
+        <span style="font-size:11px;color:var(--text3)">弥生会計の振替伝票形式</span>
+      </button>
+      <button class="btn btn-secondary" style="text-align:left;padding:12px 14px" onclick="exportExpenseCSV('money')">
+        <strong>🟡 マネーフォワード形式</strong><br>
+        <span style="font-size:11px;color:var(--text3)">マネーフォワードクラウド会計フォーマット</span>
+      </button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="closeModal('exp-export-modal')">閉じる</button>
   </div>
 </div>
 </div>
@@ -2347,8 +2529,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.8.1';
-const APP_BUILD_TIME='2026/04/18 19:07';
+const APP_VERSION='v3.0';
+const APP_BUILD_TIME='2026/04/18 19:43';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3005,6 +3187,9 @@ function showPage(id, el, addToHistory=true){
     const main=document.querySelector('.main');
     if(main) main.scrollTop=0;
   }
+  // ページ固有の初期化フック
+  if(id==='settings') renderNavOrderEditor();
+  if(id==='developer') updateDeveloperInfo();
   // Mobile drawer sync
   document.querySelectorAll('#mobile-drawer-nav .nav-item').forEach(n=>{
     n.classList.toggle('active', n.dataset.page===id);
@@ -4592,6 +4777,8 @@ function initAppAfterAuth(){
   const hv=document.getElementById('home-header-version');
   if(hv) hv.textContent=APP_VERSION+' · '+APP_BUILD_TIME;
   loadSidebarTitle(); loadSettings(); loadLogo();
+  renderNavManagement();
+  showDeveloperMenu();
   renderAll(); buildMonthlyChart(); initReportYears(); initSrYears();
   renderCalendar(); renderTemplates(); renderAlerts();
   renderEmployees(); renderBranches(); renderPayments(); renderExpenses(); renderBulletins();
@@ -5056,12 +5243,12 @@ function renderStaffReport(){
       const emp=employees.find(x=>x.name===e.name);
       const isUnassigned=(e.name==='未割当');
       return`<div class="staff-row">
-        <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showStaffDetailDocs('${e.name.replace(/'/g,"\\'")}',${y},${m||'null'})" title="クリックで取引一覧">
           ${emp?.photo?`<img src="${emp.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`
             :isUnassigned?`<div style="width:28px;height:28px;border-radius:50%;background:#FFE4D6;color:#E67E22;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">!</div>`
             :`<div style="width:28px;height:28px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${e.name.charAt(0)}</div>`}
-          <span style="font-size:13px;font-weight:600">${e.name}</span>
-          ${isUnassigned?`<button onclick="showUnassignedDocs(${y},${m||'null'})" style="font-size:10px;padding:2px 8px;border-radius:99px;background:#E67E22;color:white;border:none;cursor:pointer;margin-left:4px">📋 一覧</button>`:''}
+          <span style="font-size:13px;font-weight:600;color:var(--accent);text-decoration:underline">${e.name}</span>
+          ${isUnassigned?`<button onclick="event.stopPropagation();showUnassignedDocs(${y},${m||'null'})" style="font-size:10px;padding:2px 8px;border-radius:99px;background:#E67E22;color:white;border:none;cursor:pointer;margin-left:4px">📋 一覧</button>`:''}
         </div>
         <div style="text-align:right;font-size:13px">${e.count}件</div>
         <div style="text-align:right;font-size:13px;font-weight:700">${fmt(e.total)}</div>
@@ -5088,6 +5275,57 @@ function renderStaffReport(){
 }
 
 // 未割当書類の一覧表示
+// スタッフ詳細：取引一覧表示
+function showStaffDetailDocs(staffName, year, month){
+  if(staffName==='未割当'){
+    showUnassignedDocs(year,month);
+    return;
+  }
+  const list=docs.filter(d=>{
+    if(!['請求書','領収書'].includes(d.type)) return false;
+    if((d.staff||'').trim()!==staffName) return false;
+    const dt=new Date(d.date);
+    if(dt.getFullYear()!==year) return false;
+    if(month && dt.getMonth()!==month-1) return false;
+    return true;
+  }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+
+  const total=list.reduce((s,d)=>s+(d.grandTotal||0),0);
+  const periodLabel=month?`${year}年${month}月`:`${year}年（年間）`;
+
+  const html=`<div class="modal-overlay open" id="staff-detail-modal" onclick="if(event.target===this)closeModal('staff-detail-modal')">
+    <div class="modal" style="max-width:780px">
+      <div class="modal-header">
+        <h3>👤 ${staffName} さんの取引一覧 <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${periodLabel}</span></h3>
+        <button class="close-btn" onclick="closeModal('staff-detail-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:65vh;overflow-y:auto">
+        <div style="background:var(--accent-light);color:var(--accent);padding:10px 14px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <span style="font-size:13px;font-weight:600">📊 合計 ${list.length}件</span>
+          <span style="font-size:14px;font-weight:700">${fmt(total)}</span>
+        </div>
+        ${list.length?list.map(d=>{
+          const tc={'請求書':'badge-invoice','領収書':'badge-receipt'};
+          return`<div style="display:flex;align-items:center;gap:8px;padding:10px 8px;border-bottom:1px solid var(--border)">
+            <span class="badge ${tc[d.type]||''}" style="font-size:10px;flex-shrink:0">${d.type}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.number} - ${d.subject||'（件名なし）'}</div>
+              <div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.customer||'—'} / ${d.date||''}</div>
+            </div>
+            <span style="font-size:13px;font-weight:700;flex-shrink:0">${fmt(d.grandTotal)}</span>
+            <button class="btn btn-secondary btn-sm" onclick="closeModal('staff-detail-modal');setTimeout(()=>editDoc('${d.id}'),100)" style="flex-shrink:0">編集</button>
+          </div>`;
+        }).join(''):'<div style="text-align:center;color:var(--text3);padding:32px">該当する書類はありません</div>'}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('staff-detail-modal')">閉じる</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('staff-detail-modal')?.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
 function showUnassignedDocs(year, month){
   const list=docs.filter(d=>{
     if(!['請求書','領収書'].includes(d.type)) return false;
@@ -5218,12 +5456,19 @@ function calcExpTax(){
   if(el)el.value=fmt(total);
 }
 
+function buildExpTaxSelect(selected){
+  const sel=document.getElementById('exp-tax');
+  if(!sel) return;
+  sel.innerHTML=taxOptions(selected||'10');
+}
+
 function openExpenseModal(id){
   editingExpenseId=id||null;
   currentExpenseReceipt='';
   document.getElementById('exp-modal-title').textContent=id?'経費を編集':'経費を追加';
   if(id){
     const e=expenses.find(x=>x.id===id);if(!e)return;
+    buildExpTaxSelect(e.tax||'10');
     document.getElementById('exp-date').value=e.date||today();
     document.getElementById('exp-category').value=e.category||'';
     document.getElementById('exp-desc').value=e.desc||'';
@@ -5231,7 +5476,7 @@ function openExpenseModal(id){
     document.getElementById('exp-tax').value=e.tax||'10';
     document.getElementById('exp-payment-method').value=e.paymentMethod||'現金';
     document.getElementById('exp-staff').value=e.staff||'';
-    document.getElementById('exp-status').value=e.status||'未精算';
+    document.getElementById('exp-status').value=e.status||'精算済';
     document.getElementById('exp-doc-ref').value=e.docRef||'';
     document.getElementById('exp-memo').value=e.memo||'';
     currentExpenseReceipt=e.receipt||'';
@@ -5241,10 +5486,11 @@ function openExpenseModal(id){
     if(del) del.style.display=currentExpenseReceipt?'inline-flex':'none';
     document.getElementById('exp-receipt-name').textContent=currentExpenseReceipt?'✓ 登録済':'';
   }else{
+    buildExpTaxSelect('10');
     ['exp-category','exp-desc','exp-doc-ref','exp-memo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     document.getElementById('exp-date').value=today();
     document.getElementById('exp-amount').value='';
-    document.getElementById('exp-tax').value='10';
+    document.getElementById('exp-tax').value=settings?.defaultTax??'10';
     document.getElementById('exp-payment-method').value='現金';
     document.getElementById('exp-staff').value='';
     document.getElementById('exp-status').value='精算済';
@@ -5949,6 +6195,64 @@ function exportReportCSV(){
 const _origRenderReport=typeof renderReport==='function'?renderReport:null;
 
 // ===== CSV EXPORT (全形式) =====
+function openExpExportModal(){
+  const now=new Date(),y=now.getFullYear(),m=String(now.getMonth()+1).padStart(2,'0');
+  const lastDay=new Date(y,now.getMonth()+1,0).getDate();
+  document.getElementById('exp-csv-from').value=`${y}-${m}-01`;
+  document.getElementById('exp-csv-to').value=`${y}-${m}-${String(lastDay).padStart(2,'0')}`;
+  document.getElementById('exp-export-modal').classList.add('open');
+}
+
+function exportExpenseCSV(format){
+  const from=document.getElementById('exp-csv-from')?.value||'';
+  const to=document.getElementById('exp-csv-to')?.value||'';
+  let list=[...expenses];
+  if(from)list=list.filter(e=>e.date>=from);
+  if(to)list=list.filter(e=>e.date<=to);
+  if(!list.length){showToast('該当する経費がありません','#E67E22');return;}
+
+  const esc=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  let csv='',filename='';
+
+  if(format==='standard'){
+    filename=`expenses_${from||'all'}_${to||'all'}.csv`;
+    csv='日付,カテゴリ,内容,金額(税抜),税率,消費税額,合計(税込),支払方法,担当者,状態,関連書類,メモ\n';
+    csv+=list.map(e=>[e.date,e.category,e.desc,e.amount,e.tax==='0'?'非課税':e.tax+'%',e.taxAmt,e.total,e.paymentMethod,e.staff,e.status,e.docRef,e.memo].map(esc).join(',')).join('\n');
+  }else if(format==='freee'){
+    filename=`freee_expense_${today()}.csv`;
+    csv='発生日,収支区分,勘定科目,取引先,金額,税区分,備考,部門\n';
+    csv+=list.map(e=>[
+      e.date,'支出',e.category||'雑費',e.desc||'',e.total,
+      e.tax==='10'?'課税仕入10%':e.tax==='8'?'課税仕入8%':'非課税仕入',
+      e.memo||e.docRef||'', ''
+    ].map(esc).join(',')).join('\n');
+  }else if(format==='yayoi'){
+    filename=`yayoi_expense_${today()}.csv`;
+    csv='"伝票No","日付","借方勘定科目","借方補助科目","借方金額","貸方勘定科目","貸方補助科目","貸方金額","摘要","税区分"\n';
+    list.forEach((e,i)=>{
+      csv+=[String(i+1).padStart(6,'0'),e.date,e.category||'雑費','',e.total,
+        e.paymentMethod==='現金'?'現金':e.paymentMethod==='銀行振込'?'普通預金':'未払金','',e.total,
+        e.desc||'',e.tax==='10'?'課税仕入10%':e.tax==='8'?'課税仕入8%':'非課税'
+      ].map(esc).join(',')+'\n';
+    });
+  }else if(format==='money'){
+    filename=`moneyforward_expense_${today()}.csv`;
+    csv='取引日,取引内容,金額（収入）,金額（支出）,口座,大分類,中分類,メモ\n';
+    csv+=list.map(e=>[
+      e.date, e.desc||'', '', e.total,
+      e.paymentMethod||'現金', '経費', e.category||'', e.memo||''
+    ].map(esc).join(',')).join('\n');
+  }
+
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+  URL.revokeObjectURL(url);
+  closeModal('exp-export-modal');
+  showToast(`${list.length}件をエクスポートしました ✓`);
+}
+
 function exportCSV(format){
   const from=document.getElementById('csv-from')?.value||'';
   const to=document.getElementById('csv-to')?.value||'';
@@ -6338,18 +6642,399 @@ const NAV_ITEMS=[
   {id:'employees',icon:'👤',label:'従業員管理',admin:true},
 ];
 
+// ===== ナビゲーション管理メニュー（並び替え可能） =====
+const DEFAULT_NAV_MANAGEMENT=[
+  {key:'customers',  icon:'👥',label:'顧客管理',     action:"showPage('customers',this)"},
+  {key:'calendar',   icon:'📅',label:'作業カレンダー',action:"showPage('calendar',this)"},
+  {key:'alerts',     icon:'🔔',label:'支払いアラート',action:"showPage('alerts',this)"},
+  {key:'report',     icon:'📈',label:'年次レポート',  action:"showPage('report',this)"},
+  {key:'templates',  icon:'📦',label:'作業テンプレート',action:"showPage('templates',this)"},
+  {key:'payments',   icon:'💴',label:'入金管理',     action:"showPage('payments',this)"},
+  {key:'staff-report',icon:'📊',label:'スタッフ実績',action:"showPage('staff-report',this)"},
+  {key:'csv-export', icon:'📤',label:'CSVエクスポート',action:"showPage('csv-export',this)"},
+  {key:'expenses',   icon:'💸',label:'経費管理',     action:"showPage('expenses',this)"},
+  {key:'backup',     icon:'🗄️',label:'バックアップ', action:"showPage('backup',this)"},
+];
+
+function getNavManagementOrder(){
+  // 保存された順序があれば使用、なければデフォルト順
+  const savedOrder=JSON.parse(localStorage.getItem('navMgmtOrder')||'null');
+  if(!savedOrder||!Array.isArray(savedOrder)) return DEFAULT_NAV_MANAGEMENT.slice();
+  // 保存順をベースに、新規追加されたメニューも末尾に追加
+  const map=Object.fromEntries(DEFAULT_NAV_MANAGEMENT.map(it=>[it.key,it]));
+  const ordered=[];
+  savedOrder.forEach(k=>{ if(map[k]){ordered.push(map[k]); delete map[k];} });
+  Object.values(map).forEach(it=>ordered.push(it));
+  return ordered;
+}
+
+function saveNavManagementOrder(items){
+  localStorage.setItem('navMgmtOrder', JSON.stringify(items.map(i=>i.key)));
+}
+
+function renderNavManagement(){
+  const el=document.getElementById('nav-management');
+  if(!el) return;
+  const items=getNavManagementOrder();
+  el.innerHTML=items.map(it=>`<div class="nav-item" onclick="${it.action}"><span class="nav-icon">${it.icon}</span><span class="nav-label">${it.label}</span><span class="nav-tooltip">${it.label}</span></div>`).join('');
+}
+
+// 設定画面用：メニュー順序エディタ
+function renderNavOrderEditor(){
+  const el=document.getElementById('nav-order-editor');
+  if(!el) return;
+  const items=getNavManagementOrder();
+  el.innerHTML=items.map((it,i)=>`
+    <div class="nav-order-row">
+      <span class="nav-order-num">${i+1}</span>
+      <span class="nav-order-icon">${it.icon}</span>
+      <span class="nav-order-label">${it.label}</span>
+      <div class="nav-order-actions">
+        <button onclick="moveNavItem(${i},-1)" ${i===0?'disabled':''} class="tax-act-btn" title="上へ">↑</button>
+        <button onclick="moveNavItem(${i},1)" ${i===items.length-1?'disabled':''} class="tax-act-btn" title="下へ">↓</button>
+      </div>
+    </div>`).join('');
+}
+
+function moveNavItem(idx,dir){
+  const items=getNavManagementOrder();
+  const j=idx+dir;
+  if(j<0||j>=items.length) return;
+  [items[idx],items[j]]=[items[j],items[idx]];
+  saveNavManagementOrder(items);
+  renderNavOrderEditor();
+  renderNavManagement();
+  buildMobileDrawer();
+}
+
+function resetNavOrder(){
+  showConfirm('メニューの並び順をデフォルトに戻しますか？',()=>{
+    localStorage.removeItem('navMgmtOrder');
+    renderNavOrderEditor();
+    renderNavManagement();
+    buildMobileDrawer();
+    showToast('並び順をリセットしました ✓');
+  });
+}
+
+// ===== 開発者ツール =====
+const DEVELOPER_EMAIL='a.nojima.irori@gmail.com';
+const DEVELOPER_PIN='Yuki1105Boss';
+let _isDeveloperUnlocked=false;
+
+function isDeveloperUser(){
+  return (currentUser?.email||'').toLowerCase()===DEVELOPER_EMAIL.toLowerCase();
+}
+
+function showDeveloperMenu(){
+  const navItem=document.getElementById('nav-developer');
+  if(navItem) navItem.style.display=isDeveloperUser()||_isDeveloperUnlocked?'flex':'none';
+}
+
+function requireDeveloper(el){
+  if(isDeveloperUser()||_isDeveloperUnlocked){
+    showPage('developer',el);
+    updateDeveloperInfo();
+    return;
+  }
+  document.getElementById('dev-auth-pin').value='';
+  document.getElementById('dev-auth-error').textContent='';
+  document.getElementById('dev-auth-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('dev-auth-pin').focus(),100);
+}
+
+function checkDeveloperPin(){
+  const pin=document.getElementById('dev-auth-pin').value;
+  if(pin===DEVELOPER_PIN){
+    _isDeveloperUnlocked=true;
+    closeModal('dev-auth-modal');
+    showDeveloperMenu();
+    showPage('developer');
+    updateDeveloperInfo();
+    showToast('開発者モードを解除しました ✓');
+  } else {
+    document.getElementById('dev-auth-error').textContent='パスワードが正しくありません';
+  }
+}
+
+function lockDeveloper(){
+  _isDeveloperUnlocked=false;
+  showDeveloperMenu();
+  showPage('home');
+  showToast('開発者モードをロックしました 🔒');
+}
+
+function updateDeveloperInfo(){
+  const el=id=>document.getElementById(id);
+  if(el('dev-info-version')) el('dev-info-version').textContent=APP_VERSION;
+  if(el('dev-info-build')) el('dev-info-build').textContent=APP_BUILD_TIME;
+  if(el('dev-info-user')) el('dev-info-user').textContent=`${currentUser?.displayName||'未ログイン'} (${currentUser?.email||'-'})`;
+  if(el('dev-info-storage')){
+    let total=0;
+    for(let k in localStorage){if(localStorage.hasOwnProperty(k)) total+=(localStorage[k].length||0)+k.length;}
+    el('dev-info-storage').textContent=`約 ${(total/1024).toFixed(1)} KB`;
+  }
+  if(el('dev-info-counts')){
+    el('dev-info-counts').textContent=`書類:${docs.length} / 顧客:${customers.length} / 従業員:${employees.length} / 経費:${expenses.length}`;
+  }
+}
+
+// サンプルデータ生成
+const SAMPLE_CUSTOMERS=['北海道商事株式会社','札幌建設工業','石狩運輸','チ卜セ食品','フミサ電気','千歳ガス','北光物産','エコ建材','旭川産業','函館商会'];
+const SAMPLE_HONORIFIC=['御中','様','御中','様','御中'];
+const SAMPLE_TEL_PREFIX=['011-','0123-','0143-','0166-','0138-'];
+const SAMPLE_ADDRESSES=['北海道千歳市末広','北海道札幌市中央区南1条','北海道恵庭市恵み野','北海道苫小牧市表町','北海道江別市野幌','北海道北広島市美沢','北海道石狩市花川南','北海道岩見沢市5条'];
+const SAMPLE_SUBJECTS=['配管修理工事','エアコン取付','水道蛇口交換','フェンス設置','ペンキ塗装','照明器具交換','網戸張替え','庭木剪定','排水管清掃','ガラス交換','カーテンレール取付','障子張替え','畳交換','床補修'];
+const SAMPLE_CATEGORIES=['修繕','設置','清掃','メンテナンス','緊急対応'];
+const SAMPLE_EXP_CATS=['交通費','通信費','消耗品費','工具・備品','燃料費','広告宣伝費','接待交際費','その他'];
+const SAMPLE_EXP_DESCS=['ガソリン代（軽トラ）','コンビニコーヒー（打合せ）','ビス・ネジ類購入','作業用手袋','養生テープ','配管材料','電動ドライバー替刃','工事看板','名刺印刷','取引先への手土産','駐車場代','高速道路代'];
+const SAMPLE_EMP_NAMES=['山田 健一','鈴木 大輔','佐藤 美咲','高橋 翔太','田中 千恵'];
+const SAMPLE_EMP_ROLES=['現場リーダー','技術者','技術者','補助スタッフ','事務'];
+
+function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function randomDate(year){
+  const m=randInt(0,11);
+  const lastDay=new Date(year,m+1,0).getDate();
+  const d=randInt(1,lastDay);
+  return `${year}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+function randomTime(){
+  return `${String(randInt(8,18)).padStart(2,'0')}:${String(randInt(0,59)).padStart(2,'0')}`;
+}
+
+function generateSampleData(){
+  showConfirm('サンプルデータを生成します。\n既存のデータは保持されますが、テスト用データが大量に追加されます。\nよろしいですか？',()=>{
+    const year=parseInt(document.getElementById('dev-year').value);
+    const count=parseInt(document.getElementById('dev-count').value);
+    const opts={
+      customers:document.getElementById('dev-gen-customers').checked,
+      employees:document.getElementById('dev-gen-employees').checked,
+      quotes:document.getElementById('dev-gen-quotes').checked,
+      invoices:document.getElementById('dev-gen-invoices').checked,
+      receipts:document.getElementById('dev-gen-receipts').checked,
+      expenses:document.getElementById('dev-gen-expenses').checked,
+      jobs:document.getElementById('dev-gen-jobs').checked,
+      payments:document.getElementById('dev-gen-payments').checked,
+    };
+
+    let added={customers:0,employees:0,docs:0,expenses:0,jobs:0,payments:0};
+
+    // 顧客
+    if(opts.customers){
+      SAMPLE_CUSTOMERS.forEach((name,i)=>{
+        if(customers.find(c=>c.name===name)) return;
+        customers.push({
+          id:'sample-cust-'+Date.now()+'-'+i,
+          name,
+          honorific:rand(SAMPLE_HONORIFIC),
+          tel:rand(SAMPLE_TEL_PREFIX)+String(randInt(100,999))+'-'+String(randInt(1000,9999)),
+          fax:rand(SAMPLE_TEL_PREFIX)+String(randInt(100,999))+'-'+String(randInt(1000,9999)),
+          zip:String(randInt(60,99))+String(randInt(1000,9999)),
+          address:rand(SAMPLE_ADDRESSES)+`${randInt(1,30)}-${randInt(1,15)}`,
+          email:`sample${i}@example.com`,
+          dept:i%2===0?'営業部':'',
+          memo:'[サンプルデータ]',
+          _sample:true
+        });
+        added.customers++;
+      });
+    }
+
+    // 従業員
+    if(opts.employees){
+      SAMPLE_EMP_NAMES.forEach((name,i)=>{
+        if(employees.find(e=>e.name===name)) return;
+        employees.push({
+          id:'sample-emp-'+Date.now()+'-'+i,
+          name,
+          role:SAMPLE_EMP_ROLES[i],
+          tel:'090-'+String(randInt(1000,9999))+'-'+String(randInt(1000,9999)),
+          email:`emp${i+1}@example.com`,
+          memo:'[サンプル]',
+          _sample:true
+        });
+        added.employees++;
+      });
+    }
+
+    // 書類（見積/請求/領収）
+    const docTypes=[];
+    if(opts.quotes) docTypes.push('見積書');
+    if(opts.invoices) docTypes.push('請求書');
+    if(opts.receipts) docTypes.push('領収書');
+    if(docTypes.length){
+      const allCusts=customers.length?customers:[{name:'サンプル顧客',honorific:'御中'}];
+      const allStaff=employees.length?employees.map(e=>e.name):['野島昭男'];
+      for(let i=0;i<count;i++){
+        const type=rand(docTypes);
+        const cust=rand(allCusts);
+        const date=randomDate(year);
+        const subject=rand(SAMPLE_SUBJECTS);
+        const subtotal=randInt(5,200)*1000;
+        const tax10=Math.round(subtotal*0.1);
+        const total=subtotal+tax10;
+        const pre={'見積書':'EST','請求書':'INV','領収書':'REC'}[type];
+        const ym=String(year).slice(2)+date.split('-')[1];
+        docs.push({
+          id:'sample-doc-'+Date.now()+'-'+i,
+          number:`${pre}-${ym}-${String(randInt(100,999))}`,
+          type,
+          customer:cust.name,
+          honorific:cust.honorific,
+          date,
+          dueDate:type==='請求書'?randomDate(year):'',
+          subject,
+          category:rand(SAMPLE_CATEGORIES),
+          staff:rand(allStaff),
+          status:type==='見積書'?'下書き':'発行済',
+          items:[{name:subject,qty:1,unit:'式',price:subtotal,amt:subtotal,tax:'10'}],
+          subtotal,tax10,tax8:0,grandTotal:total,
+          memo:'[サンプル]',
+          _sample:true
+        });
+        added.docs++;
+      }
+    }
+
+    // 経費
+    if(opts.expenses){
+      const allStaff=employees.length?employees.map(e=>e.name):['野島昭男'];
+      for(let i=0;i<Math.min(count,30);i++){
+        const date=randomDate(year);
+        const amt=randInt(3,50)*100;
+        const tax='10';
+        const taxAmt=Math.round(amt*0.1);
+        expenses.push({
+          id:'sample-exp-'+Date.now()+'-'+i,
+          date,
+          category:rand(SAMPLE_EXP_CATS),
+          desc:rand(SAMPLE_EXP_DESCS),
+          amount:amt,tax,taxAmt,total:amt+taxAmt,
+          paymentMethod:rand(['現金','クレジットカード','銀行振込']),
+          staff:rand(allStaff),
+          status:Math.random()>0.3?'精算済':'未精算',
+          docRef:'',memo:'[サンプル]',
+          receipt:'',
+          _sample:true
+        });
+        added.expenses++;
+      }
+    }
+
+    // 作業実績
+    if(opts.jobs){
+      const allCusts=customers.length?customers:[{name:'サンプル顧客'}];
+      const allStaff=employees.length?employees.map(e=>e.name):['野島昭男'];
+      for(let i=0;i<Math.min(count,20);i++){
+        jobs.push({
+          id:'sample-job-'+Date.now()+'-'+i,
+          date:randomDate(year),
+          time:randomTime(),
+          customer:rand(allCusts).name,
+          subject:rand(SAMPLE_SUBJECTS),
+          category:rand(SAMPLE_CATEGORIES),
+          staff:rand(allStaff),
+          duration:randInt(1,8),
+          memo:'[サンプル]',
+          _sample:true
+        });
+        added.jobs++;
+      }
+    }
+
+    // 入金記録
+    if(opts.payments){
+      const invoices=docs.filter(d=>d.type==='請求書');
+      invoices.slice(0,Math.min(invoices.length,15)).forEach((inv,i)=>{
+        if(!payments) payments={};
+        payments[inv.id]={
+          paidDate:randomDate(year),
+          paidAmount:inv.grandTotal,
+          method:rand(['銀行振込','現金','クレジットカード']),
+          memo:'[サンプル]',
+          _sample:true
+        };
+        added.payments++;
+      });
+    }
+
+    persist();
+    renderAll&&renderAll();
+    renderEmployees&&renderEmployees();
+    renderExpenses&&renderExpenses();
+    updateDeveloperInfo();
+    showToast(`サンプルデータを生成しました ✓\n顧客:${added.customers} / 従業員:${added.employees} / 書類:${added.docs} / 経費:${added.expenses} / 作業:${added.jobs} / 入金:${added.payments}`);
+  });
+}
+
+function deleteSampleData(){
+  showConfirm('「[サンプル]」マークが付いたデータをすべて削除します。\nよろしいですか？',()=>{
+    const before={c:customers.length,e:employees.length,d:docs.length,x:expenses.length,j:jobs.length};
+    customers=customers.filter(c=>!c._sample && !(c.memo||'').includes('[サンプル'));
+    employees=employees.filter(e=>!e._sample && !(e.memo||'').includes('[サンプル'));
+    docs=docs.filter(d=>!d._sample && !(d.memo||'').includes('[サンプル'));
+    expenses=expenses.filter(e=>!e._sample && !(e.memo||'').includes('[サンプル'));
+    jobs=jobs.filter(j=>!j._sample && !(j.memo||'').includes('[サンプル'));
+    if(payments){
+      Object.keys(payments).forEach(k=>{
+        if(payments[k]?._sample) delete payments[k];
+      });
+    }
+    const removed={
+      c:before.c-customers.length,
+      e:before.e-employees.length,
+      d:before.d-docs.length,
+      x:before.x-expenses.length,
+      j:before.j-jobs.length,
+    };
+    persist();
+    renderAll&&renderAll();
+    renderEmployees&&renderEmployees();
+    renderExpenses&&renderExpenses();
+    updateDeveloperInfo();
+    showToast(`サンプルデータを削除しました 🗑\n顧客:${removed.c} / 従業員:${removed.e} / 書類:${removed.d} / 経費:${removed.x} / 作業:${removed.j}`);
+  });
+}
+
+// ===== 開発者ツールここまで =====
+
 function buildMobileDrawer(){
   const nav=document.getElementById('mobile-drawer-nav');
   if(!nav)return;
-  nav.innerHTML=NAV_ITEMS.map(item=>{
-    if(item.section) return `<div class="nav-section">${item.section}</div>`;
+  // 管理セクションのカスタム順序を取得
+  const mgmtOrder=getNavManagementOrder();
+  const mgmtKeys=new Set(mgmtOrder.map(it=>it.key));
+
+  let html='';
+  let inMgmtSection=false;
+  let mgmtSectionRendered=false;
+
+  NAV_ITEMS.forEach(item=>{
+    if(item.section){
+      inMgmtSection=(item.section==='管理');
+      html+=`<div class="nav-section">${item.section}</div>`;
+      if(inMgmtSection&&!mgmtSectionRendered){
+        // 管理セクションのカスタム順序を出力
+        mgmtOrder.forEach(mi=>{
+          html+=`<div class="nav-item" data-page="${mi.key}" onclick="showPageMobile('${mi.key}',this)">
+            <span class="nav-icon">${mi.icon}</span><span>${mi.label}</span>
+          </div>`;
+        });
+        mgmtSectionRendered=true;
+      }
+      return;
+    }
+    // 管理セクション内のアイテムは上で既に出力済みなのでスキップ
+    if(mgmtKeys.has(item.id)) return;
     const onclick=item.admin?`requireAdmin('employees',this)`:`showPageMobile('${item.id}',this)`;
     const style=item.id==='bulletin'?' style="background:#E67E22;border-radius:8px;margin:4px 8px;font-weight:700"':'';
     const labelStyle=item.id==='bulletin'?' style="color:white"':'';
-    return `<div class="nav-item" data-page="${item.id}" onclick="${onclick}"${style}>
+    html+=`<div class="nav-item" data-page="${item.id}" onclick="${onclick}"${style}>
       <span class="nav-icon">${item.icon}</span><span${labelStyle}>${item.label}</span>
     </div>`;
-  }).join('');
+  });
+  nav.innerHTML=html;
 }
 
 function showPageMobile(id,el){
