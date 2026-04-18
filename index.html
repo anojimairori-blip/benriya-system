@@ -602,6 +602,25 @@ select{appearance:auto}
 .preview-from{font-size:12px;text-align:right;line-height:1.9}
 .preview-logo{max-width:100px;max-height:50px;object-fit:contain;display:block;margin-left:auto;margin-bottom:5px}
 .preview-table{width:100%;border-collapse:collapse;margin-bottom:15px;font-size:12px;table-layout:fixed;word-break:break-word}
+
+/* 件名（品目テーブル直上） */
+.preview-subject{display:flex;align-items:flex-end;gap:10px;margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #888}
+.preview-subject .ps-label{font-size:11px;color:#666;font-weight:600;letter-spacing:.1em;flex-shrink:0;padding-bottom:2px}
+.preview-subject .ps-text{font-size:16px;font-weight:700;color:#222;flex:1;word-break:break-word}
+/* 書類タイプ別カラー対応 */
+.preview-doc.doc-quote .preview-subject{border-bottom-color:var(--doc-color-quote)}
+.preview-doc.doc-invoice .preview-subject{border-bottom-color:var(--doc-color-invoice)}
+.preview-doc.doc-receipt .preview-subject{border-bottom-color:var(--doc-color-receipt)}
+.preview-doc.doc-quote .preview-subject .ps-label{color:var(--doc-color-quote)}
+.preview-doc.doc-invoice .preview-subject .ps-label{color:var(--doc-color-invoice)}
+.preview-doc.doc-receipt .preview-subject .ps-label{color:var(--doc-color-receipt)}
+
+/* 監査ライン（会社名下に小さく） */
+.audit-line{font-size:10px !important;color:#999;margin-top:6px;line-height:1.4}
+@media print{
+  .preview-subject{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .audit-line{color:#999 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 .preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #DDD;overflow:hidden}
 .preview-table td{padding:6px 9px;border:1px solid #DDD;overflow:hidden}
 .preview-total table{margin-left:auto;font-size:13px}
@@ -1311,6 +1330,46 @@ if('serviceWorker' in navigator){
         </div>
       </div>
 
+      <!-- 顧客インポート / エクスポート -->
+      <div class="section-title" style="margin-bottom:8px">📤 顧客データ インポート / エクスポート</div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:12px">弥生会計、freee、マネーフォワード、勘定奉行など、各種会計ソフトのCSV形式に対応。出力項目の順序もカスタマイズ可能です。</p>
+      <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:20px">
+
+        <!-- エクスポート -->
+        <div style="margin-bottom:18px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px">📥 エクスポート（顧客データを書き出す）</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('flexsys')">📋 標準形式</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('yayoi')">📊 弥生会計</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('freee')">💰 freee</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('mfcloud')">☁️ マネーフォワード</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('obc')">🏢 勘定奉行</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('vcard')">📇 vCard</button>
+          </div>
+          <details style="margin-top:10px">
+            <summary style="cursor:pointer;font-size:12px;color:var(--text2);font-weight:600;margin-bottom:8px">⚙️ 標準形式の項目順をカスタマイズ</summary>
+            <div style="background:white;border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:8px">
+              <p style="font-size:11px;color:var(--text3);margin-bottom:8px">ドラッグで順序を変更、チェックで項目の有無を選択</p>
+              <div id="cust-export-fields"></div>
+              <div style="display:flex;gap:6px;margin-top:10px;justify-content:flex-end">
+                <button class="btn btn-secondary btn-sm" onclick="resetCustExportFields()">🔄 デフォルトに戻す</button>
+                <button class="btn btn-primary btn-sm" onclick="saveCustExportFields()">💾 保存</button>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- インポート -->
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:10px">📤 インポート（顧客データを読み込む）</div>
+          <p style="font-size:11px;color:var(--text3);margin-bottom:8px">CSVファイルから顧客を一括登録。弥生・freee・MFのCSVも自動判別。</p>
+          <input type="file" id="cust-import-file" accept=".csv,.txt" style="display:none" onchange="importCustomers(event)">
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('cust-import-file').click()">📂 CSVファイルを選択</button>
+          <button class="btn btn-secondary btn-sm" onclick="downloadCustImportTemplate()" style="margin-left:6px">📋 テンプレートDL</button>
+          <div id="cust-import-result" style="margin-top:10px;font-size:12px"></div>
+        </div>
+      </div>
+
       <!-- ロゴ -->
       <div class="section-title" style="margin-bottom:12px">会社ロゴ</div>
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px">
@@ -1873,6 +1932,8 @@ if('serviceWorker' in navigator){
     </div>
     <button class="close-btn" onclick="closeModal('doc-modal')">✕</button>
   </div>
+  <!-- 監査情報（編集時のみ表示） -->
+  <div id="doc-audit-info" style="display:none;padding:6px 20px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.5"></div>
   <div class="modal-body" style="padding:16px 20px">
 
     <!-- ① 種別・番号・日付 -->
@@ -3810,6 +3871,9 @@ function openNewDoc(type,custName){
   const t=type||'見積書';
   document.getElementById('doc-modal-title').textContent='新規'+t+'作成';
   document.getElementById('doc-modal').dataset.editing='';
+  // 監査情報非表示（新規時）
+  const audit=document.getElementById('doc-audit-info');
+  if(audit) audit.style.display='none';
   document.getElementById('doc-type').value=t;
   document.getElementById('doc-number').value=genNumber(t);
   document.getElementById('doc-date').value=today();
@@ -4106,6 +4170,19 @@ function editDoc(id){
   editingDocId=id;selectedCustId=d.customerId||null;
   document.getElementById('doc-modal-title').textContent=d.type+'を編集';
   document.getElementById('doc-modal').dataset.editing='1';
+  // 監査情報表示
+  const audit=document.getElementById('doc-audit-info');
+  if(audit){
+    const lines=[];
+    if(d.createdByName||d.createdBy) lines.push(`📝 作成: ${escAttr(d.createdByName||d.createdBy)} (${formatDateTime(d.createdAt)})`);
+    if(d.updatedByName||d.updatedBy) lines.push(`✏️ 最終更新: ${escAttr(d.updatedByName||d.updatedBy)} (${formatDateTime(d.updatedAt)})`);
+    if(lines.length){
+      audit.innerHTML=lines.join(' / ');
+      audit.style.display='block';
+    } else {
+      audit.style.display='none';
+    }
+  }
   document.getElementById('doc-type').value=d.type;
   document.getElementById('doc-number').value=d.number;
   document.getElementById('doc-date').value=d.date;
@@ -4186,46 +4263,54 @@ function previewDoc(id){
   if(d.tax8>0)taxRows.push(`<tr><td>消費税（8%）</td><td style="text-align:right">${fmt(d.tax8)}</td></tr>`);
   const logoHtml=s.logo?`<img src="${s.logo}" class="preview-logo" alt="logo">`:'';
   const c=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
-  // 書類タイプ別カラークラス
   const docColorClass={'見積書':'doc-quote','請求書':'doc-invoice','領収書':'doc-receipt'}[d.type]||'';
+  // 監査情報（会社名下に小さく表示する文字列）
+  const auditInline=[];
+  if(d.createdByName||d.createdBy) auditInline.push(`作成: ${escAttr(d.createdByName||d.createdBy)} (${formatDateTime(d.createdAt)})`);
+  if(d.updatedByName||d.updatedBy) auditInline.push(`更新: ${escAttr(d.updatedByName||d.updatedBy)} (${formatDateTime(d.updatedAt)})`);
+  const auditStr=auditInline.length?`<p class="audit-line" style="font-size:10px;color:#999;margin-top:6px;line-height:1.4">${auditInline.join(' / ')}</p>`:'';
+
   document.getElementById('preview-body').innerHTML=`
   <div class="preview-doc ${docColorClass}">
-    <p class="doc-number">${d.number}</p>
-    <h2>${d.type}</h2>
+    <p class="doc-number">${escAttr(d.number||'')}</p>
+    <h2>${escAttr(d.type||'')}</h2>
     <div class="preview-meta">
       <div class="preview-to">
-        <p style="font-size:13px;margin-bottom:6px">件名：${d.subject||'—'}</p>
-        <p class="company">${d.customer||'（顧客名未入力）'}　${c?.honorific!=null?c.honorific:'御中'}</p>
-        ${c?.dept?`<p style="font-size:12px;color:#666;margin-top:2px">${c.dept}</p>`:''}
-        ${d.contact?`<p style="font-size:12px;color:#555;margin-top:2px">担当：${d.contact} 様</p>`:''}
-        ${c?.address?`<p style="font-size:11px;color:#888;margin-top:4px">〒${c.zip||''} ${c.address}</p>`:''}
-        ${c?.tel?`<p style="font-size:11px;color:#888">Tel: ${c.tel}</p>`:''}
-        ${c?.fax?`<p style="font-size:11px;color:#888">Fax: ${c.fax}</p>`:''}
+        <p class="company">${escAttr(d.customer||'（顧客名未入力）')}　${escAttr(c?.honorific!=null?c.honorific:'御中')}</p>
+        ${c?.dept?`<p style="font-size:12px;color:#666;margin-top:2px">${escAttr(c.dept)}</p>`:''}
+        ${d.contact?`<p style="font-size:12px;color:#555;margin-top:2px">担当：${escAttr(d.contact)} 様</p>`:''}
+        ${c?.address?`<p style="font-size:11px;color:#888;margin-top:4px">〒${escAttr(c.zip||'')} ${escAttr(c.address)}</p>`:''}
+        ${c?.tel?`<p style="font-size:11px;color:#888">Tel: ${escAttr(c.tel)}</p>`:''}
+        ${c?.fax?`<p style="font-size:11px;color:#888">Fax: ${escAttr(c.fax)}</p>`:''}
       </div>
       <div class="preview-from">
-        ${logoHtml}<p><strong>${s.company||'（会社名未設定）'}</strong></p>
-        <p>${s.owner||''}</p><p>${s.address||''}</p><p>${s.tel||''}${s.fax?' / FAX:'+s.fax:''}</p><p>${s.email||''}</p>
-        ${d.staff?`<p style="margin-top:4px">担当：${d.staff}</p>`:''}
-        <p style="margin-top:5px">発行日：${d.date}</p>
-        ${d.dueDate&&d.type==='請求書'?`<p>支払期限：${d.dueDate}</p>`:''}
+        ${logoHtml}<p><strong>${escAttr(s.company||'（会社名未設定）')}</strong></p>
+        <p>${escAttr(s.owner||'')}</p><p>${escAttr(s.address||'')}</p><p>${escAttr(s.tel||'')}${s.fax?' / FAX:'+escAttr(s.fax):''}</p><p>${escAttr(s.email||'')}</p>
+        ${d.staff?`<p style="margin-top:4px">担当：${escAttr(d.staff)}</p>`:''}
+        <p style="margin-top:5px">発行日：${escAttr(d.date||'')}</p>
+        ${d.dueDate&&d.type==='請求書'?`<p>支払期限：${escAttr(d.dueDate)}</p>`:''}
+        ${auditStr}
       </div>
     </div>
+
+    <!-- 件名（品目テーブルの直上に下線付き） -->
+    <div class="preview-subject">
+      <span class="ps-label">件名</span>
+      <span class="ps-text">${escAttr(d.subject||'')}</span>
+    </div>
+
     <table class="preview-table">
       <thead><tr><th style="width:44%">品目・作業内容</th><th style="text-align:right">数量</th><th style="text-align:right">単価</th><th style="text-align:center">税率</th><th style="text-align:right">金額</th></tr></thead>
-      <tbody>${(d.lines||[]).map(l=>`<tr><td>${l.name||'—'}</td><td style="text-align:right">${l.qty}</td><td style="text-align:right">${fmt(l.price)}</td><td style="text-align:center">${l.tax==='0'?'非課税':l.tax+'%'}</td><td style="text-align:right">${fmt(l.qty*l.price)}</td></tr>`).join('')}</tbody>
+      <tbody>${(d.lines||[]).map(l=>`<tr><td>${escAttr(l.name||'—')}</td><td style="text-align:right">${l.qty}</td><td style="text-align:right">${fmt(l.price)}</td><td style="text-align:center">${l.tax==='0'?'非課税':l.tax+'%'}</td><td style="text-align:right">${fmt(l.qty*l.price)}</td></tr>`).join('')}</tbody>
     </table>
     <div class="preview-total"><table>
       <tr><td>小計（税抜）</td><td style="text-align:right">${fmt(d.subtotal)}</td></tr>
       ${taxRows.join('')}
       <tr class="grand"><td style="padding-top:8px;font-weight:700">合計（税込）</td><td style="text-align:right;padding-top:8px">${fmt(d.grandTotal)}</td></tr>
     </table></div>
-    ${d.type==='請求書'&&s.bank?`<div class="preview-notes"><strong>お振込先：</strong>${s.bank}　${s.account||''}</div>`:''}
+    ${d.type==='請求書'&&s.bank?`<div class="preview-notes"><strong>お振込先：</strong>${escAttr(s.bank)}　${escAttr(s.account||'')}</div>`:''}
     ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr(d.notes)}</div>`:''}
     ${d.type==='領収書'?`<div style="text-align:right;margin-top:12px"><div class="stamp">領収済</div></div>`:''}
-    <div class="no-print" style="margin-top:18px;padding:10px 14px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text3);line-height:1.6">
-      ${d.createdByName||d.createdBy?`📝 作成: ${d.createdByName||d.createdBy} (${formatDateTime(d.createdAt)})<br>`:''}
-      ${d.updatedByName||d.updatedBy?`✏️ 最終更新: ${d.updatedByName||d.updatedBy} (${formatDateTime(d.updatedAt)})`:''}
-    </div>
   </div>`;
   document.getElementById('preview-modal').classList.add('open');
 }
@@ -7453,6 +7538,319 @@ function onDocColorChange(type, color){
   // 即時反映
   applyDocColors();
   showToast(`${type==='quote'?'見積書':type==='invoice'?'請求書':'領収書'}のカラーを変更しました ✓`);
+}
+
+// ===== 顧客 インポート / エクスポート =====
+const CUST_FIELD_DEFS={
+  name:'顧客名',
+  honorific:'敬称',
+  dept:'部署',
+  contact:'担当者名',
+  zip:'郵便番号',
+  address:'住所',
+  tel:'電話番号',
+  fax:'FAX',
+  email:'メールアドレス',
+  url:'URL',
+  category:'カテゴリ',
+  taxId:'インボイス登録番号',
+  bank:'振込先',
+  memo:'メモ'
+};
+const CUST_FIELDS_DEFAULT=['name','honorific','dept','contact','zip','address','tel','fax','email','memo'];
+
+function getCustExportFields(){
+  if(settings.custExportFields && Array.isArray(settings.custExportFields)) return settings.custExportFields;
+  try{
+    const saved=JSON.parse(localStorage.getItem('custExportFields')||'null');
+    if(saved && Array.isArray(saved)) return saved;
+  }catch(e){}
+  return [...CUST_FIELDS_DEFAULT];
+}
+
+function renderCustExportFields(){
+  const container=document.getElementById('cust-export-fields');
+  if(!container) return;
+  const current=getCustExportFields();
+  // 並び順: current → 残り
+  const order=[...current];
+  Object.keys(CUST_FIELD_DEFS).forEach(k=>{if(!order.includes(k)) order.push(k);});
+  container.innerHTML=order.map((key,i)=>`
+    <div class="cef-row" draggable="true" data-key="${key}" data-idx="${i}"
+      ondragstart="cefDragStart(event,${i})" ondragover="cefDragOver(event,${i})" ondrop="cefDrop(event,${i})" ondragend="cefDragEnd()"
+      style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;margin-bottom:4px;cursor:move;font-size:12px">
+      <span style="color:var(--text3);font-size:12px">⋮⋮</span>
+      <input type="checkbox" data-key="${key}" ${current.includes(key)?'checked':''} onchange="cefToggle(this)" style="width:14px;height:14px;cursor:pointer">
+      <span style="flex:1">${CUST_FIELD_DEFS[key]||key}</span>
+      <span style="color:var(--text3);font-size:10px;font-family:monospace">${key}</span>
+    </div>
+  `).join('');
+}
+
+let _cefDragIdx=null;
+function cefDragStart(e,idx){_cefDragIdx=idx;e.dataTransfer.effectAllowed='move';}
+function cefDragOver(e,idx){e.preventDefault();e.dataTransfer.dropEffect='move';}
+function cefDrop(e,idx){
+  e.preventDefault();
+  if(_cefDragIdx===null||_cefDragIdx===idx)return;
+  const rows=document.querySelectorAll('#cust-export-fields .cef-row');
+  const order=[...rows].map(r=>r.dataset.key);
+  const moved=order.splice(_cefDragIdx,1)[0];
+  order.splice(idx,0,moved);
+  // 一時保存
+  settings._cefTempOrder=order;
+  // 再描画（チェック状態を保持して新しい順序で）
+  const checked=new Set([...document.querySelectorAll('#cust-export-fields input[type=checkbox]:checked')].map(cb=>cb.dataset.key));
+  document.getElementById('cust-export-fields').innerHTML=order.map((key,i)=>`
+    <div class="cef-row" draggable="true" data-key="${key}" data-idx="${i}"
+      ondragstart="cefDragStart(event,${i})" ondragover="cefDragOver(event,${i})" ondrop="cefDrop(event,${i})" ondragend="cefDragEnd()"
+      style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;margin-bottom:4px;cursor:move;font-size:12px">
+      <span style="color:var(--text3);font-size:12px">⋮⋮</span>
+      <input type="checkbox" data-key="${key}" ${checked.has(key)?'checked':''} onchange="cefToggle(this)" style="width:14px;height:14px;cursor:pointer">
+      <span style="flex:1">${CUST_FIELD_DEFS[key]||key}</span>
+      <span style="color:var(--text3);font-size:10px;font-family:monospace">${key}</span>
+    </div>
+  `).join('');
+  _cefDragIdx=null;
+}
+function cefDragEnd(){_cefDragIdx=null;}
+function cefToggle(cb){/* チェック状態の同期。保存は「保存」ボタンで */}
+
+function saveCustExportFields(){
+  const rows=document.querySelectorAll('#cust-export-fields .cef-row');
+  const order=[...rows].map(r=>r.dataset.key);
+  const checked=[...rows].filter(r=>r.querySelector('input[type=checkbox]').checked).map(r=>r.dataset.key);
+  // チェック済みのみ、順序を維持
+  const result=order.filter(k=>checked.includes(k));
+  if(!result.length){showToast('最低1項目選択してください','#C0392B');return;}
+  settings.custExportFields=result;
+  localStorage.setItem('custExportFields',JSON.stringify(result));
+  if(typeof persist==='function') persist();
+  showToast('項目順を保存しました ✓');
+}
+
+function resetCustExportFields(){
+  showConfirm('項目順をデフォルトに戻しますか？',()=>{
+    settings.custExportFields=[...CUST_FIELDS_DEFAULT];
+    localStorage.setItem('custExportFields',JSON.stringify(CUST_FIELDS_DEFAULT));
+    if(typeof persist==='function') persist();
+    renderCustExportFields();
+    showToast('リセットしました ✓');
+  });
+}
+
+// CSV共通: エスケープ
+function csvEsc(v){
+  if(v==null) return '';
+  const s=String(v);
+  if(/[",\n\r]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+
+// CSVダウンロード（BOM付きShift_JIS or UTF-8）
+function downloadCSV(content, filename, withBOM){
+  const bom='\ufeff';
+  const blob=new Blob([(withBOM?bom:'')+content],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.download=filename;a.href=url;document.body.appendChild(a);a.click();a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportCustomers(format){
+  if(!customers.length){showToast('顧客データがありません','#C0392B');return;}
+  const ts=today().replace(/-/g,'');
+  let content='', filename='', withBOM=true;
+
+  if(format==='flexsys'){
+    // 標準形式（カスタマイズ可能）
+    const fields=getCustExportFields();
+    const headers=fields.map(k=>CUST_FIELD_DEFS[k]||k);
+    const rows=customers.map(c=>fields.map(k=>csvEsc(c[k]||'')).join(','));
+    content=headers.join(',')+'\n'+rows.join('\n');
+    filename=`顧客データ_${ts}.csv`;
+  }
+  else if(format==='yayoi'){
+    // 弥生会計 取引先データ形式
+    const headers=['得意先コード','得意先名','フリガナ','郵便番号','住所1','住所2','電話番号','FAX番号','メールアドレス','担当者','部署','メモ'];
+    const rows=customers.map((c,i)=>[
+      'C'+String(i+1).padStart(5,'0'),
+      c.name||'',
+      '',
+      c.zip||'',
+      c.address||'','',
+      c.tel||'',c.fax||'',
+      c.email||'',
+      ((c.contacts||[])[0]?.name)||c.contact||'',
+      c.dept||'',
+      c.memo||''
+    ].map(csvEsc).join(','));
+    content=headers.join(',')+'\n'+rows.join('\n');
+    filename=`yayoi_customers_${ts}.csv`;
+  }
+  else if(format==='freee'){
+    // freee 取引先インポート形式
+    const headers=['取引先名','取引先名（カナ）','郵便番号','都道府県','住所1','住所2','電話番号','FAX番号','メールアドレス','担当者','部署','登録番号','備考'];
+    const rows=customers.map(c=>[
+      c.name||'','',
+      c.zip||'','',c.address||'','',
+      c.tel||'',c.fax||'',
+      c.email||'',
+      ((c.contacts||[])[0]?.name)||c.contact||'',
+      c.dept||'',
+      c.taxId||'',
+      c.memo||''
+    ].map(csvEsc).join(','));
+    content=headers.join(',')+'\n'+rows.join('\n');
+    filename=`freee_customers_${ts}.csv`;
+  }
+  else if(format==='mfcloud'){
+    // マネーフォワード 取引先 形式
+    const headers=['取引先名','カナ','郵便番号','住所','電話番号','FAX','メール','担当者','部署','インボイス番号','備考'];
+    const rows=customers.map(c=>[
+      c.name||'','',
+      c.zip||'',c.address||'',
+      c.tel||'',c.fax||'',
+      c.email||'',
+      ((c.contacts||[])[0]?.name)||c.contact||'',
+      c.dept||'',
+      c.taxId||'',
+      c.memo||''
+    ].map(csvEsc).join(','));
+    content=headers.join(',')+'\n'+rows.join('\n');
+    filename=`mfcloud_customers_${ts}.csv`;
+  }
+  else if(format==='obc'){
+    // 勘定奉行 得意先マスター
+    const headers=['得意先コード','得意先名','得意先名カナ','郵便番号','住所１','住所２','電話番号','ＦＡＸ番号','メールアドレス','担当者名','部署名','備考'];
+    const rows=customers.map((c,i)=>[
+      String(i+1).padStart(6,'0'),
+      c.name||'','',
+      c.zip||'',
+      c.address||'','',
+      c.tel||'',c.fax||'',
+      c.email||'',
+      ((c.contacts||[])[0]?.name)||c.contact||'',
+      c.dept||'',
+      c.memo||''
+    ].map(csvEsc).join(','));
+    content=headers.join(',')+'\n'+rows.join('\n');
+    filename=`obc_customers_${ts}.csv`;
+  }
+  else if(format==='vcard'){
+    // vCard 3.0形式
+    content=customers.map(c=>{
+      const lines=['BEGIN:VCARD','VERSION:3.0'];
+      lines.push(`FN:${c.name||''}`);
+      lines.push(`N:${c.name||''};;;;`);
+      if(c.dept) lines.push(`ORG:${c.name||''};${c.dept}`);
+      else lines.push(`ORG:${c.name||''}`);
+      if(c.tel) lines.push(`TEL;TYPE=WORK,VOICE:${c.tel}`);
+      if(c.fax) lines.push(`TEL;TYPE=WORK,FAX:${c.fax}`);
+      if(c.email) lines.push(`EMAIL;TYPE=INTERNET:${c.email}`);
+      if(c.address) lines.push(`ADR;TYPE=WORK:;;${c.address};;;${c.zip||''};Japan`);
+      if(c.memo) lines.push(`NOTE:${c.memo.replace(/\n/g,'\\n')}`);
+      lines.push('END:VCARD');
+      return lines.join('\r\n');
+    }).join('\r\n');
+    filename=`customers_${ts}.vcf`;
+    withBOM=false;
+  }
+
+  downloadCSV(content, filename, withBOM);
+  showToast(`${customers.length}件の顧客をエクスポートしました ✓`);
+}
+
+function downloadCustImportTemplate(){
+  const headers=Object.values(CUST_FIELD_DEFS);
+  const sample=['サンプル株式会社','御中','営業部','山田太郎','0001234','千歳市〇〇1-2-3','0123-45-6789','0123-45-6790','sample@example.com','https://example.com','法人','T1234567890123','北海道銀行','よくお願いします'];
+  downloadCSV(headers.join(',')+'\n'+sample.map(csvEsc).join(','),'顧客インポート_テンプレート.csv',true);
+  showToast('テンプレートをダウンロードしました ✓');
+}
+
+function importCustomers(event){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    let text=e.target.result;
+    // BOM除去
+    if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+    // 簡易CSVパーサー
+    const rows=parseCSV(text);
+    if(rows.length<2){
+      document.getElementById('cust-import-result').innerHTML='<span style="color:var(--red)">❌ ヘッダー行とデータ行が必要です</span>';
+      return;
+    }
+    const headers=rows[0].map(h=>h.trim());
+    // ヘッダー名→内部キーへのマッピング
+    const headerToKey={};
+    Object.entries(CUST_FIELD_DEFS).forEach(([k,label])=>{headerToKey[label]=k;});
+    // 弥生・freee・MF・OBCの代表的な列名も対応
+    const aliasMap={
+      '取引先名':'name','得意先名':'name','顧客名':'name','取引先名（カナ）':null,'カナ':null,'フリガナ':null,
+      '郵便番号':'zip','〒':'zip',
+      '住所':'address','住所1':'address','住所１':'address',
+      '電話番号':'tel','TEL':'tel','電話':'tel',
+      'FAX番号':'fax','ＦＡＸ番号':'fax','FAX':'fax',
+      'メールアドレス':'email','メール':'email','Email':'email','E-mail':'email',
+      '担当者':'contact','担当者名':'contact',
+      '部署':'dept','部署名':'dept',
+      'インボイス番号':'taxId','登録番号':'taxId','インボイス登録番号':'taxId',
+      'メモ':'memo','備考':'memo'
+    };
+    const colMap=headers.map(h=>headerToKey[h]||aliasMap[h]||null);
+
+    let added=0, skipped=0;
+    for(let i=1;i<rows.length;i++){
+      const row=rows[i];
+      if(row.every(v=>!v||!v.trim())) continue;
+      const cust={id:'cust-imp-'+Date.now()+'-'+i};
+      colMap.forEach((key,ci)=>{
+        if(key && row[ci]) cust[key]=row[ci].trim();
+      });
+      if(!cust.name){skipped++;continue;}
+      if(!cust.honorific) cust.honorific='御中';
+      // 重複チェック（名前+電話で判定）
+      const exists=customers.find(c=>c.name===cust.name && (c.tel||'')===(cust.tel||''));
+      if(exists){skipped++;continue;}
+      stampAudit(cust, true);
+      customers.push(cust);
+      added++;
+    }
+    persist();
+    if(typeof renderCustomerList==='function') renderCustomerList();
+    if(typeof updateCustomerDatalist==='function') updateCustomerDatalist();
+    document.getElementById('cust-import-result').innerHTML=
+      `<span style="color:var(--accent)">✅ ${added}件追加 / ${skipped>0?`<span style="color:var(--text3)">${skipped}件スキップ（重複・不正）</span>`:''}</span>`;
+    showToast(`✓ ${added}件の顧客をインポートしました`);
+    event.target.value='';
+  };
+  reader.onerror=()=>{
+    document.getElementById('cust-import-result').innerHTML='<span style="color:var(--red)">❌ ファイル読み込みエラー</span>';
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+// 簡易CSVパーサー（クォート対応）
+function parseCSV(text){
+  const rows=[];
+  let row=[], cell='', inQuote=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i], next=text[i+1];
+    if(inQuote){
+      if(ch==='"' && next==='"'){cell+='"';i++;}
+      else if(ch==='"'){inQuote=false;}
+      else cell+=ch;
+    } else {
+      if(ch==='"'){inQuote=true;}
+      else if(ch===','){row.push(cell);cell='';}
+      else if(ch==='\r'){/* skip */}
+      else if(ch==='\n'){row.push(cell);rows.push(row);row=[];cell='';}
+      else cell+=ch;
+    }
+  }
+  if(cell||row.length){row.push(cell);rows.push(row);}
+  return rows;
 }
 
 function applyTheme(name, el){
