@@ -1077,7 +1077,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.16.1</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.17.1</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1101,7 +1101,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.16.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.17.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1136,7 +1136,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.16.1</div>
+    <div class="logo-version" id="sidebar-version">v3.17.1</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -3174,8 +3174,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.16.1';
-const APP_BUILD_TIME='2026/04/19 08:17';
+const APP_VERSION='v3.17.1';
+const APP_BUILD_TIME='2026/04/19 08:35';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7633,6 +7633,8 @@ async function checkShareLinkOnLoad(){
         return true;
       }
       const data=snap.data();
+      // トークンをdataに埋め込む（PDF API で使う）
+      data.token = token;
       const expiresAt=new Date(data.expiresAt).getTime();
       if(Date.now()>expiresAt){
         _showPublicError('このリンクは期限切れです。作成者に再発行を依頼してください。');
@@ -7864,8 +7866,8 @@ body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto San
 
   <!-- ボタン -->
   <div class="action-bar">
-    <button class="btn-pdf" id="pdf-download-btn" onclick="_downloadPortalPdf()">📄 PDFをダウンロード</button>
-    <div class="pdf-hint">スマホでは「印刷」より「PDFダウンロード」がおすすめです</div>
+    <button class="btn-pdf" id="pdf-download-btn" onclick="_downloadPortalImage()">📸 画像で保存（スマホ推奨）</button>
+    <div class="pdf-hint">画像として保存されます。印刷・メール添付・共有ができます</div>
   </div>
 
   <div class="footer-credit">Powered by Flexsys2026</div>
@@ -7934,64 +7936,87 @@ body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto San
   </div>`:''}
 </div>
 
-<` + `script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
-  integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+<` + `script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+  integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
   crossorigin="anonymous" referrerpolicy="no-referrer"><\/script>
 
 <` + `script>
-window._pdfFilename = ${JSON.stringify(pdfFilename)};
-window._downloadPortalPdf = async function(){
+window._imgFilename = ${JSON.stringify(pdfFilename.replace('.pdf', '.png'))};
+window._shareToken = ${JSON.stringify(data.token||'')};
+window._downloadPortalImage = async function(){
   const btn = document.getElementById('pdf-download-btn');
   const original = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '<span class="loader-spin"></span>PDF生成中...（スマホは20秒ほどかかります）';
+  btn.innerHTML = '<span class="loader-spin"></span>画像生成中...';
+
   try{
-    if(typeof html2pdf === 'undefined'){
+    // html2canvas が読み込まれるまで待機
+    if(typeof html2canvas === 'undefined'){
       await new Promise((resolve, reject)=>{
         let waited = 0;
         const iv = setInterval(()=>{
-          if(typeof html2pdf !== 'undefined'){ clearInterval(iv); resolve(); }
-          else if(waited > 15000){ clearInterval(iv); reject(new Error('html2pdf 読み込み失敗')); }
+          if(typeof html2canvas !== 'undefined'){ clearInterval(iv); resolve(); }
+          else if(waited > 10000){ clearInterval(iv); reject(new Error('html2canvas 読み込み失敗')); }
           waited += 100;
         }, 100);
       });
     }
+
     const source = document.getElementById('pdf-source');
+    // 実際に表示させてキャプチャ（オフスクリーンだと捕捉できない場合あり）
+    source.style.left = '0';
+    source.style.top = '0';
+    source.style.zIndex = '-1';
+    source.style.opacity = '0';
+    source.style.pointerEvents = 'none';
+
+    // レンダリング
+    const canvas = await html2canvas(source, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: 794
+    });
+
+    // オフスクリーンに戻す
+    source.style.left = '-99999px';
+    source.style.top = '0';
+    source.style.zIndex = '';
+    source.style.opacity = '';
+
+    // Canvas → Blob → ダウンロード
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // iOSは .save() が動かないことがあるので、blobに変換して手動ダウンロード
-    const pdfBlob = await html2pdf().set({
-      margin: [10, 10, 10, 10],
-      filename: window._pdfFilename,
-      image: { type: 'jpeg', quality: 0.92 },
-      html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false, allowTaint: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-      pagebreak: { mode: ['avoid-all', 'css'] }
-    }).from(source).outputPdf('blob');
-
-    // Blob → URL → 擬似リンクでダウンロード（iOS対応）
-    const url = URL.createObjectURL(pdfBlob);
-    if(isIOS){
-      // iOS Safariは <a download> が無効なので、新規タブで開く
-      const win = window.open(url, '_blank');
-      if(!win){
-        // ポップアップブロックされた場合、同じタブで開く
-        window.location.href = url;
+    canvas.toBlob((blob)=>{
+      if(!blob){
+        alert('画像生成に失敗しました');
+        return;
       }
-      alert('PDFが新しいタブで開きました。\\n\\niPhone/iPadでは共有ボタンから「ファイルに保存」や「プリント」を選択してください。');
-    } else {
-      // Android/PC: 通常のダウンロード
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = window._pdfFilename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url), 1000);
-    }
+      const url = URL.createObjectURL(blob);
+
+      if(isIOS){
+        // iOS Safari: 新しいタブで画像を開く → 長押しで「写真に保存」
+        const newWin = window.open(url, '_blank');
+        setTimeout(() => {
+          alert('画像が新しいタブで開きました。\\n\\n画像を長押しして「写真に保存」を選択してください。');
+        }, 400);
+      } else {
+        // Android/PC: ダウンロードリンク
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = window._imgFilename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+      }
+    }, 'image/png', 0.95);
+
   }catch(e){
-    console.error('PDF generation error:', e);
-    alert('PDF生成に失敗しました: ' + e.message + '\\n\\nもう一度試してください。');
+    console.error('Image generation error:', e);
+    alert('画像生成に失敗しました。\\n\\n理由: ' + e.message);
   }finally{
     btn.disabled = false;
     btn.innerHTML = original;
