@@ -777,7 +777,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.0</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.2</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -812,7 +812,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.0</div>
+    <div class="logo-version" id="sidebar-version">v3.2</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -950,7 +950,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.0 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.2 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -1414,9 +1414,9 @@ if('serviceWorker' in navigator){
   </div>
   <div class="content">
     <div class="stats-grid" style="margin-bottom:18px">
-      <div class="stat-card accent"><div class="stat-label">今月の経費合計</div><div class="stat-value" id="exp-month-total">¥0</div><div class="stat-sub" id="exp-month-count">0件</div></div>
-      <div class="stat-card"><div class="stat-label">今年の経費合計</div><div class="stat-value" id="exp-year-total">¥0</div></div>
-      <div class="stat-card"><div class="stat-label">未精算</div><div class="stat-value" id="exp-unpaid-total" style="color:var(--red)">¥0</div><div class="stat-sub" id="exp-unpaid-count">0件</div></div>
+      <div class="stat-card accent" style="cursor:pointer" onclick="showExpenseStatDrilldown('thisMonth')"><div class="stat-label">今月の経費合計</div><div class="stat-value" id="exp-month-total">¥0</div><div class="stat-sub" id="exp-month-count">0件</div></div>
+      <div class="stat-card" style="cursor:pointer" onclick="showExpenseStatDrilldown('thisYear')"><div class="stat-label">今年の経費合計</div><div class="stat-value" id="exp-year-total">¥0</div></div>
+      <div class="stat-card" style="cursor:pointer" onclick="showExpenseStatDrilldown('unpaid')"><div class="stat-label">未精算</div><div class="stat-value" id="exp-unpaid-total" style="color:var(--red)">¥0</div><div class="stat-sub" id="exp-unpaid-count">0件</div></div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
       <select id="exp-filter-cat" onchange="renderExpenses()" style="padding:7px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none">
@@ -2529,8 +2529,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.0';
-const APP_BUILD_TIME='2026/04/18 19:43';
+const APP_VERSION='v3.2';
+const APP_BUILD_TIME='2026/04/18 20:15';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -2679,14 +2679,14 @@ function renderHome(){
   });
   const hs=document.getElementById('home-stats');
   if(hs) hs.innerHTML=`
-    <div class="stat-card accent" style="cursor:pointer" onclick="showPage('dashboard')">
-      <div class="stat-label">TODAY 本日売上</div><div class="stat-value">${fmt(todayAmt)}</div><div class="stat-sub">ダッシュボードへ →</div>
+    <div class="stat-card accent" style="cursor:pointer" onclick="showDocsDrilldown('today')">
+      <div class="stat-label">TODAY 本日売上</div><div class="stat-value">${fmt(todayAmt)}</div><div class="stat-sub">クリックで一覧表示 →</div>
     </div>
-    <div class="stat-card" style="cursor:pointer" onclick="showPage('report')">
-      <div class="stat-label">今月の売上</div><div class="stat-value">${fmt(monthAmt)}</div><div class="stat-sub">レポートへ →</div>
+    <div class="stat-card" style="cursor:pointer" onclick="showDocsDrilldown('thisMonth')">
+      <div class="stat-label">今月の売上</div><div class="stat-value">${fmt(monthAmt)}</div><div class="stat-sub">クリックで一覧表示 →</div>
     </div>
-    <div class="stat-card" style="cursor:pointer" onclick="showPage('payments')">
-      <div class="stat-label">未回収</div><div class="stat-value" style="color:var(--red)">${fmt(unpaidAmt)}</div><div class="stat-sub">${unpaidC}件 / 入金管理へ →</div>
+    <div class="stat-card" style="cursor:pointer" onclick="showDocsDrilldown('unpaid')">
+      <div class="stat-label">未回収</div><div class="stat-value" style="color:var(--red)">${fmt(unpaidAmt)}</div><div class="stat-sub">${unpaidC}件 / クリックで一覧 →</div>
     </div>`;
 
   // Menu grid sections
@@ -3374,7 +3374,7 @@ function buildMonthlyChart(){
   docs.forEach(d=>{if(!['請求書','領収書'].includes(d.type))return;const dt=new Date(d.date);if(dt.getFullYear()===y)totals[dt.getMonth()]+=d.grandTotal||0;});
   const max=Math.max(...totals,1);
   const el=document.getElementById('monthly-chart');if(!el)return;
-  el.innerHTML=totals.map((v,i)=>`<div class="bar-col">
+  el.innerHTML=totals.map((v,i)=>`<div class="bar-col" style="cursor:pointer" onclick="showDocsDrilldown('month',{year:${y},month:${i+1}})" title="${months[i]}の売上一覧">
     <div class="bar-val">${v>0?(v>=10000?Math.round(v/1000)+'k':fmt(v)):''}</div>
     <div class="bar" style="height:${Math.max(Math.round((v/max)*100),v>0?4:0)}%;background:${i===now.getMonth()?'var(--accent)':'#A8D5B8'}"></div>
     <div class="bar-label">${months[i]}</div>
@@ -3840,7 +3840,60 @@ function shareEmail(){
   window.location.href=`mailto:?subject=${sub}&body=${body}`;
   closeModal('share-modal');
 }
-function shareLine(){const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;const text=d?encodeURIComponent(`【${d.type}】${d.subject||d.number}\n金額：${fmt(d.grandTotal)}\n${settings.company||''}`):'';window.open('https://line.me/R/msg/text/?'+text,'_blank');closeModal('share-modal');}
+function shareLine(){
+  const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
+  if(!d){closeModal('share-modal');return;}
+
+  const company=settings.company||'';
+  const subject=d.subject||d.number;
+  const message=`【${d.type}】${subject}\n金額：${fmt(d.grandTotal)}\n${company?'\nFrom: '+company:''}`;
+  const encodedMsg=encodeURIComponent(message);
+
+  closeModal('share-modal');
+
+  // モバイル判定
+  const isMobile=isMobileDevice();
+
+  if(isMobile){
+    // スマホ: LINEアプリの友達選択画面を直接呼び出し
+    // line:// スキームを優先、失敗したら https にフォールバック
+    const lineAppUrl=`line://msg/text/${encodedMsg}`;
+    const lineWebUrl=`https://line.me/R/share?text=${encodedMsg}`;
+
+    // line:// を試す
+    const link=document.createElement('a');
+    link.href=lineAppUrl;
+    link.style.display='none';
+    document.body.appendChild(link);
+
+    // タイマーで起動失敗を検知してWebフォールバック
+    const startTime=Date.now();
+    const fallbackTimer=setTimeout(()=>{
+      if(Date.now()-startTime<2500){
+        // LINEアプリが起動しなかった→Web版を開く
+        window.open(lineWebUrl,'_blank');
+      }
+    },1500);
+
+    link.click();
+    setTimeout(()=>document.body.removeChild(link),100);
+
+    // ページがbackgroundに行ったらキャンセル（LINE起動成功）
+    document.addEventListener('visibilitychange',function vh(){
+      if(document.hidden){
+        clearTimeout(fallbackTimer);
+        document.removeEventListener('visibilitychange',vh);
+      }
+    });
+  } else {
+    // PC: LINE Webクライアントの友達選択画面（共有シート相当）
+    // share?text 形式は友達/グループ選択UIを表示
+    const lineShareUrl=`https://line.me/R/share?text=${encodedMsg}`;
+    window.open(lineShareUrl,'_blank','width=500,height=700');
+  }
+
+  showToast('💬 LINEを起動しました', '#06C755');
+}
 function copyLink(){navigator.clipboard.writeText(window.location.href).then(()=>{alert('URLをコピーしました');closeModal('share-modal');});}
 
 // ===== CUSTOMERS =====
@@ -3869,7 +3922,7 @@ function renderCustomerList(){
       <td style="font-size:12px;color:var(--text2)">${mc?mc.name+(mc.role?' ('+mc.role+')':''):'—'}</td>
       <td>${c.tel||'—'}</td>
       <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.address||'—'}</td>
-      <td><span style="background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px">${count}件</span></td>
+      <td><span style="background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;cursor:pointer" onclick="showDocsDrilldown('customer',{customerName:'${c.name.replace(/'/g,"\\'")}'})" title="取引一覧を表示">${count}件 →</span></td>
       <td style="white-space:nowrap;display:flex;gap:3px;padding:6px 8px">
         <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書','${c.name.replace(/'/g,"\\'")}')">見積</button>
         <button class="btn btn-blue btn-sm" onclick="openNewDoc('請求書','${c.name.replace(/'/g,"\\'")}')">請求</button>
@@ -4190,12 +4243,12 @@ function renderReport(){
   const rs=document.getElementById('report-stats');
   if(rs)rs.innerHTML=`<div class="stat-card accent"><div class="stat-label">${y}年 年間売上</div><div class="stat-value">${fmt(yt)}</div></div><div class="stat-card"><div class="stat-label">見積発行</div><div class="stat-value">${mData.reduce((s,m)=>s+m.q,0)}件</div></div><div class="stat-card"><div class="stat-label">請求発行</div><div class="stat-value">${mData.reduce((s,m)=>s+m.i,0)}件</div></div><div class="stat-card"><div class="stat-label">最高月</div><div class="stat-value">${months[bi]}</div><div class="stat-sub">${fmt(mData[bi].total)}</div></div>`;
   const max=Math.max(...mData.map(m=>m.total),1);const rc=document.getElementById('report-chart');
-  if(rc)rc.innerHTML=mData.map((m,i)=>`<div class="bar-col"><div class="bar-val">${m.total>0?(m.total>=10000?Math.round(m.total/1000)+'k':fmt(m.total)):''}</div><div class="bar" style="height:${Math.max(Math.round((m.total/max)*100),m.total>0?4:0)}%;background:${i===new Date().getMonth()&&y===new Date().getFullYear()?'var(--accent)':'#A8D5B8'}"></div><div class="bar-label">${months[i]}</div></div>`).join('');
+  if(rc)rc.innerHTML=mData.map((m,i)=>`<div class="bar-col" style="cursor:pointer" onclick="showDocsDrilldown('month',{year:${y},month:${i+1}})" title="${months[i]}の一覧"><div class="bar-val">${m.total>0?(m.total>=10000?Math.round(m.total/1000)+'k':fmt(m.total)):''}</div><div class="bar" style="height:${Math.max(Math.round((m.total/max)*100),m.total>0?4:0)}%;background:${i===new Date().getMonth()&&y===new Date().getFullYear()?'var(--accent)':'#A8D5B8'}"></div><div class="bar-label">${months[i]}</div></div>`).join('');
   const catData={};docs.filter(d=>['請求書','領収書'].includes(d.type)&&new Date(d.date).getFullYear()===y).forEach(d=>{const cat=d.category||'その他';catData[cat]=(catData[cat]||0)+(d.grandTotal||0);});
-  const catEl=document.getElementById('cat-chart');if(catEl){const entries=Object.entries(catData).sort((a,b)=>b[1]-a[1]).slice(0,6);const cm=Math.max(...entries.map(e=>e[1]),1);catEl.innerHTML=entries.length?entries.map(([k,v])=>`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span style="color:var(--text2)">${k}</span><span style="font-weight:600">${fmt(v)}</span></div><div style="background:var(--surface2);border-radius:4px;height:7px"><div style="background:${CATS[k]||'var(--accent)'};height:7px;border-radius:4px;width:${Math.round((v/cm)*100)}%"></div></div></div>`).join(''):'<p style="font-size:13px;color:var(--text3)">データなし</p>';}
+  const catEl=document.getElementById('cat-chart');if(catEl){const entries=Object.entries(catData).sort((a,b)=>b[1]-a[1]).slice(0,6);const cm=Math.max(...entries.map(e=>e[1]),1);catEl.innerHTML=entries.length?entries.map(([k,v])=>`<div style="margin-bottom:9px;cursor:pointer" onclick="showCategoryDrilldown('${k.replace(/'/g,"\\\\'")}',${y})" title="${k}の一覧"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span style="color:var(--text2)">${k}</span><span style="font-weight:600">${fmt(v)}</span></div><div style="background:var(--surface2);border-radius:4px;height:7px"><div style="background:${CATS[k]||'var(--accent)'};height:7px;border-radius:4px;width:${Math.round((v/cm)*100)}%"></div></div></div>`).join(''):'<p style="font-size:13px;color:var(--text3)">データなし</p>';}
   const custData={};docs.filter(d=>['請求書','領収書'].includes(d.type)&&new Date(d.date).getFullYear()===y).forEach(d=>{if(d.customer)custData[d.customer]=(custData[d.customer]||0)+(d.grandTotal||0);});
-  const custEl=document.getElementById('cust-chart');if(custEl){const entries=Object.entries(custData).sort((a,b)=>b[1]-a[1]).slice(0,5);const cm=Math.max(...entries.map(e=>e[1]),1);custEl.innerHTML=entries.length?entries.map(([k,v],i)=>`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span style="color:var(--text2)">${i+1}. ${k}</span><span style="font-weight:600">${fmt(v)}</span></div><div style="background:var(--surface2);border-radius:4px;height:7px"><div style="background:var(--accent);height:7px;border-radius:4px;width:${Math.round((v/cm)*100)}%;opacity:${1-i*0.15}"></div></div></div>`).join(''):'<p style="font-size:13px;color:var(--text3)">データなし</p>';}
-  const tbody=document.getElementById('report-table-body');if(tbody)tbody.innerHTML=mData.map((m,i)=>{const prev=i>0?mData[i-1].total:null;const diff=prev!=null&&prev>0?Math.round((m.total-prev)/prev*100):null;return`<tr><td style="font-weight:600">${months[i]}</td><td style="text-align:right">${m.q}件</td><td style="text-align:right">${m.i}件</td><td style="text-align:right">${m.r}件</td><td style="text-align:right;font-weight:600">${fmt(m.total)}</td><td style="text-align:right;color:${diff==null?'var(--text3)':diff>=0?'var(--accent)':'var(--red)'}">${diff==null?'—':(diff>=0?'▲':'▼')+Math.abs(diff)+'%'}</td></tr>`;}).join('');
+  const custEl=document.getElementById('cust-chart');if(custEl){const entries=Object.entries(custData).sort((a,b)=>b[1]-a[1]).slice(0,5);const cm=Math.max(...entries.map(e=>e[1]),1);custEl.innerHTML=entries.length?entries.map(([k,v],i)=>`<div style="margin-bottom:9px;cursor:pointer" onclick="showDocsDrilldown('customer',{customerName:'${k.replace(/'/g,"\\\\'")}'})" title="${k}との取引一覧"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span style="color:var(--text2)">${i+1}. ${k}</span><span style="font-weight:600">${fmt(v)}</span></div><div style="background:var(--surface2);border-radius:4px;height:7px"><div style="background:var(--accent);height:7px;border-radius:4px;width:${Math.round((v/cm)*100)}%;opacity:${1-i*0.15}"></div></div></div>`).join(''):'<p style="font-size:13px;color:var(--text3)">データなし</p>';}
+  const tbody=document.getElementById('report-table-body');if(tbody)tbody.innerHTML=mData.map((m,i)=>{const prev=i>0?mData[i-1].total:null;const diff=prev!=null&&prev>0?Math.round((m.total-prev)/prev*100):null;return`<tr style="cursor:pointer" onclick="showDocsDrilldown('month',{year:${y},month:${i+1}})" title="${months[i]}の一覧"><td style="font-weight:600">${months[i]}</td><td style="text-align:right">${m.q}件</td><td style="text-align:right">${m.i}件</td><td style="text-align:right">${m.r}件</td><td style="text-align:right;font-weight:600">${fmt(m.total)}</td><td style="text-align:right;color:${diff==null?'var(--text3)':diff>=0?'var(--accent)':'var(--red)'}">${diff==null?'—':(diff>=0?'▲':'▼')+Math.abs(diff)+'%'}</td></tr>`;}).join('');
 }
 
 // ===== TEMPLATES =====
@@ -5267,7 +5320,7 @@ function renderStaffReport(){
   docs.filter(d=>['請求書','領収書'].includes(d.type)&&new Date(d.date).getFullYear()===y)
     .forEach(d=>{monthTotals[new Date(d.date).getMonth()]+=d.grandTotal||0;});
   const chartMax=Math.max(...monthTotals,1);
-  chartEl.innerHTML=monthTotals.map((v,i)=>`<div class="bar-col">
+  chartEl.innerHTML=monthTotals.map((v,i)=>`<div class="bar-col" style="cursor:pointer" onclick="showDocsDrilldown('month',{year:${y},month:${i+1}})" title="${months[i]}の売上一覧">
     <div class="bar-val">${v>0?(v>=10000?Math.round(v/1000)+'k':fmt(v)):''}</div>
     <div class="bar" style="height:${Math.max(Math.round(v/chartMax*100),v>0?4:0)}%;background:${i===new Date().getMonth()&&y===new Date().getFullYear()?'var(--accent)':'#A8D5B8'}"></div>
     <div class="bar-label">${months[i]}</div>
@@ -6717,6 +6770,174 @@ function resetNavOrder(){
   });
 }
 
+function showCategoryDrilldown(category, year){
+  const list=docs.filter(d=>['請求書','領収書'].includes(d.type)&&d.category===category&&new Date(d.date).getFullYear()===year);
+  list.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  _renderDrilldownDocs(`カテゴリ「${category}」の取引`, `${year}年`, list);
+}
+
+function showExpenseStatDrilldown(rangeType){
+  const now=new Date();
+  const yyyy=now.getFullYear();
+  const mm=String(now.getMonth()+1).padStart(2,'0');
+  let title='', filterDesc='', list=[];
+  switch(rangeType){
+    case 'thisMonth':
+      title='今月の経費';
+      filterDesc=`${yyyy}年${mm}月`;
+      list=expenses.filter(e=>e.date&&e.date.startsWith(`${yyyy}-${mm}`));
+      break;
+    case 'thisYear':
+      title='今年の経費';
+      filterDesc=`${yyyy}年`;
+      list=expenses.filter(e=>e.date&&e.date.startsWith(`${yyyy}-`));
+      break;
+    case 'unpaid':
+      title='未精算の経費';
+      filterDesc='精算待ち';
+      list=expenses.filter(e=>e.status==='未精算');
+      break;
+  }
+  _renderDrilldownExpenses(title, filterDesc, list);
+}
+
+// ===== ドリルダウン（一覧→詳細プレビュー） =====
+function showDocsDrilldown(rangeType, opts){
+  opts=opts||{};
+  const today=new Date();
+  const todayStr=today.toISOString().split('T')[0];
+  const yyyy=today.getFullYear();
+  const mm=String(today.getMonth()+1).padStart(2,'0');
+
+  let list=[], title='', filterDesc='';
+
+  switch(rangeType){
+    case 'today':
+      title='本日の売上';
+      filterDesc=`${yyyy}/${mm}/${String(today.getDate()).padStart(2,'0')}`;
+      list=docs.filter(d=>['請求書','領収書'].includes(d.type)&&d.date===todayStr);
+      break;
+    case 'thisMonth':
+      title='今月の売上';
+      filterDesc=`${yyyy}年${mm}月`;
+      list=docs.filter(d=>['請求書','領収書'].includes(d.type)&&d.date&&d.date.startsWith(`${yyyy}-${mm}`));
+      break;
+    case 'unpaid':
+      title='未回収の請求書';
+      filterDesc='入金待ち';
+      list=docs.filter(d=>d.type==='請求書'&&!payments?.[d.id]);
+      break;
+    case 'month':
+      title=`${opts.year}年${opts.month}月の売上`;
+      filterDesc=`${opts.year}年${opts.month}月`;
+      const ym=`${opts.year}-${String(opts.month).padStart(2,'0')}`;
+      list=docs.filter(d=>['請求書','領収書'].includes(d.type)&&d.date&&d.date.startsWith(ym));
+      break;
+    case 'year':
+      title=`${opts.year}年の売上`;
+      filterDesc=`${opts.year}年`;
+      list=docs.filter(d=>['請求書','領収書'].includes(d.type)&&d.date&&d.date.startsWith(`${opts.year}-`));
+      break;
+    case 'staff':
+      title=`${opts.staffName}さんの取引`;
+      filterDesc=opts.label||'';
+      list=docs.filter(d=>{
+        if(!['請求書','領収書'].includes(d.type)) return false;
+        if((d.staff||'').trim()!==opts.staffName) return false;
+        if(opts.year && new Date(d.date).getFullYear()!==opts.year) return false;
+        if(opts.month && new Date(d.date).getMonth()!==opts.month-1) return false;
+        return true;
+      });
+      break;
+    case 'customer':
+      title=`${opts.customerName}との取引`;
+      filterDesc='全期間';
+      list=docs.filter(d=>d.customer===opts.customerName);
+      break;
+    case 'expCategory':
+      title=`カテゴリ「${opts.category}」の経費`;
+      filterDesc=opts.label||'';
+      _renderDrilldownExpenses(title, filterDesc, expenses.filter(e=>e.category===opts.category));
+      return;
+    case 'expMonth':
+      title=`${opts.year}年${opts.month}月の経費`;
+      filterDesc=`${opts.year}年${opts.month}月`;
+      const expYm=`${opts.year}-${String(opts.month).padStart(2,'0')}`;
+      _renderDrilldownExpenses(title, filterDesc, expenses.filter(e=>e.date&&e.date.startsWith(expYm)));
+      return;
+  }
+
+  list.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  _renderDrilldownDocs(title, filterDesc, list);
+}
+
+function _renderDrilldownDocs(title, filterDesc, list){
+  const total=list.reduce((s,d)=>s+(d.grandTotal||0),0);
+  const tc={'見積書':'badge-quote','請求書':'badge-invoice','領収書':'badge-receipt'};
+  const html=`<div class="modal-overlay open" id="drilldown-modal" onclick="if(event.target===this)closeModal('drilldown-modal')">
+    <div class="modal" style="max-width:780px">
+      <div class="modal-header">
+        <h3>📊 ${title} <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${filterDesc}</span></h3>
+        <button class="close-btn" onclick="closeModal('drilldown-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:65vh;overflow-y:auto">
+        <div style="background:var(--accent-light);color:var(--accent);padding:10px 14px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:5">
+          <span style="font-size:13px;font-weight:600">📊 合計 ${list.length}件</span>
+          <span style="font-size:14px;font-weight:700">${fmt(total)}</span>
+        </div>
+        ${list.length?list.map(d=>`<div style="display:flex;align-items:center;gap:8px;padding:10px 8px;border-bottom:1px solid var(--border);cursor:pointer" onclick="closeModal('drilldown-modal');setTimeout(()=>previewDoc('${d.id}'),100)">
+            <span class="badge ${tc[d.type]||''}" style="font-size:10px;flex-shrink:0">${d.type}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(d.number||'')} - ${escAttr(d.subject||'（件名なし）')}</div>
+              <div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(d.customer||'—')} / ${d.date||''} / 担当: ${escAttr(d.staff||'—')}</div>
+            </div>
+            <span style="font-size:13px;font-weight:700;flex-shrink:0">${fmt(d.grandTotal)}</span>
+            <span style="color:var(--text3);font-size:14px;flex-shrink:0">▶</span>
+          </div>`).join(''):'<div style="text-align:center;color:var(--text3);padding:32px">該当する書類はありません</div>'}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('drilldown-modal')">閉じる</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('drilldown-modal')?.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function _renderDrilldownExpenses(title, filterDesc, list){
+  list.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const total=list.reduce((s,e)=>s+(e.total||0),0);
+  const sc={'未精算':'badge-draft','精算済':'badge-paid'};
+  const html=`<div class="modal-overlay open" id="drilldown-modal" onclick="if(event.target===this)closeModal('drilldown-modal')">
+    <div class="modal" style="max-width:780px">
+      <div class="modal-header">
+        <h3>💸 ${title} <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${filterDesc}</span></h3>
+        <button class="close-btn" onclick="closeModal('drilldown-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="max-height:65vh;overflow-y:auto">
+        <div style="background:#FFE4D6;color:#C0392B;padding:10px 14px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:5">
+          <span style="font-size:13px;font-weight:600">💸 合計 ${list.length}件</span>
+          <span style="font-size:14px;font-weight:700">${fmt(total)}</span>
+        </div>
+        ${list.length?list.map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:10px 8px;border-bottom:1px solid var(--border)">
+            <span class="badge ${sc[e.status]||'badge-draft'}" style="font-size:10px;flex-shrink:0">${e.status||'未精算'}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(e.category||'')} - ${escAttr(e.desc||'')}</div>
+              <div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.date||''} / ${escAttr(e.paymentMethod||'')} / 担当: ${escAttr(e.staff||'—')}</div>
+            </div>
+            <span style="font-size:13px;font-weight:700;flex-shrink:0">${fmt(e.total)}</span>
+            <button class="btn btn-secondary btn-sm" onclick="closeModal('drilldown-modal');setTimeout(()=>openExpenseModal('${e.id}'),100)" style="flex-shrink:0">編集</button>
+          </div>`).join(''):'<div style="text-align:center;color:var(--text3);padding:32px">該当する経費はありません</div>'}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('drilldown-modal')">閉じる</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('drilldown-modal')?.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
 // ===== 開発者ツール =====
 const DEVELOPER_EMAIL='a.nojima.irori@gmail.com';
 const DEVELOPER_PIN='Yuki1105Boss';
@@ -6858,7 +7079,7 @@ function generateSampleData(){
       });
     }
 
-    // 書類（見積/請求/領収）
+    // 書類（見積/請求/領収）— 各タイプごとに公平に分散
     const docTypes=[];
     if(opts.quotes) docTypes.push('見積書');
     if(opts.invoices) docTypes.push('請求書');
@@ -6866,35 +7087,41 @@ function generateSampleData(){
     if(docTypes.length){
       const allCusts=customers.length?customers:[{name:'サンプル顧客',honorific:'御中'}];
       const allStaff=employees.length?employees.map(e=>e.name):['野島昭男'];
-      for(let i=0;i<count;i++){
-        const type=rand(docTypes);
-        const cust=rand(allCusts);
-        const date=randomDate(year);
-        const subject=rand(SAMPLE_SUBJECTS);
-        const subtotal=randInt(5,200)*1000;
-        const tax10=Math.round(subtotal*0.1);
-        const total=subtotal+tax10;
-        const pre={'見積書':'EST','請求書':'INV','領収書':'REC'}[type];
-        const ym=String(year).slice(2)+date.split('-')[1];
-        docs.push({
-          id:'sample-doc-'+Date.now()+'-'+i,
-          number:`${pre}-${ym}-${String(randInt(100,999))}`,
-          type,
-          customer:cust.name,
-          honorific:cust.honorific,
-          date,
-          dueDate:type==='請求書'?randomDate(year):'',
-          subject,
-          category:rand(SAMPLE_CATEGORIES),
-          staff:rand(allStaff),
-          status:type==='見積書'?'下書き':'発行済',
-          items:[{name:subject,qty:1,unit:'式',price:subtotal,amt:subtotal,tax:'10'}],
-          subtotal,tax10,tax8:0,grandTotal:total,
-          memo:'[サンプル]',
-          _sample:true
-        });
-        added.docs++;
-      }
+
+      // 各タイプ毎に最低5件は生成、count に応じて均等に追加配分
+      const minPerType=5;
+      const perType=Math.max(minPerType, Math.floor(count/docTypes.length));
+
+      docTypes.forEach(type=>{
+        for(let i=0;i<perType;i++){
+          const cust=rand(allCusts);
+          const date=randomDate(year);
+          const subject=rand(SAMPLE_SUBJECTS);
+          const subtotal=randInt(5,200)*1000;
+          const tax10=Math.round(subtotal*0.1);
+          const total=subtotal+tax10;
+          const pre={'見積書':'EST','請求書':'INV','領収書':'REC'}[type];
+          const ym=String(year).slice(2)+date.split('-')[1];
+          docs.push({
+            id:'sample-doc-'+Date.now()+'-'+type+'-'+i,
+            number:`${pre}-${ym}-${String(randInt(100,999))}`,
+            type,
+            customer:cust.name,
+            honorific:cust.honorific,
+            date,
+            dueDate:type==='請求書'?randomDate(year):'',
+            subject,
+            category:rand(SAMPLE_CATEGORIES),
+            staff:rand(allStaff),
+            status:type==='見積書'?rand(['下書き','送付済','承認済']):type==='請求書'?rand(['発行済','入金待ち','入金済']):'発行済',
+            items:[{name:subject,qty:1,unit:'式',price:subtotal,amt:subtotal,tax:'10'}],
+            subtotal,tax10,tax8:0,grandTotal:total,
+            memo:'[サンプル]',
+            _sample:true
+          });
+          added.docs++;
+        }
+      });
     }
 
     // 経費
