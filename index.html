@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp; frame-src https://flexsysv2026.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp https://api.qrserver.com; frame-src https://flexsysv2026.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -235,11 +235,19 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* CARD / TABLE */
 .section-title{font-size:14px;font-weight:700;margin-bottom:10px}
 .card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:18px}
-table{width:100%;border-collapse:collapse}
-th{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.05em;padding:9px 13px;background:var(--surface2);text-align:left;border-bottom:1px solid var(--border)}
+/* テーブルカードは横スクロール可能に（電話番号や件数バッジが折り返さない） */
+.card:has(>table){overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.05em;padding:9px 13px;background:var(--surface2);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
 td{padding:10px 13px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--bg)}
+
+/* スクロールバーを目立たなく */
+.card::-webkit-scrollbar{height:8px}
+.card::-webkit-scrollbar-track{background:var(--surface2);border-radius:4px}
+.card::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.card::-webkit-scrollbar-thumb:hover{background:var(--text3)}
 
 /* BADGE */
 .badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
@@ -829,7 +837,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.9.4</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.9.6</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -853,7 +861,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.9.4.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.9.6.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -888,7 +896,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.9.4</div>
+    <div class="logo-version" id="sidebar-version">v3.9.6</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1023,7 +1031,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.9.4.1 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.9.6.1 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -2739,7 +2747,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.9.4';
+const APP_VERSION='v3.9.6';
 const APP_BUILD_TIME='2026/04/18 22:52';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -4219,21 +4227,24 @@ function renderCustomerList(){
   tbody.innerHTML=list.map(c=>{
     const count=docs.filter(d=>d.customer===c.name||d.customerId===c.id).length;
     const mc=(c.contacts||[])[0];
+    const escName=c.name.replace(/'/g,"\\'");
     return`<tr>
-      <td>
-        <a href="#" onclick="openCustDetail('${c.id}',true);return false" style="color:var(--accent);font-weight:700;text-decoration:none">${c.name}</a>
-        <span style="font-size:11px;color:var(--text3);margin-left:5px">${c.honorific||'御中'}</span>
+      <td style="white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis">
+        <a href="#" onclick="openCustDetail('${c.id}',true);return false" style="color:var(--accent);font-weight:700;text-decoration:none">${escAttr(c.name)}</a>
+        <span style="font-size:11px;color:var(--text3);margin-left:5px">${escAttr(c.honorific||'御中')}</span>
       </td>
-      <td style="font-size:12px;color:var(--text2)">${mc?mc.name+(mc.role?' ('+mc.role+')':''):'—'}</td>
-      <td>${c.tel||'—'}</td>
-      <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.address||'—'}</td>
-      <td><span style="background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;cursor:pointer" onclick="showDocsDrilldown('customer',{customerName:'${c.name.replace(/'/g,"\\'")}'})" title="取引一覧を表示">${count}件 →</span></td>
-      <td style="white-space:nowrap;display:flex;gap:3px;padding:6px 8px">
-        <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書','${c.name.replace(/'/g,"\\'")}')">見積</button>
-        <button class="btn btn-blue btn-sm" onclick="openNewDoc('請求書','${c.name.replace(/'/g,"\\'")}')">請求</button>
-        <button class="btn btn-primary btn-sm" onclick="openNewDoc('領収書','${c.name.replace(/'/g,"\\'")}')">領収</button>
-        <button class="btn btn-secondary btn-sm" onclick="editCustomer('${c.id}')">編集</button>
-        <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteCustomer('${c.id}'))">削除</button>
+      <td style="font-size:12px;color:var(--text2);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis">${mc?escAttr(mc.name+(mc.role?' ('+mc.role+')':'')):'—'}</td>
+      <td style="white-space:nowrap;font-size:12px">${escAttr(c.tel||'—')}</td>
+      <td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(c.address||'—')}</td>
+      <td style="white-space:nowrap"><span style="background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;white-space:nowrap" onclick="showDocsDrilldown('customer',{customerName:'${escName}'})" title="取引一覧を表示">${count}件 →</span></td>
+      <td style="white-space:nowrap;padding:6px 8px">
+        <div style="display:inline-flex;gap:3px;flex-wrap:nowrap;align-items:center">
+          <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書','${escName}')" title="見積書作成">見積</button>
+          <button class="btn btn-blue btn-sm" onclick="openNewDoc('請求書','${escName}')" title="請求書作成">請求</button>
+          <button class="btn btn-primary btn-sm" onclick="openNewDoc('領収書','${escName}')" title="領収書作成">領収</button>
+          <button class="btn btn-secondary btn-sm" onclick="editCustomer('${c.id}')">編集</button>
+          <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteCustomer('${c.id}'))">削除</button>
+        </div>
       </td>
     </tr>`;
   }).join('');
@@ -7313,19 +7324,18 @@ function initTheme(){
   },50);
 }
 
-// ===== QR CODE (Pure JS — ISO 18004) =====
-// Minimal QR encoder for alphanumeric/byte mode — no external library needed
+// ===== QR CODE (QR Server API + qrcodejs フォールバック) =====
 function generateQR(docId){
   const d=docs.find(x=>x.id===docId);if(!d)return;
   currentPreviewDocId=docId;
   const cust=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
   const honorific=cust?.honorific!=null?cust.honorific:'御中';
 
-  // QRに埋め込むテキスト（ASCII英数字のみで構成 → スキャン成功率UP）
-  const lines=[
+  // QRに埋め込むテキスト
+  const qrText=[
     d.number||'',
     d.type||'',
-    d.customer||(d.customer?d.customer+'':'')+' '+honorific,
+    (d.customer||'')+' '+honorific,
     d.subject||'',
     fmt(d.grandTotal),
     d.date,
@@ -7334,42 +7344,86 @@ function generateQR(docId){
 
   // 書類情報表示
   document.getElementById('qr-doc-info').innerHTML=
-    `<div style="font-weight:700;font-size:14px;margin-bottom:4px">${d.type}　${d.number}</div>`+
-    `<div style="margin-bottom:2px">${d.customer}　<span style="background:var(--accent-light);color:var(--accent);padding:1px 7px;border-radius:99px;font-size:12px">${honorific}</span></div>`+
+    `<div style="font-weight:700;font-size:14px;margin-bottom:4px">${escAttr(d.type)}　${escAttr(d.number)}</div>`+
+    `<div style="margin-bottom:2px">${escAttr(d.customer||'')}　<span style="background:var(--accent-light);color:var(--accent);padding:1px 7px;border-radius:99px;font-size:12px">${escAttr(honorific)}</span></div>`+
     `<div style="color:var(--accent);font-weight:700;font-size:15px">${fmt(d.grandTotal)}</div>`+
-    `<div style="color:var(--text3);font-size:11px;margin-top:2px">${d.date}${d.subject?' / '+d.subject:''}</div>`;
+    `<div style="color:var(--text3);font-size:11px;margin-top:2px">${d.date}${d.subject?' / '+escAttr(d.subject):''}</div>`;
 
-  // QRコード生成
   const container=document.getElementById('qr-container');
-  container.innerHTML='';
-  try{
-    new QRCode(container,{
-      text: lines,
-      width: 220, height: 220,
-      colorDark: '#000000',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
-    });
-  }catch(err){
-    console.error('QR error:',err);
-    container.innerHTML=`<div style="width:220px;height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface2);border-radius:8px;border:2px dashed var(--border)">
-      <div style="font-size:28px;margin-bottom:8px">📋</div>
-      <div style="font-size:12px;color:var(--text2);font-weight:700;margin-bottom:4px">${d.number}</div>
-      <div style="font-size:11px;color:var(--text3)">${d.customer}</div>
-      <div style="font-size:13px;font-weight:700;color:var(--accent);margin-top:6px">${fmt(d.grandTotal)}</div>
-    </div>`;
-  }
+  container.innerHTML='<div style="width:240px;height:240px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px">QR生成中...</div>';
   document.getElementById('qr-modal').classList.add('open');
+
+  // 方式1: QR Server API（オンライン・最も安定・スマホでスキャン可能）
+  const apiUrl=`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&ecc=M&data=${encodeURIComponent(qrText)}`;
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=()=>{
+    container.innerHTML='';
+    img.style.cssText='width:240px;height:240px;background:white;border-radius:8px;display:block';
+    img.alt='QRコード';
+    container.appendChild(img);
+    // 後でDLするため URL を保存
+    container._qrSrc=apiUrl;
+    container._qrText=qrText;
+  };
+  img.onerror=()=>{
+    // 方式2: qrcodejs（CDN）にフォールバック
+    container.innerHTML='';
+    try{
+      if(typeof QRCode!=='undefined'){
+        new QRCode(container,{
+          text: qrText,
+          width: 240, height: 240,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        container._qrText=qrText;
+      } else { throw new Error('QRCode lib not loaded'); }
+    }catch(err){
+      // 方式3: 最終フォールバック - 書類情報を視覚化
+      console.error('QR error:',err);
+      container.innerHTML=`<div style="width:240px;height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface2);border-radius:8px;border:2px dashed var(--border);padding:14px;text-align:center">
+        <div style="font-size:28px;margin-bottom:8px">📋</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">QR生成にネット接続が必要です</div>
+        <div style="font-size:13px;color:var(--text);font-weight:700;margin-top:6px">${escAttr(d.number||'')}</div>
+        <div style="font-size:11px;color:var(--text2)">${escAttr(d.customer||'')}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--accent);margin-top:6px">${fmt(d.grandTotal)}</div>
+      </div>`;
+    }
+  };
+  img.src=apiUrl;
 }
 
-function downloadQR(){
+async function downloadQR(){
   const container=document.getElementById('qr-container');
-  const canvas=container.querySelector('canvas');
   const d=docs.find(x=>x.id===currentPreviewDocId);
   const fname=`QR_${d?.number||'doc'}.png`;
+
+  // QR Server API画像 → fetch して blob で保存
+  if(container._qrSrc){
+    try{
+      const res=await fetch(container._qrSrc);
+      const blob=await res.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.download=fname;a.href=url;document.body.appendChild(a);a.click();a.remove();
+      URL.revokeObjectURL(url);
+      return;
+    }catch(e){console.warn('QR download failed:',e);}
+  }
+  // qrcodejs canvas → PNG変換
+  const canvas=container.querySelector('canvas');
   if(canvas){
     const a=document.createElement('a');a.download=fname;a.href=canvas.toDataURL('image/png');a.click();
+    return;
   }
+  // <img> タグ → src を直接DL
+  const imgEl=container.querySelector('img');
+  if(imgEl?.src){
+    const a=document.createElement('a');a.download=fname;a.href=imgEl.src;a.target='_blank';a.click();
+    return;
+  }
+  showToast('QR画像を取得できませんでした','#C0392B');
 }
 
 
