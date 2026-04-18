@@ -173,6 +173,27 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .btn-primary{background:var(--accent);color:white}.btn-primary:hover{background:#1e3d2a}
 .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{background:var(--border)}
 .btn-sm{padding:5px 10px;font-size:12px}
+/* AIレシートボタン（大きめ・見やすく） */
+.ai-receipt-btn{padding:10px 16px;font-size:13px;font-weight:700;min-height:40px}
+.ai-receipt-btn-sub{padding:10px 14px;font-size:13px;min-height:40px}
+
+/* ===== 税率エディタ ===== */
+.tax-row{display:flex;gap:8px;align-items:center;padding:10px 12px;margin-bottom:8px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);flex-wrap:nowrap}
+.tax-row-default{border-color:var(--accent)}
+.tax-enable{display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0}
+.tax-enable input{width:16px;height:16px;cursor:pointer;accent-color:var(--accent)}
+.tax-enable-txt{font-size:12px;color:var(--text2)}
+.tax-label-input{width:90px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-weight:700;outline:none;font-family:inherit}
+.tax-rate-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.tax-rate-input{width:80px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;outline:none;font-family:inherit;text-align:right}
+.tax-rate-pct{font-size:13px;color:var(--text3)}
+.tax-note-input{flex:1;min-width:100px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;font-family:inherit;color:var(--text2)}
+.tax-default-lbl{display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;white-space:nowrap;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text2)}
+.tax-default-lbl input{accent-color:var(--accent);cursor:pointer}
+.tax-default-active{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.tax-actions{display:flex;gap:4px;flex-shrink:0}
+.tax-act-btn{padding:5px 7px;border:1px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;min-width:30px;min-height:30px}
+.tax-act-del{border-color:#F5C6C2;background:var(--red-light);color:var(--red)}
 .btn-danger{background:var(--red-light);color:var(--red);border:1px solid #F5C6C2}.btn-danger:hover{background:#F5C6C2}
 .btn-gold{background:var(--gold-light);color:var(--gold);border:1px solid #F0D080}.btn-gold:hover{background:#F0D080}
 .btn-blue{background:var(--blue-light);color:var(--blue);border:1px solid #B0D0F0}.btn-blue:hover{background:#B0D0F0}
@@ -612,6 +633,29 @@ select{appearance:auto}
   /* Buttons smaller */
   .btn{font-size:12px;padding:7px 11px}
   .btn-sm{font-size:11px;padding:4px 8px}
+  /* AIレシートボタン：モバイルでは縦並び・全幅・タップしやすく */
+  .ai-receipt-btn,.ai-receipt-btn-sub{padding:14px 16px;font-size:14px;min-height:48px;flex:1 1 100%;width:100%}
+
+  /* ===== 税率エディタ：モバイルでは2行レイアウト ===== */
+  .tax-row{flex-wrap:wrap;gap:6px;padding:10px}
+  .tax-label-input{width:70px;font-size:12px;padding:6px 8px}
+  .tax-rate-input{width:60px;font-size:12px;padding:6px 8px}
+  .tax-note-input{flex:1 1 100%;order:10;font-size:12px;padding:6px 8px}
+  .tax-default-lbl{font-size:11px;padding:4px 6px}
+  .tax-enable-txt{display:none}
+  .tax-act-btn{min-width:34px;min-height:34px;font-size:12px}
+
+  /* ===== テーブルのはみ出し対策 ===== */
+  .content table{font-size:12px}
+  /* 横スクロールが必要な要素 */
+  .scrollable-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* 設定画面系のフォームフィールド */
+  .form-row{flex-wrap:wrap}
+  .form-row.cols2>.form-group,.form-row.cols3>.form-group,.form-row.cols4>.form-group{flex:1 1 100%;min-width:0}
+  /* モーダル内のスクロール */
+  .modal-body{overflow-x:hidden}
+  /* 長いテキスト対策 */
+  .modal-body input,.modal-body select,.modal-body textarea{max-width:100%;box-sizing:border-box}
   /* Hide nav history breadcrumb on very small screens */
   .nav-hist-breadcrumb{display:none}
   /* Report grids */
@@ -726,13 +770,22 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.6.3</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.8</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
   <nav class="mobile-drawer-nav" id="mobile-drawer-nav">
     <!-- filled by JS -->
   </nav>
+  <!-- ログイン情報＋ログアウト -->
+  <div id="mobile-drawer-footer" style="border-top:1px solid rgba(255,255,255,.15);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+    <img id="mobile-user-avatar" style="width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,.4)" src="" alt="">
+    <div style="flex:1;min-width:0">
+      <div id="mobile-user-name" style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:white"></div>
+      <div id="mobile-user-email" style="font-size:10px;opacity:.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:white"></div>
+    </div>
+    <button onclick="fbLogout()" title="ログアウト" style="background:rgba(255,255,255,.15);border:none;cursor:pointer;color:white;font-size:13px;padding:8px 12px;border-radius:8px;font-weight:600;white-space:nowrap">🚪 ログアウト</button>
+  </div>
 </div>
 
 <!-- SIDEBAR -->
@@ -752,7 +805,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.6.3</div>
+    <div class="logo-version" id="sidebar-version">v2.8</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -898,7 +951,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v2.6.3 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v2.8 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -2152,9 +2205,9 @@ if('serviceWorker' in navigator){
           🤖 AIで自動入力 ／ 📷 領収書写真
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" onclick="startReceiptCamera()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">📷 カメラで撮影</button>
-          <button class="btn btn-primary btn-sm" onclick="document.getElementById('exp-ai-upload-file').click()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">📂 画像を選択</button>
-          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('exp-receipt-file').click()" title="AI読み取りせず写真のみ添付">📎 写真のみ</button>
+          <button class="btn btn-primary ai-receipt-btn" onclick="startReceiptCamera()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">📷 カメラで撮影</button>
+          <button class="btn btn-primary ai-receipt-btn" onclick="document.getElementById('exp-ai-upload-file').click()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">📂 画像を選択</button>
+          <button class="btn btn-secondary ai-receipt-btn-sub" onclick="document.getElementById('exp-receipt-file').click()" title="AI読み取りせず写真のみ添付">📎 写真のみ</button>
         </div>
       </div>
       <input type="file" id="exp-ai-camera-file" accept="image/*" capture="environment" style="display:none" onchange="handleAiReceiptScan(event)">
@@ -2294,8 +2347,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.6.3';
-const APP_BUILD_TIME='2026/04/18 18:28';
+const APP_VERSION='v2.8';
+const APP_BUILD_TIME='2026/04/18 18:51';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3364,12 +3417,9 @@ let dragSrcId=null;
 // Tax rate options helper
 // ===== TAX RATE MANAGEMENT =====
 const DEFAULT_TAX_RATES=[
-  {value:'10', label:'10%',   rate:0.10, enabled:true,  note:'標準税率'},
-  {value:'8',  label:'8%',    rate:0.08, enabled:true,  note:'軽減税率（食品・新聞等）'},
-  {value:'0',  label:'非課税', rate:0,    enabled:true,  note:'非課税取引'},
-  {value:'5',  label:'5%',    rate:0.05, enabled:false, note:'旧税率（参考）'},
-  {value:'3',  label:'3%',    rate:0.03, enabled:false, note:'旧税率（参考）'},
-  {value:'free',label:'税抜',  rate:0,    enabled:true,  note:'税抜き表示（税額計上なし）'},
+  {value:'10', label:'10%',   rate:0.10, enabled:true, note:'標準税率'},
+  {value:'8',  label:'8%',    rate:0.08, enabled:true, note:'軽減税率（食品・新聞等）'},
+  {value:'0',  label:'非課税', rate:0,    enabled:true, note:'非課税取引'},
 ];
 let customTaxRates=JSON.parse(localStorage.getItem('customTaxRates')||'null')||JSON.parse(JSON.stringify(DEFAULT_TAX_RATES));
 function persistTaxRates(){localStorage.setItem('customTaxRates',JSON.stringify(customTaxRates));}
@@ -4224,10 +4274,14 @@ async function fbLogin(){
 
 // ログアウト
 async function fbLogout(){
-  const F = window._FB;
-  if(!F) return;
-  if(fbUnsubscribe){ fbUnsubscribe(); fbUnsubscribe=null; }
-  await F.signOut(F.auth);
+  showConfirm('ログアウトしますか？\n（保存していないデータがあれば失われます）', async()=>{
+    const F = window._FB;
+    if(!F) return;
+    if(fbUnsubscribe){ fbUnsubscribe(); fbUnsubscribe=null; }
+    closeDrawer();
+    await F.signOut(F.auth);
+    showToast('ログアウトしました', '#27AE60');
+  });
 }
 
 // 同期インジケーター
@@ -4377,7 +4431,7 @@ function initFirebaseAuth(){
       // UIを更新
       if(loginEl) loginEl.style.display='none';
       if(appEl)   appEl.style.display='flex';
-      // ユーザー情報表示
+      // ユーザー情報表示（PC + モバイル）
       const sbu = document.getElementById('sidebar-user');
       if(sbu) sbu.style.display='block';
       const av = document.getElementById('user-avatar');
@@ -4386,6 +4440,13 @@ function initFirebaseAuth(){
       if(un) un.textContent=user.displayName||'ユーザー';
       const ue = document.getElementById('user-email');
       if(ue) ue.textContent=user.email||'';
+      // モバイルドロワーフッター
+      const mav = document.getElementById('mobile-user-avatar');
+      if(mav && user.photoURL) mav.src=user.photoURL;
+      const mun = document.getElementById('mobile-user-name');
+      if(mun) mun.textContent=user.displayName||'ユーザー';
+      const mue = document.getElementById('mobile-user-email');
+      if(mue) mue.textContent=user.email||'';
       // データ読み込み
       await fbLoadAll(user.uid);
       initAppAfterAuth();
@@ -6360,32 +6421,31 @@ function renderTaxEditor(){
   if(!el) return;
   const currentDefault=settings?.defaultTax??customTaxRates.filter(r=>r.enabled)[0]?.value??'10';
   el.innerHTML=customTaxRates.map((r,i)=>`
-    <div style="display:flex;gap:8px;align-items:center;padding:10px 12px;margin-bottom:8px;background:var(--surface2);border-radius:8px;border:1px solid ${r.value===currentDefault&&r.enabled?'var(--accent)':'var(--border)'}">
-      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0">
-        <input type="checkbox" ${r.enabled?'checked':''} onchange="toggleTaxRate(${i},this.checked)"
-          style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent)">
-        <span style="font-size:12px;color:var(--text2)">${r.enabled?'有効':'無効'}</span>
+    <div class="tax-row ${r.value===currentDefault&&r.enabled?'tax-row-default':''}">
+      <label class="tax-enable">
+        <input type="checkbox" ${r.enabled?'checked':''} onchange="toggleTaxRate(${i},this.checked)">
+        <span class="tax-enable-txt">${r.enabled?'有効':'無効'}</span>
       </label>
-      <input type="text" value="${r.label}"
-        oninput="updateTaxRateField(${i},'label',this.value)"
-        style="width:90px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-weight:700;outline:none;font-family:inherit">
-      <input type="number" value="${r.rate*100}" min="0" max="100" step="0.1"
-        oninput="updateTaxRateField(${i},'rate',parseFloat(this.value)/100)"
-        style="width:80px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;outline:none;font-family:inherit;text-align:right">
-      <span style="font-size:13px;color:var(--text3)">%</span>
-      <input type="text" value="${r.note||''}"
-        oninput="updateTaxRateField(${i},'note',this.value)"
-        style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;outline:none;font-family:inherit;color:var(--text2)">
-      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;white-space:nowrap;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid ${r.value===currentDefault&&r.enabled?'var(--accent)':'var(--border)'};background:${r.value===currentDefault&&r.enabled?'var(--accent-light)':'var(--surface)'};color:${r.value===currentDefault&&r.enabled?'var(--accent)':'var(--text2)'}">
+      <input class="tax-label-input" type="text" value="${escAttr(r.label)}"
+        oninput="updateTaxRateField(${i},'label',this.value)">
+      <div class="tax-rate-wrap">
+        <input class="tax-rate-input" type="number" value="${r.rate*100}" min="0" max="100" step="0.1"
+          oninput="updateTaxRateField(${i},'rate',parseFloat(this.value)/100)">
+        <span class="tax-rate-pct">%</span>
+      </div>
+      <input class="tax-note-input" type="text" value="${escAttr(r.note||'')}" placeholder="備考"
+        oninput="updateTaxRateField(${i},'note',this.value)">
+      <label class="tax-default-lbl ${r.value===currentDefault&&r.enabled?'tax-default-active':''}">
         <input type="radio" name="default-tax" value="${r.value}" ${r.value===currentDefault&&r.enabled?'checked':''}
           ${!r.enabled?'disabled':''}
-          onchange="setDefaultTax('${r.value}')"
-          style="accent-color:var(--accent);cursor:pointer">
+          onchange="setDefaultTax('${r.value}')">
         初期値
       </label>
-      <button onclick="moveTaxRate(${i},-1)" ${i===0?'disabled':''} style="padding:5px 7px;border:1px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer" title="上へ">↑</button>
-      <button onclick="moveTaxRate(${i},1)" ${i===customTaxRates.length-1?'disabled':''} style="padding:5px 7px;border:1px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer" title="下へ">↓</button>
-      <button onclick="removeTaxRate(${i})" style="padding:5px 8px;border:1px solid #F5C6C2;border-radius:5px;background:var(--red-light);color:var(--red);cursor:pointer" title="削除">✕</button>
+      <div class="tax-actions">
+        <button onclick="moveTaxRate(${i},-1)" ${i===0?'disabled':''} class="tax-act-btn" title="上へ">↑</button>
+        <button onclick="moveTaxRate(${i},1)" ${i===customTaxRates.length-1?'disabled':''} class="tax-act-btn" title="下へ">↓</button>
+        <button onclick="removeTaxRate(${i})" class="tax-act-btn tax-act-del" title="削除">✕</button>
+      </div>
     </div>`).join('');
 }
 
