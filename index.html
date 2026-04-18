@@ -397,6 +397,60 @@ tr:hover td{background:var(--bg)}
 /* 更新ボタン */
 .btn-refresh{padding:6px 10px;font-size:13px;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:7px;cursor:pointer;transition:all .15s;font-family:inherit;min-width:36px}
 
+/* 言語選択ボタン */
+.lang-btn{
+  padding:8px 14px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  border-radius:8px;
+  font-size:13px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all .15s;
+  font-family:inherit;
+}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.lang-btn.active{background:var(--accent);color:white;border-color:var(--accent);font-weight:700}
+
+/* 作業写真ボタン（一覧行）- 視認性の高いオレンジ系 */
+.btn-photo-action{
+  padding:5px 11px;
+  font-size:12px;
+  font-weight:600;
+  background:linear-gradient(135deg,#FFF0E6,#FFE4CC);
+  color:#B84A00;
+  border:1px solid #FFCC99;
+  border-radius:7px;
+  cursor:pointer;
+  transition:all .15s;
+  font-family:inherit;
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  white-space:nowrap;
+  position:relative;
+}
+.btn-photo-action:hover{
+  background:linear-gradient(135deg,#FFD9B3,#FFCC99);
+  border-color:#FF9933;
+  color:#8C3600;
+  transform:translateY(-1px);
+  box-shadow:0 2px 6px rgba(184,74,0,.2);
+}
+.btn-photo-action:active{transform:translateY(0)}
+.btn-photo-action .photo-count{
+  background:#B84A00;
+  color:white;
+  font-size:10px;
+  font-weight:700;
+  padding:1px 6px;
+  border-radius:99px;
+  margin-left:2px;
+  min-width:18px;
+  text-align:center;
+}
+
 /* 作業写真 */
 .wp-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
 .wp-img-wrap{aspect-ratio:4/3;background:var(--surface2);overflow:hidden}
@@ -927,7 +981,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.10</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.11</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -951,7 +1005,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.10</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.11</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -986,7 +1040,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.10</div>
+    <div class="logo-version" id="sidebar-version">v3.11</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1121,7 +1175,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.10 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.11 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -1286,6 +1340,17 @@ if('serviceWorker' in navigator){
     <div class="card" style="max-width:640px;padding:24px">
 
       <!-- テーマ -->
+      <!-- 言語設定 -->
+      <div class="section-title" style="margin-bottom:8px">🌐 言語 / Language</div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:12px">UIの表示言語を選べます。書類本文はClaude AIで翻訳できます。</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="lang-selector">
+        <button type="button" class="lang-btn" data-lang="ja" onclick="setLanguage('ja')">🇯🇵 日本語</button>
+        <button type="button" class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇺🇸 English</button>
+        <button type="button" class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">🇨🇳 中文</button>
+        <button type="button" class="lang-btn" data-lang="vi" onclick="setLanguage('vi')">🇻🇳 Tiếng Việt</button>
+        <button type="button" class="lang-btn" data-lang="ko" onclick="setLanguage('ko')">🇰🇷 한국어</button>
+      </div>
+
       <div class="section-title" style="margin-bottom:12px">🎨 テーマ・カラー</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px" id="theme-picker">
         <div class="theme-swatch" data-theme="default" onclick="applyTheme('default',this)" title="ナチュラル（デフォルト）">
@@ -2111,6 +2176,17 @@ if('serviceWorker' in navigator){
   <div class="modal-body" id="preview-body"></div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('preview-modal')">閉じる</button>
+    <div style="display:inline-flex;gap:4px;align-items:center;margin-right:auto">
+      <span style="font-size:11px;color:var(--text3)">🌐</span>
+      <select id="preview-translate-lang" onchange="if(this.value)translateCurrentDoc(this.value)" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:inherit">
+        <option value="">翻訳しない</option>
+        <option value="en">🇺🇸 English</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="vi">🇻🇳 Tiếng Việt</option>
+        <option value="ko">🇰🇷 한국어</option>
+        <option value="ja">🇯🇵 日本語（元に戻す）</option>
+      </select>
+    </div>
     <button class="btn btn-secondary" onclick="shareDoc()">📤 共有・送信</button>
     <button class="btn btn-primary" onclick="window.print()">🖨️ 印刷・PDF保存</button>
   </div>
@@ -2118,55 +2194,6 @@ if('serviceWorker' in navigator){
 </div>
 
 <!-- SHARE MODAL -->
-<!-- 作業写真モーダル -->
-<div class="modal-overlay" id="wp-modal">
-<div class="modal" style="max-width:900px">
-  <div class="modal-header">
-    <h3 id="wp-modal-title">📸 作業写真</h3>
-    <button class="close-btn" onclick="closeModal('wp-modal')">✕</button>
-  </div>
-  <div class="modal-body" style="padding:16px">
-    <!-- アップロード -->
-    <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:14px">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <label style="font-size:12px;color:var(--text2);font-weight:600">追加時のラベル:</label>
-        <select id="wp-default-label" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px">
-          <option value="作業前">作業前</option>
-          <option value="作業中">作業中</option>
-          <option value="作業後">作業後</option>
-          <option value="備品">備品・材料</option>
-          <option value="">（ラベルなし）</option>
-        </select>
-        <input type="file" id="wp-file" accept="image/*" multiple style="display:none" onchange="onWpFileSelected(event)">
-        <button class="btn btn-primary btn-sm" onclick="document.getElementById('wp-file').click()">📷 写真を追加（複数選択可）</button>
-        <span style="font-size:10px;color:var(--text3);margin-left:auto">最大5MB/枚 自動圧縮してアップロード</span>
-      </div>
-    </div>
-
-    <!-- 写真グリッド -->
-    <div id="wp-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;max-height:450px;overflow-y:auto;padding:4px"></div>
-
-    <!-- 共有セクション -->
-    <div style="margin-top:16px;background:var(--accent-light);border-radius:8px;padding:14px;border:1px solid var(--accent)">
-      <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px">🔗 顧客に写真を共有</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <label style="font-size:12px;color:var(--text2)">有効期間:</label>
-        <select id="wp-share-days" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px">
-          <option value="1">1日</option>
-          <option value="3">3日</option>
-          <option value="7" selected>7日（推奨）</option>
-          <option value="14">14日</option>
-          <option value="30">30日（最大）</option>
-        </select>
-        <button class="btn btn-primary btn-sm" onclick="generatePhotoShareLink()">🔗 共有リンクを生成</button>
-      </div>
-      <div id="wp-share-result" style="display:none"></div>
-      <div id="wp-qr-container"></div>
-    </div>
-  </div>
-</div>
-</div>
-
 <!-- 共有リンクのビューアー（顧客向け） -->
 <div id="share-viewer" style="display:none;background:#F5F3EE;min-height:100vh"></div>
 
@@ -3028,8 +3055,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.10';
-const APP_BUILD_TIME='2026/04/19 00:24';
+const APP_VERSION='v3.11';
+const APP_BUILD_TIME='2026/04/19 00:59';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4005,8 +4032,7 @@ function renderDocRows(tbodyId,list,showType){
       <button class="btn btn-secondary btn-sm" onclick="editDoc('${d.id}')">編集</button>
       ${d.type==='見積書'?`<button class="btn btn-blue btn-sm" onclick="convertDoc('${d.id}','請求書')">→請求</button>`:''}
       ${d.type==='請求書'?`<button class="btn btn-primary btn-sm" onclick="convertDoc('${d.id}','領収書')">→領収</button>`:''}
-      <button class="btn btn-secondary btn-sm" title="作業写真" onclick="openPhotoModal('${d.id}')">📷${(docPhotos[d.id]||[]).length>0?`<span style='color:var(--accent)'>${docPhotos[d.id].length}</span>`:''}</button>
-      <button class="btn btn-secondary btn-sm" title="作業写真（クラウド）" onclick="openWorkPhotoModal('${d.id}')">☁️📸</button>
+      <button class="btn-photo-action" title="作業写真の管理・共有" onclick="openPhotoModal('${d.id}')">📷 写真${(docPhotos[d.id]||[]).length>0?`<span class="photo-count">${docPhotos[d.id].length}</span>`:''}</button>
       <button class="btn btn-secondary btn-sm" title="QRコード" onclick="generateQR('${d.id}')">QR</button>
       <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteDoc('${d.id}'))">削除</button>
     </td>
@@ -5998,6 +6024,10 @@ function initFirebaseAuth(){
     const appEl = document.getElementById('app-main');
     const loginEl = document.getElementById('login-screen');
     if(user){
+      // Google ログインの言語を自動検出（初回のみ）
+      if(typeof autoDetectLangFromUser==='function'){
+        autoDetectLangFromUser(user);
+      }
       // ===== アクセス許可チェック =====
       const allowed = await checkAccessAllowed(user.email);
       if(!allowed){
@@ -6182,6 +6212,19 @@ function initAppAfterAuth(){
     if(currentTheme==='default') document.documentElement.removeAttribute('data-theme');
     else document.documentElement.setAttribute('data-theme',currentTheme);
   }
+  // 言語設定: settings > localStorage > navigator.language > ja
+  if(settings && settings.appLang && I18N_DICT[settings.appLang]){
+    currentLang = settings.appLang;
+    localStorage.setItem('appLang', currentLang);
+  }
+  document.documentElement.lang = currentLang;
+  // 言語ボタンのactive状態を反映
+  setTimeout(()=>{
+    document.querySelectorAll('.lang-btn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.lang===currentLang);
+    });
+    applyTranslations();
+  }, 100);
   // 書類タイプ別カラーを適用
   if(typeof applyDocColors==='function') applyDocColors();
   renderNavManagement();
@@ -6911,8 +6954,14 @@ async function handlePhotoUpload(ev){
       }
 
       _showUploadProgress(`圧縮中: ${file.name}`, (uploaded/files.length)*100);
-      // 圧縮: 最大幅1600px, 品質85%
-      const compressed=await _compressImage(file, 1600, 0.85);
+      // ラベル別最適化: 施工前/後は高品質（証拠用）、その他は軽量
+      const compressionSettings={
+        before: {maxWidth:1920, quality:0.90},  // 施工前: 高品質（証拠）
+        after:  {maxWidth:1920, quality:0.90},  // 施工後: 高品質（証拠）
+        other:  {maxWidth:1200, quality:0.80}   // その他: 軽量
+      };
+      const cs=compressionSettings[_currentPhotoLabel]||compressionSettings.other;
+      const compressed=await _compressImage(file, cs.maxWidth, cs.quality);
 
       _showUploadProgress(`アップロード中: ${file.name}`, (uploaded/files.length)*100);
       // Firebase Storage に保存
@@ -8112,421 +8161,239 @@ function exportCSV(format){
   pushUndo({type:'none',data:null,label:`「${filename}」をダウンロードしました`});
 }
 
-// ===== 作業写真（Firebase Storage）=====
-const WORK_PHOTO_MAX_SIZE = 5 * 1024 * 1024; // 元画像5MB制限
-const WORK_PHOTO_COMPRESS_MAX = 1600; // 圧縮後最大1600px
-const WORK_PHOTO_COMPRESS_QUALITY = 0.82;
-const WORK_PHOTO_SHARE_DEFAULT_DAYS = 7;
-
-let _workPhotos = {}; // { docId: [{id, path, url, label, uploadedAt, uploadedBy, ...}] }
-let _currentPhotoDocId = null;
-
-// 画像圧縮（Canvas使用）
-async function compressImageForUpload(file, maxSize, quality){
-  return new Promise((resolve, reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>{
-      const img=new Image();
-      img.onload=()=>{
-        let {width, height}=img;
-        if(width>maxSize||height>maxSize){
-          const scale=Math.min(maxSize/width, maxSize/height);
-          width=Math.round(width*scale);
-          height=Math.round(height*scale);
-        }
-        const canvas=document.createElement('canvas');
-        canvas.width=width; canvas.height=height;
-        const ctx=canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(b=>{
-          if(b) resolve(b);
-          else reject(new Error('圧縮失敗'));
-        }, 'image/jpeg', quality);
-      };
-      img.onerror=()=>reject(new Error('画像読込失敗'));
-      img.src=reader.result;
-    };
-    reader.onerror=()=>reject(new Error('ファイル読込失敗'));
-    reader.readAsDataURL(file);
-  });
-}
-
-// Firestoreから作業写真メタ情報を取得
-async function loadWorkPhotos(docId){
-  const F=window._FB;
-  if(!F||!currentUser||!docId) return [];
-  try{
-    const colRef=F.collection(F.db,'users',currentUser.uid,'workPhotos');
-    const q=F.query(colRef, F.where('docId','==',docId), F.orderBy('uploadedAt','asc'));
-    const snap=await F.getDocs(q);
-    const arr=[];
-    snap.forEach(doc=>arr.push({id:doc.id, ...doc.data()}));
-    _workPhotos[docId]=arr;
-    return arr;
-  }catch(e){
-    console.error('[workPhotos] load failed:',e);
-    return [];
-  }
-}
-
-// 写真アップロード
-async function uploadWorkPhoto(docId, file, label){
-  const F=window._FB;
-  if(!F||!currentUser) throw new Error('ログインが必要です');
-  if(!docId) throw new Error('書類IDが不明です');
-  if(file.size > WORK_PHOTO_MAX_SIZE) throw new Error(`ファイルサイズが大きすぎます（最大 ${WORK_PHOTO_MAX_SIZE/1024/1024}MB）`);
-  if(!file.type.startsWith('image/')) throw new Error('画像ファイルを選択してください');
-
-  showToast('📤 画像を圧縮・アップロード中...','#3B82F6');
-
-  // 圧縮
-  const compressed=await compressImageForUpload(file, WORK_PHOTO_COMPRESS_MAX, WORK_PHOTO_COMPRESS_QUALITY);
-  const photoId='photo-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
-  const path=`users/${currentUser.uid}/work-photos/${docId}/${photoId}.jpg`;
-
-  // Firebase Storage にアップロード
-  const ref=F.storageRef(F.storage, path);
-  const metadata={
-    contentType:'image/jpeg',
-    customMetadata:{docId, label:label||'', uploadedBy:currentUser.uid}
-  };
-  await F.uploadBytes(ref, compressed, metadata);
-  const url=await F.getDownloadURL(ref);
-
-  // Firestoreにメタ保存
-  const meta={
-    docId,
-    path,
-    url,
-    label: label||'',
-    size: compressed.size,
-    originalSize: file.size,
-    uploadedAt: new Date().toISOString(),
-    uploadedBy: currentUser.uid,
-    uploadedByName: currentUser.displayName || currentUser.email || ''
-  };
-  const docRef=F.doc(F.db,'users',currentUser.uid,'workPhotos',photoId);
-  await F.setDoc(docRef, meta);
-
-  // ローカルキャッシュ更新
-  if(!_workPhotos[docId]) _workPhotos[docId]=[];
-  _workPhotos[docId].push({id:photoId, ...meta});
-
-  showToast('✓ アップロード完了','#10B981');
-  return {id:photoId, ...meta};
-}
-
-// 写真削除
-async function deleteWorkPhoto(docId, photoId){
-  const F=window._FB;
-  if(!F||!currentUser) throw new Error('ログインが必要です');
-  const photo=(_workPhotos[docId]||[]).find(p=>p.id===photoId);
-  if(!photo) throw new Error('写真が見つかりません');
-
-  try{
-    const ref=F.storageRef(F.storage, photo.path);
-    await F.deleteObject(ref);
-  }catch(e){
-    console.warn('[workPhotos] storage delete failed (continuing):',e);
-  }
-  await F.deleteDoc(F.doc(F.db,'users',currentUser.uid,'workPhotos',photoId));
-  _workPhotos[docId]=(_workPhotos[docId]||[]).filter(p=>p.id!==photoId);
-}
-
-// ラベル更新
-async function updateWorkPhotoLabel(docId, photoId, newLabel){
-  const F=window._FB;
-  if(!F||!currentUser) return;
-  await F.setDoc(F.doc(F.db,'users',currentUser.uid,'workPhotos',photoId), {label:newLabel}, {merge:true});
-  const photo=(_workPhotos[docId]||[]).find(p=>p.id===photoId);
-  if(photo) photo.label=newLabel;
-}
-
-// ===== 写真モーダル UI =====
-function openWorkPhotoModal(docId){
-  _currentPhotoDocId=docId;
-  const d=docs.find(x=>x.id===docId);
-  if(!d){showToast('書類が見つかりません','#C0392B');return;}
-
-  document.getElementById('wp-modal-title').textContent=`📸 作業写真 - ${d.type} ${d.number}`;
-  document.getElementById('wp-modal').classList.add('open');
-
-  loadWorkPhotos(docId).then(()=>renderWorkPhotoGrid());
-}
-
-function renderWorkPhotoGrid(){
-  const docId=_currentPhotoDocId;
-  const grid=document.getElementById('wp-grid');
-  if(!grid||!docId) return;
-  const photos=_workPhotos[docId]||[];
-  if(photos.length===0){
-    grid.innerHTML='<div style="padding:30px;text-align:center;color:var(--text3);grid-column:1/-1">まだ写真がありません。下の「＋ 写真を追加」から追加してください。</div>';
-    return;
-  }
-
-  // Before/After でグループ化
-  const beforePhotos=photos.filter(p=>(p.label||'').toLowerCase().includes('before')||p.label==='作業前');
-  const afterPhotos=photos.filter(p=>(p.label||'').toLowerCase().includes('after')||p.label==='作業後');
-  const otherPhotos=photos.filter(p=>!beforePhotos.includes(p)&&!afterPhotos.includes(p));
-
-  const renderOne=(p)=>`
-    <div class="wp-card" data-photo-id="${p.id}">
-      <div class="wp-img-wrap">
-        <img src="${escAttr(p.url)}" alt="${escAttr(p.label||'')}" loading="lazy" onclick="openPhotoViewer('${p.id}')">
-      </div>
-      <div class="wp-meta">
-        <select class="wp-label-select" onchange="onWpLabelChange('${p.id}',this.value)">
-          <option value="" ${!p.label?'selected':''}>(ラベルなし)</option>
-          <option value="作業前" ${p.label==='作業前'?'selected':''}>作業前</option>
-          <option value="作業中" ${p.label==='作業中'?'selected':''}>作業中</option>
-          <option value="作業後" ${p.label==='作業後'?'selected':''}>作業後</option>
-          <option value="備品" ${p.label==='備品'?'selected':''}>備品・材料</option>
-          <option value="書類" ${p.label==='書類'?'selected':''}>書類・契約書</option>
-        </select>
-        <button class="btn btn-danger btn-sm" onclick="confirmDeleteWpPhoto('${p.id}')" title="削除">🗑</button>
-      </div>
-      <div class="wp-info">${new Date(p.uploadedAt).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} / ${Math.round(p.size/1024)}KB</div>
-    </div>`;
-
-  let html='';
-  if(beforePhotos.length){
-    html+=`<div style="grid-column:1/-1;font-size:12px;font-weight:700;color:var(--blue);margin-top:4px">🔵 作業前（${beforePhotos.length}枚）</div>`;
-    html+=beforePhotos.map(renderOne).join('');
-  }
-  if(afterPhotos.length){
-    html+=`<div style="grid-column:1/-1;font-size:12px;font-weight:700;color:var(--accent);margin-top:8px">🟢 作業後（${afterPhotos.length}枚）</div>`;
-    html+=afterPhotos.map(renderOne).join('');
-  }
-  if(otherPhotos.length){
-    html+=`<div style="grid-column:1/-1;font-size:12px;font-weight:700;color:var(--text3);margin-top:8px">⚪ その他（${otherPhotos.length}枚）</div>`;
-    html+=otherPhotos.map(renderOne).join('');
-  }
-  grid.innerHTML=html;
-}
-
-async function onWpLabelChange(photoId, newLabel){
-  try{
-    await updateWorkPhotoLabel(_currentPhotoDocId, photoId, newLabel);
-    renderWorkPhotoGrid();
-    showToast('✓ ラベルを更新しました');
-  }catch(e){showToast('更新失敗: '+e.message,'#C0392B');}
-}
-
-function confirmDeleteWpPhoto(photoId){
-  showConfirm('この写真を削除しますか？サーバーからも完全に削除されます。', async ()=>{
-    try{
-      await deleteWorkPhoto(_currentPhotoDocId, photoId);
-      renderWorkPhotoGrid();
-      showToast('🗑 削除しました');
-    }catch(e){showToast('削除失敗: '+e.message,'#C0392B');}
-  });
-}
-
-async function onWpFileSelected(event){
-  const files=event.target.files;
-  if(!files||!files.length) return;
-  const defaultLabel=document.getElementById('wp-default-label')?.value||'';
-
-  for(const file of files){
-    try{
-      await uploadWorkPhoto(_currentPhotoDocId, file, defaultLabel);
-    }catch(e){
-      showToast(`失敗: ${file.name} - ${e.message}`,'#C0392B');
-    }
-  }
-  event.target.value='';
-  renderWorkPhotoGrid();
-}
-
-function openPhotoViewer(photoId){
-  const p=(_workPhotos[_currentPhotoDocId]||[]).find(x=>x.id===photoId);
-  if(!p) return;
-  window.open(p.url,'_blank','noopener');
-}
-
-// ===== Phase 2: 共有リンク =====
-async function generatePhotoShareLink(){
-  const F=window._FB;
-  if(!F||!currentUser) {showToast('ログインが必要です','#C0392B');return;}
-  const docId=_currentPhotoDocId;
-  const d=docs.find(x=>x.id===docId);
-  if(!d){showToast('書類が見つかりません','#C0392B');return;}
-  const photos=_workPhotos[docId]||[];
-  if(photos.length===0){showToast('写真がありません','#C0392B');return;}
-
-  const daysInput=document.getElementById('wp-share-days');
-  const days=parseInt(daysInput?.value||WORK_PHOTO_SHARE_DEFAULT_DAYS);
-  if(isNaN(days)||days<1||days>30){showToast('有効期間は1〜30日で入力','#C0392B');return;}
-
-  // 共有トークン生成
-  const token=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);
-  const expiry=Date.now()+days*86400000;
-  const shareData={
-    token,
-    docId,
-    docNumber: d.number,
-    docType: d.type,
-    customer: d.customer||'',
-    company: settings.company||'',
-    photos: photos.map(p=>({url:p.url, label:p.label||'', uploadedAt:p.uploadedAt})),
-    expiry,
-    createdAt: new Date().toISOString(),
-    createdBy: currentUser.uid,
-    createdByName: currentUser.displayName||currentUser.email||'',
-    accessCount: 0,
-    lastAccessAt: null
-  };
-
-  // Firestoreの公開共有コレクション（ただし読み込みはルールで token 必須）
-  try{
-    await F.setDoc(F.doc(F.db,'photoShares',token), shareData);
-    const shareUrl=`${location.origin}${location.pathname}#share=${token}`;
-
-    // 結果を表示
-    const resultEl=document.getElementById('wp-share-result');
-    resultEl.style.display='block';
-    resultEl.innerHTML=`
-      <div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:12px;margin-top:10px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">✓ 共有リンク作成完了</div>
-        <div style="display:flex;gap:6px;margin-bottom:8px">
-          <input type="text" id="wp-share-url" value="${escAttr(shareUrl)}" readonly style="flex:1;padding:8px;border:1px solid var(--border);border-radius:6px;font-family:monospace;font-size:11px" onclick="this.select()">
-          <button class="btn btn-secondary btn-sm" onclick="copyShareUrl()">📋 コピー</button>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" onclick="_legacySharePhotoLink('${token}','line')">💬 LINEで送る</button>
-          <button class="btn btn-secondary btn-sm" onclick="_legacySharePhotoLink('${token}','email')">✉️ メール</button>
-          <button class="btn btn-secondary btn-sm" onclick="_legacySharePhotoLink('${token}','qr')">📷 QR表示</button>
-        </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:8px">有効期限: ${days}日間（${new Date(expiry).toLocaleDateString('ja-JP')}まで）</div>
-      </div>`;
-    showToast('✓ 共有リンクを作成しました','#10B981');
-  }catch(e){
-    console.error(e);
-    showToast('共有リンクの作成に失敗: '+e.message,'#C0392B');
-  }
-}
-
-function copyShareUrl(){
-  const el=document.getElementById('wp-share-url');
-  if(!el) return;
-  navigator.clipboard.writeText(el.value).then(()=>showToast('✓ URLをコピーしました'));
-}
-
-function _legacySharePhotoLink(token, method){
-  const url=`${location.origin}${location.pathname}#share=${token}`;
-  const d=docs.find(x=>x.id===_currentPhotoDocId);
-  const subject=`【${d?.type||'書類'}】${d?.customer||''}様 作業写真`;
-  const body=`${d?.customer||''} ${(customers.find(c=>c.name===d?.customer)?.honorific)||'御中'}\n\n作業の写真をお送りします。下記リンクからご確認ください。\n\n${url}\n\n${settings.company||''}`;
-
-  if(method==='line'){
-    const msg=encodeURIComponent(`${subject}\n${url}`);
-    if(isMobileDevice()) window.location.href=`line://msg/text/${msg}`;
-    else window.open(`https://line.me/R/share?text=${msg}`,'_blank','width=500,height=700');
-  } else if(method==='email'){
-    window.location.href=`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  } else if(method==='qr'){
-    const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=10&data=${encodeURIComponent(url)}`;
-    document.getElementById('wp-qr-container').innerHTML=`
-      <div style="text-align:center;padding:16px;background:white;border-radius:8px;margin-top:10px">
-        <img src="${escAttr(qrUrl)}" alt="QR" style="width:280px;height:280px">
-        <div style="font-size:11px;color:var(--text3);margin-top:6px">スマホで読み取って共有</div>
-      </div>`;
-  }
-}
-
-// 共有リンクにアクセスされたとき（顧客が開く）
-async function checkShareRoute(){
-  const hash=location.hash||'';
-  const m=hash.match(/^#share=(\w+)$/);
-  if(!m) return false;
-  const token=m[1];
-  if(!token||token.length<20) return false;
-
-  await showSharedPhotoViewer(token);
-  return true;
-}
-
-async function showSharedPhotoViewer(token){
-  document.getElementById('app').style.display='none';
-  const viewer=document.getElementById('share-viewer');
-  viewer.style.display='block';
-  viewer.innerHTML='<div style="padding:40px;text-align:center"><div class="wp-loading"></div>読み込み中...</div>';
-
-  const F=window._FB;
-  if(!F){viewer.innerHTML='<div style="padding:40px;text-align:center;color:#C0392B">システム初期化中です。ページを再読込してください。</div>';return;}
-
-  try{
-    const docSnap=await F.getDoc(F.doc(F.db,'photoShares',token));
-    if(!docSnap.exists()){
-      viewer.innerHTML='<div style="padding:40px;text-align:center;color:#C0392B">共有リンクが無効です</div>';
-      return;
-    }
-    const data=docSnap.data();
-    if(Date.now() > data.expiry){
-      viewer.innerHTML=`<div style="padding:40px;text-align:center;color:#C0392B">この共有リンクは有効期限が切れています<br><small>（期限: ${new Date(data.expiry).toLocaleString('ja-JP')}）</small></div>`;
-      return;
-    }
-
-    // アクセス記録を更新（非同期・失敗OK）
-    try{
-      await F.setDoc(F.doc(F.db,'photoShares',token), {
-        accessCount:(data.accessCount||0)+1,
-        lastAccessAt: new Date().toISOString()
-      }, {merge:true});
-    }catch(e){}
-
-    renderSharedPhotoViewer(data);
-  }catch(e){
-    console.error(e);
-    viewer.innerHTML=`<div style="padding:40px;text-align:center;color:#C0392B">エラー: ${escAttr(e.message)}</div>`;
-  }
-}
-
-function renderSharedPhotoViewer(data){
-  const viewer=document.getElementById('share-viewer');
-  const photos=data.photos||[];
-  const before=photos.filter(p=>(p.label||'').includes('作業前'));
-  const after=photos.filter(p=>(p.label||'').includes('作業後'));
-  const other=photos.filter(p=>!before.includes(p)&&!after.includes(p));
-
-  const renderPhotoRow=(arr,title,color)=>{
-    if(arr.length===0) return '';
-    return `<div style="margin-bottom:24px">
-      <h3 style="font-size:14px;color:${color};margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid ${color}">${title}（${arr.length}枚）</h3>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
-        ${arr.map(p=>`<div style="background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,0.08)">
-          <img src="${escAttr(p.url)}" alt="" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;cursor:pointer" onclick="window.open('${escAttr(p.url)}','_blank','noopener')">
-          <div style="padding:6px 10px;font-size:11px;color:#666">${new Date(p.uploadedAt).toLocaleDateString('ja-JP')}</div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-  };
-
-  viewer.innerHTML=`
-    <div style="max-width:1000px;margin:0 auto;padding:20px">
-      <div style="background:white;border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,0.08)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-          <h1 style="font-size:22px;color:#2D5A3D;margin:0">📸 作業写真</h1>
-          <span style="font-size:11px;background:#E6F2EA;color:#2D5A3D;padding:4px 10px;border-radius:99px">${escAttr(data.docType||'')} ${escAttr(data.docNumber||'')}</span>
-        </div>
-        <div style="color:#666;font-size:13px">
-          ${data.customer?`<div>顧客: ${escAttr(data.customer)} 様</div>`:''}
-          ${data.company?`<div>送信元: ${escAttr(data.company)}</div>`:''}
-          <div style="font-size:11px;color:#999;margin-top:6px">有効期限: ${new Date(data.expiry).toLocaleString('ja-JP')}</div>
-        </div>
-      </div>
-      ${photos.length===0?'<div style="text-align:center;padding:40px;color:#999">写真がありません</div>':''}
-      ${renderPhotoRow(before,'🔵 作業前','#1A73E8')}
-      ${renderPhotoRow(after,'🟢 作業後','#2D5A3D')}
-      ${renderPhotoRow(other,'⚪ その他','#666')}
-      <div style="text-align:center;padding:20px;color:#999;font-size:11px">
-        Powered by Flexsys2026
-      </div>
-    </div>`;
-}
 // ===== THEME MANAGEMENT =====
 const THEMES=['default','dark','navy','pop','sunset','mint'];
 let currentTheme=localStorage.getItem('appTheme')||'default';
+
+// ===== 多言語化（i18n）=====
+const I18N_DICT = {
+  ja: {
+    // ナビゲーション
+    'nav.home':'ホーム','nav.dashboard':'ダッシュボード','nav.customers':'顧客管理',
+    'nav.calendar':'作業カレンダー','nav.quotes':'見積書一覧','nav.invoices':'請求書一覧',
+    'nav.receipts':'領収書一覧','nav.alerts':'支払いアラート','nav.report':'年次レポート',
+    'nav.staff_report':'スタッフ別実績','nav.payments':'入金管理','nav.expenses':'経費管理',
+    'nav.templates':'作業テンプレート','nav.employees':'従業員管理','nav.branches':'拠点管理',
+    'nav.bulletins':'掲示板','nav.backup':'バックアップ・復旧','nav.csv':'CSVエクスポート',
+    'nav.settings':'会社設定','nav.tax':'税率設定','nav.developer':'開発者ツール',
+    // 共通ボタン
+    'btn.save':'保存','btn.cancel':'キャンセル','btn.delete':'削除','btn.edit':'編集',
+    'btn.close':'閉じる','btn.add':'追加','btn.new':'新規','btn.print':'印刷',
+    'btn.share':'共有','btn.download':'ダウンロード','btn.upload':'アップロード',
+    'btn.refresh':'更新','btn.search':'検索','btn.back':'戻る',
+    // 書類
+    'doc.quote':'見積書','doc.invoice':'請求書','doc.receipt':'領収書',
+    'doc.subject':'件名','doc.customer':'顧客名','doc.date':'日付','doc.amount':'金額',
+    'doc.status':'状態','doc.number':'書類番号','doc.category':'カテゴリ','doc.staff':'担当者',
+    // トースト
+    'toast.saved':'保存しました','toast.deleted':'削除しました','toast.updated':'更新しました',
+    'toast.login_required':'ログインが必要です','toast.error':'エラーが発生しました',
+    // 言語設定
+    'lang.setting':'言語設定','lang.auto':'Googleアカウントに従う','lang.system':'システム言語',
+  },
+  en: {
+    'nav.home':'Home','nav.dashboard':'Dashboard','nav.customers':'Customers',
+    'nav.calendar':'Schedule','nav.quotes':'Quotations','nav.invoices':'Invoices',
+    'nav.receipts':'Receipts','nav.alerts':'Payment Alerts','nav.report':'Annual Report',
+    'nav.staff_report':'Staff Report','nav.payments':'Payments','nav.expenses':'Expenses',
+    'nav.templates':'Templates','nav.employees':'Employees','nav.branches':'Branches',
+    'nav.bulletins':'Notice Board','nav.backup':'Backup & Restore','nav.csv':'CSV Export',
+    'nav.settings':'Settings','nav.tax':'Tax Settings','nav.developer':'Developer',
+    'btn.save':'Save','btn.cancel':'Cancel','btn.delete':'Delete','btn.edit':'Edit',
+    'btn.close':'Close','btn.add':'Add','btn.new':'New','btn.print':'Print',
+    'btn.share':'Share','btn.download':'Download','btn.upload':'Upload',
+    'btn.refresh':'Refresh','btn.search':'Search','btn.back':'Back',
+    'doc.quote':'Quotation','doc.invoice':'Invoice','doc.receipt':'Receipt',
+    'doc.subject':'Subject','doc.customer':'Customer','doc.date':'Date','doc.amount':'Amount',
+    'doc.status':'Status','doc.number':'Document No.','doc.category':'Category','doc.staff':'Staff',
+    'toast.saved':'Saved','toast.deleted':'Deleted','toast.updated':'Updated',
+    'toast.login_required':'Login required','toast.error':'An error occurred',
+    'lang.setting':'Language','lang.auto':'Follow Google Account','lang.system':'System Language',
+  },
+  zh: {
+    'nav.home':'首页','nav.dashboard':'仪表板','nav.customers':'客户管理',
+    'nav.calendar':'日程表','nav.quotes':'报价单','nav.invoices':'发票',
+    'nav.receipts':'收据','nav.alerts':'付款提醒','nav.report':'年度报告',
+    'nav.staff_report':'员工业绩','nav.payments':'收款管理','nav.expenses':'费用管理',
+    'nav.templates':'模板','nav.employees':'员工管理','nav.branches':'分店管理',
+    'nav.bulletins':'公告板','nav.backup':'备份与恢复','nav.csv':'CSV 导出',
+    'nav.settings':'公司设置','nav.tax':'税率设置','nav.developer':'开发者工具',
+    'btn.save':'保存','btn.cancel':'取消','btn.delete':'删除','btn.edit':'编辑',
+    'btn.close':'关闭','btn.add':'添加','btn.new':'新建','btn.print':'打印',
+    'btn.share':'分享','btn.download':'下载','btn.upload':'上传',
+    'btn.refresh':'刷新','btn.search':'搜索','btn.back':'返回',
+    'doc.quote':'报价单','doc.invoice':'发票','doc.receipt':'收据',
+    'doc.subject':'主题','doc.customer':'客户','doc.date':'日期','doc.amount':'金额',
+    'doc.status':'状态','doc.number':'文档编号','doc.category':'类别','doc.staff':'负责人',
+    'toast.saved':'已保存','toast.deleted':'已删除','toast.updated':'已更新',
+    'toast.login_required':'需要登录','toast.error':'发生错误',
+    'lang.setting':'语言','lang.auto':'跟随 Google 账户','lang.system':'系统语言',
+  },
+  vi: {
+    'nav.home':'Trang chủ','nav.dashboard':'Bảng điều khiển','nav.customers':'Khách hàng',
+    'nav.calendar':'Lịch','nav.quotes':'Báo giá','nav.invoices':'Hóa đơn',
+    'nav.receipts':'Biên lai','nav.alerts':'Cảnh báo thanh toán','nav.report':'Báo cáo năm',
+    'nav.staff_report':'Báo cáo nhân viên','nav.payments':'Thanh toán','nav.expenses':'Chi phí',
+    'nav.templates':'Mẫu','nav.employees':'Nhân viên','nav.branches':'Chi nhánh',
+    'nav.bulletins':'Thông báo','nav.backup':'Sao lưu','nav.csv':'Xuất CSV',
+    'nav.settings':'Cài đặt','nav.tax':'Thuế','nav.developer':'Nhà phát triển',
+    'btn.save':'Lưu','btn.cancel':'Hủy','btn.delete':'Xóa','btn.edit':'Sửa',
+    'btn.close':'Đóng','btn.add':'Thêm','btn.new':'Mới','btn.print':'In',
+    'btn.share':'Chia sẻ','btn.download':'Tải xuống','btn.upload':'Tải lên',
+    'btn.refresh':'Làm mới','btn.search':'Tìm','btn.back':'Quay lại',
+    'doc.quote':'Báo giá','doc.invoice':'Hóa đơn','doc.receipt':'Biên lai',
+    'doc.subject':'Chủ đề','doc.customer':'Khách hàng','doc.date':'Ngày','doc.amount':'Số tiền',
+    'doc.status':'Trạng thái','doc.number':'Số tài liệu','doc.category':'Danh mục','doc.staff':'Nhân viên',
+    'toast.saved':'Đã lưu','toast.deleted':'Đã xóa','toast.updated':'Đã cập nhật',
+    'toast.login_required':'Cần đăng nhập','toast.error':'Đã xảy ra lỗi',
+    'lang.setting':'Ngôn ngữ','lang.auto':'Theo tài khoản Google','lang.system':'Ngôn ngữ hệ thống',
+  },
+  ko: {
+    'nav.home':'홈','nav.dashboard':'대시보드','nav.customers':'고객 관리',
+    'nav.calendar':'일정','nav.quotes':'견적서','nav.invoices':'청구서',
+    'nav.receipts':'영수증','nav.alerts':'지불 알림','nav.report':'연간 보고서',
+    'nav.staff_report':'직원 실적','nav.payments':'입금 관리','nav.expenses':'경비 관리',
+    'nav.templates':'템플릿','nav.employees':'직원 관리','nav.branches':'지점 관리',
+    'nav.bulletins':'게시판','nav.backup':'백업 및 복원','nav.csv':'CSV 내보내기',
+    'nav.settings':'회사 설정','nav.tax':'세율 설정','nav.developer':'개발자 도구',
+    'btn.save':'저장','btn.cancel':'취소','btn.delete':'삭제','btn.edit':'편집',
+    'btn.close':'닫기','btn.add':'추가','btn.new':'새로 만들기','btn.print':'인쇄',
+    'btn.share':'공유','btn.download':'다운로드','btn.upload':'업로드',
+    'btn.refresh':'새로 고침','btn.search':'검색','btn.back':'뒤로',
+    'doc.quote':'견적서','doc.invoice':'청구서','doc.receipt':'영수증',
+    'doc.subject':'제목','doc.customer':'고객','doc.date':'날짜','doc.amount':'금액',
+    'doc.status':'상태','doc.number':'문서 번호','doc.category':'카테고리','doc.staff':'담당자',
+    'toast.saved':'저장되었습니다','toast.deleted':'삭제되었습니다','toast.updated':'업데이트되었습니다',
+    'toast.login_required':'로그인이 필요합니다','toast.error':'오류가 발생했습니다',
+    'lang.setting':'언어','lang.auto':'Google 계정 따름','lang.system':'시스템 언어',
+  }
+};
+
+const LANG_NAMES = {ja:'🇯🇵 日本語', en:'🇺🇸 English', zh:'🇨🇳 中文', vi:'🇻🇳 Tiếng Việt', ko:'🇰🇷 한국어'};
+
+// 現在の言語: localStorage > settings > Google locale > navigator.language > 'ja'
+let currentLang = (function(){
+  const saved = localStorage.getItem('appLang');
+  if(saved && I18N_DICT[saved]) return saved;
+  const nav = (navigator.language||'ja').slice(0,2).toLowerCase();
+  if(I18N_DICT[nav]) return nav;
+  return 'ja';
+})();
+
+// 翻訳関数
+function t(key, fallback){
+  const dict = I18N_DICT[currentLang] || I18N_DICT.ja;
+  return dict[key] || fallback || key;
+}
+
+// 言語切替
+function setLanguage(lang){
+  if(!I18N_DICT[lang]) return;
+  currentLang = lang;
+  localStorage.setItem('appLang', lang);
+  if(settings){
+    settings.appLang = lang;
+    if(typeof persist==='function') persist();
+  }
+  // HTML lang属性を更新
+  document.documentElement.lang = lang;
+  // 言語ボタンのactive状態更新
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.lang===lang);
+  });
+  // DOM要素で data-i18n を持つものを翻訳
+  applyTranslations();
+  showToast('✓ ' + LANG_NAMES[lang]);
+}
+
+// data-i18n 属性付き要素を翻訳
+function applyTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.dataset.i18n;
+    if(key) el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.dataset.i18nPlaceholder;
+    if(key) el.placeholder = t(key);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+    const key = el.dataset.i18nTitle;
+    if(key) el.title = t(key);
+  });
+}
+
+// Google ログイン後に言語を自動設定
+function autoDetectLangFromUser(user){
+  if(!user || localStorage.getItem('appLang')) return; // 既に設定済みならスキップ
+  // providerData から locale を取得
+  const provLocale = user.providerData?.[0]?.locale?.slice(0,2).toLowerCase();
+  if(provLocale && I18N_DICT[provLocale]){
+    setLanguage(provLocale);
+  }
+}
+
+// ===== Claude API 書類翻訳（動的コンテンツ用） =====
+async function translateDocContent(text, targetLang){
+  if(!text || !text.trim()) return text;
+  const langNames = {ja:'Japanese', en:'English', zh:'Chinese (Simplified)', vi:'Vietnamese', ko:'Korean'};
+  const target = langNames[targetLang] || 'English';
+  try{
+    const res = await fetch('/api/translate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({text, targetLang: target})
+    });
+    if(!res.ok) throw new Error('Translation API failed: '+res.status);
+    const data = await res.json();
+    return data.translated || text;
+  }catch(e){
+    console.warn('Translation failed:', e.message);
+    return text; // 失敗時は原文
+  }
+}
+
+// 書類全体を翻訳（プレビュー用）
+async function translateCurrentDoc(targetLang){
+  if(!currentPreviewDocId) return;
+  const d = docs.find(x=>x.id===currentPreviewDocId);
+  if(!d) return;
+
+  // 「元に戻す」: 単にプレビューを再描画
+  if(targetLang==='ja' || !targetLang){
+    previewDoc(currentPreviewDocId);
+    return;
+  }
+
+  showToast('🌐 翻訳中...', '#3B82F6');
+  try{
+    // 翻訳対象: 件名、品目名、備考
+    const subjectT = d.subject ? await translateDocContent(d.subject, targetLang) : '';
+    const notesT = d.notes ? await translateDocContent(d.notes, targetLang) : '';
+    const linesT = await Promise.all((d.lines||[]).map(async l => ({
+      ...l,
+      name: l.name ? await translateDocContent(l.name, targetLang) : l.name
+    })));
+
+    // 一時的な翻訳版を作成（元データは変更しない）
+    const translatedDoc = {
+      ...d,
+      subject: subjectT,
+      notes: notesT,
+      lines: linesT,
+      _translatedLang: targetLang
+    };
+    // 一時的にdocsを差し替えてプレビュー
+    const origIdx = docs.findIndex(x=>x.id===currentPreviewDocId);
+    const orig = docs[origIdx];
+    docs[origIdx] = translatedDoc;
+    previewDoc(currentPreviewDocId);
+    docs[origIdx] = orig; // すぐに戻す（データには保存しない）
+    showToast('✓ 翻訳完了（'+LANG_NAMES[targetLang]+'）', '#10B981');
+  }catch(e){
+    console.error(e);
+    showToast('翻訳に失敗: '+e.message, '#C0392B');
+  }
+}
 
 // ===== 書類タイプ別カラー =====
 const DOC_COLOR_DEFAULTS={quote:'#C49A2D',invoice:'#1A73E8',receipt:'#2D5A3D'};
