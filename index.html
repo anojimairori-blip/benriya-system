@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp https://api.qrserver.com; frame-src https://flexsysv2026.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://*.firebasestorage.app https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp https://api.qrserver.com; frame-src https://flexsysv2026.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -397,6 +397,16 @@ tr:hover td{background:var(--bg)}
 /* 更新ボタン */
 .btn-refresh{padding:6px 10px;font-size:13px;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:7px;cursor:pointer;transition:all .15s;font-family:inherit;min-width:36px}
 
+/* 作業写真 */
+.wp-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.wp-img-wrap{aspect-ratio:4/3;background:var(--surface2);overflow:hidden}
+.wp-img-wrap img{width:100%;height:100%;object-fit:cover;cursor:zoom-in;display:block}
+.wp-meta{display:flex;gap:4px;padding:6px;border-top:1px solid var(--border)}
+.wp-label-select{flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit}
+.wp-info{padding:4px 8px;font-size:10px;color:var(--text3);background:var(--surface2)}
+.wp-loading{display:inline-block;width:20px;height:20px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:wp-spin 0.8s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes wp-spin{to{transform:rotate(360deg)}}
+
 /* 書類タイプ別カラープリセット */
 .color-preset{border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:0;transition:transform .1s}
 .color-preset:hover{transform:scale(1.2);border-color:var(--accent)}
@@ -619,8 +629,10 @@ select{appearance:auto}
 .audit-line{font-size:10px !important;color:#999;margin-top:6px;line-height:1.4}
 @media print{
   .preview-subject{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  /* 印刷時は監査情報を非表示 */
+  /* 印刷時は監査情報・スタンプを非表示 */
   .audit-line{display:none !important}
+  .stamp{display:none !important}
+  .sample-badge{display:none !important}
 }
 .preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #DDD;overflow:hidden}
 .preview-table td{padding:6px 9px;border:1px solid #DDD;overflow:hidden}
@@ -672,10 +684,20 @@ select{appearance:auto}
 .photo-thumb{position:relative;aspect-ratio:1;border-radius:7px;overflow:hidden;border:1px solid var(--border);cursor:pointer;background:var(--surface2)}
 .photo-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .2s}
 .photo-thumb:hover img{transform:scale(1.05)}
-.photo-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center}
+.photo-thumb .photo-label{position:absolute;top:4px;left:4px;background:rgba(0,0,0,.7);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;pointer-events:none}
+.photo-thumb.label-before .photo-label{background:rgba(26,115,232,.85)}
+.photo-thumb.label-after .photo-label{background:rgba(16,185,129,.85)}
+.photo-thumb.label-other .photo-label{background:rgba(102,102,102,.85)}
+.photo-thumb .photo-cloud{position:absolute;bottom:4px;right:4px;background:rgba(255,255,255,.8);color:var(--accent);font-size:10px;padding:1px 5px;border-radius:4px;font-weight:700}
+.photo-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2}
 .photo-thumb:hover .photo-del{display:flex}
 .photo-add{aspect-ratio:1;border-radius:7px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px;font-size:11px;color:var(--text3);transition:all .15s}
 .photo-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+/* 写真ラベルタブ */
+.photo-label-tab{padding:6px 12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.photo-label-tab:hover{border-color:var(--accent);color:var(--accent)}
+.photo-label-tab.active{background:var(--accent);color:white;border-color:var(--accent)}
 
 /* BRANCH */
 .branch-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
@@ -849,8 +871,10 @@ if(typeof QRCode === 'undefined'){
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-  import { getFirestore, doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, writeBatch }
+  import { getFirestore, doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, writeBatch, query, where, orderBy, limit }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject, listAll }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 
   // ★★★ Firebaseの設定 ★★★
   const firebaseConfig = {
@@ -866,15 +890,17 @@ if(typeof QRCode === 'undefined'){
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const storage = getStorage(app);
   const provider = new GoogleAuthProvider();
-  // Googleカレンダー連携用スコープ
   provider.addScope('https://www.googleapis.com/auth/calendar.events');
   provider.setCustomParameters({prompt:'consent'});
 
   // グローバルに公開
-  window._FB = { auth, db, provider, GoogleAuthProvider,
+  window._FB = { auth, db, storage, provider, GoogleAuthProvider,
     signInWithPopup, signOut, onAuthStateChanged,
-    doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, writeBatch };
+    doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, writeBatch,
+    query, where, orderBy, limit,
+    storageRef, uploadBytes, getDownloadURL, deleteObject, listAll };
 
   // Firebase初期化完了フラグ
   window._fbReady = true;
@@ -901,7 +927,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.9.9</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.10</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -925,7 +951,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.9.9.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.10</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -960,7 +986,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.9.9</div>
+    <div class="logo-version" id="sidebar-version">v3.10</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1095,7 +1121,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.9.9.1 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.10 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -2092,6 +2118,58 @@ if('serviceWorker' in navigator){
 </div>
 
 <!-- SHARE MODAL -->
+<!-- 作業写真モーダル -->
+<div class="modal-overlay" id="wp-modal">
+<div class="modal" style="max-width:900px">
+  <div class="modal-header">
+    <h3 id="wp-modal-title">📸 作業写真</h3>
+    <button class="close-btn" onclick="closeModal('wp-modal')">✕</button>
+  </div>
+  <div class="modal-body" style="padding:16px">
+    <!-- アップロード -->
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:14px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <label style="font-size:12px;color:var(--text2);font-weight:600">追加時のラベル:</label>
+        <select id="wp-default-label" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px">
+          <option value="作業前">作業前</option>
+          <option value="作業中">作業中</option>
+          <option value="作業後">作業後</option>
+          <option value="備品">備品・材料</option>
+          <option value="">（ラベルなし）</option>
+        </select>
+        <input type="file" id="wp-file" accept="image/*" multiple style="display:none" onchange="onWpFileSelected(event)">
+        <button class="btn btn-primary btn-sm" onclick="document.getElementById('wp-file').click()">📷 写真を追加（複数選択可）</button>
+        <span style="font-size:10px;color:var(--text3);margin-left:auto">最大5MB/枚 自動圧縮してアップロード</span>
+      </div>
+    </div>
+
+    <!-- 写真グリッド -->
+    <div id="wp-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;max-height:450px;overflow-y:auto;padding:4px"></div>
+
+    <!-- 共有セクション -->
+    <div style="margin-top:16px;background:var(--accent-light);border-radius:8px;padding:14px;border:1px solid var(--accent)">
+      <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px">🔗 顧客に写真を共有</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <label style="font-size:12px;color:var(--text2)">有効期間:</label>
+        <select id="wp-share-days" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px">
+          <option value="1">1日</option>
+          <option value="3">3日</option>
+          <option value="7" selected>7日（推奨）</option>
+          <option value="14">14日</option>
+          <option value="30">30日（最大）</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="generatePhotoShareLink()">🔗 共有リンクを生成</button>
+      </div>
+      <div id="wp-share-result" style="display:none"></div>
+      <div id="wp-qr-container"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 共有リンクのビューアー（顧客向け） -->
+<div id="share-viewer" style="display:none;background:#F5F3EE;min-height:100vh"></div>
+
 <div class="modal-overlay" id="share-modal">
 <div class="modal" style="max-width:400px">
   <div class="modal-header"><h3>共有・送信</h3><button class="close-btn" onclick="closeModal('share-modal')">✕</button></div>
@@ -2611,19 +2689,70 @@ if('serviceWorker' in navigator){
 
 <!-- PHOTO MODAL (per doc) -->
 <div class="modal-overlay" id="photo-modal">
-<div class="modal" style="max-width:640px">
+<div class="modal" style="max-width:720px">
   <div class="modal-header"><h3 id="photo-modal-title">📷 作業写真</h3><button class="close-btn" onclick="closeModal('photo-modal')">✕</button></div>
   <div class="modal-body">
-    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">現場写真を書類に紐付けて管理できます。PDF印刷時には含まれません（データとして保存）。</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:10px">現場写真を書類に紐付けて管理できます。Firebase Storage に保存され、顧客にリンクで共有できます。</p>
+
+    <!-- ラベル選択 -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:12px;color:var(--text2);font-weight:600">追加時ラベル:</span>
+      <div style="display:flex;gap:6px" id="photo-label-tabs">
+        <button type="button" class="photo-label-tab active" data-label="before" onclick="switchPhotoLabel('before')">📷 施工前</button>
+        <button type="button" class="photo-label-tab" data-label="after" onclick="switchPhotoLabel('after')">✅ 施工後</button>
+        <button type="button" class="photo-label-tab" data-label="other" onclick="switchPhotoLabel('other')">📌 その他</button>
+      </div>
+    </div>
+
     <input type="file" id="photo-upload-input" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(event)">
+
+    <!-- アップロード進捗バー -->
+    <div id="photo-upload-progress" style="display:none;background:var(--surface2);border-radius:6px;padding:10px;margin-bottom:10px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px" id="photo-upload-msg">アップロード中...</div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+        <div id="photo-upload-bar" style="height:100%;background:var(--accent);width:0%;transition:width .2s"></div>
+      </div>
+    </div>
+
+    <!-- 写真グリッド -->
     <div class="photo-grid" id="photo-grid">
       <div class="photo-add" onclick="document.getElementById('photo-upload-input').click()">
         <span style="font-size:24px">📷</span><span>写真を追加</span>
       </div>
     </div>
+
+    <!-- 共有パネル -->
+    <div id="photo-share-panel" style="display:none;margin-top:14px;background:var(--surface2);border-radius:8px;padding:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">📤 顧客に写真を共有</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+        <label style="font-size:12px;color:var(--text2)">有効期限:</label>
+        <select id="photo-share-expiry" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px">
+          <option value="1">1日</option>
+          <option value="3">3日</option>
+          <option value="7" selected>7日間</option>
+          <option value="30">30日</option>
+          <option value="365">1年</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="createPhotoShareLink()">🔗 共有リンク生成</button>
+      </div>
+      <div id="photo-share-result" style="display:none;background:white;border:1px solid var(--border);border-radius:6px;padding:10px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">共有URL（コピーしてお送りください）:</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input type="text" id="photo-share-url" readonly style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:monospace;background:var(--surface2)">
+          <button class="btn btn-secondary btn-sm" onclick="copyPhotoShareUrl()">📋 コピー</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="sharePhotoLink('line')" style="background:#06C755;color:white;border-color:#06C755">💬 LINE</button>
+          <button class="btn btn-secondary btn-sm" onclick="sharePhotoLink('email')">✉️ メール</button>
+          <button class="btn btn-secondary btn-sm" onclick="sharePhotoLink('qr')">📷 QR</button>
+          <button class="btn btn-secondary btn-sm" onclick="sharePhotoLink('native')">📲 共有</button>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('photo-modal')">閉じる</button>
+    <button class="btn btn-gold btn-sm" onclick="togglePhotoSharePanel()" id="photo-share-toggle">📤 顧客共有</button>
     <button class="btn btn-primary" onclick="document.getElementById('photo-upload-input').click()">＋ 写真を追加</button>
   </div>
 </div>
@@ -2899,8 +3028,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.9.9';
-const APP_BUILD_TIME='2026/04/19 00:04';
+const APP_VERSION='v3.10';
+const APP_BUILD_TIME='2026/04/19 00:24';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3020,8 +3149,22 @@ const CATS={'引越し・運搬':'#E67E22','清掃・片付け':'#27AE60','修�
 
 // ===== INIT =====
 window.onload=()=>{
+  // 共有リンクでアクセスされた場合は認証前に処理
+  if(location.hash && /^#share=\w+/.test(location.hash)){
+    // Firebase SDKのロードを待つ
+    const tryShare=async ()=>{
+      if(window._fbReady){
+        const handled=await checkShareRoute();
+        if(handled) return;
+      } else {
+        setTimeout(tryShare, 200);
+        return;
+      }
+    };
+    tryShare();
+    return;
+  }
   // Firebase対応: 認証確認後にアプリ初期化
-  // Firebase SDKが読み込まれたら認証開始、未設定ならローカルモードで起動
   if(window._fbReady){
     initFirebaseAuth();
   }else{
@@ -3863,6 +4006,7 @@ function renderDocRows(tbodyId,list,showType){
       ${d.type==='見積書'?`<button class="btn btn-blue btn-sm" onclick="convertDoc('${d.id}','請求書')">→請求</button>`:''}
       ${d.type==='請求書'?`<button class="btn btn-primary btn-sm" onclick="convertDoc('${d.id}','領収書')">→領収</button>`:''}
       <button class="btn btn-secondary btn-sm" title="作業写真" onclick="openPhotoModal('${d.id}')">📷${(docPhotos[d.id]||[]).length>0?`<span style='color:var(--accent)'>${docPhotos[d.id].length}</span>`:''}</button>
+      <button class="btn btn-secondary btn-sm" title="作業写真（クラウド）" onclick="openWorkPhotoModal('${d.id}')">☁️📸</button>
       <button class="btn btn-secondary btn-sm" title="QRコード" onclick="generateQR('${d.id}')">QR</button>
       <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteDoc('${d.id}'))">削除</button>
     </td>
@@ -4325,11 +4469,12 @@ function sharePrint(){closeModal('share-modal');window.print();}
 
 // ===== PDF生成 共通ヘルパー =====
 async function _generatePdfBlob(){
-  // 監査情報を一時的に非表示にしてPDF化（印刷時と同じ見た目）
+  // 監査情報・スタンプを一時的に非表示にしてPDF化（印刷時と同じ見た目）
   const previewDoc=document.querySelector('#preview-body .preview-doc');
   if(!previewDoc) throw new Error('プレビューが開かれていません');
-  const auditLines=previewDoc.querySelectorAll('.audit-line');
-  auditLines.forEach(el=>el.style.display='none');
+  const hideEls=previewDoc.querySelectorAll('.audit-line, .stamp, .sample-badge');
+  const oldDisplay=[];
+  hideEls.forEach(el=>{oldDisplay.push(el.style.display); el.style.display='none';});
 
   if(typeof html2pdf==='undefined') throw new Error('PDFライブラリが読み込まれていません');
 
@@ -4349,8 +4494,8 @@ async function _generatePdfBlob(){
     const blob = await worker.output('blob');
     return { blob, filename: fname };
   } finally {
-    // 監査情報を元に戻す
-    auditLines.forEach(el=>el.style.display='');
+    // 元に戻す
+    hideEls.forEach((el,i)=>{el.style.display=oldDisplay[i]||'';});
   }
 }
 
@@ -6643,51 +6788,433 @@ function showUnassignedDocs(year, month){
   document.body.insertAdjacentHTML('beforeend', html);
 }
 
-// ===== PHOTOS =====
+// ===== PHOTOS (Firebase Storage) =====
+// docPhotos[docId] = [{url, path, label, date, size, uploadedBy, uploadedAt, id}]
+// url: Firebase Storage downloadURL
+// path: Storage path (削除用)
+// label: 'before' | 'after' | 'other'
+
+let _currentPhotoLabel='before';
+
+function switchPhotoLabel(label){
+  _currentPhotoLabel=label;
+  document.querySelectorAll('.photo-label-tab').forEach(b=>{
+    b.classList.toggle('active', b.dataset.label===label);
+  });
+}
+
 function openPhotoModal(docId){
   currentPhotoDocId=docId;
   const d=docs.find(x=>x.id===docId);
   document.getElementById('photo-modal-title').textContent=`📷 ${d?d.number+' 作業写真':'作業写真'}`;
+  _currentPhotoLabel='before';
+  switchPhotoLabel('before');
+  document.getElementById('photo-share-panel').style.display='none';
+  document.getElementById('photo-share-result').style.display='none';
   renderPhotoGrid();
   document.getElementById('photo-modal').classList.add('open');
 }
+
 function renderPhotoGrid(){
   const grid=document.getElementById('photo-grid');if(!grid)return;
   const photos=docPhotos[currentPhotoDocId]||[];
-  grid.innerHTML=photos.map((p,i)=>`
-    <div class="photo-thumb" onclick="openLightbox(${i})">
-      <img src="${p.url}" alt="${p.caption||''}">
-      <button class="photo-del" onclick="event.stopPropagation();deletePhoto(${i})">✕</button>
-    </div>`).join('')+
+  // ラベル順に並び替え: before → after → other
+  const order={before:0,after:1,other:2};
+  const sorted=[...photos].sort((a,b)=>(order[a.label||'other']||3)-(order[b.label||'other']||3));
+  grid.innerHTML=sorted.map((p,i)=>{
+    const origIdx=photos.indexOf(p);
+    const labelText={before:'施工前',after:'施工後',other:'その他'}[p.label||'other']||'';
+    const isCloud=p.path && !String(p.url||'').startsWith('data:');
+    return `<div class="photo-thumb label-${p.label||'other'}" onclick="openLightbox(${origIdx})">
+      <img src="${escAttr(p.url)}" alt="${escAttr(p.caption||'')}" loading="lazy">
+      <span class="photo-label">${labelText}</span>
+      ${isCloud?'<span class="photo-cloud" title="クラウド保存済み">☁️</span>':''}
+      <button class="photo-del" onclick="event.stopPropagation();deletePhoto(${origIdx})" title="削除">✕</button>
+    </div>`;
+  }).join('')+
     `<div class="photo-add" onclick="document.getElementById('photo-upload-input').click()">
       <span style="font-size:24px">📷</span><span>写真を追加</span>
     </div>`;
 }
-function handlePhotoUpload(ev){
-  const files=Array.from(ev.target.files);
-  let done=0;
-  files.forEach(file=>{
-    if(file.size>5*1024*1024){alert(`${file.name}は5MBを超えています`);done++;return;}
+
+// 画像圧縮（アップロード前・帯域節約）
+async function _compressImage(file, maxWidth, quality){
+  return new Promise((resolve, reject)=>{
     const reader=new FileReader();
     reader.onload=e=>{
-      if(!docPhotos[currentPhotoDocId])docPhotos[currentPhotoDocId]=[];
-      docPhotos[currentPhotoDocId].push({url:e.target.result,caption:'',date:today()});
-      done++;if(done===files.length){persist();renderPhotoGrid();}
+      const img=new Image();
+      img.onload=()=>{
+        let {width,height}=img;
+        if(width>maxWidth){
+          height=Math.round(height*(maxWidth/width));
+          width=maxWidth;
+        }
+        const canvas=document.createElement('canvas');
+        canvas.width=width; canvas.height=height;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,width,height);
+        canvas.toBlob(blob=>{
+          if(!blob) return reject(new Error('画像圧縮失敗'));
+          resolve(blob);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror=()=>reject(new Error('画像読込失敗'));
+      img.src=e.target.result;
     };
+    reader.onerror=()=>reject(new Error('ファイル読込失敗'));
     reader.readAsDataURL(file);
   });
+}
+
+// アップロード進捗UI
+function _showUploadProgress(msg, percent){
+  const box=document.getElementById('photo-upload-progress');
+  const msgEl=document.getElementById('photo-upload-msg');
+  const bar=document.getElementById('photo-upload-bar');
+  if(!box) return;
+  box.style.display=percent>=0?'block':'none';
+  if(msgEl) msgEl.textContent=msg;
+  if(bar) bar.style.width=Math.max(0,Math.min(100,percent))+'%';
+}
+
+async function handlePhotoUpload(ev){
+  const files=Array.from(ev.target.files||[]);
+  if(!files.length) return;
   ev.target.value='';
+
+  if(!currentUser){
+    showToast('ログインが必要です','#C0392B');
+    return;
+  }
+  const F=window._FB;
+  if(!F || !F.storage){
+    showToast('Firebase Storageが利用できません','#C0392B');
+    return;
+  }
+
+  const docId=currentPhotoDocId;
+  if(!docPhotos[docId]) docPhotos[docId]=[];
+
+  _showUploadProgress(`0 / ${files.length} をアップロード中...`, 0);
+
+  let uploaded=0, failed=0;
+  for(const file of files){
+    try{
+      // ファイルサイズチェック（圧縮前）
+      if(file.size>15*1024*1024){
+        showToast(`${file.name}は15MBを超えています（スキップ）`,'#C0392B');
+        failed++; continue;
+      }
+      if(!file.type.startsWith('image/')){
+        showToast(`${file.name}は画像ファイルではありません（スキップ）`,'#C0392B');
+        failed++; continue;
+      }
+
+      _showUploadProgress(`圧縮中: ${file.name}`, (uploaded/files.length)*100);
+      // 圧縮: 最大幅1600px, 品質85%
+      const compressed=await _compressImage(file, 1600, 0.85);
+
+      _showUploadProgress(`アップロード中: ${file.name}`, (uploaded/files.length)*100);
+      // Firebase Storage に保存
+      const photoId=Date.now()+'_'+Math.random().toString(36).slice(2,8);
+      const path=`work-photos/${currentUser.uid}/${docId}/${photoId}.jpg`;
+      const ref=F.storageRef(F.storage, path);
+      const metadata={ contentType:'image/jpeg', customMetadata:{ docId, uploadedBy:currentUser.uid, label:_currentPhotoLabel }};
+      await F.uploadBytes(ref, compressed, metadata);
+      const url=await F.getDownloadURL(ref);
+
+      docPhotos[docId].push({
+        id:photoId,
+        url,
+        path,
+        label:_currentPhotoLabel,
+        caption:'',
+        date:today(),
+        size:compressed.size,
+        uploadedBy:currentUser.uid,
+        uploadedByName:currentUser.displayName||currentUser.email||'',
+        uploadedAt:new Date().toISOString()
+      });
+      uploaded++;
+      _showUploadProgress(`${uploaded} / ${files.length} 完了`, (uploaded/files.length)*100);
+    }catch(e){
+      console.error('Photo upload failed:',e);
+      showToast(`${file.name}のアップロードに失敗: ${e.message}`,'#C0392B');
+      failed++;
+    }
+  }
+
+  persist();
+  renderPhotoGrid();
+  _showUploadProgress('', -1);
+  if(uploaded>0){
+    showToast(`✓ ${uploaded}枚アップロード完了${failed>0?` (${failed}枚失敗)`:''}`,'#10B981');
+  }
 }
-function deletePhoto(idx){
-  // 削除確認省略（undoで復元不可のため削除前メッセージのみ）
-  docPhotos[currentPhotoDocId].splice(idx,1);persist();renderPhotoGrid();
+
+async function deletePhoto(idx){
+  const photos=docPhotos[currentPhotoDocId];
+  if(!photos || !photos[idx]) return;
+  const p=photos[idx];
+
+  showConfirm('この写真を削除しますか？\nFirebase Storage からも完全に削除されます。', async()=>{
+    // Firebase Storageから削除
+    if(p.path){
+      try{
+        const F=window._FB;
+        if(F && F.storage){
+          const ref=F.storageRef(F.storage, p.path);
+          await F.deleteObject(ref);
+        }
+      }catch(e){
+        // 既に削除されている場合は無視
+        console.warn('Storage delete warning:', e.message);
+      }
+    }
+    photos.splice(idx,1);
+    persist();
+    renderPhotoGrid();
+    showToast('写真を削除しました','#10B981');
+  });
 }
+
 function openLightbox(idx){
   const photos=docPhotos[currentPhotoDocId]||[];
   const p=photos[idx];if(!p)return;
   document.getElementById('lightbox-img').src=p.url;
-  document.getElementById('lightbox-caption').textContent=`${idx+1}/${photos.length}${p.date?' — '+p.date:''}`;
+  const labelText={before:'施工前',after:'施工後',other:'その他'}[p.label||'other']||'';
+  document.getElementById('lightbox-caption').textContent=`${idx+1}/${photos.length} [${labelText}]${p.date?' — '+p.date:''}`;
   document.getElementById('lightbox-modal').classList.add('open');
+}
+
+// ===== 顧客共有リンク (Phase 2) =====
+function togglePhotoSharePanel(){
+  const panel=document.getElementById('photo-share-panel');
+  const show=panel.style.display==='none';
+  panel.style.display=show?'block':'none';
+  if(!show) document.getElementById('photo-share-result').style.display='none';
+}
+
+// トークン生成（暗号論的に安全）
+function _generateShareToken(){
+  const arr=new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function createPhotoShareLink(){
+  if(!currentUser){showToast('ログインが必要です','#C0392B');return;}
+  const docId=currentPhotoDocId;
+  const photos=docPhotos[docId]||[];
+  if(!photos.length){showToast('共有する写真がありません','#C0392B');return;}
+
+  const expiryDays=parseInt(document.getElementById('photo-share-expiry').value)||7;
+  const expiryMs=expiryDays*86400000;
+  const token=_generateShareToken();
+  const expiresAt=Date.now()+expiryMs;
+  const d=docs.find(x=>x.id===docId);
+
+  // Firestoreに共有情報を保存
+  const F=window._FB;
+  if(!F || !F.db){showToast('Firebase が利用できません','#C0392B');return;}
+
+  try{
+    await F.setDoc(F.doc(F.db,'photoShares',token),{
+      token,
+      docId,
+      ownerUid:currentUser.uid,
+      ownerEmail:currentUser.email||'',
+      customer:d?.customer||'',
+      docNumber:d?.number||'',
+      docType:d?.type||'',
+      photos:photos.map(p=>({id:p.id,url:p.url,label:p.label||'other',date:p.date||'',caption:p.caption||''})),
+      createdAt:new Date().toISOString(),
+      expiresAt:new Date(expiresAt).toISOString(),
+      accessCount:0
+    });
+
+    // 共有URL: #share=token をURLに付けると閲覧ページが開く
+    const shareUrl=`${window.location.origin}${window.location.pathname}#share=${token}`;
+    document.getElementById('photo-share-url').value=shareUrl;
+    document.getElementById('photo-share-result').style.display='block';
+    showToast(`✓ ${expiryDays}日間有効な共有リンクを生成しました`,'#10B981');
+  }catch(e){
+    console.error('Share link error:',e);
+    showToast('共有リンク生成に失敗: '+e.message,'#C0392B');
+  }
+}
+
+function copyPhotoShareUrl(){
+  const url=document.getElementById('photo-share-url').value;
+  if(!url){showToast('URLがありません','#C0392B');return;}
+  navigator.clipboard.writeText(url).then(()=>{
+    showToast('✓ URLをコピーしました','#10B981');
+  }).catch(()=>{
+    showToast('コピーに失敗しました','#C0392B');
+  });
+}
+
+async function sharePhotoLink(method){
+  const url=document.getElementById('photo-share-url').value;
+  if(!url){showToast('URLがありません','#C0392B');return;}
+  const d=docs.find(x=>x.id===currentPhotoDocId);
+  const msg=`${d?.customer||''} 様\n\n作業写真をお送りします。\n下記リンクからご確認ください（期限付き）:\n${url}\n\n${settings.company||''}`;
+
+  if(method==='line'){
+    window.open(`https://line.me/R/share?text=${encodeURIComponent(msg)}`,'_blank');
+  } else if(method==='email'){
+    const sub=encodeURIComponent(`【作業写真】${d?.customer||''} 様`);
+    window.location.href=`mailto:?subject=${sub}&body=${encodeURIComponent(msg)}`;
+  } else if(method==='qr'){
+    _showPhotoShareQr(url);
+  } else if(method==='native' && navigator.share){
+    try{
+      await navigator.share({title:'作業写真', text:msg, url});
+    }catch(e){
+      if(e.name!=='AbortError') showToast('共有失敗: '+e.message,'#C0392B');
+    }
+  } else {
+    copyPhotoShareUrl();
+  }
+}
+
+function _showPhotoShareQr(url){
+  // QRコード用モーダルを流用
+  const container=document.getElementById('qr-container');
+  const info=document.getElementById('qr-doc-info');
+  info.innerHTML=
+    `<div style="font-weight:700;font-size:14px;margin-bottom:4px">📷 作業写真 共有リンク</div>`+
+    `<div style="color:var(--text3);font-size:11px;margin-top:4px">スマホで読み取って閲覧ページへ</div>`;
+  container.innerHTML='<div style="width:240px;height:240px;display:flex;align-items:center;justify-content:center">生成中...</div>';
+  const apiUrl=`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&ecc=M&data=${encodeURIComponent(url)}`;
+  const img=new Image();
+  img.onload=()=>{container.innerHTML=''; img.style.cssText='width:240px;height:240px;border-radius:8px;display:block'; container.appendChild(img);};
+  img.onerror=()=>{showToast('QR生成に失敗','#C0392B');};
+  img.src=apiUrl;
+  document.getElementById('qr-modal').classList.add('open');
+}
+
+// ===== Phase 3: 顧客閲覧ページ =====
+async function checkShareLinkOnLoad(){
+  const hash=window.location.hash;
+  const m=hash.match(/#share=([a-f0-9]{32})/);
+  if(!m) return false;
+  const token=m[1];
+
+  // Firebase がready になるまで待つ
+  if(!window._FB){
+    await new Promise(r=>document.addEventListener('fb-ready', r, {once:true}));
+  }
+  const F=window._FB;
+
+  // ローディング画面を表示
+  _showPublicLoading();
+
+  try{
+    const docRef=F.doc(F.db,'photoShares',token);
+    const snap=await F.getDoc(docRef);
+    if(!snap.exists()){
+      _showPublicError('リンクが無効です。作成者に再発行を依頼してください。');
+      return true;
+    }
+    const data=snap.data();
+    const expiresAt=new Date(data.expiresAt).getTime();
+    if(Date.now()>expiresAt){
+      _showPublicError('このリンクは期限切れです。作成者に再発行を依頼してください。');
+      return true;
+    }
+
+    // アクセスログ（エラーは無視）
+    try{
+      await F.setDoc(docRef, {accessCount:(data.accessCount||0)+1, lastAccessAt:new Date().toISOString()}, {merge:true});
+    }catch(e){}
+
+    _showPublicPhotoPortal(data, expiresAt);
+    return true;
+  }catch(e){
+    console.error('Share load error:',e);
+    _showPublicError('写真の読み込みに失敗しました: '+e.message);
+    return true;
+  }
+}
+
+function _showPublicLoading(){
+  document.body.innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F5F3EE;font-family:'Hiragino Sans','Noto Sans JP',sans-serif"><div style="text-align:center"><div style="font-size:48px;margin-bottom:12px">📷</div><div style="color:#666">読み込み中...</div></div></div>`;
+}
+
+function _showPublicError(msg){
+  document.body.innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F5F3EE;font-family:'Hiragino Sans','Noto Sans JP',sans-serif;padding:20px"><div style="text-align:center;background:white;border-radius:12px;padding:40px;max-width:420px;box-shadow:0 4px 20px rgba(0,0,0,.1)"><div style="font-size:48px;margin-bottom:16px">⚠️</div><div style="font-size:18px;font-weight:700;color:#333;margin-bottom:8px">閲覧できません</div><div style="color:#666;line-height:1.6">${escAttr(msg)}</div></div></div>`;
+}
+
+function _showPublicPhotoPortal(data, expiresAt){
+  const photos=data.photos||[];
+  const order={before:0,after:1,other:2};
+  const sorted=[...photos].sort((a,b)=>(order[a.label||'other']||3)-(order[b.label||'other']||3));
+  const labelText={before:'📷 施工前',after:'✅ 施工後',other:'📌 その他'};
+  const labelColor={before:'#1A73E8',after:'#10B981',other:'#666'};
+  const expiresDate=new Date(expiresAt);
+  const expiresStr=`${expiresDate.getFullYear()}/${String(expiresDate.getMonth()+1).padStart(2,'0')}/${String(expiresDate.getDate()).padStart(2,'0')}`;
+
+  document.body.innerHTML=`
+<div style="min-height:100vh;background:#F5F3EE;font-family:'Hiragino Sans','Noto Sans JP',sans-serif;padding:20px">
+  <div style="max-width:800px;margin:0 auto">
+    <div style="background:white;border-radius:12px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="font-size:32px">📷</div>
+        <div>
+          <h1 style="font-size:20px;font-weight:700;color:#333;margin:0">作業写真</h1>
+          <div style="font-size:13px;color:#666">${escAttr(data.customer||'')} 様</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#888;padding-top:12px;border-top:1px solid #eee">
+        ${data.docType?`<span>📄 ${escAttr(data.docType)}</span>`:''}
+        ${data.docNumber?`<span>🔢 ${escAttr(data.docNumber)}</span>`:''}
+        <span>📸 ${photos.length}枚</span>
+        <span style="color:#E67E22">⏰ 閲覧期限: ${expiresStr}</span>
+      </div>
+    </div>
+
+    <div style="background:white;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)">
+      ${sorted.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+        ${sorted.map((p,i)=>`
+          <div class="pub-photo" data-idx="${i}" style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;cursor:pointer;background:#eee">
+            <img src="${escAttr(p.url)}" alt="" style="width:100%;height:100%;object-fit:cover;display:block" loading="lazy">
+            <span style="position:absolute;top:6px;left:6px;background:${labelColor[p.label||'other']};color:white;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px">${labelText[p.label||'other']}</span>
+          </div>
+        `).join('')}
+      </div>`:'<div style="text-align:center;color:#999;padding:40px">写真がありません</div>'}
+
+      <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa">
+        このページは安全な共有リンクで表示されています
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="pub-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999;align-items:center;justify-content:center;padding:20px">
+    <div style="max-width:900px;max-height:90vh;text-align:center">
+      <img id="pub-lightbox-img" style="max-width:100%;max-height:80vh;border-radius:8px;display:block;margin:0 auto">
+      <div id="pub-lightbox-caption" style="color:white;font-size:13px;margin-top:12px"></div>
+      <button onclick="document.getElementById('pub-lightbox').style.display='none'" style="position:fixed;top:20px;right:20px;background:rgba(255,255,255,0.2);color:white;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer">✕</button>
+    </div>
+  </div>
+</div>`;
+
+  // Lightbox クリックハンドラ
+  document.querySelectorAll('.pub-photo').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx=parseInt(el.dataset.idx);
+      const p=sorted[idx];
+      if(!p) return;
+      document.getElementById('pub-lightbox-img').src=p.url;
+      document.getElementById('pub-lightbox-caption').textContent=`${idx+1}/${sorted.length} ${labelText[p.label||'other']}${p.date?' — '+p.date:''}`;
+      document.getElementById('pub-lightbox').style.display='flex';
+    });
+  });
+  // 背景クリックで閉じる
+  document.getElementById('pub-lightbox').addEventListener('click', e=>{
+    if(e.target.id==='pub-lightbox') e.target.style.display='none';
+  });
 }
 
 // ===== UNDO SYSTEM =====
@@ -7585,7 +8112,418 @@ function exportCSV(format){
   pushUndo({type:'none',data:null,label:`「${filename}」をダウンロードしました`});
 }
 
-// ===== QR CODE (簡易実装) =====
+// ===== 作業写真（Firebase Storage）=====
+const WORK_PHOTO_MAX_SIZE = 5 * 1024 * 1024; // 元画像5MB制限
+const WORK_PHOTO_COMPRESS_MAX = 1600; // 圧縮後最大1600px
+const WORK_PHOTO_COMPRESS_QUALITY = 0.82;
+const WORK_PHOTO_SHARE_DEFAULT_DAYS = 7;
+
+let _workPhotos = {}; // { docId: [{id, path, url, label, uploadedAt, uploadedBy, ...}] }
+let _currentPhotoDocId = null;
+
+// 画像圧縮（Canvas使用）
+async function compressImageForUpload(file, maxSize, quality){
+  return new Promise((resolve, reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        let {width, height}=img;
+        if(width>maxSize||height>maxSize){
+          const scale=Math.min(maxSize/width, maxSize/height);
+          width=Math.round(width*scale);
+          height=Math.round(height*scale);
+        }
+        const canvas=document.createElement('canvas');
+        canvas.width=width; canvas.height=height;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(b=>{
+          if(b) resolve(b);
+          else reject(new Error('圧縮失敗'));
+        }, 'image/jpeg', quality);
+      };
+      img.onerror=()=>reject(new Error('画像読込失敗'));
+      img.src=reader.result;
+    };
+    reader.onerror=()=>reject(new Error('ファイル読込失敗'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// Firestoreから作業写真メタ情報を取得
+async function loadWorkPhotos(docId){
+  const F=window._FB;
+  if(!F||!currentUser||!docId) return [];
+  try{
+    const colRef=F.collection(F.db,'users',currentUser.uid,'workPhotos');
+    const q=F.query(colRef, F.where('docId','==',docId), F.orderBy('uploadedAt','asc'));
+    const snap=await F.getDocs(q);
+    const arr=[];
+    snap.forEach(doc=>arr.push({id:doc.id, ...doc.data()}));
+    _workPhotos[docId]=arr;
+    return arr;
+  }catch(e){
+    console.error('[workPhotos] load failed:',e);
+    return [];
+  }
+}
+
+// 写真アップロード
+async function uploadWorkPhoto(docId, file, label){
+  const F=window._FB;
+  if(!F||!currentUser) throw new Error('ログインが必要です');
+  if(!docId) throw new Error('書類IDが不明です');
+  if(file.size > WORK_PHOTO_MAX_SIZE) throw new Error(`ファイルサイズが大きすぎます（最大 ${WORK_PHOTO_MAX_SIZE/1024/1024}MB）`);
+  if(!file.type.startsWith('image/')) throw new Error('画像ファイルを選択してください');
+
+  showToast('📤 画像を圧縮・アップロード中...','#3B82F6');
+
+  // 圧縮
+  const compressed=await compressImageForUpload(file, WORK_PHOTO_COMPRESS_MAX, WORK_PHOTO_COMPRESS_QUALITY);
+  const photoId='photo-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
+  const path=`users/${currentUser.uid}/work-photos/${docId}/${photoId}.jpg`;
+
+  // Firebase Storage にアップロード
+  const ref=F.storageRef(F.storage, path);
+  const metadata={
+    contentType:'image/jpeg',
+    customMetadata:{docId, label:label||'', uploadedBy:currentUser.uid}
+  };
+  await F.uploadBytes(ref, compressed, metadata);
+  const url=await F.getDownloadURL(ref);
+
+  // Firestoreにメタ保存
+  const meta={
+    docId,
+    path,
+    url,
+    label: label||'',
+    size: compressed.size,
+    originalSize: file.size,
+    uploadedAt: new Date().toISOString(),
+    uploadedBy: currentUser.uid,
+    uploadedByName: currentUser.displayName || currentUser.email || ''
+  };
+  const docRef=F.doc(F.db,'users',currentUser.uid,'workPhotos',photoId);
+  await F.setDoc(docRef, meta);
+
+  // ローカルキャッシュ更新
+  if(!_workPhotos[docId]) _workPhotos[docId]=[];
+  _workPhotos[docId].push({id:photoId, ...meta});
+
+  showToast('✓ アップロード完了','#10B981');
+  return {id:photoId, ...meta};
+}
+
+// 写真削除
+async function deleteWorkPhoto(docId, photoId){
+  const F=window._FB;
+  if(!F||!currentUser) throw new Error('ログインが必要です');
+  const photo=(_workPhotos[docId]||[]).find(p=>p.id===photoId);
+  if(!photo) throw new Error('写真が見つかりません');
+
+  try{
+    const ref=F.storageRef(F.storage, photo.path);
+    await F.deleteObject(ref);
+  }catch(e){
+    console.warn('[workPhotos] storage delete failed (continuing):',e);
+  }
+  await F.deleteDoc(F.doc(F.db,'users',currentUser.uid,'workPhotos',photoId));
+  _workPhotos[docId]=(_workPhotos[docId]||[]).filter(p=>p.id!==photoId);
+}
+
+// ラベル更新
+async function updateWorkPhotoLabel(docId, photoId, newLabel){
+  const F=window._FB;
+  if(!F||!currentUser) return;
+  await F.setDoc(F.doc(F.db,'users',currentUser.uid,'workPhotos',photoId), {label:newLabel}, {merge:true});
+  const photo=(_workPhotos[docId]||[]).find(p=>p.id===photoId);
+  if(photo) photo.label=newLabel;
+}
+
+// ===== 写真モーダル UI =====
+function openWorkPhotoModal(docId){
+  _currentPhotoDocId=docId;
+  const d=docs.find(x=>x.id===docId);
+  if(!d){showToast('書類が見つかりません','#C0392B');return;}
+
+  document.getElementById('wp-modal-title').textContent=`📸 作業写真 - ${d.type} ${d.number}`;
+  document.getElementById('wp-modal').classList.add('open');
+
+  loadWorkPhotos(docId).then(()=>renderWorkPhotoGrid());
+}
+
+function renderWorkPhotoGrid(){
+  const docId=_currentPhotoDocId;
+  const grid=document.getElementById('wp-grid');
+  if(!grid||!docId) return;
+  const photos=_workPhotos[docId]||[];
+  if(photos.length===0){
+    grid.innerHTML='<div style="padding:30px;text-align:center;color:var(--text3);grid-column:1/-1">まだ写真がありません。下の「＋ 写真を追加」から追加してください。</div>';
+    return;
+  }
+
+  // Before/After でグループ化
+  const beforePhotos=photos.filter(p=>(p.label||'').toLowerCase().includes('before')||p.label==='作業前');
+  const afterPhotos=photos.filter(p=>(p.label||'').toLowerCase().includes('after')||p.label==='作業後');
+  const otherPhotos=photos.filter(p=>!beforePhotos.includes(p)&&!afterPhotos.includes(p));
+
+  const renderOne=(p)=>`
+    <div class="wp-card" data-photo-id="${p.id}">
+      <div class="wp-img-wrap">
+        <img src="${escAttr(p.url)}" alt="${escAttr(p.label||'')}" loading="lazy" onclick="openPhotoViewer('${p.id}')">
+      </div>
+      <div class="wp-meta">
+        <select class="wp-label-select" onchange="onWpLabelChange('${p.id}',this.value)">
+          <option value="" ${!p.label?'selected':''}>(ラベルなし)</option>
+          <option value="作業前" ${p.label==='作業前'?'selected':''}>作業前</option>
+          <option value="作業中" ${p.label==='作業中'?'selected':''}>作業中</option>
+          <option value="作業後" ${p.label==='作業後'?'selected':''}>作業後</option>
+          <option value="備品" ${p.label==='備品'?'selected':''}>備品・材料</option>
+          <option value="書類" ${p.label==='書類'?'selected':''}>書類・契約書</option>
+        </select>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteWpPhoto('${p.id}')" title="削除">🗑</button>
+      </div>
+      <div class="wp-info">${new Date(p.uploadedAt).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})} / ${Math.round(p.size/1024)}KB</div>
+    </div>`;
+
+  let html='';
+  if(beforePhotos.length){
+    html+=`<div style="grid-column:1/-1;font-size:12px;font-weight:700;color:var(--blue);margin-top:4px">🔵 作業前（${beforePhotos.length}枚）</div>`;
+    html+=beforePhotos.map(renderOne).join('');
+  }
+  if(afterPhotos.length){
+    html+=`<div style="grid-column:1/-1;font-size:12px;font-weight:700;color:var(--accent);margin-top:8px">🟢 作業後（${afterPhotos.length}枚）</div>`;
+    html+=afterPhotos.map(renderOne).join('');
+  }
+  if(otherPhotos.length){
+    html+=`<div style="grid-column:1/-1;font-size:12px;font-weight:700;color:var(--text3);margin-top:8px">⚪ その他（${otherPhotos.length}枚）</div>`;
+    html+=otherPhotos.map(renderOne).join('');
+  }
+  grid.innerHTML=html;
+}
+
+async function onWpLabelChange(photoId, newLabel){
+  try{
+    await updateWorkPhotoLabel(_currentPhotoDocId, photoId, newLabel);
+    renderWorkPhotoGrid();
+    showToast('✓ ラベルを更新しました');
+  }catch(e){showToast('更新失敗: '+e.message,'#C0392B');}
+}
+
+function confirmDeleteWpPhoto(photoId){
+  showConfirm('この写真を削除しますか？サーバーからも完全に削除されます。', async ()=>{
+    try{
+      await deleteWorkPhoto(_currentPhotoDocId, photoId);
+      renderWorkPhotoGrid();
+      showToast('🗑 削除しました');
+    }catch(e){showToast('削除失敗: '+e.message,'#C0392B');}
+  });
+}
+
+async function onWpFileSelected(event){
+  const files=event.target.files;
+  if(!files||!files.length) return;
+  const defaultLabel=document.getElementById('wp-default-label')?.value||'';
+
+  for(const file of files){
+    try{
+      await uploadWorkPhoto(_currentPhotoDocId, file, defaultLabel);
+    }catch(e){
+      showToast(`失敗: ${file.name} - ${e.message}`,'#C0392B');
+    }
+  }
+  event.target.value='';
+  renderWorkPhotoGrid();
+}
+
+function openPhotoViewer(photoId){
+  const p=(_workPhotos[_currentPhotoDocId]||[]).find(x=>x.id===photoId);
+  if(!p) return;
+  window.open(p.url,'_blank','noopener');
+}
+
+// ===== Phase 2: 共有リンク =====
+async function generatePhotoShareLink(){
+  const F=window._FB;
+  if(!F||!currentUser) {showToast('ログインが必要です','#C0392B');return;}
+  const docId=_currentPhotoDocId;
+  const d=docs.find(x=>x.id===docId);
+  if(!d){showToast('書類が見つかりません','#C0392B');return;}
+  const photos=_workPhotos[docId]||[];
+  if(photos.length===0){showToast('写真がありません','#C0392B');return;}
+
+  const daysInput=document.getElementById('wp-share-days');
+  const days=parseInt(daysInput?.value||WORK_PHOTO_SHARE_DEFAULT_DAYS);
+  if(isNaN(days)||days<1||days>30){showToast('有効期間は1〜30日で入力','#C0392B');return;}
+
+  // 共有トークン生成
+  const token=Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);
+  const expiry=Date.now()+days*86400000;
+  const shareData={
+    token,
+    docId,
+    docNumber: d.number,
+    docType: d.type,
+    customer: d.customer||'',
+    company: settings.company||'',
+    photos: photos.map(p=>({url:p.url, label:p.label||'', uploadedAt:p.uploadedAt})),
+    expiry,
+    createdAt: new Date().toISOString(),
+    createdBy: currentUser.uid,
+    createdByName: currentUser.displayName||currentUser.email||'',
+    accessCount: 0,
+    lastAccessAt: null
+  };
+
+  // Firestoreの公開共有コレクション（ただし読み込みはルールで token 必須）
+  try{
+    await F.setDoc(F.doc(F.db,'photoShares',token), shareData);
+    const shareUrl=`${location.origin}${location.pathname}#share=${token}`;
+
+    // 結果を表示
+    const resultEl=document.getElementById('wp-share-result');
+    resultEl.style.display='block';
+    resultEl.innerHTML=`
+      <div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:12px;margin-top:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">✓ 共有リンク作成完了</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input type="text" id="wp-share-url" value="${escAttr(shareUrl)}" readonly style="flex:1;padding:8px;border:1px solid var(--border);border-radius:6px;font-family:monospace;font-size:11px" onclick="this.select()">
+          <button class="btn btn-secondary btn-sm" onclick="copyShareUrl()">📋 コピー</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="_legacySharePhotoLink('${token}','line')">💬 LINEで送る</button>
+          <button class="btn btn-secondary btn-sm" onclick="_legacySharePhotoLink('${token}','email')">✉️ メール</button>
+          <button class="btn btn-secondary btn-sm" onclick="_legacySharePhotoLink('${token}','qr')">📷 QR表示</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px">有効期限: ${days}日間（${new Date(expiry).toLocaleDateString('ja-JP')}まで）</div>
+      </div>`;
+    showToast('✓ 共有リンクを作成しました','#10B981');
+  }catch(e){
+    console.error(e);
+    showToast('共有リンクの作成に失敗: '+e.message,'#C0392B');
+  }
+}
+
+function copyShareUrl(){
+  const el=document.getElementById('wp-share-url');
+  if(!el) return;
+  navigator.clipboard.writeText(el.value).then(()=>showToast('✓ URLをコピーしました'));
+}
+
+function _legacySharePhotoLink(token, method){
+  const url=`${location.origin}${location.pathname}#share=${token}`;
+  const d=docs.find(x=>x.id===_currentPhotoDocId);
+  const subject=`【${d?.type||'書類'}】${d?.customer||''}様 作業写真`;
+  const body=`${d?.customer||''} ${(customers.find(c=>c.name===d?.customer)?.honorific)||'御中'}\n\n作業の写真をお送りします。下記リンクからご確認ください。\n\n${url}\n\n${settings.company||''}`;
+
+  if(method==='line'){
+    const msg=encodeURIComponent(`${subject}\n${url}`);
+    if(isMobileDevice()) window.location.href=`line://msg/text/${msg}`;
+    else window.open(`https://line.me/R/share?text=${msg}`,'_blank','width=500,height=700');
+  } else if(method==='email'){
+    window.location.href=`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  } else if(method==='qr'){
+    const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=10&data=${encodeURIComponent(url)}`;
+    document.getElementById('wp-qr-container').innerHTML=`
+      <div style="text-align:center;padding:16px;background:white;border-radius:8px;margin-top:10px">
+        <img src="${escAttr(qrUrl)}" alt="QR" style="width:280px;height:280px">
+        <div style="font-size:11px;color:var(--text3);margin-top:6px">スマホで読み取って共有</div>
+      </div>`;
+  }
+}
+
+// 共有リンクにアクセスされたとき（顧客が開く）
+async function checkShareRoute(){
+  const hash=location.hash||'';
+  const m=hash.match(/^#share=(\w+)$/);
+  if(!m) return false;
+  const token=m[1];
+  if(!token||token.length<20) return false;
+
+  await showSharedPhotoViewer(token);
+  return true;
+}
+
+async function showSharedPhotoViewer(token){
+  document.getElementById('app').style.display='none';
+  const viewer=document.getElementById('share-viewer');
+  viewer.style.display='block';
+  viewer.innerHTML='<div style="padding:40px;text-align:center"><div class="wp-loading"></div>読み込み中...</div>';
+
+  const F=window._FB;
+  if(!F){viewer.innerHTML='<div style="padding:40px;text-align:center;color:#C0392B">システム初期化中です。ページを再読込してください。</div>';return;}
+
+  try{
+    const docSnap=await F.getDoc(F.doc(F.db,'photoShares',token));
+    if(!docSnap.exists()){
+      viewer.innerHTML='<div style="padding:40px;text-align:center;color:#C0392B">共有リンクが無効です</div>';
+      return;
+    }
+    const data=docSnap.data();
+    if(Date.now() > data.expiry){
+      viewer.innerHTML=`<div style="padding:40px;text-align:center;color:#C0392B">この共有リンクは有効期限が切れています<br><small>（期限: ${new Date(data.expiry).toLocaleString('ja-JP')}）</small></div>`;
+      return;
+    }
+
+    // アクセス記録を更新（非同期・失敗OK）
+    try{
+      await F.setDoc(F.doc(F.db,'photoShares',token), {
+        accessCount:(data.accessCount||0)+1,
+        lastAccessAt: new Date().toISOString()
+      }, {merge:true});
+    }catch(e){}
+
+    renderSharedPhotoViewer(data);
+  }catch(e){
+    console.error(e);
+    viewer.innerHTML=`<div style="padding:40px;text-align:center;color:#C0392B">エラー: ${escAttr(e.message)}</div>`;
+  }
+}
+
+function renderSharedPhotoViewer(data){
+  const viewer=document.getElementById('share-viewer');
+  const photos=data.photos||[];
+  const before=photos.filter(p=>(p.label||'').includes('作業前'));
+  const after=photos.filter(p=>(p.label||'').includes('作業後'));
+  const other=photos.filter(p=>!before.includes(p)&&!after.includes(p));
+
+  const renderPhotoRow=(arr,title,color)=>{
+    if(arr.length===0) return '';
+    return `<div style="margin-bottom:24px">
+      <h3 style="font-size:14px;color:${color};margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid ${color}">${title}（${arr.length}枚）</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+        ${arr.map(p=>`<div style="background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,0.08)">
+          <img src="${escAttr(p.url)}" alt="" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;cursor:pointer" onclick="window.open('${escAttr(p.url)}','_blank','noopener')">
+          <div style="padding:6px 10px;font-size:11px;color:#666">${new Date(p.uploadedAt).toLocaleDateString('ja-JP')}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  };
+
+  viewer.innerHTML=`
+    <div style="max-width:1000px;margin:0 auto;padding:20px">
+      <div style="background:white;border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,0.08)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+          <h1 style="font-size:22px;color:#2D5A3D;margin:0">📸 作業写真</h1>
+          <span style="font-size:11px;background:#E6F2EA;color:#2D5A3D;padding:4px 10px;border-radius:99px">${escAttr(data.docType||'')} ${escAttr(data.docNumber||'')}</span>
+        </div>
+        <div style="color:#666;font-size:13px">
+          ${data.customer?`<div>顧客: ${escAttr(data.customer)} 様</div>`:''}
+          ${data.company?`<div>送信元: ${escAttr(data.company)}</div>`:''}
+          <div style="font-size:11px;color:#999;margin-top:6px">有効期限: ${new Date(data.expiry).toLocaleString('ja-JP')}</div>
+        </div>
+      </div>
+      ${photos.length===0?'<div style="text-align:center;padding:40px;color:#999">写真がありません</div>':''}
+      ${renderPhotoRow(before,'🔵 作業前','#1A73E8')}
+      ${renderPhotoRow(after,'🟢 作業後','#2D5A3D')}
+      ${renderPhotoRow(other,'⚪ その他','#666')}
+      <div style="text-align:center;padding:20px;color:#999;font-size:11px">
+        Powered by Flexsys2026
+      </div>
+    </div>`;
+}
 // ===== THEME MANAGEMENT =====
 const THEMES=['default','dark','navy','pop','sunset','mint'];
 let currentTheme=localStorage.getItem('appTheme')||'default';
@@ -9478,7 +10416,12 @@ function injectHamburgers(){
   },{passive:true});
 }
 
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded', async ()=>{
+  // 共有リンクアクセスの場合は公開ポータルを表示
+  if(typeof checkShareLinkOnLoad==='function'){
+    const isShareLink=await checkShareLinkOnLoad();
+    if(isShareLink) return; // 共有ページを表示して終了
+  }
   buildMobileDrawer();
   injectHamburgers();
 });
