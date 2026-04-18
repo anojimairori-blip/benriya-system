@@ -396,6 +396,48 @@ tr:hover td{background:var(--bg)}
 
 /* 更新ボタン */
 .btn-refresh{padding:6px 10px;font-size:13px;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:7px;cursor:pointer;transition:all .15s;font-family:inherit;min-width:36px}
+
+/* 書類タイプ別カラープリセット */
+.color-preset{border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:0;transition:transform .1s}
+.color-preset:hover{transform:scale(1.2);border-color:var(--accent)}
+
+/* 書類タイプ別カラー変数（デフォルト・JSで動的更新される） */
+:root{
+  --doc-color-quote:#C49A2D;
+  --doc-color-quote-light:#FAF5E5;
+  --doc-color-invoice:#1A73E8;
+  --doc-color-invoice-light:#E8F0FE;
+  --doc-color-receipt:#2D5A3D;
+  --doc-color-receipt-light:#E6F2EA;
+}
+
+/* 書類タイプ別 ページタイトル枠（左メニューから開いた一覧画面） */
+#page-quotes .main-header h2{border-left:5px solid var(--doc-color-quote);padding-left:12px}
+#page-invoices .main-header h2{border-left:5px solid var(--doc-color-invoice);padding-left:12px}
+#page-receipts .main-header h2{border-left:5px solid var(--doc-color-receipt);padding-left:12px}
+
+/* 一覧テーブルヘッダー背景 */
+#page-quotes table th{background:var(--doc-color-quote-light)}
+#page-invoices table th{background:var(--doc-color-invoice-light)}
+#page-receipts table th{background:var(--doc-color-receipt-light)}
+
+/* 書類プレビューの罫線・項目枠（印刷／PDFにも反映） */
+.preview-doc.doc-quote{border-top:6px solid var(--doc-color-quote)}
+.preview-doc.doc-invoice{border-top:6px solid var(--doc-color-invoice)}
+.preview-doc.doc-receipt{border-top:6px solid var(--doc-color-receipt)}
+.preview-doc.doc-quote h2{color:var(--doc-color-quote);border-bottom:2px solid var(--doc-color-quote)}
+.preview-doc.doc-invoice h2{color:var(--doc-color-invoice);border-bottom:2px solid var(--doc-color-invoice)}
+.preview-doc.doc-receipt h2{color:var(--doc-color-receipt);border-bottom:2px solid var(--doc-color-receipt)}
+.preview-doc.doc-quote .preview-table th{background:var(--doc-color-quote-light);color:var(--doc-color-quote);border-bottom:2px solid var(--doc-color-quote)}
+.preview-doc.doc-invoice .preview-table th{background:var(--doc-color-invoice-light);color:var(--doc-color-invoice);border-bottom:2px solid var(--doc-color-invoice)}
+.preview-doc.doc-receipt .preview-table th{background:var(--doc-color-receipt-light);color:var(--doc-color-receipt);border-bottom:2px solid var(--doc-color-receipt)}
+.preview-doc.doc-quote .grand td{color:var(--doc-color-quote);border-top:2px solid var(--doc-color-quote)}
+.preview-doc.doc-invoice .grand td{color:var(--doc-color-invoice);border-top:2px solid var(--doc-color-invoice)}
+.preview-doc.doc-receipt .grand td{color:var(--doc-color-receipt);border-top:2px solid var(--doc-color-receipt)}
+@media print{
+  .preview-doc.doc-quote,.preview-doc.doc-invoice,.preview-doc.doc-receipt{border-top-width:6px;border-top-style:solid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .preview-doc h2,.preview-doc .preview-table th,.preview-doc .grand td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 .btn-refresh:hover:not(:disabled){background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
 .btn-refresh:disabled{opacity:.5;cursor:not-allowed}
 .btn-refresh.refreshing{animation:btn-refresh-spin 0.6s linear infinite}
@@ -837,7 +879,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.9.6</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.9.7</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -861,7 +903,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.9.6.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.9.7.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -896,7 +938,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.9.6</div>
+    <div class="logo-version" id="sidebar-version">v3.9.7</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1031,7 +1073,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.9.6.1 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.9.7.1 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -1221,6 +1263,51 @@ if('serviceWorker' in navigator){
         <div class="theme-swatch" data-theme="mint" onclick="applyTheme('mint',this)" title="ミント">
           <div class="theme-preview"><div class="tp-sidebar" style="background:#0A7A7A"></div><div class="tp-main" style="background:#F0FAFA"></div></div>
           <div class="theme-name">ミント</div>
+        </div>
+      </div>
+
+      <!-- 書類タイプ別カラー設定 -->
+      <div class="section-title" style="margin-bottom:8px">📄 書類カラー（罫線・枠・印刷）</div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:12px">見積書・請求書・領収書ごとに、罫線・項目枠・タイトル背景の色を設定できます。一覧画面の項目タイトル枠もこの色になります。</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px" id="doc-colors-grid">
+        <div style="background:var(--surface2);padding:12px;border-radius:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">📝 見積書</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="color" id="doc-color-quote" value="#C49A2D" onchange="onDocColorChange('quote',this.value)" style="width:36px;height:36px;border:1px solid var(--border);border-radius:6px;cursor:pointer;padding:2px">
+            <input type="text" id="doc-color-quote-text" value="#C49A2D" onchange="onDocColorChange('quote',this.value)" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:monospace">
+          </div>
+          <div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">
+            <button class="color-preset" data-color="#C49A2D" onclick="setDocColor('quote','#C49A2D')" style="width:18px;height:18px;background:#C49A2D"></button>
+            <button class="color-preset" data-color="#D4A841" onclick="setDocColor('quote','#D4A841')" style="width:18px;height:18px;background:#D4A841"></button>
+            <button class="color-preset" data-color="#B8860B" onclick="setDocColor('quote','#B8860B')" style="width:18px;height:18px;background:#B8860B"></button>
+            <button class="color-preset" data-color="#7B6340" onclick="setDocColor('quote','#7B6340')" style="width:18px;height:18px;background:#7B6340"></button>
+          </div>
+        </div>
+        <div style="background:var(--surface2);padding:12px;border-radius:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px">📋 請求書</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="color" id="doc-color-invoice" value="#1A73E8" onchange="onDocColorChange('invoice',this.value)" style="width:36px;height:36px;border:1px solid var(--border);border-radius:6px;cursor:pointer;padding:2px">
+            <input type="text" id="doc-color-invoice-text" value="#1A73E8" onchange="onDocColorChange('invoice',this.value)" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:monospace">
+          </div>
+          <div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">
+            <button class="color-preset" data-color="#1A73E8" onclick="setDocColor('invoice','#1A73E8')" style="width:18px;height:18px;background:#1A73E8"></button>
+            <button class="color-preset" data-color="#1565C0" onclick="setDocColor('invoice','#1565C0')" style="width:18px;height:18px;background:#1565C0"></button>
+            <button class="color-preset" data-color="#0D47A1" onclick="setDocColor('invoice','#0D47A1')" style="width:18px;height:18px;background:#0D47A1"></button>
+            <button class="color-preset" data-color="#37474F" onclick="setDocColor('invoice','#37474F')" style="width:18px;height:18px;background:#37474F"></button>
+          </div>
+        </div>
+        <div style="background:var(--surface2);padding:12px;border-radius:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">🧾 領収書</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="color" id="doc-color-receipt" value="#2D5A3D" onchange="onDocColorChange('receipt',this.value)" style="width:36px;height:36px;border:1px solid var(--border);border-radius:6px;cursor:pointer;padding:2px">
+            <input type="text" id="doc-color-receipt-text" value="#2D5A3D" onchange="onDocColorChange('receipt',this.value)" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:monospace">
+          </div>
+          <div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">
+            <button class="color-preset" data-color="#2D5A3D" onclick="setDocColor('receipt','#2D5A3D')" style="width:18px;height:18px;background:#2D5A3D"></button>
+            <button class="color-preset" data-color="#388E3C" onclick="setDocColor('receipt','#388E3C')" style="width:18px;height:18px;background:#388E3C"></button>
+            <button class="color-preset" data-color="#0A7A7A" onclick="setDocColor('receipt','#0A7A7A')" style="width:18px;height:18px;background:#0A7A7A"></button>
+            <button class="color-preset" data-color="#5BAD7E" onclick="setDocColor('receipt','#5BAD7E')" style="width:18px;height:18px;background:#5BAD7E"></button>
+          </div>
         </div>
       </div>
 
@@ -2747,7 +2834,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.9.6';
+const APP_VERSION='v3.9.7';
 const APP_BUILD_TIME='2026/04/18 22:52';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -4099,8 +4186,10 @@ function previewDoc(id){
   if(d.tax8>0)taxRows.push(`<tr><td>消費税（8%）</td><td style="text-align:right">${fmt(d.tax8)}</td></tr>`);
   const logoHtml=s.logo?`<img src="${s.logo}" class="preview-logo" alt="logo">`:'';
   const c=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
+  // 書類タイプ別カラークラス
+  const docColorClass={'見積書':'doc-quote','請求書':'doc-invoice','領収書':'doc-receipt'}[d.type]||'';
   document.getElementById('preview-body').innerHTML=`
-  <div class="preview-doc">
+  <div class="preview-doc ${docColorClass}">
     <p class="doc-number">${d.number}</p>
     <h2>${d.type}</h2>
     <div class="preview-meta">
@@ -5744,6 +5833,8 @@ function initAppAfterAuth(){
     if(currentTheme==='default') document.documentElement.removeAttribute('data-theme');
     else document.documentElement.setAttribute('data-theme',currentTheme);
   }
+  // 書類タイプ別カラーを適用
+  if(typeof applyDocColors==='function') applyDocColors();
   renderNavManagement();
   showDeveloperMenu();
   renderAll(); buildMonthlyChart(); initReportYears(); initSrYears();
@@ -7294,6 +7385,75 @@ function exportCSV(format){
 // ===== THEME MANAGEMENT =====
 const THEMES=['default','dark','navy','pop','sunset','mint'];
 let currentTheme=localStorage.getItem('appTheme')||'default';
+
+// ===== 書類タイプ別カラー =====
+const DOC_COLOR_DEFAULTS={quote:'#C49A2D',invoice:'#1A73E8',receipt:'#2D5A3D'};
+
+function getDocColor(type){
+  // type: 'quote'|'invoice'|'receipt'
+  if(settings && settings.docColors && settings.docColors[type]){
+    return settings.docColors[type];
+  }
+  try{
+    const saved=JSON.parse(localStorage.getItem('docColors')||'null');
+    if(saved && saved[type]) return saved[type];
+  }catch(e){}
+  return DOC_COLOR_DEFAULTS[type];
+}
+
+// hex色を薄い色に変換（プレビュー枠背景用）
+function _lightenColor(hex, amount){
+  // hex (#RRGGBB) → light (背景用)
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  // 90%白に寄せる
+  const mix=v=>Math.round(v + (255-v)*0.9);
+  return `rgb(${mix(r)},${mix(g)},${mix(b)})`;
+}
+
+function applyDocColors(){
+  const root=document.documentElement;
+  ['quote','invoice','receipt'].forEach(t=>{
+    const c=getDocColor(t);
+    root.style.setProperty('--doc-color-'+t, c);
+    root.style.setProperty('--doc-color-'+t+'-light', _lightenColor(c, 0.9));
+    // UIにも反映
+    const picker=document.getElementById('doc-color-'+t);
+    const text=document.getElementById('doc-color-'+t+'-text');
+    if(picker) picker.value=c;
+    if(text) text.value=c;
+  });
+}
+
+function setDocColor(type, color){
+  const picker=document.getElementById('doc-color-'+type);
+  const text=document.getElementById('doc-color-'+type+'-text');
+  if(picker) picker.value=color;
+  if(text) text.value=color;
+  onDocColorChange(type, color);
+}
+
+function onDocColorChange(type, color){
+  // バリデーション: #RRGGBB 形式
+  if(!/^#[0-9A-Fa-f]{6}$/.test(color)){
+    showToast('色コードは #RRGGBB 形式で入力してください','#C0392B');
+    return;
+  }
+  // 両方のフィールドを同期
+  const picker=document.getElementById('doc-color-'+type);
+  const text=document.getElementById('doc-color-'+type+'-text');
+  if(picker) picker.value=color;
+  if(text) text.value=color;
+  // settings保存
+  if(!settings.docColors) settings.docColors={};
+  settings.docColors[type]=color;
+  localStorage.setItem('docColors', JSON.stringify(settings.docColors));
+  if(typeof persist==='function') persist();
+  // 即時反映
+  applyDocColors();
+  showToast(`${type==='quote'?'見積書':type==='invoice'?'請求書':'領収書'}のカラーを変更しました ✓`);
+}
 
 function applyTheme(name, el){
   currentTheme=name;
