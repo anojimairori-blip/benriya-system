@@ -726,7 +726,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.5</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v2.5.2</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -752,7 +752,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v2.5</div>
+    <div class="logo-version" id="sidebar-version">v2.5.2</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -907,7 +907,7 @@ if('serviceWorker' in navigator){
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">🔖</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.5</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)" id="home-version-text">バージョン v2.5.2</div>
         <div style="font-size:11px;color:var(--text2)" id="home-version-date">最終更新：2026年04月17日</div>
       </div>
     </div>
@@ -2161,7 +2161,7 @@ if('serviceWorker' in navigator){
           🤖 AIで自動入力
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" onclick="document.getElementById('exp-ai-camera-file').click()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">📷 カメラで撮影</button>
+          <button class="btn btn-primary btn-sm" onclick="startReceiptCamera()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">📷 カメラで撮影</button>
           <button class="btn btn-primary btn-sm" onclick="document.getElementById('exp-ai-upload-file').click()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">📂 画像を選択</button>
         </div>
       </div>
@@ -2232,6 +2232,29 @@ if('serviceWorker' in navigator){
 </div>
 </div>
 
+<!-- AI CAMERA CAPTURE MODAL（Webカメラ撮影用） -->
+<div class="modal-overlay" id="receipt-camera-modal">
+<div class="modal" style="max-width:640px">
+  <div class="modal-header">
+    <h3>📷 レシートを撮影</h3>
+    <button class="close-btn" onclick="stopReceiptCamera()">✕</button>
+  </div>
+  <div class="modal-body" style="padding:0">
+    <div style="background:#000;text-align:center;position:relative">
+      <video id="receipt-camera-video" autoplay playsinline muted style="max-width:100%;max-height:60vh;display:block;margin:0 auto"></video>
+      <div id="receipt-camera-error" style="display:none;color:white;padding:40px 20px;font-size:14px"></div>
+    </div>
+    <div style="padding:12px 16px;background:var(--surface2);font-size:12px;color:var(--text2);text-align:center">
+      💡 レシート全体が画面に入るように撮影してください
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="stopReceiptCamera()">キャンセル</button>
+    <button class="btn btn-primary" id="receipt-camera-capture-btn" onclick="captureReceiptPhoto()" style="background:linear-gradient(135deg,#7B68EE,#9B59B6)">📸 撮影してAIで読み取り</button>
+  </div>
+</div>
+</div>
+
 <!-- REPORT PRINT MODAL -->
 <div class="modal-overlay" id="report-print-modal">
 <div class="modal" style="max-width:760px">
@@ -2283,7 +2306,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v2.5';
+const APP_VERSION='v2.5.2';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5166,50 +5189,149 @@ function viewExpReceiptThumb(){
 }
 
 // ===== AIレシート読み取り =====
-async function handleAiReceiptScan(ev){
-  const file=ev.target.files[0];
-  if(!file)return;
-  if(file.size>5*1024*1024){
-    showToast('画像は5MB以下にしてください','#C0392B');
-    ev.target.value='';
+// PCかスマホかを判定
+function isMobileDevice(){
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+}
+
+// カメラ起動（PC: WebRTC / スマホ: capture属性）
+let _receiptCameraStream=null;
+async function startReceiptCamera(){
+  // スマホは従来通り capture="environment" を使う
+  if(isMobileDevice()){
+    document.getElementById('exp-ai-camera-file').click();
     return;
   }
 
+  // PCの場合: WebRTC でカメラを起動
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    showToast('お使いのブラウザはカメラ撮影に対応していません','#C0392B');
+    return;
+  }
+
+  document.getElementById('receipt-camera-modal').classList.add('open');
+  const videoEl=document.getElementById('receipt-camera-video');
+  const errorEl=document.getElementById('receipt-camera-error');
+  videoEl.style.display='block';
+  errorEl.style.display='none';
+
+  try{
+    _receiptCameraStream=await navigator.mediaDevices.getUserMedia({
+      video:{
+        facingMode:'environment',
+        width:{ideal:1920},
+        height:{ideal:1080}
+      },
+      audio:false
+    });
+    videoEl.srcObject=_receiptCameraStream;
+  }catch(e){
+    videoEl.style.display='none';
+    errorEl.style.display='block';
+    errorEl.innerHTML='❌ カメラを起動できません<br><span style="font-size:12px;opacity:0.8">'+(e.message||'カメラへのアクセスが拒否されました')+'</span><br><br><span style="font-size:12px;opacity:0.7">💡 ブラウザのアドレスバー左のマークからカメラ許可を確認してください</span>';
+  }
+}
+
+function stopReceiptCamera(){
+  if(_receiptCameraStream){
+    _receiptCameraStream.getTracks().forEach(t=>t.stop());
+    _receiptCameraStream=null;
+  }
+  document.getElementById('receipt-camera-modal').classList.remove('open');
+}
+
+async function captureReceiptPhoto(){
+  if(!_receiptCameraStream){
+    showToast('カメラが起動していません','#C0392B');
+    return;
+  }
+  const videoEl=document.getElementById('receipt-camera-video');
+  const captureBtn=document.getElementById('receipt-camera-capture-btn');
+  captureBtn.disabled=true;
+  captureBtn.textContent='📸 撮影中...';
+
+  try{
+    // ビデオフレームをCanvasに描画
+    const canvas=document.createElement('canvas');
+    canvas.width=videoEl.videoWidth;
+    canvas.height=videoEl.videoHeight;
+    const ctx=canvas.getContext('2d');
+    ctx.drawImage(videoEl,0,0);
+    const dataUrl=canvas.toDataURL('image/jpeg',0.92);
+
+    // カメラ停止
+    stopReceiptCamera();
+
+    // 撮影画像をAI読み取りに渡す
+    await processReceiptImage(dataUrl);
+  }catch(e){
+    showToast('撮影に失敗しました: '+e.message,'#C0392B');
+  }finally{
+    captureBtn.disabled=false;
+    captureBtn.textContent='📸 撮影してAIで読み取り';
+  }
+}
+
+// 画像をリサイズ（Claude API制限対策：最大1568px・JPEG変換）
+function resizeImageForOcr(dataUrl, maxSize){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      try{
+        let w=img.width, h=img.height;
+        if(w>maxSize||h>maxSize){
+          if(w>h){
+            h=Math.round(h*maxSize/w);
+            w=maxSize;
+          } else {
+            w=Math.round(w*maxSize/h);
+            h=maxSize;
+          }
+        }
+        const canvas=document.createElement('canvas');
+        canvas.width=w;
+        canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='white';
+        ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',0.85));
+      }catch(e){reject(e);}
+    };
+    img.onerror=()=>reject(new Error('画像の読み込みに失敗しました'));
+    img.src=dataUrl;
+  });
+}
+
+// 共通の画像処理＋API送信
+async function processReceiptImage(fullDataUrl){
   const statusEl=document.getElementById('ai-scan-status');
   statusEl.style.display='block';
   statusEl.style.background='var(--accent-light)';
   statusEl.style.color='var(--accent)';
-  statusEl.innerHTML='🤖 <strong>AIが読み取り中...</strong>（5〜10秒程度）';
+  statusEl.innerHTML='🤖 <strong>画像を準備中...</strong>';
 
   try{
-    // 画像をBase64に変換
-    const base64=await new Promise((resolve,reject)=>{
-      const reader=new FileReader();
-      reader.onload=e=>{
-        const result=e.target.result;
-        // data:image/jpeg;base64, を除去
-        const base64Only=result.split(',')[1];
-        resolve({base64:base64Only,full:result,type:file.type});
-      };
-      reader.onerror=reject;
-      reader.readAsDataURL(file);
-    });
+    // リサイズ
+    const resized=await resizeImageForOcr(fullDataUrl, 1568);
+    const base64Only=resized.split(',')[1];
 
     // 写真として登録
-    currentExpenseReceipt=base64.full;
+    currentExpenseReceipt=fullDataUrl;
     document.getElementById('exp-receipt-name').textContent='✓ AI読み取り完了';
     const thumb=document.getElementById('exp-receipt-thumb');
     const del=document.getElementById('exp-receipt-del');
     if(thumb){thumb.src=currentExpenseReceipt;thumb.style.display='block';}
     if(del) del.style.display='inline-flex';
 
-    // Cloudflare Workers経由でClaude APIに送信
+    statusEl.innerHTML='🤖 <strong>AIが読み取り中...</strong>（5〜10秒程度）';
+
     const res=await fetch('/api/receipt-ocr',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        image:base64.base64,
-        mediaType:base64.type
+        image:base64Only,
+        mediaType:'image/jpeg'
       })
     });
 
@@ -5223,8 +5345,6 @@ async function handleAiReceiptScan(ev){
     }
 
     const d=result.data;
-
-    // フォームに自動入力（要素存在チェック付き）
     const setVal=(id,val)=>{
       if(val===undefined||val===null||val==='') return;
       const el=document.getElementById(id);
@@ -5243,7 +5363,6 @@ async function handleAiReceiptScan(ev){
     if(d.vendor||d.memo) setVal('exp-desc', [d.vendor,d.memo].filter(Boolean).join(' / '));
     if(d.memo&&d.vendor) setVal('exp-memo', d.memo);
 
-    // 税込金額を再計算表示
     if(typeof calcExpTax==='function') calcExpTax();
 
     statusEl.style.background='#E6F2EA';
@@ -5255,6 +5374,36 @@ async function handleAiReceiptScan(ev){
     statusEl.style.background='#FDE5DD';
     statusEl.style.color='#C0392B';
     statusEl.innerHTML='❌ <strong>通信エラー</strong>: '+e.message;
+  }
+}
+
+async function handleAiReceiptScan(ev){
+  const file=ev.target.files[0];
+  if(!file)return;
+  if(file.size>10*1024*1024){
+    showToast('画像は10MB以下にしてください','#C0392B');
+    ev.target.value='';
+    return;
+  }
+
+  try{
+    // ファイル読込
+    const fullDataUrl=await new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=e=>resolve(e.target.result);
+      reader.onerror=reject;
+      reader.readAsDataURL(file);
+    });
+    // 共通の処理関数を呼び出し
+    await processReceiptImage(fullDataUrl);
+  }catch(e){
+    const statusEl=document.getElementById('ai-scan-status');
+    if(statusEl){
+      statusEl.style.display='block';
+      statusEl.style.background='#FDE5DD';
+      statusEl.style.color='#C0392B';
+      statusEl.innerHTML='❌ <strong>画像読込エラー</strong>: '+e.message;
+    }
   }finally{
     ev.target.value='';
   }
