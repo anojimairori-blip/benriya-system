@@ -1075,7 +1075,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.15.3</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.16</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1099,7 +1099,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.15.3</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.16</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1134,7 +1134,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.15.3</div>
+    <div class="logo-version" id="sidebar-version">v3.16</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -3172,8 +3172,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.15.3';
-const APP_BUILD_TIME='2026/04/19 07:51';
+const APP_VERSION='v3.16';
+const APP_BUILD_TIME='2026/04/19 08:06';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7684,100 +7684,289 @@ function _showPublicDocPortal(data, expiresAt){
 
   const fmtNum=n=>(Number(n)||0).toLocaleString('ja-JP');
   const docColor={見積書:'#C49A2D', 請求書:'#1A73E8', 領収書:'#2D5A3D'}[d.type]||'#666';
+  const docColorLight={見積書:'#FAF6E8', 請求書:'#E8F0FB', 領収書:'#E8F0EC'}[d.type]||'#F5F5F5';
 
-  const linesHtml=(d.lines||[]).map(l=>{
+  // ========== モバイル: カード形式 ==========
+  const linesMobile=(d.lines||[]).map(l=>{
+    const amt=(Number(l.qty)||0)*(Number(l.price)||0);
+    return `<div class="line-card">
+      <div class="line-name">${_escPub(l.name||'')}</div>
+      <div class="line-meta">
+        <span>${_escPub(l.qty||'')} ${_escPub(l.unit||'')} × ¥${fmtNum(l.price)}</span>
+        <span class="line-amt">¥${fmtNum(amt)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // ========== A4: テーブル形式（PDF用） ==========
+  const linesPdf=(d.lines||[]).map(l=>{
     const amt=(Number(l.qty)||0)*(Number(l.price)||0);
     return `<tr>
-      <td style="padding:8px;border:1px solid #ddd">${_escPub(l.name||'')}</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:left">${_escPub(l.name||'')}</td>
       <td style="padding:8px;border:1px solid #ddd;text-align:right">${_escPub(l.qty||'')}</td>
-      <td style="padding:8px;border:1px solid #ddd">${_escPub(l.unit||'')}</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:center">${_escPub(l.unit||'')}</td>
       <td style="padding:8px;border:1px solid #ddd;text-align:right">¥${fmtNum(l.price)}</td>
       <td style="padding:8px;border:1px solid #ddd;text-align:right;font-weight:600">¥${fmtNum(amt)}</td>
     </tr>`;
   }).join('');
 
+  // PDFファイル名
+  const pdfFilename = `${d.type||'書類'}_${d.number||'doc'}.pdf`;
+
   document.body.innerHTML=`
-<div style="min-height:100vh;background:#F5F3EE;font-family:'Hiragino Sans','Noto Sans JP',sans-serif;padding:20px">
-  <div style="max-width:800px;margin:0 auto">
-    <div style="background:white;border-radius:12px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)">
-      <div style="text-align:center;color:#666;font-size:12px;margin-bottom:16px;padding:10px;background:#FEF7E6;border:1px solid #F5D76E;border-radius:8px">
-        🔒 このページは期限付きの安全な共有リンクで表示されています　⏰ 閲覧期限: ${expStr}
-      </div>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif;color:#333;line-height:1.6}
+.portal-wrap{max-width:760px;margin:0 auto;padding:14px 12px 32px}
 
-      <!-- 書類本体 -->
-      <div id="doc-area" style="background:white;padding:30px;border:1px solid #eee;border-radius:8px">
-        <div style="text-align:right;color:#999;font-size:11px;font-family:monospace">${_escPub(d.number||'')}</div>
-        <h1 style="text-align:center;font-size:26px;font-weight:700;margin:12px 0 24px;color:${docColor};letter-spacing:8px">${_escPub(d.type||'')}</h1>
+/* ヘッダー: 期限バナー */
+.expiry-banner{background:#FEF7E6;border:1px solid #F5D76E;border-radius:10px;padding:10px 14px;font-size:12px;color:#7B5C00;text-align:center;margin-bottom:14px}
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
-          <div>
-            <div style="font-size:18px;font-weight:700;border-bottom:2px solid #333;padding-bottom:4px;margin-bottom:8px">${_escPub(c.name||d.customer||'')}　${_escPub(c.honorific||'御中')}</div>
-            ${c.dept?`<div style="font-size:13px;color:#666">${_escPub(c.dept)}</div>`:''}
-            ${d.contact?`<div style="font-size:13px;color:#555">担当：${_escPub(d.contact)} 様</div>`:''}
-            ${c.address?`<div style="font-size:11px;color:#888;margin-top:4px">〒${_escPub(c.zip||'')} ${_escPub(c.address)}</div>`:''}
-            ${c.tel?`<div style="font-size:11px;color:#888">Tel: ${_escPub(c.tel)}</div>`:''}
-          </div>
-          <div style="text-align:right">
-            ${s.logo?`<img src="${_escPub(s.logo)}" alt="" style="max-width:120px;max-height:60px;margin-bottom:8px">`:''}
-            <div style="font-weight:700">${_escPub(s.company||'')}</div>
-            <div style="font-size:12px;color:#555">${_escPub(s.address||'')}</div>
-            <div style="font-size:12px;color:#555">${_escPub(s.tel||'')}${s.fax?' / FAX:'+_escPub(s.fax):''}</div>
-            ${s.email?`<div style="font-size:12px;color:#555">${_escPub(s.email)}</div>`:''}
-            ${d.staff?`<div style="font-size:12px;color:#555;margin-top:4px">担当：${_escPub(d.staff)}</div>`:''}
-            <div style="font-size:12px;margin-top:6px">発行日：${_escPub(d.date||'')}</div>
-            ${d.dueDate&&d.type==='請求書'?`<div style="font-size:12px">支払期限：${_escPub(d.dueDate)}</div>`:''}
-          </div>
-        </div>
+/* 書類カード（スマホ表示） */
+.doc-card{background:white;border-radius:14px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:14px}
 
-        <div style="background:#F5F3EE;padding:10px 14px;border-left:4px solid ${docColor};margin-bottom:16px">
-          <span style="color:#666;font-size:12px;margin-right:8px">件名</span>
-          <span style="font-weight:600">${_escPub(d.subject||'')}</span>
-        </div>
+/* 書類タイプヘッダー */
+.doc-header{text-align:center;padding:14px 0 18px;border-bottom:3px solid ${docColor};margin-bottom:18px}
+.doc-number{font-size:11px;color:#999;font-family:'SF Mono',monospace;letter-spacing:0.5px}
+.doc-title{font-size:28px;font-weight:700;color:${docColor};letter-spacing:8px;margin:6px 0;line-height:1}
+.doc-date{font-size:12px;color:#666;margin-top:4px}
 
-        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px">
-          <thead>
-            <tr style="background:#F0EDE7">
-              <th style="padding:8px;border:1px solid #ddd;text-align:left">品目</th>
-              <th style="padding:8px;border:1px solid #ddd;text-align:right;width:60px">数量</th>
-              <th style="padding:8px;border:1px solid #ddd;width:60px">単位</th>
-              <th style="padding:8px;border:1px solid #ddd;text-align:right;width:100px">単価</th>
-              <th style="padding:8px;border:1px solid #ddd;text-align:right;width:100px">金額</th>
-            </tr>
-          </thead>
-          <tbody>${linesHtml}</tbody>
-        </table>
+/* 顧客名（一番大きく目立つ） */
+.cust-block{background:${docColorLight};border-radius:10px;padding:14px;margin-bottom:14px}
+.cust-name{font-size:20px;font-weight:700;color:#222;margin-bottom:2px}
+.cust-honor{display:inline-block;background:white;color:${docColor};padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600;margin-left:6px}
+.cust-meta{font-size:12px;color:#666;margin-top:6px;line-height:1.5}
 
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-          <table style="font-size:13px">
-            <tr><td style="padding:4px 10px;text-align:right">小計:</td><td style="padding:4px 10px;text-align:right;min-width:100px">¥${fmtNum(d.subtotal)}</td></tr>
-            <tr><td style="padding:4px 10px;text-align:right">消費税:</td><td style="padding:4px 10px;text-align:right">¥${fmtNum(d.tax)}</td></tr>
-            <tr style="font-size:16px;font-weight:700;border-top:2px solid #333"><td style="padding:6px 10px;text-align:right">合計:</td><td style="padding:6px 10px;text-align:right;color:${docColor}">¥${fmtNum(d.grandTotal)}</td></tr>
-          </table>
-        </div>
+/* 件名 */
+.subject-block{background:#F8F8F8;border-left:4px solid ${docColor};padding:10px 12px;border-radius:6px;margin-bottom:14px}
+.subject-label{font-size:10px;color:#999;font-weight:600;letter-spacing:0.5px;margin-bottom:2px;text-transform:uppercase}
+.subject-text{font-size:15px;font-weight:600;color:#222}
 
-        ${d.notes?`<div style="background:#F8F8F8;padding:12px;border-radius:6px;font-size:12px;white-space:pre-wrap;color:#555">${_escPub(d.notes)}</div>`:''}
-        ${s.bank?`<div style="margin-top:16px;font-size:12px;color:#555"><strong>お振込先：</strong>${_escPub(s.bank)}${s.account?' / '+_escPub(s.account):''}</div>`:''}
-      </div>
+/* 品目: モバイルカード */
+.lines-mobile{display:block}
+.line-card{background:#FBFAF7;border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid #EEE}
+.line-name{font-size:14px;font-weight:600;color:#222;margin-bottom:5px;line-height:1.4}
+.line-meta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#666}
+.line-amt{font-weight:700;color:#222;font-size:14px}
 
-      <!-- 操作ボタン -->
-      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
-        <button onclick="window.print()" style="padding:10px 20px;background:#1A73E8;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:600">🖨️ 印刷・PDF保存</button>
-      </div>
+/* 合計 */
+.total-block{background:${docColor};color:white;border-radius:10px;padding:14px 16px;margin:14px 0}
+.total-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:0.9;margin-bottom:4px}
+.total-grand{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.3);padding-top:8px;margin-top:8px}
+.total-grand-label{font-size:14px;font-weight:600}
+.total-grand-value{font-size:24px;font-weight:700;letter-spacing:1px}
 
-      <div style="text-align:center;margin-top:20px;font-size:11px;color:#aaa">
-        Powered by Flexsys2026
-      </div>
+/* 備考 */
+.notes-block{background:#F8F8F8;border-radius:8px;padding:12px;font-size:12px;white-space:pre-wrap;color:#555;line-height:1.7;margin-top:14px}
+
+/* 振込先 */
+.bank-block{background:#F0F8FF;border-radius:8px;padding:12px;margin-top:14px;font-size:12px;color:#333;border-left:3px solid #4A90E2}
+.bank-block strong{display:block;font-size:11px;color:#4A90E2;margin-bottom:3px;letter-spacing:0.5px}
+
+/* 自社情報フッター */
+.company-footer{margin-top:20px;padding:14px;background:#FAFAF8;border-radius:8px;font-size:11px;color:#777;line-height:1.6;text-align:center}
+.company-name{font-weight:700;font-size:13px;color:#444;margin-bottom:4px}
+.company-logo{max-width:80px;max-height:40px;margin-bottom:6px}
+
+/* ボタンエリア */
+.action-bar{position:sticky;bottom:0;background:white;padding:12px 14px;margin:0 -12px;border-top:1px solid #EEE;box-shadow:0 -2px 8px rgba(0,0,0,0.04);z-index:10}
+.btn-pdf{display:flex;align-items:center;justify-content:center;width:100%;padding:14px;background:${docColor};color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.1);font-family:inherit}
+.btn-pdf:active{transform:scale(0.98);opacity:0.9}
+.btn-pdf:disabled{opacity:0.6;cursor:wait}
+.btn-print{display:flex;align-items:center;justify-content:center;width:100%;padding:11px;background:white;color:${docColor};border:1px solid ${docColor};border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px}
+
+/* ローディング */
+.loader-spin{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.footer-credit{text-align:center;font-size:10px;color:#aaa;margin-top:14px;padding-bottom:12px}
+
+/* PDF用エリア（オフスクリーン: A4サイズ用) */
+#pdf-source{position:fixed;left:-99999px;top:0;width:794px;background:white;padding:40px 30px;font-family:'Hiragino Sans','Noto Sans JP',sans-serif;color:#333;font-size:13px;line-height:1.5}
+
+@media (min-width:600px){
+  /* タブレット以上: 2カラムレイアウト */
+  .portal-wrap{padding:20px}
+  .doc-title{font-size:32px}
+  .cust-name{font-size:22px}
+}
+
+@media print{
+  .action-bar, .expiry-banner, .footer-credit{display:none !important}
+  body{background:white}
+  .doc-card{box-shadow:none;border-radius:0;padding:0}
+}
+</style>
+
+<div class="portal-wrap">
+  <div class="expiry-banner">
+    🔒 期限付きの安全な共有リンクです（${expStr}まで有効）
+  </div>
+
+  <div class="doc-card" id="display-card">
+    <!-- タイトル -->
+    <div class="doc-header">
+      <div class="doc-number">${_escPub(d.number||'')}</div>
+      <div class="doc-title">${_escPub(d.type||'')}</div>
+      <div class="doc-date">${_escPub(d.date||'')}${d.dueDate&&d.type==='請求書'?` / 支払期限: ${_escPub(d.dueDate)}`:''}</div>
+    </div>
+
+    <!-- 顧客名 -->
+    <div class="cust-block">
+      <div class="cust-name">${_escPub(c.name||d.customer||'')}<span class="cust-honor">${_escPub(c.honorific||'御中')}</span></div>
+      ${c.dept?`<div class="cust-meta">${_escPub(c.dept)}</div>`:''}
+      ${d.contact?`<div class="cust-meta">担当: ${_escPub(d.contact)} 様</div>`:''}
+    </div>
+
+    <!-- 件名 -->
+    ${d.subject?`<div class="subject-block">
+      <div class="subject-label">件名 / Subject</div>
+      <div class="subject-text">${_escPub(d.subject)}</div>
+    </div>`:''}
+
+    <!-- 品目: モバイルカード形式 -->
+    <div class="lines-mobile">${linesMobile}</div>
+
+    <!-- 合計 -->
+    <div class="total-block">
+      <div class="total-row"><span>小計</span><span>¥${fmtNum(d.subtotal)}</span></div>
+      <div class="total-row"><span>消費税</span><span>¥${fmtNum(d.tax)}</span></div>
+      <div class="total-grand"><span class="total-grand-label">合計金額</span><span class="total-grand-value">¥${fmtNum(d.grandTotal)}</span></div>
+    </div>
+
+    <!-- 備考 -->
+    ${d.notes?`<div class="notes-block">${_escPub(d.notes)}</div>`:''}
+
+    <!-- 振込先 -->
+    ${s.bank&&d.type!=='領収書'?`<div class="bank-block">
+      <strong>お振込先 / Payment</strong>
+      ${_escPub(s.bank)}${s.account?'<br>'+_escPub(s.account):''}
+    </div>`:''}
+
+    <!-- 自社情報（フッター） -->
+    <div class="company-footer">
+      ${s.logo?`<img src="${_escPub(s.logo)}" alt="" class="company-logo"><br>`:''}
+      <div class="company-name">${_escPub(s.company||'')}</div>
+      ${s.zip?`〒${_escPub(s.zip)} `:''}${_escPub(s.address||'')}
+      ${s.tel?`<br>TEL: ${_escPub(s.tel)}`:''}${s.fax?` / FAX: ${_escPub(s.fax)}`:''}
+      ${s.email?`<br>${_escPub(s.email)}`:''}
+      ${d.staff?`<br><span style="color:#999;font-size:10px">担当: ${_escPub(d.staff)}</span>`:''}
     </div>
   </div>
+
+  <!-- ボタン -->
+  <div class="action-bar">
+    <button class="btn-pdf" id="pdf-download-btn" onclick="_downloadPortalPdf()">📄 PDFをダウンロード</button>
+    <button class="btn-print" onclick="window.print()">🖨️ 印刷</button>
+  </div>
+
+  <div class="footer-credit">Powered by Flexsys2026</div>
 </div>
-<style>
-@media print{
-  body{background:white !important}
-  button{display:none !important}
-  #doc-area{border:none !important;padding:0 !important}
-  div[style*="FEF7E6"]{display:none !important}
-}
-</style>`;
+
+<!-- PDF生成用の隠しエリア（A4レイアウト） -->
+<div id="pdf-source">
+  <div style="border-bottom:3px solid ${docColor};padding-bottom:14px;margin-bottom:18px">
+    <div style="text-align:right;color:#999;font-size:11px;font-family:monospace">${_escPub(d.number||'')}</div>
+    <h1 style="text-align:center;font-size:32px;font-weight:700;margin:8px 0;color:${docColor};letter-spacing:10px">${_escPub(d.type||'')}</h1>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;margin-bottom:24px">
+    <div style="flex:1;max-width:60%">
+      <div style="font-size:22px;font-weight:700;border-bottom:2px solid #333;padding-bottom:5px;margin-bottom:8px">${_escPub(c.name||d.customer||'')}　${_escPub(c.honorific||'御中')}</div>
+      ${c.dept?`<div style="font-size:13px;color:#666;margin-bottom:3px">${_escPub(c.dept)}</div>`:''}
+      ${d.contact?`<div style="font-size:13px;color:#555;margin-bottom:3px">担当：${_escPub(d.contact)} 様</div>`:''}
+      ${c.address?`<div style="font-size:11px;color:#888;margin-top:6px">〒${_escPub(c.zip||'')} ${_escPub(c.address)}</div>`:''}
+      ${c.tel?`<div style="font-size:11px;color:#888">Tel: ${_escPub(c.tel)}</div>`:''}
+    </div>
+    <div style="text-align:right;flex-shrink:0;max-width:38%">
+      ${s.logo?`<img src="${_escPub(s.logo)}" alt="" style="max-width:120px;max-height:55px;margin-bottom:6px">`:''}
+      <div style="font-weight:700;font-size:14px">${_escPub(s.company||'')}</div>
+      ${s.zip?`<div style="font-size:11px;color:#555">〒${_escPub(s.zip)}</div>`:''}
+      <div style="font-size:11px;color:#555">${_escPub(s.address||'')}</div>
+      ${s.tel?`<div style="font-size:11px;color:#555">TEL: ${_escPub(s.tel)}</div>`:''}
+      ${s.fax?`<div style="font-size:11px;color:#555">FAX: ${_escPub(s.fax)}</div>`:''}
+      ${s.email?`<div style="font-size:11px;color:#555">${_escPub(s.email)}</div>`:''}
+      ${d.staff?`<div style="font-size:12px;margin-top:6px">担当：${_escPub(d.staff)}</div>`:''}
+      <div style="font-size:12px;margin-top:4px">発行日：${_escPub(d.date||'')}</div>
+      ${d.dueDate&&d.type==='請求書'?`<div style="font-size:12px">支払期限：${_escPub(d.dueDate)}</div>`:''}
+    </div>
+  </div>
+
+  ${d.subject?`<div style="background:${docColorLight};padding:10px 14px;border-left:5px solid ${docColor};margin-bottom:16px">
+    <span style="color:#666;font-size:11px;margin-right:10px;font-weight:600">件名</span>
+    <span style="font-weight:600;font-size:14px">${_escPub(d.subject)}</span>
+  </div>`:''}
+
+  <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px">
+    <thead>
+      <tr style="background:${docColorLight}">
+        <th style="padding:9px;border:1px solid #ccc;text-align:left;font-size:12px">品目</th>
+        <th style="padding:9px;border:1px solid #ccc;text-align:right;width:60px;font-size:12px">数量</th>
+        <th style="padding:9px;border:1px solid #ccc;text-align:center;width:50px;font-size:12px">単位</th>
+        <th style="padding:9px;border:1px solid #ccc;text-align:right;width:90px;font-size:12px">単価</th>
+        <th style="padding:9px;border:1px solid #ccc;text-align:right;width:100px;font-size:12px">金額</th>
+      </tr>
+    </thead>
+    <tbody>${linesPdf}</tbody>
+  </table>
+
+  <div style="display:flex;justify-content:flex-end;margin-bottom:18px">
+    <table style="font-size:13px;border-collapse:collapse">
+      <tr><td style="padding:5px 14px;text-align:right;color:#666">小計:</td><td style="padding:5px 14px;text-align:right;min-width:120px">¥${fmtNum(d.subtotal)}</td></tr>
+      <tr><td style="padding:5px 14px;text-align:right;color:#666">消費税:</td><td style="padding:5px 14px;text-align:right">¥${fmtNum(d.tax)}</td></tr>
+      <tr style="font-size:18px;font-weight:700;border-top:2px solid #333"><td style="padding:8px 14px;text-align:right;color:${docColor}">合計:</td><td style="padding:8px 14px;text-align:right;color:${docColor}">¥${fmtNum(d.grandTotal)}</td></tr>
+    </table>
+  </div>
+
+  ${d.notes?`<div style="background:#FAFAF8;border-left:3px solid #999;padding:12px 14px;font-size:12px;white-space:pre-wrap;color:#555;line-height:1.7;margin-bottom:14px">${_escPub(d.notes)}</div>`:''}
+
+  ${s.bank&&d.type!=='領収書'?`<div style="background:#F0F8FF;border-left:3px solid #4A90E2;padding:11px 14px;font-size:12px;color:#333">
+    <strong style="color:#4A90E2;font-size:11px;display:block;margin-bottom:3px">お振込先</strong>
+    ${_escPub(s.bank)}${s.account?'<br>'+_escPub(s.account):''}
+  </div>`:''}
+</div>
+
+<` + `script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+  integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"><\/script>
+
+<` + `script>
+window._pdfFilename = ${JSON.stringify(pdfFilename)};
+window._downloadPortalPdf = async function(){
+  const btn = document.getElementById('pdf-download-btn');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader-spin"></span>PDF生成中...';
+  try{
+    if(typeof html2pdf === 'undefined'){
+      // ライブラリが読み込まれていない場合はリトライ
+      await new Promise((resolve, reject)=>{
+        let waited = 0;
+        const iv = setInterval(()=>{
+          if(typeof html2pdf !== 'undefined'){ clearInterval(iv); resolve(); }
+          else if(waited > 10000){ clearInterval(iv); reject(new Error('html2pdf 読み込み失敗')); }
+          waited += 100;
+        }, 100);
+      });
+    }
+    const source = document.getElementById('pdf-source');
+    await html2pdf().set({
+      margin: [10, 10, 10, 10],
+      filename: window._pdfFilename,
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css'] }
+    }).from(source).save();
+  }catch(e){
+    console.error('PDF generation error:', e);
+    alert('PDF生成に失敗しました: ' + e.message + '\\n\\n代わりに「印刷」ボタンを使用してください。');
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+};
+<\/script>`;
 }
 
 // 公開ポータル専用HTMLエスケープ
