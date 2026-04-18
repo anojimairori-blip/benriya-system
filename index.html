@@ -981,7 +981,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.11</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.11.1</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1005,7 +1005,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.11</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.11.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1040,7 +1040,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.11</div>
+    <div class="logo-version" id="sidebar-version">v3.11.1</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1175,7 +1175,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.11 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.11.1 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -3055,8 +3055,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.11';
-const APP_BUILD_TIME='2026/04/19 00:59';
+const APP_VERSION='v3.11.1';
+const APP_BUILD_TIME='2026/04/19 01:12';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4438,11 +4438,6 @@ function previewDoc(id){
   const logoHtml=s.logo?`<img src="${s.logo}" class="preview-logo" alt="logo">`:'';
   const c=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
   const docColorClass={'見積書':'doc-quote','請求書':'doc-invoice','領収書':'doc-receipt'}[d.type]||'';
-  // 監査情報（会社名下に小さく表示する文字列）
-  const auditInline=[];
-  if(d.createdByName||d.createdBy) auditInline.push(`作成: ${escAttr(d.createdByName||d.createdBy)} (${formatDateTime(d.createdAt)})`);
-  if(d.updatedByName||d.updatedBy) auditInline.push(`更新: ${escAttr(d.updatedByName||d.updatedBy)} (${formatDateTime(d.updatedAt)})`);
-  const auditStr=auditInline.length?`<p class="audit-line" style="font-size:10px;color:#999;margin-top:6px;line-height:1.4">${auditInline.join(' / ')}</p>`:'';
 
   document.getElementById('preview-body').innerHTML=`
   <div class="preview-doc ${docColorClass}">
@@ -4459,11 +4454,10 @@ function previewDoc(id){
       </div>
       <div class="preview-from">
         ${logoHtml}<p><strong>${escAttr(s.company||'（会社名未設定）')}</strong></p>
-        <p>${escAttr(s.owner||'')}</p><p>${escAttr(s.address||'')}</p><p>${escAttr(s.tel||'')}${s.fax?' / FAX:'+escAttr(s.fax):''}</p><p>${escAttr(s.email||'')}</p>
+        <p>${escAttr(s.address||'')}</p><p>${escAttr(s.tel||'')}${s.fax?' / FAX:'+escAttr(s.fax):''}</p><p>${escAttr(s.email||'')}</p>
         ${d.staff?`<p style="margin-top:4px">担当：${escAttr(d.staff)}</p>`:''}
         <p style="margin-top:5px">発行日：${escAttr(d.date||'')}</p>
         ${d.dueDate&&d.type==='請求書'?`<p>支払期限：${escAttr(d.dueDate)}</p>`:''}
-        ${auditStr}
       </div>
     </div>
 
@@ -5856,7 +5850,22 @@ async function fbLoadAll(uid){
     const userDoc = F.doc(F.db, 'users', uid);
     const snap = await F.getDoc(userDoc);
     const data = snap.exists() ? snap.data() : {};
-    if(data.docs)       docs       = data.docs;
+
+    // docs は分割保存されている可能性 → _docsInChunks フラグをチェック
+    if(data._docsInChunks){
+      // チャンクから復元
+      const chunksSnap = await F.getDocs(F.collection(F.db,'users',uid,'docChunks'));
+      const allDocs=[];
+      const sortedChunks=[];
+      chunksSnap.forEach(d=>sortedChunks.push({idx:d.data().chunkIndex||0, docs:d.data().docs||[]}));
+      sortedChunks.sort((a,b)=>a.idx-b.idx);
+      sortedChunks.forEach(ch=>allDocs.push(...ch.docs));
+      docs = allDocs;
+      console.log(`[load] Loaded ${docs.length} docs from ${sortedChunks.length} chunks`);
+    } else if(data.docs){
+      docs = data.docs;
+    }
+
     if(data.customers)  customers  = data.customers;
     if(data.settings)   settings   = data.settings;
     if(data.jobs)       jobs       = data.jobs;
@@ -5964,10 +5973,8 @@ async function _fbPersist(){
     const uid = currentUser.uid;
 
     // 画像データを除外したexpensesを作成（Firestoreは配列内のネストを許可しない）
-    // receipt（Base64画像）はローカルのみ保管、Firestoreにはプレースホルダーのみ
     const expensesForFB = expenses.map(e=>{
       const copy = {...e};
-      // 画像データを除去（サイズ大＋Firestoreの配列ネスト制約）
       if(copy.receipt) copy.receipt = '__local_only__';
       if(copy.receiptPhoto) copy.receiptPhoto = '__local_only__';
       if(copy.receiptPhotos) delete copy.receiptPhotos;
@@ -5981,7 +5988,8 @@ async function _fbPersist(){
       return copy;
     });
 
-    await F.setDoc(F.doc(F.db,'users',uid),{
+    // サイズ見積もり（Firestoreの1MB制限回避）
+    const payload = {
       docs: docsForFB,
       customers, settings, jobs, templates,
       employees, branches, payments,
@@ -5989,14 +5997,57 @@ async function _fbPersist(){
       bulletins,
       updatedAt: new Date().toISOString(),
       updatedBy: currentUser.email||uid
-    });
+    };
+    const sizeBytes = new Blob([JSON.stringify(payload)]).size;
+    const SIZE_LIMIT = 900 * 1024; // 900KB（Firestore 1MB上限の90%で安全マージン）
+
+    if(sizeBytes < SIZE_LIMIT){
+      // 通常保存（サイズOK）
+      await F.setDoc(F.doc(F.db,'users',uid), payload);
+      // 分割保存が過去にあれば、まとめ直したので削除
+      try{
+        const chunksSnap = await F.getDocs(F.collection(F.db,'users',uid,'docChunks'));
+        const deletePromises=[];
+        chunksSnap.forEach(d=>deletePromises.push(F.deleteDoc(d.ref)));
+        if(deletePromises.length) await Promise.all(deletePromises);
+      }catch(e){}
+    } else {
+      // サイズ超過 → docs だけ分割して別コレクションに保存
+      console.warn(`[persist] Size ${(sizeBytes/1024).toFixed(0)}KB exceeds limit, splitting docs`);
+
+      // メイン側からdocsを外して保存
+      const mainPayload = {...payload};
+      delete mainPayload.docs;
+      mainPayload._docsInChunks = true;
+      await F.setDoc(F.doc(F.db,'users',uid), mainPayload);
+
+      // docsを100件ずつチャンクに分けて保存
+      const CHUNK_SIZE = 100;
+      const chunks = [];
+      for(let i=0; i<docsForFB.length; i+=CHUNK_SIZE){
+        chunks.push(docsForFB.slice(i, i+CHUNK_SIZE));
+      }
+      // 既存チャンクを削除
+      try{
+        const existingChunks = await F.getDocs(F.collection(F.db,'users',uid,'docChunks'));
+        existingChunks.forEach(d=>F.deleteDoc(d.ref));
+      }catch(e){}
+      // 新しいチャンクを保存
+      await Promise.all(chunks.map((chunk,idx)=>
+        F.setDoc(F.doc(F.db,'users',uid,'docChunks','chunk_'+String(idx).padStart(4,'0')),{
+          docs: chunk, chunkIndex: idx, totalChunks: chunks.length
+        })
+      ));
+      console.log(`[persist] Saved ${docsForFB.length} docs in ${chunks.length} chunks`);
+    }
+
     // 写真データは別保存（サイズ大）
     if(Object.keys(docPhotos).length > 0){
       await F.setDoc(F.doc(F.db,'users',uid,'extra','photos'),{ docPhotos });
     }
   }catch(e){
     console.error('FB save error:',e);
-    showToast('同期エラー（ローカル保存済み）','#E67E22');
+    showToast(`同期エラー（ローカル保存済み）: ${e.message}`,'#E67E22');
   }finally{
     hideSync();
   }
