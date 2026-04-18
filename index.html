@@ -120,6 +120,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .nav-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
 .nav-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
+/* ドラッグハンドル（管理メニュー並び替え用） */
+.nav-mgmt-row{position:relative}
+.nav-drag-handle{margin-left:auto;padding:4px 8px;font-size:14px;color:rgba(255,255,255,.4);cursor:grab;border-radius:4px;flex-shrink:0;user-select:none;line-height:1;transition:color .15s,background .15s}
+.nav-mgmt-row:hover .nav-drag-handle{color:rgba(255,255,255,.85);background:rgba(255,255,255,.08)}
+.nav-drag-handle:hover{color:white !important;background:rgba(255,255,255,.18) !important}
+.nav-drag-handle:active{cursor:grabbing}
+.sidebar.collapsed .nav-drag-handle{display:none}
+
 /* ===== COLLAPSED HOVER TOOLTIP ===== */
 .nav-tooltip{
   display:none;
@@ -727,6 +735,9 @@ if(typeof QRCode === 'undefined'){
   const auth = getAuth(app);
   const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
+  // Googleカレンダー連携用スコープ
+  provider.addScope('https://www.googleapis.com/auth/calendar.events');
+  provider.setCustomParameters({prompt:'consent'});
 
   // グローバルに公開
   window._FB = { auth, db, provider, GoogleAuthProvider,
@@ -753,7 +764,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.4</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.5</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -777,7 +788,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.4</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.5</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -812,7 +823,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.4</div>
+    <div class="logo-version" id="sidebar-version">v3.5</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -947,7 +958,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.4 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.5 · 2026/04/18 09:00</span>
     </div>
     <div class="header-actions">
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -1035,6 +1046,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <h2>📅 作業カレンダー</h2>
     <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" onclick="openGcalSettingsModal()" title="Googleカレンダー連携">📅 Google連携</button>
       <button class="btn btn-secondary btn-sm" onclick="calPrev()">◀</button>
       <span id="cal-label" style="font-size:14px;font-weight:700;padding:0 6px"></span>
       <button class="btn btn-secondary btn-sm" onclick="calNext()">▶</button>
@@ -2475,6 +2487,60 @@ if('serviceWorker' in navigator){
 </div>
 </div>
 
+<!-- GOOGLE CALENDAR SETTINGS MODAL -->
+<div class="modal-overlay" id="gcal-settings-modal">
+<div class="modal" style="max-width:520px">
+  <div class="modal-header"><h3>📅 Googleカレンダー連携</h3><button class="close-btn" onclick="closeModal('gcal-settings-modal')">✕</button></div>
+  <div class="modal-body">
+    <div style="background:var(--blue-light);border:1px solid #B0D0F0;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--blue);line-height:1.6">
+      💡 作業カレンダーで追加した予定をGoogleカレンダーに自動同期します。スマホのカレンダーアプリでも見られるようになります。
+    </div>
+
+    <div style="margin-bottom:14px;padding:10px 12px;background:var(--surface2);border-radius:8px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:4px">認証状態</div>
+      <div id="gcal-token-status" style="font-size:13px;font-weight:600">確認中...</div>
+    </div>
+
+    <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface2);border-radius:8px;margin-bottom:14px;cursor:pointer">
+      <input type="checkbox" id="gcal-enabled" style="width:18px;height:18px">
+      <div>
+        <div style="font-size:13px;font-weight:600">連携を有効にする</div>
+        <div style="font-size:11px;color:var(--text3)">作業の追加・編集・削除がGoogleカレンダーに反映されます</div>
+      </div>
+    </label>
+
+    <div class="form-group" style="margin-bottom:14px">
+      <label>書き込み先カレンダー</label>
+      <select id="gcal-calendar-select" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px">
+        <option value="primary">メインカレンダー</option>
+      </select>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">複数のGoogleカレンダーをお持ちの場合、書き込み先を選択できます</div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-secondary btn-sm" onclick="window.open('https://calendar.google.com','_blank')">📅 Googleカレンダーを開く</button>
+      <button class="btn btn-secondary btn-sm" onclick="syncAllJobsToGcal()">🔄 全予定を再同期</button>
+    </div>
+
+    <details style="margin-top:14px;font-size:12px;color:var(--text2)">
+      <summary style="cursor:pointer;font-weight:600">📖 セットアップ手順</summary>
+      <ol style="padding-left:20px;margin-top:8px;line-height:1.8">
+        <li>「連携を有効にする」をON</li>
+        <li>書き込み先カレンダーを選択（通常はメインでOK）</li>
+        <li>「保存」</li>
+        <li>初回は権限ダイアログ（Googleカレンダーへのアクセス）が出るので「許可」</li>
+        <li>作業を追加すると自動的にGoogleカレンダーに反映されます</li>
+      </ol>
+      <p style="margin-top:8px;color:var(--text3)">※ もし認証エラーが出る場合は、一度ログアウトして再ログインしてください</p>
+    </details>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="closeModal('gcal-settings-modal')">キャンセル</button>
+    <button class="btn btn-primary" onclick="saveGcalSettings()">💾 保存する</button>
+  </div>
+</div>
+</div>
+
 <!-- AI CAMERA CAPTURE MODAL（Webカメラ撮影用） -->
 <div class="modal-overlay" id="receipt-camera-modal">
 <div class="modal" style="max-width:640px">
@@ -2549,8 +2615,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.4';
-const APP_BUILD_TIME='2026/04/18 20:55';
+const APP_VERSION='v3.5';
+const APP_BUILD_TIME='2026/04/18 21:14';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4230,6 +4296,7 @@ function saveJob(){
   if(!title){showToast('作業内容を入力してください','#C0392B');return;}
   const sel=document.getElementById('job-customer-select');
   const custName=sel?.value||document.getElementById('job-customer')?.value||'';
+  const existing=editingJobId?jobs.find(x=>x.id===editingJobId):null;
   const j={
     id:editingJobId||('job-'+Date.now()),
     date:document.getElementById('job-date').value,
@@ -4237,16 +4304,27 @@ function saveJob(){
     customer:custName,
     title,
     category:document.getElementById('job-category').value,
-    memo:document.getElementById('job-memo').value
+    memo:document.getElementById('job-memo').value,
+    gcalEventId:existing?.gcalEventId||null
   };
+  if(existing){j.createdBy=existing.createdBy;j.createdByName=existing.createdByName;j.createdAt=existing.createdAt;}
+  stampAudit(j, !existing);
   if(editingJobId){jobs[jobs.findIndex(x=>x.id===editingJobId)]=j;}
   else jobs.push(j);
   persist();closeModal('job-modal');renderCalendar();
   showToast('作業予定を保存しました ✓');
+  // Googleカレンダー連携
+  if(isGcalEnabled()){
+    syncJobToGcal(j).catch(e=>console.warn('Gcal sync failed:',e));
+  }
 }
 function deleteJob(id){
   const j=jobs.find(x=>x.id===id);if(!j)return;
   pushUndo({type:'job',data:JSON.parse(JSON.stringify(j)),label:`作業「${j.title}」を削除しました`});
+  // Googleカレンダーからも削除
+  if(isGcalEnabled() && j.gcalEventId){
+    deleteJobFromGcal(j.gcalEventId).catch(e=>console.warn('Gcal delete failed:',e));
+  }
   jobs=jobs.filter(x=>x.id!==id);persist();renderCalendar();showToast("作業予定を削除しました");
 }
 
@@ -4563,7 +4641,15 @@ async function fbLogin(){
   if(!F){ document.getElementById('login-error').textContent='Firebase未設定。firebaseConfigを設定してください。'; return; }
   try{
     document.getElementById('login-error').textContent='';
-    await F.signInWithPopup(F.auth, new F.GoogleAuthProvider());
+    // ログイン後にCredentialからaccess tokenを取り出して保存
+    const result=await F.signInWithPopup(F.auth, F.provider);
+    try{
+      const cred=F.GoogleAuthProvider.credentialFromResult(result);
+      if(cred?.accessToken){
+        sessionStorage.setItem('google_access_token', cred.accessToken);
+        sessionStorage.setItem('google_token_at', String(Date.now()));
+      }
+    }catch(e){console.warn('Token capture failed:',e);}
   }catch(e){
     document.getElementById('login-error').textContent='ログイン失敗: '+e.message;
   }
@@ -6577,6 +6663,175 @@ function downloadQR(){
 // ===== UNDO TOAST (body-level) =====
 // Already defined above — ensure body gets the undo toast div
 
+// ===== Googleカレンダー連携 =====
+function isGcalEnabled(){
+  return localStorage.getItem('gcalEnabled')==='1';
+}
+function setGcalEnabled(v){
+  localStorage.setItem('gcalEnabled', v?'1':'0');
+}
+function getGcalCalendarId(){
+  return localStorage.getItem('gcalCalendarId')||'primary';
+}
+function setGcalCalendarId(id){
+  localStorage.setItem('gcalCalendarId', id||'primary');
+}
+function getGcalAccessToken(){
+  return sessionStorage.getItem('google_access_token')||'';
+}
+
+// 作業をGoogleカレンダーのイベントに変換
+function jobToGcalEvent(job){
+  const startTime=job.time||'09:00';
+  const [h,m]=startTime.split(':').map(Number);
+  const start=new Date(`${job.date}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:00`);
+  const end=new Date(start.getTime()+60*60*1000); // 1時間枠
+  const cust=job.customer?customers.find(c=>c.name===job.customer):null;
+  const lines=[];
+  if(job.customer) lines.push(`顧客: ${job.customer}`);
+  if(job.category) lines.push(`カテゴリ: ${job.category}`);
+  if(job.memo) lines.push(`メモ: ${job.memo}`);
+  lines.push(`─────────`);
+  lines.push(`Flexsys2026 ID: ${job.id}`);
+  lines.push(`Flexsys2026 から自動同期`);
+  return {
+    summary: `【${job.category||'作業'}】${job.title}`+(job.customer?` - ${job.customer}`:''),
+    location: cust?.address||'',
+    description: lines.join('\n'),
+    start: {dateTime: start.toISOString(), timeZone: 'Asia/Tokyo'},
+    end: {dateTime: end.toISOString(), timeZone: 'Asia/Tokyo'},
+    extendedProperties: {private: {flexsysJobId: job.id}}
+  };
+}
+
+// Calendar API呼び出し（共通）
+async function callGcalApi(path, method, body){
+  const token=getGcalAccessToken();
+  if(!token) throw new Error('Googleアクセストークンがありません。再ログインしてください。');
+  const url=`https://www.googleapis.com/calendar/v3${path}`;
+  const res=await fetch(url, {
+    method,
+    headers:{
+      'Authorization':`Bearer ${token}`,
+      'Content-Type':'application/json'
+    },
+    body: body?JSON.stringify(body):undefined
+  });
+  if(!res.ok){
+    if(res.status===401){
+      sessionStorage.removeItem('google_access_token');
+      throw new Error('認証期限切れ。一度ログアウトして再ログインしてください。');
+    }
+    const errText=await res.text();
+    throw new Error(`Gcal API Error ${res.status}: ${errText.slice(0,200)}`);
+  }
+  return res.status===204?null:await res.json();
+}
+
+// 作業をGoogleカレンダーに同期
+async function syncJobToGcal(job){
+  if(!isGcalEnabled()) return;
+  const calId=encodeURIComponent(getGcalCalendarId());
+  const event=jobToGcalEvent(job);
+  try{
+    if(job.gcalEventId){
+      // 既存イベント更新
+      await callGcalApi(`/calendars/${calId}/events/${encodeURIComponent(job.gcalEventId)}`,'PUT',event);
+    } else {
+      // 新規作成
+      const created=await callGcalApi(`/calendars/${calId}/events`,'POST',event);
+      job.gcalEventId=created.id;
+      // jobs配列の同レコードを更新
+      const idx=jobs.findIndex(x=>x.id===job.id);
+      if(idx>=0) jobs[idx].gcalEventId=created.id;
+      persist();
+    }
+  }catch(e){
+    showToast(`📅 Googleカレンダー同期エラー: ${e.message}`,'#C0392B');
+  }
+}
+
+// Googleカレンダーから削除
+async function deleteJobFromGcal(eventId){
+  if(!isGcalEnabled()) return;
+  const calId=encodeURIComponent(getGcalCalendarId());
+  try{
+    await callGcalApi(`/calendars/${calId}/events/${encodeURIComponent(eventId)}`,'DELETE');
+  }catch(e){
+    if(!String(e.message).includes('404')) console.warn('Gcal delete error:',e);
+  }
+}
+
+// すべての作業を一括同期
+async function syncAllJobsToGcal(){
+  if(!isGcalEnabled()){
+    showToast('まずGoogleカレンダー連携を有効にしてください','#E67E22');
+    return;
+  }
+  if(!getGcalAccessToken()){
+    showToast('再ログインが必要です','#E67E22');
+    return;
+  }
+  showToast(`🔄 ${jobs.length}件の作業を同期中...`);
+  let ok=0, ng=0;
+  for(const j of jobs){
+    try{
+      await syncJobToGcal(j);
+      ok++;
+    }catch(e){
+      ng++;
+    }
+  }
+  showToast(`✓ 同期完了: 成功${ok}件 / 失敗${ng}件`);
+}
+
+// 利用可能なカレンダー一覧を取得
+async function fetchGcalCalendarList(){
+  if(!getGcalAccessToken()){
+    showToast('再ログインが必要です','#E67E22');
+    return [];
+  }
+  try{
+    const res=await callGcalApi('/users/me/calendarList','GET');
+    return res.items||[];
+  }catch(e){
+    showToast(`カレンダー一覧取得エラー: ${e.message}`,'#C0392B');
+    return [];
+  }
+}
+
+// 設定画面を開く
+async function openGcalSettingsModal(){
+  // ステータス更新
+  document.getElementById('gcal-enabled').checked=isGcalEnabled();
+  document.getElementById('gcal-token-status').textContent=getGcalAccessToken()?'✅ 認証済み':'⚠️ 未認証（再ログインが必要）';
+  // カレンダー一覧取得
+  const sel=document.getElementById('gcal-calendar-select');
+  if(sel){
+    sel.innerHTML='<option value="primary">メインカレンダー</option>';
+    if(getGcalAccessToken()){
+      const cals=await fetchGcalCalendarList();
+      cals.forEach(c=>{
+        const opt=document.createElement('option');
+        opt.value=c.id;
+        opt.textContent=c.summary+(c.primary?' (メイン)':'');
+        sel.appendChild(opt);
+      });
+      sel.value=getGcalCalendarId();
+    }
+  }
+  document.getElementById('gcal-settings-modal').classList.add('open');
+}
+
+function saveGcalSettings(){
+  const enabled=document.getElementById('gcal-enabled').checked;
+  const calId=document.getElementById('gcal-calendar-select').value;
+  setGcalEnabled(enabled);
+  setGcalCalendarId(calId);
+  closeModal('gcal-settings-modal');
+  showToast(enabled?'✓ Googleカレンダー連携を有効化しました':'連携を無効化しました');
+}
+
 // ===== カレンダー顧客選択ヘルパー =====
 function buildJobCustSelect(selectedName){
   const sel=document.getElementById('job-customer-select');
@@ -6974,28 +7229,40 @@ function renderNavManagement(){
   const el=document.getElementById('nav-management');
   if(!el) return;
   const items=getNavManagementOrder();
-  el.innerHTML=items.map((it,i)=>`<div class="nav-item nav-draggable" draggable="true" data-nav-key="${it.key}" data-nav-idx="${i}" onclick="${it.action}" ondragstart="onNavDragStart(event,${i})" ondragover="onNavDragOver(event)" ondrop="onNavDrop(event,${i})" ondragend="onNavDragEnd(event)" ondragleave="onNavDragLeave(event)"><span class="nav-icon">${it.icon}</span><span class="nav-label">${it.label}</span><span class="nav-tooltip">${it.label}</span></div>`).join('');
+  el.innerHTML=items.map((it,i)=>`<div class="nav-item nav-mgmt-row" data-nav-key="${it.key}" data-nav-idx="${i}" onclick="${it.action}">
+    <span class="nav-icon">${it.icon}</span>
+    <span class="nav-label">${it.label}</span>
+    <span class="nav-drag-handle" draggable="true" title="ドラッグして並び替え" onclick="event.stopPropagation()" ondragstart="onNavDragStart(event,${i})" ondragover="onNavDragOver(event)" ondrop="onNavDrop(event,${i})" ondragend="onNavDragEnd(event)" ondragleave="onNavDragLeave(event)">☰</span>
+    <span class="nav-tooltip">${it.label}</span>
+  </div>`).join('');
 }
 
 let _navDragSrc=null;
 function onNavDragStart(e,idx){
   _navDragSrc=idx;
-  e.currentTarget.style.opacity='0.5';
-  if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',idx);}
+  const row=e.currentTarget.closest('.nav-mgmt-row');
+  if(row) row.style.opacity='0.4';
+  if(e.dataTransfer){
+    e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain',idx);
+  }
 }
 function onNavDragOver(e){
   e.preventDefault();
   if(e.dataTransfer) e.dataTransfer.dropEffect='move';
-  e.currentTarget.style.background='var(--accent-light)';
+  const row=e.currentTarget.closest('.nav-mgmt-row');
+  if(row) row.style.background='var(--accent-light)';
   return false;
 }
 function onNavDragLeave(e){
-  e.currentTarget.style.background='';
+  const row=e.currentTarget.closest('.nav-mgmt-row');
+  if(row) row.style.background='';
 }
 function onNavDrop(e,idx){
   e.preventDefault();
   e.stopPropagation();
-  e.currentTarget.style.background='';
+  const row=e.currentTarget.closest('.nav-mgmt-row');
+  if(row) row.style.background='';
   if(_navDragSrc===null||_navDragSrc===idx) return;
   const items=getNavManagementOrder();
   const [moved]=items.splice(_navDragSrc,1);
@@ -7007,8 +7274,10 @@ function onNavDrop(e,idx){
   showToast(`「${moved.label}」を移動しました ✓`);
 }
 function onNavDragEnd(e){
-  e.currentTarget.style.opacity='';
-  document.querySelectorAll('.nav-draggable').forEach(el=>el.style.background='');
+  document.querySelectorAll('.nav-mgmt-row').forEach(el=>{
+    el.style.opacity='';
+    el.style.background='';
+  });
   _navDragSrc=null;
 }
 
