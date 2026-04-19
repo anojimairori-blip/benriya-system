@@ -399,21 +399,76 @@ tr:hover td{background:var(--bg)}
 /* 更新ボタン */
 .btn-refresh{padding:6px 10px;font-size:13px;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:7px;cursor:pointer;transition:all .15s;font-family:inherit;min-width:36px}
 
-/* 言語選択ボタン */
-.lang-btn{
-  padding:8px 14px;
-  border:1px solid var(--border);
-  background:var(--surface);
-  color:var(--text);
-  border-radius:8px;
-  font-size:13px;
-  font-weight:500;
-  cursor:pointer;
-  transition:all .15s;
-  font-family:inherit;
+/* ===== 設定タブナビゲーション ===== */
+.settings-tabs-nav{
+  display:flex;
+  gap:4px;
+  margin-bottom:20px;
+  border-bottom:2px solid var(--border);
+  padding:0 2px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  flex-wrap:nowrap;
 }
-.lang-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
-.lang-btn.active{background:var(--accent);color:white;border-color:var(--accent);font-weight:700}
+.settings-tabs-nav::-webkit-scrollbar{ height:3px }
+.settings-tabs-nav::-webkit-scrollbar-thumb{ background:var(--accent-light); border-radius:2px }
+
+.settings-tab{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:11px 16px;
+  background:transparent;
+  border:none;
+  border-bottom:3px solid transparent;
+  color:var(--text2);
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:inherit;
+  white-space:nowrap;
+  transition:all 0.15s;
+  margin-bottom:-2px; /* border-bottom重ね */
+  flex-shrink:0;
+}
+.settings-tab:hover{
+  color:var(--accent);
+  background:var(--accent-light);
+  border-radius:8px 8px 0 0;
+}
+.settings-tab.active{
+  color:var(--accent);
+  border-bottom-color:var(--accent);
+  background:transparent;
+}
+.settings-tab.active .stab-icon{ filter:none }
+.settings-tab .stab-icon{ font-size:16px }
+.settings-tab .stab-label{ font-weight:600 }
+
+/* 補助タブ（CSV/開発者）は少し控えめに */
+.settings-tab-extra{
+  color:var(--text3);
+  font-weight:500;
+  font-size:12px;
+}
+.settings-tab-extra .stab-icon{ font-size:14px }
+.settings-tab-extra:hover{ color:var(--text) }
+.settings-tab-extra.active{ color:var(--accent) }
+
+/* モバイル対応 */
+@media(max-width:768px){
+  .settings-tabs-nav{
+    gap:0;
+    margin-bottom:16px;
+  }
+  .settings-tab{
+    padding:10px 12px;
+    font-size:12px;
+  }
+  .settings-tab .stab-label{ font-size:11px }
+  .settings-tab .stab-icon{ font-size:15px }
+  .settings-tab-extra{ font-size:11px }
+}
 
 /* 作業写真ボタン（一覧行）- 視認性の高いオレンジ系 */
 .btn-photo-action{
@@ -1077,7 +1132,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.17.1</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.20</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1101,7 +1156,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.17.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.20</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1136,7 +1191,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.17.1</div>
+    <div class="logo-version" id="sidebar-version">v3.20</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1422,31 +1477,33 @@ if('serviceWorker' in navigator){
 
 <!-- SETTINGS -->
 <div id="page-settings" class="page">
-  <div class="main-header"><h2>⚙️ 会社設定</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
+  <div class="main-header"><h2>⚙️ 設定</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
   <div class="content">
-    <!-- 管理メニュータブ -->
-    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')" style="background:var(--accent);color:white;border-color:var(--accent)">⚙️ 会社設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
+    <!-- ===== 設定タブナビゲーション ===== -->
+    <div class="settings-tabs-nav">
+      <button class="settings-tab active" data-settings-nav="settings" onclick="showPage('settings')">
+        <span class="stab-icon">🏢</span><span class="stab-label">会社情報</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="employees" onclick="requireAdmin('employees')">
+        <span class="stab-icon">👷</span><span class="stab-label">従業員</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="tax" onclick="showPage('tax')">
+        <span class="stab-icon">🧾</span><span class="stab-label">税率</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
+        <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+        <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+        <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
     </div>
+
     <div class="card" style="max-width:640px;padding:24px">
 
       <!-- テーマ -->
-      <!-- 言語設定 -->
-      <div class="section-title" style="margin-bottom:8px">🌐 言語 / Language</div>
-      <p style="font-size:11px;color:var(--text3);margin-bottom:12px">UIの表示言語を選べます。書類本文はClaude AIで翻訳できます。</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="lang-selector">
-        <button type="button" class="lang-btn" data-lang="ja" onclick="setLanguage('ja')">🇯🇵 日本語</button>
-        <button type="button" class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇺🇸 English</button>
-        <button type="button" class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">🇨🇳 中文</button>
-        <button type="button" class="lang-btn" data-lang="vi" onclick="setLanguage('vi')">🇻🇳 Tiếng Việt</button>
-        <button type="button" class="lang-btn" data-lang="ko" onclick="setLanguage('ko')">🇰🇷 한국어</button>
-      </div>
-
       <div class="section-title" style="margin-bottom:12px">🎨 テーマ・カラー</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px" id="theme-picker">
         <div class="theme-swatch" data-theme="default" onclick="applyTheme('default',this)" title="ナチュラル（デフォルト）">
@@ -1673,15 +1730,28 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
-    <!-- 管理メニュータブ -->
-    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')" style="background:var(--accent);color:white;border-color:var(--accent)">👤 従業員管理</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
+    <!-- ===== 設定タブナビゲーション ===== -->
+    <div class="settings-tabs-nav">
+      <button class="settings-tab" data-settings-nav="settings" onclick="showPage('settings')">
+        <span class="stab-icon">🏢</span><span class="stab-label">会社情報</span>
+      </button>
+      <button class="settings-tab active" data-settings-nav="employees" onclick="requireAdmin('employees')">
+        <span class="stab-icon">👷</span><span class="stab-label">従業員</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="tax" onclick="showPage('tax')">
+        <span class="stab-icon">🧾</span><span class="stab-label">税率</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
+        <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+        <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+        <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
     </div>
+
     <div style="background:var(--gold-light);border:1px solid #F0D080;border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--gold)">
       🔐 この画面は管理者専用です。従業員の個人情報が含まれるため、取り扱いにご注意ください。
     </div>
@@ -1796,14 +1866,26 @@ if('serviceWorker' in navigator){
 <div id="page-csv-export" class="page">
   <div class="main-header"><h2>📤 CSVエクスポート</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
   <div class="content">
-    <!-- 管理メニュータブ -->
-    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')" style="background:var(--accent);color:white;border-color:var(--accent)">📤 CSVエクスポート</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
+    <!-- ===== 設定タブナビゲーション ===== -->
+    <div class="settings-tabs-nav">
+      <button class="settings-tab" data-settings-nav="settings" onclick="showPage('settings')">
+        <span class="stab-icon">🏢</span><span class="stab-label">会社情報</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="employees" onclick="requireAdmin('employees')">
+        <span class="stab-icon">👷</span><span class="stab-label">従業員</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="tax" onclick="showPage('tax')">
+        <span class="stab-icon">🧾</span><span class="stab-label">税率</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
+        <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
+      </button>
+      <button class="settings-tab settings-tab-extra active" onclick="showPage('csv-export')">
+        <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+        <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
     </div>
     <p style="font-size:13px;color:var(--text2);margin-bottom:20px">freee・弥生・マネーフォワードなどの会計ソフトに取り込めるCSVを出力します。</p>
     <div class="form-row cols2" style="max-width:500px;margin-bottom:20px">
@@ -1880,14 +1962,26 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
-    <!-- 管理メニュータブ -->
-    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')" style="background:var(--accent);color:white;border-color:var(--accent)">🧾 税率設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
+    <!-- ===== 設定タブナビゲーション ===== -->
+    <div class="settings-tabs-nav">
+      <button class="settings-tab" data-settings-nav="settings" onclick="showPage('settings')">
+        <span class="stab-icon">🏢</span><span class="stab-label">会社情報</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="employees" onclick="requireAdmin('employees')">
+        <span class="stab-icon">👷</span><span class="stab-label">従業員</span>
+      </button>
+      <button class="settings-tab active" data-settings-nav="tax" onclick="showPage('tax')">
+        <span class="stab-icon">🧾</span><span class="stab-label">税率</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
+        <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+        <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+        <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
     </div>
     <div class="card" style="max-width:640px;padding:22px">
       <div class="section-title" style="margin-bottom:6px">消費税率の管理</div>
@@ -1945,14 +2039,26 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
-    <!-- 管理メニュータブ -->
-    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')">🗄️ バックアップ</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()" style="background:var(--accent);color:white;border-color:var(--accent)">🛠️ 開発者ツール</button>
+    <!-- ===== 設定タブナビゲーション ===== -->
+    <div class="settings-tabs-nav">
+      <button class="settings-tab" data-settings-nav="settings" onclick="showPage('settings')">
+        <span class="stab-icon">🏢</span><span class="stab-label">会社情報</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="employees" onclick="requireAdmin('employees')">
+        <span class="stab-icon">👷</span><span class="stab-label">従業員</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="tax" onclick="showPage('tax')">
+        <span class="stab-icon">🧾</span><span class="stab-label">税率</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
+        <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+        <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
+      </button>
+      <button class="settings-tab settings-tab-extra active" onclick="requireDeveloper()">
+        <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
     </div>
     <div style="background:#FFF8E7;border:1px solid #F0D080;border-radius:var(--radius);padding:14px 16px;margin-bottom:18px;font-size:13px;color:#8B6914">
       ⚠️ このページは開発者・テスト用です。サンプルデータの生成・削除を行うと既存データに影響を与える可能性があります。
@@ -2047,14 +2153,26 @@ if('serviceWorker' in navigator){
 <div id="page-backup" class="page">
   <div class="main-header"><h2>🗄️ バックアップ・復旧</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
   <div class="content">
-    <!-- 管理メニュータブ -->
-    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="btn btn-secondary btn-sm" onclick="showPage('settings')">⚙️ 会社設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('tax')">🧾 税率設定</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireAdmin('employees')">👤 従業員管理</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('backup')" style="background:var(--accent);color:white;border-color:var(--accent)">🗄️ バックアップ</button>
-      <button class="btn btn-secondary btn-sm" onclick="showPage('csv-export')">📤 CSVエクスポート</button>
-      <button class="btn btn-secondary btn-sm" onclick="requireDeveloper()">🛠️ 開発者ツール</button>
+    <!-- ===== 設定タブナビゲーション ===== -->
+    <div class="settings-tabs-nav">
+      <button class="settings-tab" data-settings-nav="settings" onclick="showPage('settings')">
+        <span class="stab-icon">🏢</span><span class="stab-label">会社情報</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="employees" onclick="requireAdmin('employees')">
+        <span class="stab-icon">👷</span><span class="stab-label">従業員</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="tax" onclick="showPage('tax')">
+        <span class="stab-icon">🧾</span><span class="stab-label">税率</span>
+      </button>
+      <button class="settings-tab active" data-settings-nav="backup" onclick="showPage('backup')">
+        <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+        <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+        <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
     </div>
     <div style="max-width:580px">
       <div style="background:var(--blue-light);border:1px solid #B0D0F0;border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--blue)">
@@ -2272,17 +2390,6 @@ if('serviceWorker' in navigator){
   <div class="modal-body" id="preview-body"></div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('preview-modal')">閉じる</button>
-    <div style="display:inline-flex;gap:4px;align-items:center;margin-right:auto">
-      <span style="font-size:11px;color:var(--text3)">🌐</span>
-      <select id="preview-translate-lang" onchange="if(this.value)translateCurrentDoc(this.value)" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:inherit">
-        <option value="">翻訳しない</option>
-        <option value="en">🇺🇸 English</option>
-        <option value="zh">🇨🇳 中文</option>
-        <option value="vi">🇻🇳 Tiếng Việt</option>
-        <option value="ko">🇰🇷 한국어</option>
-        <option value="ja">🇯🇵 日本語（元に戻す）</option>
-      </select>
-    </div>
     <button class="btn btn-secondary" onclick="shareDoc()">📤 共有・送信</button>
     <button class="btn btn-primary" onclick="window.print()">🖨️ 印刷・PDF保存</button>
   </div>
@@ -2297,11 +2404,9 @@ if('serviceWorker' in navigator){
 <div class="modal" style="max-width:400px">
   <div class="modal-header"><h3>共有・送信</h3><button class="close-btn" onclick="closeModal('share-modal')">✕</button></div>
   <div class="modal-body">
-    <div class="share-option" onclick="sharePrint()"><span class="share-icon">🖨️</span><div><div style="font-weight:700">印刷</div><div style="font-size:12px;color:var(--text2)">ブラウザで印刷</div></div></div>
-    <div class="share-option" onclick="sharePDF()"><span class="share-icon">📄</span><div><div style="font-weight:700">PDFをダウンロード</div><div style="font-size:12px;color:var(--text2)">端末に PDF を保存</div></div></div>
-    <div class="share-option" onclick="shareNative()"><span class="share-icon">📲</span><div><div style="font-weight:700">PDFを共有（LINE/メール等）</div><div style="font-size:12px;color:var(--text2)">アプリを選択して PDF を送信</div></div></div>
-    <div class="share-option" onclick="shareEmail()"><span class="share-icon">✉️</span><div><div style="font-weight:700">メール本文のみ</div><div style="font-size:12px;color:var(--text2)">PDFは手動で添付が必要</div></div></div>
-    <div class="share-option" onclick="shareQrUrl()"><span class="share-icon">📷</span><div><div style="font-weight:700">QRコード（Webで閲覧可能）</div><div style="font-size:12px;color:var(--text2)">相手が読み取って書類を閲覧・PDF保存</div></div></div>
+    <div class="share-option" onclick="shareLink()"><span class="share-icon">🔗</span><div><div style="font-weight:700">共有リンクを発行</div><div style="font-size:12px;color:var(--text2)">URLをコピー→LINE・メールに貼り付け</div></div></div>
+    <div class="share-option" onclick="sharePDF()"><span class="share-icon">📄</span><div><div style="font-weight:700">PDFをダウンロード</div><div style="font-size:12px;color:var(--text2)">端末にPDFを保存</div></div></div>
+    <div class="share-option" onclick="sharePrint()"><span class="share-icon">🖨️</span><div><div style="font-weight:700">印刷</div><div style="font-size:12px;color:var(--text2)">プリンターで印刷</div></div></div>
   </div>
 </div>
 </div>
@@ -3174,8 +3279,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.17.1';
-const APP_BUILD_TIME='2026/04/19 08:35';
+const APP_VERSION='v3.20';
+const APP_BUILD_TIME='2026/04/19 23:23';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3190,8 +3295,35 @@ const APP_BUILD_TIME='2026/04/19 08:35';
 // ===== バージョンチェック（GitHub API経由：CORS対応） =====
 const GITHUB_API_URL='https://api.github.com/repos/anojimairori-blip/benriya-system/contents/index.html';
 
+// セマンティックバージョン比較: current >= latest なら false（通知不要）
+function _isNewerVersion(latest, current){
+  // v3.17.1 → [3,17,1]
+  const parse = v => String(v).replace(/^v/i,'').split('.').map(n=>parseInt(n,10)||0);
+  const a = parse(latest);
+  const b = parse(current);
+  for(let i=0; i<Math.max(a.length,b.length); i++){
+    const av=a[i]||0, bv=b[i]||0;
+    if(av>bv) return true;
+    if(av<bv) return false;
+  }
+  return false; // 同じバージョン
+}
+
 async function checkForUpdate(){
   try{
+    // 24時間以内に「後で」を押していたらスキップ
+    const dismissedAt = parseInt(localStorage.getItem('update_banner_dismissed_at')||'0',10);
+    if(dismissedAt && (Date.now()-dismissedAt) < 24*3600*1000){
+      return; // 24時間以内なら通知しない
+    }
+
+    // このバージョンで「更新した」と記録があればスキップ（ループ防止）
+    const lastUpdatedTo = localStorage.getItem('last_updated_to_version');
+    if(lastUpdatedTo === APP_VERSION){
+      // 現在のバージョンが「更新先」と一致 = 既に更新済み → バナー抑止
+      return;
+    }
+
     const res=await fetch(GITHUB_API_URL+'?ref=main&_='+Date.now(),{
       headers:{'Accept':'application/vnd.github.v3.raw'}
     });
@@ -3200,7 +3332,9 @@ async function checkForUpdate(){
     const m=text.match(/const APP_VERSION='([^']+)'/);
     if(!m) return;
     const latest=m[1];
-    if(latest!==APP_VERSION){
+
+    // 厳密な比較: latest が current より新しい場合のみバナー表示
+    if(_isNewerVersion(latest, APP_VERSION)){
       showUpdateBanner(latest);
     }
   }catch(e){
@@ -3237,14 +3371,30 @@ function showUpdateBanner(latest){
 }
 
 function hardReload(){
-  // キャッシュを完全にクリアしてリロード
-  if('caches' in window){
-    caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).then(()=>{
-      window.location.reload(true);
-    });
-  } else {
-    window.location.reload(true);
-  }
+  // キャッシュを完全にクリアしてリロード（タイムスタンプ付きURLで強制再取得）
+  // バナーに表示されていた更新先バージョンを記録（ループ防止）
+  try{
+    const banner=document.getElementById('update-banner');
+    if(banner){
+      const m=banner.innerHTML.match(/新しいバージョン (v[\d.]+)/);
+      if(m) localStorage.setItem('last_updated_to_version', m[1]);
+    }
+  }catch(e){}
+  const clearAll = ()=>{
+    try{
+      // Service Worker のキャッシュもクリア
+      if('caches' in window){
+        caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).catch(()=>{});
+      }
+    }catch(e){}
+    // URLにタイムスタンプを付けて強制再取得（CDNキャッシュ回避）
+    const sep = location.search ? '&' : '?';
+    const url = location.origin + location.pathname + sep + '_v=' + Date.now() + location.hash;
+    // バナー却下時刻をリセット
+    localStorage.removeItem('update_banner_dismissed_at');
+    window.location.replace(url);
+  };
+  clearAll();
 }
 
 function dismissUpdateBanner(){
@@ -3252,6 +3402,8 @@ function dismissUpdateBanner(){
   if(banner) banner.remove();
   const app=document.getElementById('app-main');
   if(app) app.style.paddingTop='';
+  // 24時間は再表示しない
+  localStorage.setItem('update_banner_dismissed_at', String(Date.now()));
 }
 let sysTitle=localStorage.getItem('sysTitle_v4')||'便利屋\n書類システム';
 let adminPin=localStorage.getItem('adminPin')||'1234'; // 初回ログイン後に必ず変更してください
@@ -4158,7 +4310,7 @@ function renderDocRows(tbodyId,list,showType){
       ${d.type==='見積書'?`<button class="btn btn-blue btn-sm" onclick="convertDoc('${d.id}','請求書')">→請求</button>`:''}
       ${d.type==='請求書'?`<button class="btn btn-primary btn-sm" onclick="convertDoc('${d.id}','領収書')">→領収</button>`:''}
       <button class="btn-photo-action" title="作業写真の管理・共有" onclick="openPhotoModal('${d.id}')">📷 写真${(docPhotos[d.id]||[]).length>0?`<span class="photo-count">${docPhotos[d.id].length}</span>`:''}</button>
-      <button class="btn btn-secondary btn-sm" title="QRコード" onclick="generateQR('${d.id}')">QR</button>
+      <button class="btn btn-secondary btn-sm" title="共有リンクを発行" onclick="shareDocFromList('${d.id}')">🔗 共有</button>
       <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteDoc('${d.id}'))">削除</button>
     </td>
   </tr>`;}).join('');
@@ -4668,70 +4820,163 @@ async function sharePDF(){
 }
 
 // ③④ PDFをネイティブ共有（Web Share API Level 2）
-async function shareNative(){
-  closeModal('share-modal');
-  showToast('📄 PDFを生成中...', '#3B82F6');
-  try{
-    const {blob, filename} = await _generatePdfBlob();
-    const file=new File([blob], filename, { type:'application/pdf' });
-    const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
-    const shareData={
-      files:[file],
-      title:d?`${d.type} ${d.number}`:'書類',
-      text:d?`${d.type}をお送りします。\n金額: ${fmt(d.grandTotal)}\n${settings.company||''}`:''
-    };
-    // ファイル共有対応チェック
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share(shareData);
-      showToast('✓ 共有しました', '#10B981');
-    } else if(navigator.share){
-      // ファイル不可だがテキスト共有は可能
-      await navigator.share({title:shareData.title, text:shareData.text});
-      // ついでにPDFも手元にDL
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url; a.download=filename;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
-      showToast('✓ テキスト共有済み。PDFは手元にダウンロードされました', '#10B981');
-    } else {
-      // デスクトップ系: ダウンロードして手動でアップロード
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url; a.download=filename;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
-      showToast('📁 PDFをダウンロードしました。LINEやメールに手動でドラッグしてください', '#F59E0B');
-    }
-  }catch(e){
-    if(e.name==='AbortError'){
-      // ユーザーがキャンセル - エラー扱いにしない
-      return;
-    }
-    console.error('Share error:',e);
-    showToast('共有に失敗しました: '+e.message, '#C0392B');
-  }
-}
-
-// メール共有（本文のみ）
-function shareEmail(){
-  const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
-  const cust=d?(d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer)):null;
-  const honorific=(cust?.honorific!=null)?cust.honorific:'御中';
-  const sub=d?encodeURIComponent(`【${d.type}】${d.subject||d.number}`):'';
-  const body=encodeURIComponent(d?`${d.customer} ${honorific}\n\n${d.type}をお送りします。\n金額：${fmt(d.grandTotal)}\n\n※PDFは別途共有ボタンから送信します。\n\n${settings.company||''}`:'');
-  window.location.href=`mailto:?subject=${sub}&body=${body}`;
-  closeModal('share-modal');
-  showToast('💡 PDFは「PDFを共有」ボタンから別途送信してください', '#F59E0B');
-}
-
-// QRコード（Web閲覧可能URL）- プレビュー画面からの共有 → generateQR と同じ URL共有機能を呼ぶ
-async function shareQrUrl(){
+// 共有リンクを発行してコピー用ダイアログを表示
+async function shareLink(){
   closeModal('share-modal');
   const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
   if(!d){showToast('書類が選択されていません','#C0392B');return;}
-  // 既存のgenerateQR関数を呼ぶ（URL化されたQR共有機能）
-  generateQR(d.id);
+  if(!currentUser){showToast('ログインが必要です','#C0392B');return;}
+  await _createAndShowShareLink(d);
+}
+
+// 書類一覧から直接共有リンク発行
+async function shareDocFromList(docId){
+  const d=docs.find(x=>x.id===docId);
+  if(!d){showToast('書類が見つかりません','#C0392B');return;}
+  if(!currentUser){showToast('ログインが必要です','#C0392B');return;}
+  currentPreviewDocId=docId;
+  await _createAndShowShareLink(d);
+}
+
+async function _createAndShowShareLink(d){
+  showToast('🔗 共有リンクを生成中...', '#3B82F6');
+  try{
+    const {url, expiresAt} = await createDocShareLink(d.id, 7);
+    const expDate = new Date(expiresAt);
+    const expStr = `${expDate.getFullYear()}/${String(expDate.getMonth()+1).padStart(2,'0')}/${String(expDate.getDate()).padStart(2,'0')}`;
+
+    const cust=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
+    const honor=cust?.honorific||'御中';
+    const msg=`${d.customer||''} ${honor}\n\n${d.type}をお送りします。\n金額: ${fmt(d.grandTotal)}\n\n下記リンクからご確認ください（${expStr}まで有効）:\n${url}\n\n${settings.company||''}`;
+
+    _showShareLinkDialog(url, msg, d);
+  }catch(e){
+    console.error('[Share link error]',e);
+    showToast('共有リンクの生成に失敗: '+e.message,'#C0392B');
+  }
+}
+
+// 共有リンク表示ダイアログ
+function _showShareLinkDialog(url, message, doc){
+  const existing=document.getElementById('share-link-dialog');
+  if(existing) existing.remove();
+
+  const dialog=document.createElement('div');
+  dialog.id='share-link-dialog';
+  dialog.className='modal-overlay open';
+  dialog.style.zIndex='1500';
+
+  const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  dialog.innerHTML=`
+    <div class="modal" style="max-width:480px">
+      <div class="modal-header">
+        <h3>🔗 共有リンクを発行しました</h3>
+        <button class="close-btn" onclick="document.getElementById('share-link-dialog').remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--accent-light);border-radius:8px;padding:12px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">✓ リンク発行完了（7日間有効）</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.5">相手はブラウザで書類を閲覧し、PDF/画像で保存できます</div>
+        </div>
+
+        <!-- URL入力欄 -->
+        <div style="margin-bottom:14px">
+          <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">📎 共有URL</label>
+          <div style="display:flex;gap:6px">
+            <input type="text" id="share-link-url" value="${escAttr(url)}" readonly
+              style="flex:1;padding:9px 11px;border:1px solid var(--border);border-radius:7px;font-size:11px;font-family:monospace;background:var(--surface2)"
+              onclick="this.select()">
+            <button class="btn btn-primary btn-sm" style="white-space:nowrap" onclick="_copyShareLinkOnly()">📋 コピー</button>
+          </div>
+        </div>
+
+        <!-- 挨拶文付きメッセージ -->
+        <div style="margin-bottom:14px">
+          <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">💬 挨拶文付きメッセージ（LINE・メール用）</label>
+          <textarea id="share-link-message" readonly
+            style="width:100%;padding:10px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;background:var(--surface2);min-height:130px;resize:vertical;line-height:1.6"
+            onclick="this.select()">${escAttr(message)}</textarea>
+          <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:6px" onclick="_copyShareLinkMessage()">📋 挨拶文ごとコピー</button>
+        </div>
+
+        <!-- 直接送信ボタン -->
+        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:14px">
+          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">📤 アプリで直接送信</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn btn-sm" style="background:#06C755;color:white;border:none;padding:10px" onclick="_sendShareLinkTo('line')">
+              💬 LINEで送る
+            </button>
+            <button class="btn btn-secondary btn-sm" style="padding:10px" onclick="_sendShareLinkTo('email')">
+              ✉️ メールで送る
+            </button>
+            ${isMobile?`<button class="btn btn-secondary btn-sm" style="padding:10px;grid-column:1/-1" onclick="_sendShareLinkTo('native')">
+              📲 他のアプリで共有
+            </button>`:''}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(dialog);
+}
+
+// コピー系ヘルパー
+async function _copyShareLinkOnly(){
+  const url=document.getElementById('share-link-url')?.value;
+  if(!url) return;
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast('✓ URLをコピーしました','#10B981');
+  }catch(e){
+    // フォールバック: execCommand
+    document.getElementById('share-link-url').select();
+    document.execCommand('copy');
+    showToast('✓ URLをコピーしました','#10B981');
+  }
+}
+
+async function _copyShareLinkMessage(){
+  const msg=document.getElementById('share-link-message')?.value;
+  if(!msg) return;
+  try{
+    await navigator.clipboard.writeText(msg);
+    showToast('✓ 挨拶文ごとコピーしました。LINEやメールに貼り付けてください','#10B981');
+  }catch(e){
+    document.getElementById('share-link-message').select();
+    document.execCommand('copy');
+    showToast('✓ コピーしました','#10B981');
+  }
+}
+
+async function _sendShareLinkTo(method){
+  const url=document.getElementById('share-link-url')?.value;
+  const msg=document.getElementById('share-link-message')?.value;
+  if(!url||!msg) return;
+
+  const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
+
+  if(method==='line'){
+    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if(isMobile){
+      window.location.href=`https://line.me/R/share?text=${encodeURIComponent(msg)}`;
+    } else {
+      // PC: コピーしてLINE PC版を案内
+      try{
+        await navigator.clipboard.writeText(msg);
+        showToast('✓ メッセージをコピーしました。LINE PC版で貼り付けてください','#06C755');
+      }catch(e){}
+    }
+  } else if(method==='email'){
+    const sub=encodeURIComponent(`【${d?.type||'書類'}】${d?.number||''}${d?.subject?' '+d.subject:''}`);
+    window.location.href=`mailto:?subject=${sub}&body=${encodeURIComponent(msg)}`;
+  } else if(method==='native' && navigator.share){
+    try{
+      await navigator.share({title:`${d?.type||'書類'} ${d?.number||''}`, text:msg, url});
+    }catch(e){
+      if(e.name!=='AbortError') showToast('共有失敗: '+e.message,'#C0392B');
+    }
+  }
 }
 
 // ===== CUSTOMERS =====
@@ -6409,10 +6654,6 @@ function initFirebaseAuth(){
     const appEl = document.getElementById('app-main');
     const loginEl = document.getElementById('login-screen');
     if(user){
-      // Google ログインの言語を自動検出（初回のみ）
-      if(typeof autoDetectLangFromUser==='function'){
-        autoDetectLangFromUser(user);
-      }
       // ===== アクセス許可チェック =====
       const allowed = await checkAccessAllowed(user.email);
       if(!allowed){
@@ -6599,19 +6840,6 @@ function initAppAfterAuth(){
     if(currentTheme==='default') document.documentElement.removeAttribute('data-theme');
     else document.documentElement.setAttribute('data-theme',currentTheme);
   }
-  // 言語設定: settings > localStorage > navigator.language > ja
-  if(settings && settings.appLang && I18N_DICT[settings.appLang]){
-    currentLang = settings.appLang;
-    localStorage.setItem('appLang', currentLang);
-  }
-  document.documentElement.lang = currentLang;
-  // 言語ボタンのactive状態を反映
-  setTimeout(()=>{
-    document.querySelectorAll('.lang-btn').forEach(b=>{
-      b.classList.toggle('active', b.dataset.lang===currentLang);
-    });
-    applyTranslations();
-  }, 100);
   // 書類タイプ別カラーを適用
   if(typeof applyDocColors==='function') applyDocColors();
   renderNavManagement();
@@ -9009,276 +9237,6 @@ function exportCSV(format){
 // ===== THEME MANAGEMENT =====
 const THEMES=['default','dark','navy','pop','sunset','mint'];
 let currentTheme=localStorage.getItem('appTheme')||'default';
-
-// ===== 多言語化（i18n）=====
-const I18N_DICT = {
-  ja: {
-    // ナビゲーション
-    'nav.home':'ホーム','nav.dashboard':'ダッシュボード','nav.customers':'顧客管理',
-    'nav.calendar':'作業カレンダー','nav.quotes':'見積書一覧','nav.invoices':'請求書一覧',
-    'nav.receipts':'領収書一覧','nav.alerts':'支払いアラート','nav.report':'年次レポート',
-    'nav.staff_report':'スタッフ別実績','nav.payments':'入金管理','nav.expenses':'経費管理',
-    'nav.templates':'作業テンプレート','nav.employees':'従業員管理','nav.branches':'拠点管理',
-    'nav.bulletins':'掲示板','nav.backup':'バックアップ・復旧','nav.csv':'CSVエクスポート',
-    'nav.settings':'会社設定','nav.tax':'税率設定','nav.developer':'開発者ツール',
-    // 共通ボタン
-    'btn.save':'保存','btn.cancel':'キャンセル','btn.delete':'削除','btn.edit':'編集',
-    'btn.close':'閉じる','btn.add':'追加','btn.new':'新規','btn.print':'印刷',
-    'btn.share':'共有','btn.download':'ダウンロード','btn.upload':'アップロード',
-    'btn.refresh':'更新','btn.search':'検索','btn.back':'戻る',
-    // 書類
-    'doc.quote':'見積書','doc.invoice':'請求書','doc.receipt':'領収書',
-    'doc.subject':'件名','doc.customer':'顧客名','doc.date':'日付','doc.amount':'金額',
-    'doc.status':'状態','doc.number':'書類番号','doc.category':'カテゴリ','doc.staff':'担当者',
-    // トースト
-    'toast.saved':'保存しました','toast.deleted':'削除しました','toast.updated':'更新しました',
-    'toast.login_required':'ログインが必要です','toast.error':'エラーが発生しました',
-    // 言語設定
-    'lang.setting':'言語設定','lang.auto':'Googleアカウントに従う','lang.system':'システム言語',
-  },
-  en: {
-    'nav.home':'Home','nav.dashboard':'Dashboard','nav.customers':'Customers',
-    'nav.calendar':'Schedule','nav.quotes':'Quotations','nav.invoices':'Invoices',
-    'nav.receipts':'Receipts','nav.alerts':'Payment Alerts','nav.report':'Annual Report',
-    'nav.staff_report':'Staff Report','nav.payments':'Payments','nav.expenses':'Expenses',
-    'nav.templates':'Templates','nav.employees':'Employees','nav.branches':'Branches',
-    'nav.bulletins':'Notice Board','nav.backup':'Backup & Restore','nav.csv':'CSV Export',
-    'nav.settings':'Settings','nav.tax':'Tax Settings','nav.developer':'Developer',
-    'btn.save':'Save','btn.cancel':'Cancel','btn.delete':'Delete','btn.edit':'Edit',
-    'btn.close':'Close','btn.add':'Add','btn.new':'New','btn.print':'Print',
-    'btn.share':'Share','btn.download':'Download','btn.upload':'Upload',
-    'btn.refresh':'Refresh','btn.search':'Search','btn.back':'Back',
-    'doc.quote':'Quotation','doc.invoice':'Invoice','doc.receipt':'Receipt',
-    'doc.subject':'Subject','doc.customer':'Customer','doc.date':'Date','doc.amount':'Amount',
-    'doc.status':'Status','doc.number':'Document No.','doc.category':'Category','doc.staff':'Staff',
-    'toast.saved':'Saved','toast.deleted':'Deleted','toast.updated':'Updated',
-    'toast.login_required':'Login required','toast.error':'An error occurred',
-    'lang.setting':'Language','lang.auto':'Follow Google Account','lang.system':'System Language',
-  },
-  zh: {
-    'nav.home':'首页','nav.dashboard':'仪表板','nav.customers':'客户管理',
-    'nav.calendar':'日程表','nav.quotes':'报价单','nav.invoices':'发票',
-    'nav.receipts':'收据','nav.alerts':'付款提醒','nav.report':'年度报告',
-    'nav.staff_report':'员工业绩','nav.payments':'收款管理','nav.expenses':'费用管理',
-    'nav.templates':'模板','nav.employees':'员工管理','nav.branches':'分店管理',
-    'nav.bulletins':'公告板','nav.backup':'备份与恢复','nav.csv':'CSV 导出',
-    'nav.settings':'公司设置','nav.tax':'税率设置','nav.developer':'开发者工具',
-    'btn.save':'保存','btn.cancel':'取消','btn.delete':'删除','btn.edit':'编辑',
-    'btn.close':'关闭','btn.add':'添加','btn.new':'新建','btn.print':'打印',
-    'btn.share':'分享','btn.download':'下载','btn.upload':'上传',
-    'btn.refresh':'刷新','btn.search':'搜索','btn.back':'返回',
-    'doc.quote':'报价单','doc.invoice':'发票','doc.receipt':'收据',
-    'doc.subject':'主题','doc.customer':'客户','doc.date':'日期','doc.amount':'金额',
-    'doc.status':'状态','doc.number':'文档编号','doc.category':'类别','doc.staff':'负责人',
-    'toast.saved':'已保存','toast.deleted':'已删除','toast.updated':'已更新',
-    'toast.login_required':'需要登录','toast.error':'发生错误',
-    'lang.setting':'语言','lang.auto':'跟随 Google 账户','lang.system':'系统语言',
-  },
-  vi: {
-    'nav.home':'Trang chủ','nav.dashboard':'Bảng điều khiển','nav.customers':'Khách hàng',
-    'nav.calendar':'Lịch','nav.quotes':'Báo giá','nav.invoices':'Hóa đơn',
-    'nav.receipts':'Biên lai','nav.alerts':'Cảnh báo thanh toán','nav.report':'Báo cáo năm',
-    'nav.staff_report':'Báo cáo nhân viên','nav.payments':'Thanh toán','nav.expenses':'Chi phí',
-    'nav.templates':'Mẫu','nav.employees':'Nhân viên','nav.branches':'Chi nhánh',
-    'nav.bulletins':'Thông báo','nav.backup':'Sao lưu','nav.csv':'Xuất CSV',
-    'nav.settings':'Cài đặt','nav.tax':'Thuế','nav.developer':'Nhà phát triển',
-    'btn.save':'Lưu','btn.cancel':'Hủy','btn.delete':'Xóa','btn.edit':'Sửa',
-    'btn.close':'Đóng','btn.add':'Thêm','btn.new':'Mới','btn.print':'In',
-    'btn.share':'Chia sẻ','btn.download':'Tải xuống','btn.upload':'Tải lên',
-    'btn.refresh':'Làm mới','btn.search':'Tìm','btn.back':'Quay lại',
-    'doc.quote':'Báo giá','doc.invoice':'Hóa đơn','doc.receipt':'Biên lai',
-    'doc.subject':'Chủ đề','doc.customer':'Khách hàng','doc.date':'Ngày','doc.amount':'Số tiền',
-    'doc.status':'Trạng thái','doc.number':'Số tài liệu','doc.category':'Danh mục','doc.staff':'Nhân viên',
-    'toast.saved':'Đã lưu','toast.deleted':'Đã xóa','toast.updated':'Đã cập nhật',
-    'toast.login_required':'Cần đăng nhập','toast.error':'Đã xảy ra lỗi',
-    'lang.setting':'Ngôn ngữ','lang.auto':'Theo tài khoản Google','lang.system':'Ngôn ngữ hệ thống',
-  },
-  ko: {
-    'nav.home':'홈','nav.dashboard':'대시보드','nav.customers':'고객 관리',
-    'nav.calendar':'일정','nav.quotes':'견적서','nav.invoices':'청구서',
-    'nav.receipts':'영수증','nav.alerts':'지불 알림','nav.report':'연간 보고서',
-    'nav.staff_report':'직원 실적','nav.payments':'입금 관리','nav.expenses':'경비 관리',
-    'nav.templates':'템플릿','nav.employees':'직원 관리','nav.branches':'지점 관리',
-    'nav.bulletins':'게시판','nav.backup':'백업 및 복원','nav.csv':'CSV 내보내기',
-    'nav.settings':'회사 설정','nav.tax':'세율 설정','nav.developer':'개발자 도구',
-    'btn.save':'저장','btn.cancel':'취소','btn.delete':'삭제','btn.edit':'편집',
-    'btn.close':'닫기','btn.add':'추가','btn.new':'새로 만들기','btn.print':'인쇄',
-    'btn.share':'공유','btn.download':'다운로드','btn.upload':'업로드',
-    'btn.refresh':'새로 고침','btn.search':'검색','btn.back':'뒤로',
-    'doc.quote':'견적서','doc.invoice':'청구서','doc.receipt':'영수증',
-    'doc.subject':'제목','doc.customer':'고객','doc.date':'날짜','doc.amount':'금액',
-    'doc.status':'상태','doc.number':'문서 번호','doc.category':'카테고리','doc.staff':'담당자',
-    'toast.saved':'저장되었습니다','toast.deleted':'삭제되었습니다','toast.updated':'업데이트되었습니다',
-    'toast.login_required':'로그인이 필요합니다','toast.error':'오류가 발생했습니다',
-    'lang.setting':'언어','lang.auto':'Google 계정 따름','lang.system':'시스템 언어',
-  }
-};
-
-const LANG_NAMES = {ja:'🇯🇵 日本語', en:'🇺🇸 English', zh:'🇨🇳 中文', vi:'🇻🇳 Tiếng Việt', ko:'🇰🇷 한국어'};
-
-// 現在の言語: localStorage > settings > Google locale > navigator.language > 'ja'
-let currentLang = (function(){
-  const saved = localStorage.getItem('appLang');
-  if(saved && I18N_DICT[saved]) return saved;
-  const nav = (navigator.language||'ja').slice(0,2).toLowerCase();
-  if(I18N_DICT[nav]) return nav;
-  return 'ja';
-})();
-
-// 翻訳関数
-function t(key, fallback){
-  const dict = I18N_DICT[currentLang] || I18N_DICT.ja;
-  return dict[key] || fallback || key;
-}
-
-// 言語切替
-function setLanguage(lang){
-  if(!I18N_DICT[lang]) return;
-  currentLang = lang;
-  localStorage.setItem('appLang', lang);
-  if(settings){
-    settings.appLang = lang;
-    if(typeof persist==='function') persist();
-  }
-  // HTML lang属性を更新
-  document.documentElement.lang = lang;
-  // 言語ボタンのactive状態更新
-  document.querySelectorAll('.lang-btn').forEach(b=>{
-    b.classList.toggle('active', b.dataset.lang===lang);
-  });
-  // DOM要素で data-i18n を持つものを翻訳
-  applyTranslations();
-  showToast('✓ ' + LANG_NAMES[lang]);
-}
-
-// data-i18n 属性付き要素を翻訳
-function applyTranslations(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const key = el.dataset.i18n;
-    if(key) el.textContent = t(key);
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
-    const key = el.dataset.i18nPlaceholder;
-    if(key) el.placeholder = t(key);
-  });
-  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
-    const key = el.dataset.i18nTitle;
-    if(key) el.title = t(key);
-  });
-}
-
-// Google ログイン後に言語を自動設定
-function autoDetectLangFromUser(user){
-  if(!user || localStorage.getItem('appLang')) return; // 既に設定済みならスキップ
-  // providerData から locale を取得
-  const provLocale = user.providerData?.[0]?.locale?.slice(0,2).toLowerCase();
-  if(provLocale && I18N_DICT[provLocale]){
-    setLanguage(provLocale);
-  }
-}
-
-// ===== Claude API 書類翻訳（動的コンテンツ用） =====
-async function translateDocContent(text, targetLang){
-  if(!text || !text.trim()) return text;
-  const langNames = {ja:'Japanese', en:'English', zh:'Chinese (Simplified)', vi:'Vietnamese', ko:'Korean'};
-  const target = langNames[targetLang] || 'English';
-  const res = await fetch('/api/translate', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({text, targetLang: target})
-  });
-  if(!res.ok){
-    let errDetail='';
-    try{ const ej=await res.json(); errDetail=ej.error||ej.message||''; }catch(e){}
-    throw new Error(`翻訳API エラー (HTTP ${res.status})${errDetail?': '+errDetail:''}`);
-  }
-  const data = await res.json();
-  if(!data.translated) throw new Error('翻訳結果が空です');
-  return data.translated;
-}
-
-// 書類全体を翻訳（プレビュー用）
-async function translateCurrentDoc(targetLang){
-  if(!currentPreviewDocId) return;
-  const d = docs.find(x=>x.id===currentPreviewDocId);
-  if(!d) return;
-
-  // 「元に戻す」: 単にプレビューを再描画
-  if(targetLang==='ja' || !targetLang){
-    previewDoc(currentPreviewDocId);
-    return;
-  }
-
-  showToast('🌐 翻訳中...', '#3B82F6');
-  try{
-    // 翻訳対象: 件名、品目名、備考
-    // 件名と品目を一度にまとめて翻訳するとAPI呼出し回数が減る
-    const toTranslate=[];
-    if(d.subject) toTranslate.push({key:'subject', text:d.subject});
-    if(d.notes) toTranslate.push({key:'notes', text:d.notes});
-    (d.lines||[]).forEach((l,i)=>{
-      if(l.name) toTranslate.push({key:'line_'+i, text:l.name});
-      if(l.unit && !/^[0-9\s\-a-zA-Z]+$/.test(l.unit)) toTranslate.push({key:'unit_'+i, text:l.unit});
-    });
-
-    // バルク翻訳：区切り文字で連結して1回のAPI呼び出しで済ませる
-    const SEP = '\n---SEP---\n';
-    const combined = toTranslate.map(t=>t.text).join(SEP);
-    const translatedCombined = await translateDocContent(combined, targetLang);
-    const parts = translatedCombined.split(/\n?---SEP---\n?/);
-
-    // マップに復元
-    const tMap = {};
-    toTranslate.forEach((t,i)=>{
-      tMap[t.key] = parts[i] || t.text;
-    });
-
-    // 翻訳後のlineを構築
-    const linesT = (d.lines||[]).map((l,i)=>({
-      ...l,
-      name: tMap['line_'+i] || l.name,
-      unit: tMap['unit_'+i] || l.unit
-    }));
-
-    // 一時的な翻訳版を作成（元データは変更しない）
-    const translatedDoc = {
-      ...d,
-      subject: tMap.subject || d.subject,
-      notes: tMap.notes || d.notes,
-      lines: linesT,
-      _translatedLang: targetLang
-    };
-    // 一時的にdocsを差し替えてプレビュー
-    const origIdx = docs.findIndex(x=>x.id===currentPreviewDocId);
-    const orig = docs[origIdx];
-    docs[origIdx] = translatedDoc;
-    previewDoc(currentPreviewDocId);
-    docs[origIdx] = orig; // すぐに戻す（データには保存しない）
-    showToast('✓ 翻訳完了（'+LANG_NAMES[targetLang]+'）', '#10B981');
-  }catch(e){
-    console.error('[Translation error]',e);
-    // 明示的にユーザーに知らせる
-    showToast('翻訳に失敗: '+e.message, '#C0392B');
-    // よくあるケースの原因を併記
-    setTimeout(()=>{
-      if(e.message.includes('404') || e.message.includes('Failed to fetch')){
-        alert('⚠️ 翻訳APIに接続できません。\n\n'+
-          '原因:\n'+
-          '・/api/translate がデプロイされていない\n'+
-          '・Cloudflare Pages Functions が有効化されていない\n'+
-          '・ネット接続が切れている\n\n'+
-          '対応:\n'+
-          '• functions/api/translate.js がデプロイされているか確認\n'+
-          '• Cloudflare環境変数 ANTHROPIC_API_KEY が設定されているか確認');
-      } else if(e.message.includes('500') || e.message.includes('401')){
-        alert('⚠️ 翻訳APIエラー: '+e.message+'\n\n'+
-          'Cloudflare環境変数 ANTHROPIC_API_KEY が正しく設定されているか確認してください。');
-      } else if(e.message.includes('429')){
-        alert('⚠️ レート制限に達しました。1分お待ちください。');
-      }
-    }, 500);
-  }
-}
 
 // ===== 書類タイプ別カラー =====
 const DOC_COLOR_DEFAULTS={quote:'#C49A2D',invoice:'#1A73E8',receipt:'#2D5A3D'};
