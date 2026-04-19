@@ -175,7 +175,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .theme-name{font-size:11px;font-weight:600;color:var(--text2)}
 
 /* MAIN */
-.main{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;height:100vh;min-width:0;max-width:100%;-webkit-overflow-scrolling:touch}
+.main{flex:1;overflow-y:auto;overflow-x:hidden;height:100vh;min-width:0;max-width:100%;-webkit-overflow-scrolling:touch;display:block}
 .main-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:var(--main-header-h);min-height:var(--main-header-h);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;gap:12px;flex-wrap:nowrap;flex-shrink:0;box-sizing:border-box;overflow:hidden}
 .main-header h2{font-size:16px;font-weight:700;white-space:nowrap}
 .btn-full-label{display:inline}
@@ -230,10 +230,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .btn-purple{background:var(--purple-light);color:var(--purple);border:1px solid #D9B8E8}.btn-purple:hover{background:#D9B8E8}
 .btn-orange{background:var(--orange-light);color:var(--orange);border:1px solid #F0C090}.btn-orange:hover{background:#F0C090}
 
-.content{padding:20px 24px;flex:1;min-width:0}
+.content{padding:20px 24px;min-width:0}
 .page{display:none}
-/* ★ flex:1 を外し自然な高さにする → .main のスクロールが正しく機能 */
-.page.active{display:flex;flex-direction:column;min-height:0}
+/* ★ flex を使わずブロック表示にして、自然な高さで .main がスクロールする */
+.page.active{display:block}
 .page .content{scroll-margin-top:calc(var(--main-header-h) + var(--history-bar-h) + 8px)}
 
 /* STATS */
@@ -1158,7 +1158,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.24.2</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.24.3</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1182,7 +1182,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.24.2</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.24.3</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1217,7 +1217,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.24.2</div>
+    <div class="logo-version" id="sidebar-version">v3.24.3</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -3486,8 +3486,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.24.2';
-const APP_BUILD_TIME='2026/04/20 07:38';
+const APP_VERSION='v3.24.3';
+const APP_BUILD_TIME='2026/04/20 08:17';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
