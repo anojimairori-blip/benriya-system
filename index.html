@@ -230,9 +230,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .btn-purple{background:var(--purple-light);color:var(--purple);border:1px solid #D9B8E8}.btn-purple:hover{background:#D9B8E8}
 .btn-orange{background:var(--orange-light);color:var(--orange);border:1px solid #F0C090}.btn-orange:hover{background:#F0C090}
 
-.content{padding:20px 24px;flex:1}
+.content{padding:20px 24px;flex:1;min-width:0}
 .page{display:none}
-.page.active{display:flex;flex-direction:column;flex:1;min-height:0}
+/* ★ flex:1 を外し自然な高さにする → .main のスクロールが正しく機能 */
+.page.active{display:flex;flex-direction:column;min-height:0}
 .page .content{scroll-margin-top:calc(var(--main-header-h) + var(--history-bar-h) + 8px)}
 
 /* STATS */
@@ -1157,7 +1158,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.24.1</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.24.2</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1181,7 +1182,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.24.1</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.24.2</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1216,7 +1217,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.24.1</div>
+    <div class="logo-version" id="sidebar-version">v3.24.2</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -2269,6 +2270,15 @@ if('serviceWorker' in navigator){
         <div><strong>ログインユーザー:</strong> <span id="dev-info-user"></span></div>
         <div><strong>localStorage 使用量:</strong> <span id="dev-info-storage"></span></div>
         <div><strong>データ件数:</strong> <span id="dev-info-counts"></span></div>
+      </div>
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
+        <div class="section-title" style="margin-bottom:8px;font-size:13px">🛠️ 強制更新ツール</div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px">
+          「新しいバージョンがあります」が消えない・更新できない場合は、このボタンでキャッシュ・記録を全削除して強制再読み込みします。
+        </p>
+        <button class="btn btn-orange" onclick="forceFullReset()" style="width:100%;padding:10px">
+          🔄 キャッシュとローカル記録をリセットして再読み込み
+        </button>
       </div>
     </div>
   </div>
@@ -3476,8 +3486,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.24.1';
-const APP_BUILD_TIME='2026/04/20 07:18';
+const APP_VERSION='v3.24.2';
+const APP_BUILD_TIME='2026/04/20 07:38';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3511,6 +3521,19 @@ function _isNewerVersion(latest, current){
 
 async function checkForUpdate(){
   try{
+    // 起動時に古い記録をクリーンアップ
+    // → last_updated_to_version が現在より新しい / 古いバージョンの記録なら削除
+    const lastUpdatedTo = localStorage.getItem('last_updated_to_version');
+    if(lastUpdatedTo && lastUpdatedTo !== APP_VERSION){
+      // 起動した実バージョンと記録が一致しない場合は記録をクリア
+      // (例: v3.24 に更新成功した記録があっても、現在は v3.23.7 を実行中など)
+      // → 単純に「現在のバージョンと一致しなければ削除」して再チェックさせる
+      if(_isNewerVersion(APP_VERSION, lastUpdatedTo)){
+        // 現在の方が新しい → 古い記録を削除
+        localStorage.removeItem('last_updated_to_version');
+      }
+    }
+
     // 24時間以内に「後で」を押していたらスキップ
     const dismissedAt = parseInt(localStorage.getItem('update_banner_dismissed_at')||'0',10);
     if(dismissedAt && (Date.now()-dismissedAt) < 24*3600*1000){
@@ -3518,15 +3541,17 @@ async function checkForUpdate(){
     }
 
     // このバージョンで「更新した」と記録があればスキップ（ループ防止）
-    const lastUpdatedTo = localStorage.getItem('last_updated_to_version');
-    if(lastUpdatedTo === APP_VERSION){
+    const updated = localStorage.getItem('last_updated_to_version');
+    if(updated === APP_VERSION){
       // 現在のバージョンが「更新先」と一致 = 既に更新済み → バナー抑止
       return;
     }
 
     // ★ 本番サイトのHTMLを直接取得（Cloudflareにデプロイ済みのバージョンを取得）
-    const res=await fetch(PRODUCTION_URL+'?_='+Date.now(),{
-      cache:'no-store'
+    // キャッシュバスターを2重に（クエリ + ヘッダ）
+    const res=await fetch(PRODUCTION_URL+'?_='+Date.now()+'&r='+Math.random(),{
+      cache:'no-store',
+      headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}
     });
     if(!res.ok) return;
     const text=await res.text();
@@ -3537,6 +3562,9 @@ async function checkForUpdate(){
     // 厳密な比較: latest が current より新しい場合のみバナー表示
     if(_isNewerVersion(latest, APP_VERSION)){
       showUpdateBanner(latest);
+    } else {
+      // 同じか古い → 既に最新版のため記録を更新（バナー再表示防止）
+      localStorage.setItem('last_updated_to_version', APP_VERSION);
     }
   }catch(e){
     // ネットワークエラーは無視
@@ -3572,7 +3600,7 @@ function showUpdateBanner(latest){
 }
 
 function hardReload(){
-  // キャッシュを完全にクリアしてリロード
+  // キャッシュを完全にクリアしてリロード（モバイル対応強化版）
   // バナーに表示されていた更新先バージョンを記録（ループ防止）
   try{
     const banner=document.getElementById('update-banner');
@@ -3582,7 +3610,10 @@ function hardReload(){
     }
   }catch(e){}
 
-  // Service Worker のキャッシュをクリア
+  // バナー却下時刻をリセット
+  localStorage.removeItem('update_banner_dismissed_at');
+
+  // 1. Service Worker のキャッシュ削除（あれば）
   const clearCaches = async () => {
     try{
       if('caches' in window){
@@ -3590,20 +3621,34 @@ function hardReload(){
         await Promise.all(keys.map(k=>caches.delete(k)));
       }
     }catch(e){}
+    // 2. Service Worker 自体を解除（あれば）
+    try{
+      if('serviceWorker' in navigator){
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r=>r.unregister()));
+      }
+    }catch(e){}
   };
 
-  // バナー却下時刻をリセット
-  localStorage.removeItem('update_banner_dismissed_at');
-
-  // キャッシュクリア後、シンプルにreload(true)
-  // → URLパラメータを付けないことで Cloudflare の 404 を回避
-  // → reload(true) でブラウザキャッシュもバイパス
+  // 3. URL にキャッシュバスター付与してから location.replace
+  // → モバイル Safari/Chrome でも確実に新版を取得
   clearCaches().then(()=>{
-    // 念のため少し待つ（caches.delete の完了を確実に）
     setTimeout(()=>{
-      // hash部分を保持しつつクリーンなURLでリロード
-      window.location.reload();
-    }, 100);
+      try{
+        // 既存の hash（共有リンク等）は保持
+        const hash = location.hash || '';
+        // 既存のクエリパラメータから _v を除いて新しいタイムスタンプを付与
+        const url = new URL(location.href);
+        url.searchParams.delete('_v');
+        url.searchParams.set('_v', Date.now().toString());
+        url.hash = hash;
+        // location.replace で履歴を上書き（戻るで戻れないように）
+        window.location.replace(url.toString());
+      }catch(e){
+        // フォールバック
+        window.location.reload();
+      }
+    }, 200);
   });
 }
 
@@ -3614,6 +3659,48 @@ function dismissUpdateBanner(){
   if(app) app.style.paddingTop='';
   // 24時間は再表示しない
   localStorage.setItem('update_banner_dismissed_at', String(Date.now()));
+}
+
+// 強制リセット&再読み込み（救済用）
+// 「新版あります」が消えない / 何度更新しても古い版が出る場合
+function forceFullReset(){
+  showConfirm(
+    '🔄 強制リセットを実行します\n\n以下を全て削除して再読み込みします:\n・更新バナーの表示記録\n・Service Workerのキャッシュ\n・ブラウザキャッシュ\n\n※ ログイン状態と業務データは保持されます。',
+    async ()=>{
+      // 更新関連の localStorage を全削除
+      const keysToRemove = [
+        'update_banner_dismissed_at',
+        'last_updated_to_version'
+      ];
+      keysToRemove.forEach(k=>{
+        try{ localStorage.removeItem(k); }catch(e){}
+      });
+      // Service Worker と caches を削除
+      try{
+        if('caches' in window){
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k=>caches.delete(k)));
+        }
+      }catch(e){}
+      try{
+        if('serviceWorker' in navigator){
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r=>r.unregister()));
+        }
+      }catch(e){}
+      // タイムスタンプ付き URL で強制再読み込み
+      setTimeout(()=>{
+        try{
+          const url = new URL(location.href);
+          url.searchParams.delete('_v');
+          url.searchParams.set('_v', Date.now().toString());
+          window.location.replace(url.toString());
+        }catch(e){
+          window.location.reload();
+        }
+      }, 300);
+    }
+  );
 }
 let sysTitle=localStorage.getItem('sysTitle_v4')||'便利屋\n書類システム';
 let adminPin=localStorage.getItem('adminPin')||'1234'; // 初回ログイン後に必ず変更してください
