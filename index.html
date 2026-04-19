@@ -1132,7 +1132,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.22.2</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.22.5</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1156,7 +1156,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.22.2</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.22.5</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1191,7 +1191,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.22.2</div>
+    <div class="logo-version" id="sidebar-version">v3.22.5</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1236,7 +1236,7 @@ if('serviceWorker' in navigator){
 <div id="page-bulletin" class="page">
   <div class="main-header">
     <h2>📌 掲示板</h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-primary" onclick="openBulletinModal()">＋ 新規投稿</button>
     </div>
   </div>
@@ -1251,7 +1251,7 @@ if('serviceWorker' in navigator){
 <div class="modal" style="max-width:600px">
   <div class="modal-header">
     <h3 id="bulletin-detail-title">お知らせ</h3>
-    <button class="close-btn" onclick="closeModal('bulletin-detail-modal')">✕</button>
+    <button class="close-btn" aria-label="閉じる" onclick="closeModal('bulletin-detail-modal')">✕</button>
   </div>
   <div class="modal-body" id="bulletin-detail-body"></div>
   <div class="modal-footer" id="bulletin-detail-footer">
@@ -1265,7 +1265,7 @@ if('serviceWorker' in navigator){
 <div class="modal" style="max-width:600px">
   <div class="modal-header">
     <h3 id="bulletin-modal-title">新規投稿</h3>
-    <button class="close-btn" onclick="closeModal('bulletin-modal')">✕</button>
+    <button class="close-btn" aria-label="閉じる" onclick="closeModal('bulletin-modal')">✕</button>
   </div>
   <div class="modal-body">
     <div class="form-row">
@@ -1328,7 +1328,7 @@ if('serviceWorker' in navigator){
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
       <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.11.1 · 2026/04/18 09:00</span>
     </div>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
       <button class="btn btn-blue btn-sm" onclick="openNewDoc('請求書')"><span class="btn-full-label">＋ 請求書</span><span class="btn-short-label">＋請求</span></button>
       <button class="btn btn-primary btn-sm" onclick="openNewDoc('領収書')"><span class="btn-full-label">＋ 領収書</span><span class="btn-short-label">＋領収</span></button>
@@ -1355,7 +1355,7 @@ if('serviceWorker' in navigator){
 <div id="page-dashboard" class="page">
   <div class="main-header">
     <h2>📊 ダッシュボード</h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')">＋ 見積書</button>
       <button class="btn btn-blue btn-sm" onclick="openNewDoc('請求書')">＋ 請求書</button>
       <button class="btn btn-primary btn-sm" onclick="openNewDoc('領収書')">＋ 領収書</button>
@@ -1377,21 +1377,21 @@ if('serviceWorker' in navigator){
 
 <!-- QUOTES / INVOICES / RECEIPTS -->
 <div id="page-quotes" class="page">
-  <div class="main-header"><h2>📝 見積書一覧</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-gold" onclick="openNewDoc('見積書')">＋ 新規見積書</button></div></div>
+  <div class="main-header"><h2>📝 見積書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-gold" onclick="openNewDoc('見積書')">＋ 新規見積書</button></div></div>
   <div class="content" id="content-quotes"></div>
 </div>
 <div id="page-invoices" class="page">
-  <div class="main-header"><h2>📋 請求書一覧</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-blue" onclick="openNewDoc('請求書')">＋ 新規請求書</button></div></div>
+  <div class="main-header"><h2>📋 請求書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-blue" onclick="openNewDoc('請求書')">＋ 新規請求書</button></div></div>
   <div class="content" id="content-invoices"></div>
 </div>
 <div id="page-receipts" class="page">
-  <div class="main-header"><h2>🧾 領収書一覧</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openNewDoc('領収書')">＋ 新規領収書</button></div></div>
+  <div class="main-header"><h2>🧾 領収書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openNewDoc('領収書')">＋ 新規領収書</button></div></div>
   <div class="content" id="content-receipts"></div>
 </div>
 
 <!-- CUSTOMERS -->
 <div id="page-customers" class="page">
-  <div class="main-header"><h2>👥 顧客管理</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openCustomerModal()">＋ 顧客追加</button></div></div>
+  <div class="main-header"><h2>👥 顧客管理</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openCustomerModal()">＋ 顧客追加</button></div></div>
   <div class="content">
     <div class="tabs">
       <div class="tab active" onclick="switchCustTab('list',this)">顧客一覧</div>
@@ -1413,7 +1413,7 @@ if('serviceWorker' in navigator){
 <div id="page-calendar" class="page">
   <div class="main-header">
     <h2>📅 作業カレンダー</h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-secondary btn-sm" onclick="openGcalSettingsModal()" title="Googleカレンダー連携">📅 Google連携</button>
       <button class="btn btn-primary btn-sm" onclick="openJobModal()">＋ 作業追加</button>
     </div>
@@ -1440,7 +1440,7 @@ if('serviceWorker' in navigator){
 
 <!-- ALERTS -->
 <div id="page-alerts" class="page">
-  <div class="main-header"><h2>🔔 支払いアラート</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
+  <div class="main-header"><h2>🔔 支払いアラート</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
   <div class="content">
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-label">期限超過</div><div class="stat-value" id="alert-overdue-count" style="color:var(--red)">0件</div><div class="stat-sub" id="alert-overdue-amt"></div></div>
@@ -1453,7 +1453,7 @@ if('serviceWorker' in navigator){
 
 <!-- REPORT -->
 <div id="page-report" class="page">
-  <div class="main-header"><h2>📈 年次レポート</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><select id="report-year" onchange="renderReport()" style="padding:7px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none"></select><button class="btn btn-secondary btn-sm" onclick="openReportPrint()">🖨️ 帳票印刷・CSV</button></div></div>
+  <div class="main-header"><h2>📈 年次レポート</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><select id="report-year" onchange="renderReport()" style="padding:7px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none"></select><button class="btn btn-secondary btn-sm" onclick="openReportPrint()">🖨️ 帳票印刷・CSV</button></div></div>
   <div class="content">
     <div class="stats-grid" id="report-stats"></div>
     <div class="chart-wrap"><div class="chart-title">月別売上グラフ</div><div class="bar-chart" id="report-chart"></div></div>
@@ -1471,7 +1471,7 @@ if('serviceWorker' in navigator){
 <div id="page-display-settings" class="page">
   <div class="main-header">
     <h2>🎨 表示・外観設定</h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div>
   </div>
   <div class="content">
     <!-- ===== 設定タブナビゲーション ===== -->
@@ -1594,7 +1594,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <div id="page-templates" class="page">
-  <div class="main-header"><h2>📦 作業テンプレート</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openTemplateModal()">＋ テンプレート追加</button></div></div>
+  <div class="main-header"><h2>📦 作業テンプレート</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openTemplateModal()">＋ テンプレート追加</button></div></div>
   <div class="content">
     <!-- ===== 設定タブナビゲーション ===== -->
     <div class="settings-tabs-nav">
@@ -1636,7 +1636,7 @@ if('serviceWorker' in navigator){
 
 <!-- SETTINGS -->
 <div id="page-settings" class="page">
-  <div class="main-header"><h2>⚙️ 設定</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
+  <div class="main-header"><h2>⚙️ 設定</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
   <div class="content">
     <!-- ===== 設定タブナビゲーション ===== -->
     <div class="settings-tabs-nav">
@@ -1667,46 +1667,6 @@ if('serviceWorker' in navigator){
     </div>
 
     <div class="card" style="max-width:640px;padding:24px">
-
-      <!-- 顧客インポート / エクスポート -->
-      <div class="section-title" style="margin-bottom:8px">📤 顧客データ インポート / エクスポート</div>
-      <p style="font-size:11px;color:var(--text3);margin-bottom:12px">弥生会計、freee、マネーフォワード、勘定奉行など、各種会計ソフトのCSV形式に対応。出力項目の順序もカスタマイズ可能です。</p>
-      <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:20px">
-
-        <!-- エクスポート -->
-        <div style="margin-bottom:18px">
-          <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px">📥 エクスポート（顧客データを書き出す）</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('flexsys')">📋 標準形式</button>
-            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('yayoi')">📊 弥生会計</button>
-            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('freee')">💰 freee</button>
-            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('mfcloud')">☁️ マネーフォワード</button>
-            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('obc')">🏢 勘定奉行</button>
-            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('vcard')">📇 vCard</button>
-          </div>
-          <details style="margin-top:10px">
-            <summary style="cursor:pointer;font-size:12px;color:var(--text2);font-weight:600;margin-bottom:8px">⚙️ 標準形式の項目順をカスタマイズ</summary>
-            <div style="background:white;border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:8px">
-              <p style="font-size:11px;color:var(--text3);margin-bottom:8px">ドラッグで順序を変更、チェックで項目の有無を選択</p>
-              <div id="cust-export-fields"></div>
-              <div style="display:flex;gap:6px;margin-top:10px;justify-content:flex-end">
-                <button class="btn btn-secondary btn-sm" onclick="resetCustExportFields()">🔄 デフォルトに戻す</button>
-                <button class="btn btn-primary btn-sm" onclick="saveCustExportFields()">💾 保存</button>
-              </div>
-            </div>
-          </details>
-        </div>
-
-        <!-- インポート -->
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:10px">📤 インポート（顧客データを読み込む）</div>
-          <p style="font-size:11px;color:var(--text3);margin-bottom:8px">CSVファイルから顧客を一括登録。弥生・freee・MFのCSVも自動判別。</p>
-          <input type="file" id="cust-import-file" accept=".csv,.txt" style="display:none" onchange="importCustomers(event)">
-          <button class="btn btn-primary btn-sm" onclick="document.getElementById('cust-import-file').click()">📂 CSVファイルを選択</button>
-          <button class="btn btn-secondary btn-sm" onclick="downloadCustImportTemplate()" style="margin-left:6px">📋 テンプレートDL</button>
-          <div id="cust-import-result" style="margin-top:10px;font-size:12px"></div>
-        </div>
-      </div>
 
       <!-- ロゴ -->
       <div class="section-title" style="margin-bottom:12px">会社ロゴ</div>
@@ -1806,7 +1766,7 @@ if('serviceWorker' in navigator){
 <div id="page-employees" class="page">
   <div class="main-header">
     <h2>👤 従業員管理 <span style="font-size:11px;background:var(--red-light);color:var(--red);padding:2px 8px;border-radius:99px;font-weight:600;margin-left:6px">管理者専用</span></h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-secondary btn-sm" onclick="lockAdmin()">🔒 管理者ロック</button>
       <button class="btn btn-primary" onclick="openEmpModal()">＋ 従業員追加</button>
     </div>
@@ -1877,7 +1837,7 @@ if('serviceWorker' in navigator){
 <div id="page-payments" class="page">
   <div class="main-header">
     <h2>💴 入金管理</h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <select id="payment-filter-status" onchange="renderPayments()" style="padding:7px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none">
         <option value="">すべて</option><option value="未入金">未入金</option><option value="一部入金">一部入金</option><option value="入金済">入金済</option>
       </select>
@@ -1903,7 +1863,7 @@ if('serviceWorker' in navigator){
 <div id="page-staff-report" class="page">
   <div class="main-header">
     <h2>📊 スタッフ別実績レポート</h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <select id="sr-year" onchange="renderStaffReport()" style="padding:7px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none"></select>
       <select id="sr-month" onchange="renderStaffReport()" style="padding:7px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none">
         <option value="">年間</option>
@@ -1934,7 +1894,7 @@ if('serviceWorker' in navigator){
 <div id="page-branches" class="page" style="display:none">
   <div class="main-header">
     <h2>🏢 拠点・支店管理</h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-primary" onclick="openBranchModal()">＋ 拠点を追加</button>
     </div>
   </div>
@@ -1952,7 +1912,7 @@ if('serviceWorker' in navigator){
 
 <!-- CSV EXPORT -->
 <div id="page-csv-export" class="page">
-  <div class="main-header"><h2>📤 CSVエクスポート</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
+  <div class="main-header"><h2>📤 CSVエクスポート</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
   <div class="content">
     <!-- ===== 設定タブナビゲーション ===== -->
     <div class="settings-tabs-nav">
@@ -2016,7 +1976,7 @@ if('serviceWorker' in navigator){
 <div id="page-expenses" class="page">
   <div class="main-header">
     <h2>💸 経費管理</h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-secondary btn-sm" onclick="openExpExportModal()">📤 エクスポート</button>
       <button class="btn btn-primary" onclick="openExpenseModal()">＋ 経費を追加</button>
     </div>
@@ -2044,6 +2004,48 @@ if('serviceWorker' in navigator){
         <tbody id="expenses-body"></tbody>
       </table>
     </div>
+
+    <div style="margin-top:32px;padding-top:24px;border-top:2px solid var(--border);max-width:720px">
+      <div class="section-title" style="margin-bottom:8px">👥 顧客データ インポート / エクスポート</div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:12px">弥生会計、freee、マネーフォワード、勘定奉行など、各種会計ソフトのCSV形式に対応。出力項目の順序もカスタマイズ可能です。</p>
+      <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:20px">
+
+        <!-- エクスポート -->
+        <div style="margin-bottom:18px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:10px">📥 エクスポート（顧客データを書き出す）</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('flexsys')">📋 標準形式</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('yayoi')">📊 弥生会計</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('freee')">💰 freee</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('mfcloud')">☁️ マネーフォワード</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('obc')">🏢 勘定奉行</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCustomers('vcard')">📇 vCard</button>
+          </div>
+          <details style="margin-top:10px">
+            <summary style="cursor:pointer;font-size:12px;color:var(--text2);font-weight:600;margin-bottom:8px">⚙️ 標準形式の項目順をカスタマイズ</summary>
+            <div style="background:white;border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:8px">
+              <p style="font-size:11px;color:var(--text3);margin-bottom:8px">ドラッグで順序を変更、チェックで項目の有無を選択</p>
+              <div id="cust-export-fields"></div>
+              <div style="display:flex;gap:6px;margin-top:10px;justify-content:flex-end">
+                <button class="btn btn-secondary btn-sm" onclick="resetCustExportFields()">🔄 デフォルトに戻す</button>
+                <button class="btn btn-primary btn-sm" onclick="saveCustExportFields()">💾 保存</button>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- インポート -->
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:10px">📤 インポート（顧客データを読み込む）</div>
+          <p style="font-size:11px;color:var(--text3);margin-bottom:8px">CSVファイルから顧客を一括登録。弥生・freee・MFのCSVも自動判別。</p>
+          <input type="file" id="cust-import-file" accept=".csv,.txt" style="display:none" onchange="importCustomers(event)">
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('cust-import-file').click()">📂 CSVファイルを選択</button>
+          <button class="btn btn-secondary btn-sm" onclick="downloadCustImportTemplate()" style="margin-left:6px">📋 テンプレートDL</button>
+          <div id="cust-import-result" style="margin-top:10px;font-size:12px"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2051,7 +2053,7 @@ if('serviceWorker' in navigator){
 <div id="page-tax" class="page">
   <div class="main-header">
     <h2>🧾 税率設定</h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-primary" onclick="saveTaxRates()">💾 保存する</button>
     </div>
   </div>
@@ -2134,7 +2136,7 @@ if('serviceWorker' in navigator){
 <div id="page-developer" class="page">
   <div class="main-header">
     <h2>🛠️ 開発者ツール <span style="font-size:11px;background:#7B68EE;color:white;padding:2px 8px;border-radius:99px;font-weight:600;margin-left:6px">限定アクセス</span></h2>
-    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-secondary btn-sm" onclick="lockDeveloper()">🔒 ロック</button>
     </div>
   </div>
@@ -2242,7 +2244,7 @@ if('serviceWorker' in navigator){
 <!-- 開発者認証モーダル -->
 <div class="modal-overlay" id="dev-auth-modal">
 <div class="modal" style="max-width:420px">
-  <div class="modal-header"><h3>🔐 開発者認証</h3><button class="close-btn" onclick="closeModal('dev-auth-modal')">✕</button></div>
+  <div class="modal-header"><h3>🔐 開発者認証</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('dev-auth-modal')">✕</button></div>
   <div class="modal-body">
     <p style="font-size:13px;color:var(--text2);margin-bottom:14px">開発者ツールにアクセスするにはパスワードを入力してください。<br><span style="font-size:11px;color:var(--text3)">※ 許可されたGoogleアカウント（a.nojima.irori@gmail.com）でも自動アクセス可能</span></p>
     <input type="password" id="dev-auth-pin" placeholder="開発者パスワード" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px" onkeypress="if(event.key==='Enter')checkDeveloperPin()">
@@ -2257,7 +2259,7 @@ if('serviceWorker' in navigator){
 
 <!-- BACKUP -->
 <div id="page-backup" class="page">
-  <div class="main-header"><h2>🗄️ バックアップ・復旧</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
+  <div class="main-header"><h2>🗄️ バックアップ・復旧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
   <div class="content">
     <!-- ===== 設定タブナビゲーション ===== -->
     <div class="settings-tabs-nav">
@@ -2350,7 +2352,7 @@ if('serviceWorker' in navigator){
       <h3 id="doc-modal-title" style="font-size:15px">新規書類作成</h3>
       <span id="doc-autosave" class="autosave-dot" title="自動保存状態"></span>
     </div>
-    <button class="close-btn" onclick="closeModal('doc-modal')">✕</button>
+    <button class="close-btn" aria-label="閉じる" onclick="closeModal('doc-modal')">✕</button>
   </div>
   <!-- 監査情報（編集時のみ表示） -->
   <div id="doc-audit-info" style="display:none;padding:6px 20px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.5"></div>
@@ -2498,7 +2500,7 @@ if('serviceWorker' in navigator){
 <!-- PREVIEW MODAL -->
 <div class="modal-overlay" id="preview-modal">
 <div class="modal" style="max-width:720px">
-  <div class="modal-header"><h3>書類プレビュー</h3><button class="close-btn" onclick="closeModal('preview-modal')">✕</button></div>
+  <div class="modal-header"><h3>書類プレビュー</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('preview-modal')">✕</button></div>
   <div class="modal-body" id="preview-body"></div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('preview-modal')">閉じる</button>
@@ -2514,7 +2516,7 @@ if('serviceWorker' in navigator){
 
 <div class="modal-overlay" id="share-modal">
 <div class="modal" style="max-width:400px">
-  <div class="modal-header"><h3>共有・送信</h3><button class="close-btn" onclick="closeModal('share-modal')">✕</button></div>
+  <div class="modal-header"><h3>共有・送信</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('share-modal')">✕</button></div>
   <div class="modal-body">
     <div class="share-option" onclick="shareLink()"><span class="share-icon">🔗</span><div><div style="font-weight:700">共有リンクを発行</div><div style="font-size:12px;color:var(--text2)">URLをコピー→LINE・メールに貼り付け</div></div></div>
     <div class="share-option" onclick="sharePDF()"><span class="share-icon">📄</span><div><div style="font-weight:700">PDFをダウンロード</div><div style="font-size:12px;color:var(--text2)">端末にPDFを保存</div></div></div>
@@ -2526,7 +2528,7 @@ if('serviceWorker' in navigator){
 <!-- CUSTOMER MODAL -->
 <div class="modal-overlay" id="customer-modal">
 <div class="modal" style="max-width:700px">
-  <div class="modal-header"><h3 id="cust-modal-title">顧客情報</h3><button class="close-btn" onclick="closeModal('customer-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="cust-modal-title">顧客情報</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('customer-modal')">✕</button></div>
   <div class="modal-body">
 
     <!-- 貼り付けパーサー -->
@@ -2618,7 +2620,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- CUSTOMER DETAIL MODAL -->
 <div class="modal-overlay" id="cust-detail-modal">
 <div class="modal" style="max-width:700px">
-  <div class="modal-header"><h3 id="cust-detail-name">顧客詳細</h3><button class="close-btn" onclick="closeModal('cust-detail-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="cust-detail-name">顧客詳細</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('cust-detail-modal')">✕</button></div>
   <div class="modal-body" id="cust-detail-body"></div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('cust-detail-modal')">閉じる</button>
@@ -2632,7 +2634,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- MAP MODAL -->
 <div class="modal-overlay" id="map-modal">
 <div class="modal" style="max-width:560px">
-  <div class="modal-header"><h3 id="map-modal-title">🗺️ 地図・距離情報</h3><button class="close-btn" onclick="closeModal('map-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="map-modal-title">🗺️ 地図・距離情報</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('map-modal')">✕</button></div>
   <div class="modal-body" id="map-modal-body"></div>
   <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('map-modal')">閉じる</button></div>
 </div>
@@ -2641,7 +2643,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- JOB MODAL -->
 <div class="modal-overlay" id="job-modal">
 <div class="modal" style="max-width:600px">
-  <div class="modal-header"><h3 id="job-modal-title">予定を追加</h3><button class="close-btn" onclick="closeModal('job-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="job-modal-title">予定を追加</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('job-modal')">✕</button></div>
   <div class="modal-body">
     <!-- 予定タイプ選択 -->
     <div class="form-row" style="margin-bottom:14px">
@@ -2755,7 +2757,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- TEMPLATE MODAL（単品テンプレート編集） -->
 <div class="modal-overlay" id="template-modal">
 <div class="modal" style="max-width:520px">
-  <div class="modal-header"><h3 id="tmpl-modal-title">テンプレート追加</h3><button class="close-btn" onclick="closeModal('template-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="tmpl-modal-title">テンプレート追加</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('template-modal')">✕</button></div>
   <div class="modal-body">
     <div class="form-row cols2">
       <div class="form-group"><label>カテゴリ ＊</label><input type="text" id="tmpl-category" list="tmpl-modal-cat-datalist" placeholder="電気・設備" autocomplete="off"></div>
@@ -2786,7 +2788,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <div class="modal" style="max-width:520px">
   <div class="modal-header">
     <h3>📦 テンプレートから挿入</h3>
-    <button class="close-btn" onclick="closeModal('tmpl-insert-modal')">✕</button>
+    <button class="close-btn" aria-label="閉じる" onclick="closeModal('tmpl-insert-modal')">✕</button>
   </div>
   <div class="modal-body">
     <!-- 絞り込み・検索 -->
@@ -2835,7 +2837,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <div class="modal" style="max-width:680px">
   <div class="modal-header">
     <h3>✂️ ロゴをトリミング</h3>
-    <button class="close-btn" onclick="closeModal('crop-modal')">✕</button>
+    <button class="close-btn" aria-label="閉じる" onclick="closeModal('crop-modal')">✕</button>
   </div>
   <div class="modal-body">
     <!-- Presets -->
@@ -2901,7 +2903,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <div class="modal" style="max-width:380px">
   <div class="modal-header" style="background:var(--red-light);border-bottom:1px solid #F5C6C2">
     <h3 style="color:var(--red)">⚠️ データ初期化の確認</h3>
-    <button class="close-btn" onclick="closeModal('reset-modal')">✕</button>
+    <button class="close-btn" aria-label="閉じる" onclick="closeModal('reset-modal')">✕</button>
   </div>
   <div class="modal-body" style="text-align:center;padding:24px">
     <div style="font-size:36px;margin-bottom:12px">🗑️</div>
@@ -2968,7 +2970,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- EMPLOYEE MODAL -->
 <div class="modal-overlay" id="emp-modal">
 <div class="modal" style="max-width:640px">
-  <div class="modal-header"><h3 id="emp-modal-title">従業員を追加</h3><button class="close-btn" onclick="closeModal('emp-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="emp-modal-title">従業員を追加</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('emp-modal')">✕</button></div>
   <div class="modal-body">
     <!-- Photo upload -->
     <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:16px">
@@ -3024,7 +3026,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- CHANGE PIN MODAL -->
 <div class="modal-overlay" id="pin-change-modal">
 <div class="modal" style="max-width:380px">
-  <div class="modal-header"><h3>🔐 管理者PINを変更</h3><button class="close-btn" onclick="closeModal('pin-change-modal')">✕</button></div>
+  <div class="modal-header"><h3>🔐 管理者PINを変更</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('pin-change-modal')">✕</button></div>
   <div class="modal-body">
     <div class="form-row">
       <div class="form-group"><label>現在のPIN（4桁以上の数字）</label><input type="password" id="pin-old" placeholder="現在のPIN" maxlength="8" minlength="4" inputmode="numeric" pattern="[0-9]{4,}" autocomplete="current-password" style="letter-spacing:.3em;font-size:18px"></div>
@@ -3047,7 +3049,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- PAYMENT DETAIL MODAL -->
 <div class="modal-overlay" id="payment-modal">
 <div class="modal" style="max-width:560px">
-  <div class="modal-header"><h3 id="pay-modal-title">入金情報</h3><button class="close-btn" onclick="closeModal('payment-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="pay-modal-title">入金情報</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('payment-modal')">✕</button></div>
   <div class="modal-body">
     <div id="pay-invoice-info" style="background:var(--surface2);border-radius:var(--radius);padding:14px;margin-bottom:16px;font-size:13px"></div>
     <div class="section-title">入金記録</div>
@@ -3078,7 +3080,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- BRANCH MODAL -->
 <div class="modal-overlay" id="branch-modal">
 <div class="modal" style="max-width:500px">
-  <div class="modal-header"><h3 id="branch-modal-title">拠点を追加</h3><button class="close-btn" onclick="closeModal('branch-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="branch-modal-title">拠点を追加</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('branch-modal')">✕</button></div>
   <div class="modal-body">
     <div class="form-row cols2">
       <div class="form-group"><label>拠点名 ＊</label><input type="text" id="br-name" placeholder="札幌本社"></div>
@@ -3103,7 +3105,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- PHOTO MODAL (per doc) -->
 <div class="modal-overlay" id="photo-modal">
 <div class="modal" style="max-width:720px">
-  <div class="modal-header"><h3 id="photo-modal-title">📷 作業写真</h3><button class="close-btn" onclick="closeModal('photo-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="photo-modal-title">📷 作業写真</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('photo-modal')">✕</button></div>
   <div class="modal-body">
     <p style="font-size:13px;color:var(--text2);margin-bottom:10px">現場写真を書類に紐付けて管理できます。Firebase Storage に保存され、顧客にリンクで共有できます。</p>
 
@@ -3185,7 +3187,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- QR MODAL -->
 <div class="modal-overlay" id="qr-modal">
 <div class="modal" style="max-width:380px">
-  <div class="modal-header"><h3>📷 QRコード</h3><button class="close-btn" onclick="closeModal('qr-modal')">✕</button></div>
+  <div class="modal-header"><h3>📷 QRコード</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('qr-modal')">✕</button></div>
   <div class="modal-body" style="text-align:center;padding:20px">
     <div id="qr-doc-info" style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6"></div>
     <!-- QR code renders here -->
@@ -3202,7 +3204,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- EXPENSE MODAL -->
 <div class="modal-overlay" id="expense-modal">
 <div class="modal" style="max-width:520px">
-  <div class="modal-header"><h3 id="exp-modal-title">経費を追加</h3><button class="close-btn" onclick="closeModal('expense-modal')">✕</button></div>
+  <div class="modal-header"><h3 id="exp-modal-title">経費を追加</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('expense-modal')">✕</button></div>
   <div class="modal-body">
     <!-- AI読み取り＋領収書添付（最上部に統合） -->
     <div style="background:linear-gradient(135deg,#F3EFFF,#FAEFFF);border:1px solid #D4C5F9;border-radius:10px;padding:12px;margin-bottom:14px">
@@ -3280,7 +3282,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- EXPENSE EXPORT MODAL -->
 <div class="modal-overlay" id="exp-export-modal">
 <div class="modal" style="max-width:560px">
-  <div class="modal-header"><h3>📤 経費データをエクスポート</h3><button class="close-btn" onclick="closeModal('exp-export-modal')">✕</button></div>
+  <div class="modal-header"><h3>📤 経費データをエクスポート</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('exp-export-modal')">✕</button></div>
   <div class="modal-body">
     <p style="font-size:13px;color:var(--text2);margin-bottom:16px">freee・弥生・マネーフォワード・MFクラウド等の会計ソフトに取り込めるCSVを出力します。</p>
     <div class="form-row cols2" style="margin-bottom:14px">
@@ -3316,7 +3318,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <!-- GOOGLE CALENDAR SETTINGS MODAL -->
 <div class="modal-overlay" id="gcal-settings-modal">
 <div class="modal" style="max-width:520px">
-  <div class="modal-header"><h3>📅 Googleカレンダー連携</h3><button class="close-btn" onclick="closeModal('gcal-settings-modal')">✕</button></div>
+  <div class="modal-header"><h3>📅 Googleカレンダー連携</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('gcal-settings-modal')">✕</button></div>
   <div class="modal-body">
     <div style="background:var(--blue-light);border:1px solid #B0D0F0;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--blue);line-height:1.6">
       💡 作業カレンダーで追加した予定をGoogleカレンダーに自動同期します。スマホのカレンダーアプリでも見られるようになります。
@@ -3372,7 +3374,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <div class="modal" style="max-width:640px">
   <div class="modal-header">
     <h3>📷 レシートを撮影</h3>
-    <button class="close-btn" onclick="stopReceiptCamera()">✕</button>
+    <button class="close-btn" aria-label="閉じる" onclick="stopReceiptCamera()">✕</button>
   </div>
   <div class="modal-body" style="padding:0">
     <div style="background:#000;text-align:center;position:relative">
@@ -3395,7 +3397,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <div class="modal" style="max-width:760px">
   <div class="modal-header">
     <h3>📋 売上集計帳票</h3>
-    <button class="close-btn" onclick="closeModal('report-print-modal')">✕</button>
+    <button class="close-btn" aria-label="閉じる" onclick="closeModal('report-print-modal')">✕</button>
   </div>
   <div class="modal-body">
     <div class="print-area" id="report-print-area"></div>
@@ -3413,7 +3415,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 <div class="modal" style="max-width:480px">
   <div class="modal-header">
     <h3>⚙️ 状態の編集・追加</h3>
-    <button class="close-btn" onclick="closeModal('status-editor-modal')">✕</button>
+    <button class="close-btn" aria-label="閉じる" onclick="closeModal('status-editor-modal')">✕</button>
   </div>
   <div class="modal-body">
     <p style="font-size:12px;color:var(--text2);margin-bottom:14px">書類の状態項目を自由に編集・追加・並び替えできます。</p>
@@ -3441,8 +3443,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.22.2';
-const APP_BUILD_TIME='2026/04/20 00:31';
+const APP_VERSION='v3.22.5';
+const APP_BUILD_TIME='2026/04/20 00:49';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4703,7 +4705,7 @@ function addLineItem(data){
     <select onchange="calcTotals()">${taxOptions(data?.tax)}</select>
     <div class="line-total" id="lt-${uid}">¥0</div>
     <button class="tmpl-btn" title="テンプレートから挿入" onclick="openTemplatePopup('${uid}')" style="background:var(--accent-light);color:var(--accent);border:1px solid var(--accent);width:34px;height:32px;border-radius:6px;cursor:pointer;font-size:14px;padding:0;font-family:inherit">📦</button>
-    <button class="del-btn" onclick="document.getElementById('${uid}').remove();calcTotals()">✕</button>`;
+    <button class="del-btn" aria-label="削除" onclick="document.getElementById('${uid}').remove();calcTotals()">✕</button>`;
   d.addEventListener('dragstart',e=>{dragSrcId=uid;d.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
   d.addEventListener('dragend',()=>{d.classList.remove('dragging');document.querySelectorAll('.line-item').forEach(r=>r.classList.remove('drag-over'));});
   d.addEventListener('dragover',e=>{e.preventDefault();document.querySelectorAll('.line-item').forEach(r=>r.classList.remove('drag-over'));d.classList.add('drag-over');});
@@ -5036,7 +5038,7 @@ function _showShareLinkDialog(url, message, doc){
     <div class="modal" style="max-width:480px">
       <div class="modal-header">
         <h3>🔗 共有リンクを発行しました</h3>
-        <button class="close-btn" onclick="document.getElementById('share-link-dialog').remove()">✕</button>
+        <button class="close-btn" aria-label="閉じる" onclick="document.getElementById('share-link-dialog').remove()">✕</button>
       </div>
       <div class="modal-body">
         <div style="background:var(--accent-light);border-radius:8px;padding:12px;margin-bottom:16px">
@@ -6943,7 +6945,6 @@ async function fbLoadAll(uid){
       sortedChunks.sort((a,b)=>a.idx-b.idx);
       sortedChunks.forEach(ch=>allDocs.push(...ch.docs));
       docs = allDocs;
-      console.log(`[load] Loaded ${docs.length} docs from ${sortedChunks.length} chunks`);
     } else if(data.docs){
       docs = data.docs;
     }
@@ -7170,7 +7171,6 @@ async function _fbPersist(){
           docs: chunks[idx], chunkIndex: idx, totalChunks: chunks.length
         });
       }
-      console.log(`[persist] Saved ${docsForFB.length} docs in ${chunks.length} chunks`);
     }
 
     // 写真データは別保存（サイズ大）
@@ -7522,7 +7522,6 @@ async function _verifyPin(inputPin){
     const newHash = await _hashPin(inputPin);
     localStorage.setItem('adminPinHash', newHash);
     localStorage.removeItem('adminPin'); // 平文は削除
-    console.log('[migration] PIN hashed and migrated');
     return true;
   }
   return false;
@@ -7691,7 +7690,6 @@ function migratePaymentsToArray(){
     }
   }
   if(migrated>0){
-    console.log(`[migration] payments: ${migrated} entries normalized to array`);
     try{localStorage.setItem('payments_v6', JSON.stringify(payments));}catch(e){}
   }
 }
@@ -7998,7 +7996,7 @@ function showStaffDetailDocs(staffName, year, month){
     <div class="modal" style="max-width:780px">
       <div class="modal-header">
         <h3>👤 ${staffName} さんの取引一覧 <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${periodLabel}</span></h3>
-        <button class="close-btn" onclick="closeModal('staff-detail-modal')">✕</button>
+        <button class="close-btn" aria-label="閉じる" onclick="closeModal('staff-detail-modal')">✕</button>
       </div>
       <div class="modal-body" style="max-height:65vh;overflow-y:auto">
         <div style="background:var(--accent-light);color:var(--accent);padding:10px 14px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
@@ -8041,7 +8039,7 @@ function showUnassignedDocs(year, month){
     <div class="modal" style="max-width:700px">
       <div class="modal-header">
         <h3>📋 担当未割当の書類（${list.length}件）</h3>
-        <button class="close-btn" onclick="closeModal('unassigned-modal')">✕</button>
+        <button class="close-btn" aria-label="閉じる" onclick="closeModal('unassigned-modal')">✕</button>
       </div>
       <div class="modal-body" style="max-height:60vh;overflow-y:auto">
         <div style="background:#FFF8E7;color:#8B6914;padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:12px">
@@ -10392,16 +10390,16 @@ async function shareDocLink(method){
         await navigator.clipboard.writeText(msg);
         showToast('✓ 共有テキストをコピーしました。LINE PC版で貼り付けてください','#06C755');
         // LINE PC版のダウンロードページも開く（初めて使う人向け）
-        if(confirm('共有テキストをクリップボードにコピーしました。\n\nLINE PC版を起動しますか？\n\n[OK] LINE PC版のトーク画面を開く\n[キャンセル] 何もしない')){
+        showConfirm('共有テキストをクリップボードにコピーしました。\n\nLINE PC版を起動しますか？\n[OK] LINE PC版のトーク画面を開く\n[キャンセル] 何もしない', ()=>{
           // LINE PCの起動プロトコル（インストール済みの場合のみ動作）
           window.location.href='line://';
           setTimeout(()=>{
             // 起動しなかった場合のフォールバック - LINE Web版を開く
-            if(confirm('LINEアプリが起動しませんでしたか？\nLINE Web版を開きますか？')){
+            showConfirm('LINEアプリが起動しませんでしたか？\nLINE Web版を開きますか？', ()=>{
               window.open('https://web.line.me/','_blank');
-            }
+            });
           }, 2000);
-        }
+        });
       }catch(e){
         showToast('コピー失敗。PDFダウンロードしてLINEに添付してください','#E67E22');
       }
@@ -10973,7 +10971,7 @@ function replyToBulletin(parentId){
 function showInputDialog(label, onOk){
   const html=`<div class="modal-overlay open" id="input-dialog-modal" onclick="if(event.target===this)closeModal('input-dialog-modal')">
     <div class="modal" style="max-width:500px">
-      <div class="modal-header"><h3>${label}</h3><button class="close-btn" onclick="closeModal('input-dialog-modal')">✕</button></div>
+      <div class="modal-header"><h3>${label}</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('input-dialog-modal')">✕</button></div>
       <div class="modal-body">
         <textarea id="input-dialog-text" rows="4" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;resize:vertical" placeholder="返信を書く..."></textarea>
       </div>
@@ -11355,7 +11353,7 @@ function _renderDrilldownDocs(title, filterDesc, list){
     <div class="modal" style="max-width:780px">
       <div class="modal-header">
         <h3>📊 ${title} <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${filterDesc}</span></h3>
-        <button class="close-btn" onclick="closeModal('drilldown-modal')">✕</button>
+        <button class="close-btn" aria-label="閉じる" onclick="closeModal('drilldown-modal')">✕</button>
       </div>
       <div class="modal-body" style="max-height:65vh;overflow-y:auto">
         <div style="background:var(--accent-light);color:var(--accent);padding:10px 14px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:5">
@@ -11389,7 +11387,7 @@ function _renderDrilldownExpenses(title, filterDesc, list){
     <div class="modal" style="max-width:780px">
       <div class="modal-header">
         <h3>💸 ${title} <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${filterDesc}</span></h3>
-        <button class="close-btn" onclick="closeModal('drilldown-modal')">✕</button>
+        <button class="close-btn" aria-label="閉じる" onclick="closeModal('drilldown-modal')">✕</button>
       </div>
       <div class="modal-body" style="max-height:65vh;overflow-y:auto">
         <div style="background:#FFE4D6;color:#C0392B;padding:10px 14px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:5">
@@ -11697,14 +11695,6 @@ function generateSampleData(){
     updateDeveloperInfo();
     // デバッグ: 生成結果を console に出力
     try{
-      console.log('[Sample Data Generated]',{
-        added,
-        totals:{docs:docs.length,customers:customers.length,employees:employees.length,expenses:expenses.length,jobs:jobs.length},
-        sampleQuotes:docs.filter(d=>d.type==='見積書'&&d._sample).length,
-        sampleInvoices:docs.filter(d=>d.type==='請求書'&&d._sample).length,
-        sampleReceipts:docs.filter(d=>d.type==='領収書'&&d._sample).length,
-        saveResult
-      });
     }catch(e){}
     // 結果メッセージに保存状態を明示
     let resultMsg=`✓ サンプルデータを生成しました\n見積:${docs.filter(d=>d.type==='見積書'&&d._sample).length} / 請求:${docs.filter(d=>d.type==='請求書'&&d._sample).length} / 領収:${docs.filter(d=>d.type==='領収書'&&d._sample).length}\n顧客:${added.customers} / 経費:${added.expenses} / 作業:${added.jobs}`;
