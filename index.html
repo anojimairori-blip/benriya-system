@@ -315,9 +315,9 @@ tr:hover td{background:var(--bg)}
 .distance-badge:hover{background:#B0D0F0}
 
 /* LINE ITEMS - DRAG */
-.line-items-header{display:grid;grid-template-columns:24px 2.5fr 64px 100px 96px 96px 34px;gap:4px;padding:0 0 5px}
+.line-items-header{display:grid;grid-template-columns:24px 2.5fr 64px 100px 96px 96px 34px 34px;gap:4px;padding:0 0 5px}
 .line-items-header span{font-size:11px;font-weight:600;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.line-item{display:grid;grid-template-columns:24px 2.5fr 64px 100px 96px 96px 34px;gap:4px;margin-bottom:5px;align-items:center;background:var(--surface);border-radius:6px;padding:2px;transition:box-shadow .15s}
+.line-item{display:grid;grid-template-columns:24px 2.5fr 64px 100px 96px 96px 34px 34px;gap:4px;margin-bottom:5px;align-items:center;background:var(--surface);border-radius:6px;padding:2px;transition:box-shadow .15s}
 .line-item.dragging{opacity:.5;box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .line-item.drag-over{box-shadow:0 0 0 2px var(--accent)}
 .drag-handle{cursor:grab;color:var(--text3);font-size:16px;text-align:center;user-select:none;padding:8px 0}
@@ -1132,7 +1132,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.20</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.22</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1156,7 +1156,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.20</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.22</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1191,7 +1191,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.20</div>
+    <div class="logo-version" id="sidebar-version">v3.22</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1467,21 +1467,16 @@ if('serviceWorker' in navigator){
 </div>
 
 <!-- TEMPLATES -->
-<div id="page-templates" class="page">
-  <div class="main-header"><h2>📦 作業テンプレート</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openTemplateModal()">＋ テンプレート追加</button></div></div>
-  <div class="content">
-    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">よく使う作業内容を登録。書類作成時にワンクリックで明細を挿入できます。</p>
-    <div id="template-list"></div>
+<!-- DISPLAY SETTINGS -->
+<div id="page-display-settings" class="page">
+  <div class="main-header">
+    <h2>🎨 表示・外観設定</h2>
+    <div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div>
   </div>
-</div>
-
-<!-- SETTINGS -->
-<div id="page-settings" class="page">
-  <div class="main-header"><h2>⚙️ 設定</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
   <div class="content">
     <!-- ===== 設定タブナビゲーション ===== -->
     <div class="settings-tabs-nav">
-      <button class="settings-tab active" data-settings-nav="settings" onclick="showPage('settings')">
+      <button class="settings-tab" data-settings-nav="settings" onclick="showPage('settings')">
         <span class="stab-icon">🏢</span><span class="stab-label">会社情報</span>
       </button>
       <button class="settings-tab" data-settings-nav="employees" onclick="requireAdmin('employees')">
@@ -1493,17 +1488,26 @@ if('serviceWorker' in navigator){
       <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
         <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="templates" onclick="showPage('templates')">
+        <span class="stab-icon">📦</span><span class="stab-label">テンプレート</span>
+      </button>
+      <button class="settings-tab settings-tab-extra active" data-settings-nav="display" onclick="showPage('display-settings')">
+        <span class="stab-icon">🎨</span><span class="stab-label">表示</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="csv" onclick="showPage('csv-export')">
         <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
       </button>
     </div>
 
-    <div class="card" style="max-width:640px;padding:24px">
+    <div style="background:var(--blue-light);border:1px solid #B0D0F0;border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;font-size:12px;color:var(--blue)">
+      💡 <strong>テーマカラーは端末ごとに保存されます。</strong>PC・スマホ・タブレットでそれぞれ別のテーマを使えます（夜はダーク・昼はナチュラルなど）。
+    </div>
 
-      <!-- テーマ -->
+    <div class="card" style="max-width:720px;padding:24px">
+      <!-- 🎨 テーマ -->
       <div class="section-title" style="margin-bottom:12px">🎨 テーマ・カラー</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px" id="theme-picker">
         <div class="theme-swatch" data-theme="default" onclick="applyTheme('default',this)" title="ナチュラル（デフォルト）">
@@ -1576,6 +1580,93 @@ if('serviceWorker' in navigator){
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="card" style="max-width:640px;padding:24px;margin-top:18px">
+      <div class="section-title" style="margin-bottom:6px">📋 メニュー「管理」セクションの並び順</div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">↑↓ボタンで左サイドバーの「管理」メニューの順番を変更できます。変更は即座に反映されます。</p>
+      <div id="nav-order-editor"></div>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="resetNavOrder()">🔄 デフォルト順に戻す</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-templates" class="page">
+  <div class="main-header"><h2>📦 作業テンプレート</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openTemplateModal()">＋ テンプレート追加</button></div></div>
+  <div class="content">
+    <!-- ===== 設定タブナビゲーション ===== -->
+    <div class="settings-tabs-nav">
+      <button class="settings-tab" data-settings-nav="settings" onclick="showPage('settings')">
+        <span class="stab-icon">🏢</span><span class="stab-label">会社情報</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="employees" onclick="requireAdmin('employees')">
+        <span class="stab-icon">👷</span><span class="stab-label">従業員</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="tax" onclick="showPage('tax')">
+        <span class="stab-icon">🧾</span><span class="stab-label">税率</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
+        <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
+      </button>
+      <button class="settings-tab settings-tab-extra active" data-settings-nav="templates" onclick="showPage('templates')">
+        <span class="stab-icon">📦</span><span class="stab-label">テンプレート</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="display" onclick="showPage('display-settings')">
+        <span class="stab-icon">🎨</span><span class="stab-label">表示</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="csv" onclick="showPage('csv-export')">
+        <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
+        <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">よく使う品目を登録しておくと、見積書作成時にワンクリックで挿入できます。</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <select id="tmpl-page-cat-filter" onchange="renderTemplates()" style="flex:1;min-width:140px;padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none;background:var(--surface)">
+        <option value="">（すべてのカテゴリ）</option>
+      </select>
+      <input type="text" id="tmpl-page-search" placeholder="🔍 品目名で検索" oninput="renderTemplates()" style="flex:1;min-width:140px;padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none">
+    </div>
+    <div id="template-list"></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="page-settings" class="page">
+  <div class="main-header"><h2>⚙️ 設定</h2><div class="header-actions"><button class="btn-refresh" onclick="refreshAllData(this)" title="最新データに更新">🔄</button></div></div>
+  <div class="content">
+    <!-- ===== 設定タブナビゲーション ===== -->
+    <div class="settings-tabs-nav">
+      <button class="settings-tab active" data-settings-nav="settings" onclick="showPage('settings')">
+        <span class="stab-icon">🏢</span><span class="stab-label">会社情報</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="employees" onclick="requireAdmin('employees')">
+        <span class="stab-icon">👷</span><span class="stab-label">従業員</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="tax" onclick="showPage('tax')">
+        <span class="stab-icon">🧾</span><span class="stab-label">税率</span>
+      </button>
+      <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
+        <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="templates" onclick="showPage('templates')">
+        <span class="stab-icon">📦</span><span class="stab-label">テンプレート</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="display" onclick="showPage('display-settings')">
+        <span class="stab-icon">🎨</span><span class="stab-label">表示</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="csv" onclick="showPage('csv-export')">
+        <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
+        <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
+    </div>
+
+    <div class="card" style="max-width:640px;padding:24px">
 
       <!-- 顧客インポート / エクスポート -->
       <div class="section-title" style="margin-bottom:8px">📤 顧客データ インポート / エクスポート</div>
@@ -1708,15 +1799,6 @@ if('serviceWorker' in navigator){
         <span id="settings-saved" style="display:none;color:var(--accent);font-size:13px">✓ 保存しました</span>
       </div>
     </div>
-
-    <!-- メニュー並び順カスタマイズ -->
-    <div class="card" style="max-width:640px;padding:24px;margin-top:18px">
-      <div class="section-title" style="margin-bottom:6px">📋 メニュー「管理」セクションの並び順</div>
-      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">↑↓ボタンで左サイドバーの「管理」メニューの順番を変更できます。変更は即座に反映されます。</p>
-      <div id="nav-order-editor"></div>
-      <div style="margin-top:14px;display:flex;gap:8px">
-        <button class="btn btn-secondary btn-sm" onclick="resetNavOrder()">🔄 デフォルト順に戻す</button>
-      </div>
     </div>
   </div>
 </div>
@@ -1744,10 +1826,16 @@ if('serviceWorker' in navigator){
       <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
         <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="templates" onclick="showPage('templates')">
+        <span class="stab-icon">📦</span><span class="stab-label">テンプレート</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="display" onclick="showPage('display-settings')">
+        <span class="stab-icon">🎨</span><span class="stab-label">表示</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="csv" onclick="showPage('csv-export')">
         <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
       </button>
     </div>
@@ -1880,10 +1968,16 @@ if('serviceWorker' in navigator){
       <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
         <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
       </button>
-      <button class="settings-tab settings-tab-extra active" onclick="showPage('csv-export')">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="templates" onclick="showPage('templates')">
+        <span class="stab-icon">📦</span><span class="stab-label">テンプレート</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="display" onclick="showPage('display-settings')">
+        <span class="stab-icon">🎨</span><span class="stab-label">表示</span>
+      </button>
+      <button class="settings-tab settings-tab-extra active" data-settings-nav="csv" onclick="showPage('csv-export')">
         <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
       </button>
     </div>
@@ -1976,10 +2070,16 @@ if('serviceWorker' in navigator){
       <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
         <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="templates" onclick="showPage('templates')">
+        <span class="stab-icon">📦</span><span class="stab-label">テンプレート</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="display" onclick="showPage('display-settings')">
+        <span class="stab-icon">🎨</span><span class="stab-label">表示</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="csv" onclick="showPage('csv-export')">
         <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
       </button>
     </div>
@@ -2053,10 +2153,16 @@ if('serviceWorker' in navigator){
       <button class="settings-tab" data-settings-nav="backup" onclick="showPage('backup')">
         <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="templates" onclick="showPage('templates')">
+        <span class="stab-icon">📦</span><span class="stab-label">テンプレート</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="display" onclick="showPage('display-settings')">
+        <span class="stab-icon">🎨</span><span class="stab-label">表示</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="csv" onclick="showPage('csv-export')">
         <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
       </button>
-      <button class="settings-tab settings-tab-extra active" onclick="requireDeveloper()">
+      <button class="settings-tab settings-tab-extra active" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
       </button>
     </div>
@@ -2167,10 +2273,16 @@ if('serviceWorker' in navigator){
       <button class="settings-tab active" data-settings-nav="backup" onclick="showPage('backup')">
         <span class="stab-icon">🗄️</span><span class="stab-label">バックアップ</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="showPage('csv-export')">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="templates" onclick="showPage('templates')">
+        <span class="stab-icon">📦</span><span class="stab-label">テンプレート</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="display" onclick="showPage('display-settings')">
+        <span class="stab-icon">🎨</span><span class="stab-label">表示</span>
+      </button>
+      <button class="settings-tab settings-tab-extra" data-settings-nav="csv" onclick="showPage('csv-export')">
         <span class="stab-icon">📤</span><span class="stab-label">CSV出力</span>
       </button>
-      <button class="settings-tab settings-tab-extra" onclick="requireDeveloper()">
+      <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
       </button>
     </div>
@@ -2341,7 +2453,7 @@ if('serviceWorker' in navigator){
         <button class="btn btn-secondary btn-sm" onclick="openTemplateSelect()">📦 テンプレート挿入</button>
       </div>
       <div class="line-items">
-        <div class="line-items-header" style="padding:0 4px 5px"><span></span><span>品目・作業内容</span><span style="text-align:right">数量</span><span style="text-align:right">単価（円）</span><span>税率</span><span style="text-align:right">金額</span><span></span></div>
+        <div class="line-items-header" style="padding:0 4px 5px"><span></span><span>品目・作業内容</span><span style="text-align:right">数量</span><span style="text-align:right">単価（円）</span><span>税率</span><span style="text-align:right">金額</span><span></span><span></span></div>
         <div id="line-items-container"></div>
       </div>
       <button class="btn btn-secondary btn-sm" onclick="addLineItem()" style="margin-top:6px">＋ 行を追加 <span class="kbd-hint">Tab↵</span></button>
@@ -2640,18 +2752,27 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 </div>
 </div>
 
-<!-- TEMPLATE MODAL -->
+<!-- TEMPLATE MODAL（単品テンプレート編集） -->
 <div class="modal-overlay" id="template-modal">
-<div class="modal" style="max-width:560px">
+<div class="modal" style="max-width:520px">
   <div class="modal-header"><h3 id="tmpl-modal-title">テンプレート追加</h3><button class="close-btn" onclick="closeModal('template-modal')">✕</button></div>
   <div class="modal-body">
     <div class="form-row cols2">
-      <div class="form-group"><label>テンプレート名 ＊</label><input type="text" id="tmpl-name" placeholder="エアコン取り付け標準"></div>
-      <div class="form-group"><label>カテゴリ</label><select id="tmpl-category"><option value="">（カテゴリ）</option><option>引越し・運搬</option><option>清掃・片付け</option><option>修理・修繕</option><option>電気・設備</option><option>庭・外構</option><option>買い物・代行</option><option>介護・生活支援</option><option>その他</option></select></div>
+      <div class="form-group"><label>カテゴリ ＊</label><input type="text" id="tmpl-category" list="tmpl-modal-cat-datalist" placeholder="電気・設備" autocomplete="off"></div>
+      <div class="form-group"><label>品目名 ＊</label><input type="text" id="tmpl-name" placeholder="エアコン取付作業"></div>
     </div>
-    <div class="line-items-header"><span></span><span>品目・作業内容</span><span>数量</span><span>単価</span><span>税率</span><span style="text-align:right">金額</span><span></span></div>
-    <div id="tmpl-lines-container"></div>
-    <button class="btn btn-secondary btn-sm" onclick="addTmplLine()" style="margin-top:6px">＋ 行を追加</button>
+    <div class="form-row cols2">
+      <div class="form-group"><label>単価（円）</label><input type="number" id="tmpl-price" placeholder="15000" min="0"></div>
+      <div class="form-group"><label>単位</label><input type="text" id="tmpl-unit" list="tmpl-unit-datalist2" placeholder="式" autocomplete="off"></div>
+    </div>
+    <div class="form-row cols2">
+      <div class="form-group"><label>税率</label><select id="tmpl-tax"></select></div>
+      <div class="form-group"><label>備考（任意）</label><input type="text" id="tmpl-note" placeholder="3時間程度の作業"></div>
+    </div>
+    <datalist id="tmpl-modal-cat-datalist"></datalist>
+    <datalist id="tmpl-unit-datalist2">
+      <option value="式"><option value="個"><option value="台"><option value="本"><option value="時間"><option value="㎡"><option value="m"><option value="kg"><option value="点">
+    </datalist>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('template-modal')">キャンセル</button>
@@ -2660,11 +2781,52 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 </div>
 </div>
 
-<!-- TEMPLATE SELECT -->
-<div class="modal-overlay" id="tmpl-select-modal">
-<div class="modal" style="max-width:480px">
-  <div class="modal-header"><h3>テンプレートを選択</h3><button class="close-btn" onclick="closeModal('tmpl-select-modal')">✕</button></div>
-  <div class="modal-body" id="tmpl-select-body"></div>
+<!-- TEMPLATE INSERT POPUP（品目行から呼ばれる） -->
+<div class="modal-overlay" id="tmpl-insert-modal">
+<div class="modal" style="max-width:520px">
+  <div class="modal-header">
+    <h3>📦 テンプレートから挿入</h3>
+    <button class="close-btn" onclick="closeModal('tmpl-insert-modal')">✕</button>
+  </div>
+  <div class="modal-body">
+    <!-- 絞り込み・検索 -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <select id="tmpl-insert-cat-filter" onchange="renderTemplateInsertList()" style="flex:1;padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none;background:var(--surface)">
+        <option value="">（すべてのカテゴリ）</option>
+      </select>
+      <input type="text" id="tmpl-insert-search" placeholder="🔍 検索" oninput="renderTemplateInsertList()" style="flex:1;min-width:140px;padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;outline:none">
+    </div>
+
+    <!-- テンプレート一覧 -->
+    <div id="tmpl-insert-list" style="max-height:50vh;overflow-y:auto;margin-bottom:14px"></div>
+
+    <!-- 新規追加（折りたたみ式） -->
+    <div style="border-top:2px solid var(--border);padding-top:14px">
+      <button class="btn btn-secondary btn-sm" onclick="toggleInlineTmplAdd()" id="tmpl-add-toggle-btn" style="width:100%">➕ 新規テンプレートを追加</button>
+      <div id="tmpl-inline-add" style="display:none;margin-top:12px;padding:14px;background:var(--accent-light);border-radius:10px">
+        <div class="form-row cols2" style="margin-bottom:8px">
+          <div class="form-group"><label style="font-size:11px">カテゴリ ＊</label><input type="text" id="new-tmpl-category" list="tmpl-cat-datalist" placeholder="電気・設備" autocomplete="off"></div>
+          <div class="form-group"><label style="font-size:11px">品目名 ＊</label><input type="text" id="new-tmpl-name" placeholder="エアコン取付作業"></div>
+        </div>
+        <div class="form-row cols2" style="margin-bottom:8px">
+          <div class="form-group"><label style="font-size:11px">単価</label><input type="number" id="new-tmpl-price" placeholder="15000" min="0"></div>
+          <div class="form-group"><label style="font-size:11px">単位</label><input type="text" id="new-tmpl-unit" list="tmpl-unit-datalist" placeholder="式" autocomplete="off"></div>
+        </div>
+        <div class="form-row cols2" style="margin-bottom:8px">
+          <div class="form-group"><label style="font-size:11px">税率</label><select id="new-tmpl-tax"></select></div>
+          <div class="form-group"><label style="font-size:11px">備考（任意）</label><input type="text" id="new-tmpl-note" placeholder="3時間程度の作業"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="saveInlineTemplate()" style="flex:1">💾 保存</button>
+          <button class="btn btn-secondary btn-sm" onclick="toggleInlineTmplAdd()">キャンセル</button>
+        </div>
+        <datalist id="tmpl-cat-datalist"></datalist>
+        <datalist id="tmpl-unit-datalist">
+          <option value="式"><option value="個"><option value="台"><option value="本"><option value="時間"><option value="㎡"><option value="m"><option value="kg"><option value="点">
+        </datalist>
+      </div>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -3279,8 +3441,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.20';
-const APP_BUILD_TIME='2026/04/19 23:23';
+const APP_VERSION='v3.22';
+const APP_BUILD_TIME='2026/04/20 00:12';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4027,6 +4189,7 @@ function showPage(id, el, addToHistory=true){
   }
   // ページ固有の初期化フック
   if(id==='settings') renderNavOrderEditor();
+  if(id==='display-settings'){ renderNavOrderEditor(); initTheme(); }
   if(id==='developer') updateDeveloperInfo();
   if(id==='calendar'){
     // FullCalendar はページが非表示状態だと幅0で初期化される。
@@ -4539,6 +4702,7 @@ function addLineItem(data){
     <input type="number" value="${data?.price||''}" min="0" placeholder="0" oninput="calcTotals()">
     <select onchange="calcTotals()">${taxOptions(data?.tax)}</select>
     <div class="line-total" id="lt-${uid}">¥0</div>
+    <button class="tmpl-btn" title="テンプレートから挿入" onclick="openTemplatePopup('${uid}')" style="background:var(--accent-light);color:var(--accent);border:1px solid var(--accent);width:34px;height:32px;border-radius:6px;cursor:pointer;font-size:14px;padding:0;font-family:inherit">📦</button>
     <button class="del-btn" onclick="document.getElementById('${uid}').remove();calcTotals()">✕</button>`;
   d.addEventListener('dragstart',e=>{dragSrcId=uid;d.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
   d.addEventListener('dragend',()=>{d.classList.remove('dragging');document.querySelectorAll('.line-item').forEach(r=>r.classList.remove('drag-over'));});
@@ -6081,17 +6245,368 @@ function renderReport(){
   const tbody=document.getElementById('report-table-body');if(tbody)tbody.innerHTML=mData.map((m,i)=>{const prev=i>0?mData[i-1].total:null;const diff=prev!=null&&prev>0?Math.round((m.total-prev)/prev*100):null;return`<tr style="cursor:pointer" onclick="showDocsDrilldown('month',{year:${y},month:${i+1}})" title="${months[i]}の一覧"><td style="font-weight:600">${months[i]}</td><td style="text-align:right">${m.q}件</td><td style="text-align:right">${m.i}件</td><td style="text-align:right">${m.r}件</td><td style="text-align:right;font-weight:600">${fmt(m.total)}</td><td style="text-align:right;color:${diff==null?'var(--text3)':diff>=0?'var(--accent)':'var(--red)'}">${diff==null?'—':(diff>=0?'▲':'▼')+Math.abs(diff)+'%'}</td></tr>`;}).join('');
 }
 
-// ===== TEMPLATES =====
-function renderTemplates(){const el=document.getElementById('template-list');if(!el)return;if(!templates.length){el.innerHTML=`<div style="text-align:center;color:var(--text3);padding:40px">テンプレートがありません。追加ボタンから作成してください。</div>`;return;}el.innerHTML=templates.map(t=>`<div class="tmpl-card"><div style="font-size:22px;width:34px;text-align:center">📋</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${escAttr(t.name||'')}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${escAttr(t.category||'カテゴリなし')}　${(t.lines||[]).length}項目　${fmt((t.lines||[]).reduce((s,l)=>s+(Number(l.qty)||0)*(Number(l.price)||0),0))}</div></div><div style="display:flex;gap:5px"><button class="btn btn-secondary btn-sm" onclick="editTemplate('${t.id}')">編集</button><button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteTemplate('${t.id}'))">削除</button></div></div>`).join('');}
-function openTemplateModal(){editingTmplId=null;document.getElementById('tmpl-modal-title').textContent='テンプレート追加';document.getElementById('tmpl-name').value='';document.getElementById('tmpl-category').value='';document.getElementById('tmpl-lines-container').innerHTML='';addTmplLine();document.getElementById('template-modal').classList.add('open');}
-function editTemplate(id){const t=templates.find(x=>x.id===id);if(!t)return;editingTmplId=id;document.getElementById('tmpl-modal-title').textContent='テンプレートを編集';document.getElementById('tmpl-name').value=t.name;document.getElementById('tmpl-category').value=t.category||'';document.getElementById('tmpl-lines-container').innerHTML='';(t.lines||[]).forEach(l=>addTmplLine(l));document.getElementById('template-modal').classList.add('open');}
-function addTmplLine(data){const c=document.getElementById('tmpl-lines-container');const uid='tl'+Date.now()+Math.random().toString(36).slice(2,5);const d=document.createElement('div');d.className='line-item';d.id=uid;d.style.gridTemplateColumns='24px 3fr 60px 100px 80px 80px 34px';
-  d.innerHTML=`<div class="drag-handle">☰</div><input type="text" placeholder="品目・作業内容" value="${(data?.name||'').replace(/"/g,'&quot;')}"><input type="number" value="${data?.qty||1}" min="0"><input type="number" value="${data?.price||''}" placeholder="0"><select>${taxOptions(data?.tax)}</select><div class="line-total">¥0</div><button class="del-btn" onclick="document.getElementById('${uid}').remove()">✕</button>`;c.appendChild(d);}
-function getTmplLines(){return Array.from(document.querySelectorAll('#tmpl-lines-container .line-item')).map(row=>{const ins=row.querySelectorAll('input,select');return{name:ins[0].value,qty:parseFloat(ins[1].value)||0,price:parseFloat(ins[2].value)||0,tax:ins[3].value};}).filter(l=>l.name);}
-function saveTemplate(){const name=document.getElementById('tmpl-name').value.trim();if(!name){alert('テンプレート名を入力してください');return;}const t={id:editingTmplId||('tmpl-'+Date.now()),name,category:document.getElementById('tmpl-category').value,lines:getTmplLines()};if(editingTmplId){templates[templates.findIndex(x=>x.id===editingTmplId)]=t;}else templates.push(t);persist();closeModal('template-modal');renderTemplates();showToast('テンプレートを保存しました ✓');}
-function deleteTemplate(id){pushUndo({type:"template",data:JSON.parse(JSON.stringify(templates.find(x=>x.id===id)||{})),label:"テンプレートを削除しました"});templates=templates.filter(x=>x.id!==id);persist();renderTemplates();showToast("テンプレートを削除しました");}
-function openTemplateSelect(){const el=document.getElementById('tmpl-select-body');if(!templates.length){el.innerHTML='<p style="text-align:center;color:var(--text3);padding:24px">テンプレートがありません</p>';}else{el.innerHTML=templates.map(t=>`<div class="tmpl-card" onclick="applyTemplate('${t.id}')"><div style="font-size:20px;width:32px;text-align:center">📋</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${t.name}</div><div style="font-size:12px;color:var(--text2)">${t.lines.length}項目　${fmt(t.lines.reduce((s,l)=>s+l.qty*l.price,0))}</div></div></div>`).join('');}document.getElementById('tmpl-select-modal').classList.add('open');}
-function applyTemplate(id){const t=templates.find(x=>x.id===id);if(!t)return;t.lines.forEach(l=>addLineItem(l));calcTotals();closeModal('tmpl-select-modal');}
+// ===== TEMPLATES (単品テンプレート方式 v3.22〜) =====
+// 新形式: {id, category, name, price, unit, tax, note}
+// 旧形式: {id, name, category, lines:[{name,qty,price,tax}]} → 自動移行
+
+// 既存データを自動移行（複数品目セット→単品テンプレに分解）
+function migrateTemplatesToSingle(){
+  if(!Array.isArray(templates)) return false;
+  const migrated=[];
+  let hasOld=false;
+  templates.forEach(t=>{
+    if(Array.isArray(t.lines)){
+      // 旧形式 → 各 line を独立したテンプレートに分解
+      hasOld=true;
+      const setName=t.name||'';
+      const cat=t.category||setName||'その他';
+      (t.lines||[]).forEach((l,i)=>{
+        if(!l||!l.name) return;
+        migrated.push({
+          id:'tmpl-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
+          category:cat,
+          name:l.name,
+          price:Number(l.price)||0,
+          unit:'式',
+          tax:l.tax||'10',
+          note:setName?('旧セット: '+setName):''
+        });
+      });
+    } else if(t.name && (t.category !== undefined || t.price !== undefined)){
+      // 既に新形式
+      migrated.push({
+        id:t.id||('tmpl-'+Date.now()+Math.random().toString(36).slice(2,5)),
+        category:t.category||'その他',
+        name:t.name,
+        price:Number(t.price)||0,
+        unit:t.unit||'式',
+        tax:t.tax||'10',
+        note:t.note||''
+      });
+    }
+  });
+  if(hasOld){
+    templates=migrated;
+    persist();
+    showToast('✓ テンプレートを新形式に自動移行しました ('+migrated.length+'件)','#10B981');
+    return true;
+  }
+  return false;
+}
+
+// テンプレート一覧をカテゴリ別カードで表示（管理ページ）
+function renderTemplates(){
+  const el=document.getElementById('template-list');
+  if(!el) return;
+  // 自動移行チェック
+  migrateTemplatesToSingle();
+  // カテゴリ絞込・検索
+  const catFilterSel=document.getElementById('tmpl-page-cat-filter');
+  const filterCat=catFilterSel?catFilterSel.value:'';
+  const searchEl=document.getElementById('tmpl-page-search');
+  const searchTerm=searchEl?searchEl.value.trim().toLowerCase():'';
+
+  // カテゴリ候補を全て収集してセレクトを更新
+  populateCategoryFilter(catFilterSel, filterCat);
+
+  // フィルタ適用
+  let list=templates.filter(t=>t&&t.name);
+  if(filterCat) list=list.filter(t=>(t.category||'その他')===filterCat);
+  if(searchTerm) list=list.filter(t=>
+    (t.name||'').toLowerCase().includes(searchTerm) ||
+    (t.category||'').toLowerCase().includes(searchTerm) ||
+    (t.note||'').toLowerCase().includes(searchTerm)
+  );
+
+  if(!list.length){
+    el.innerHTML=`<div style="text-align:center;color:var(--text3);padding:40px">${templates.length?'該当するテンプレートがありません':'テンプレートがありません。追加ボタンから作成してください。'}</div>`;
+    return;
+  }
+
+  // カテゴリ別にグルーピング
+  const groups={};
+  list.forEach(t=>{
+    const c=t.category||'その他';
+    if(!groups[c]) groups[c]=[];
+    groups[c].push(t);
+  });
+  const catKeys=Object.keys(groups).sort();
+
+  el.innerHTML=catKeys.map(cat=>{
+    const items=groups[cat];
+    return `<div style="margin-bottom:18px">
+      <div style="font-size:13px;font-weight:700;color:var(--accent);padding:6px 10px;background:var(--accent-light);border-radius:6px;margin-bottom:8px">${escAttr(cat)} <span style="font-weight:500;color:var(--text2);font-size:11px">(${items.length})</span></div>
+      ${items.map(t=>`<div class="tmpl-card" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(t.name)}</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">¥${fmt(t.price||0)} / ${escAttr(t.unit||'式')}　税率${t.tax==='0'?'非課税':(t.tax||'10')+'%'}${t.note?'　📝'+escAttr(t.note):''}</div>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0">
+          <button class="btn btn-secondary btn-sm" onclick="editTemplate('${t.id}')">編集</button>
+          <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteTemplate('${t.id}'))">削除</button>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+// カテゴリ選択肢を動的に更新
+function populateCategoryFilter(selEl, selectedVal){
+  if(!selEl) return;
+  const cats=[...new Set(templates.map(t=>t.category||'その他'))].sort();
+  selEl.innerHTML='<option value="">（すべてのカテゴリ）</option>'+
+    cats.map(c=>`<option value="${escAttr(c)}"${c===selectedVal?' selected':''}>${escAttr(c)}</option>`).join('');
+}
+
+// datalist にカテゴリを入れる（サジェスト用）
+function populateCategoryDatalist(){
+  const cats=[...new Set(templates.map(t=>t.category||'').filter(c=>c))].sort();
+  const html=cats.map(c=>`<option value="${escAttr(c)}">`).join('');
+  const d1=document.getElementById('tmpl-cat-datalist');
+  if(d1) d1.innerHTML=html;
+  const d2=document.getElementById('tmpl-modal-cat-datalist');
+  if(d2) d2.innerHTML=html;
+}
+
+// テンプレート編集モーダルを開く（新規）
+function openTemplateModal(){
+  editingTmplId=null;
+  document.getElementById('tmpl-modal-title').textContent='テンプレート追加';
+  document.getElementById('tmpl-category').value='';
+  document.getElementById('tmpl-name').value='';
+  document.getElementById('tmpl-price').value='';
+  document.getElementById('tmpl-unit').value='式';
+  const taxSel=document.getElementById('tmpl-tax');
+  taxSel.innerHTML=taxOptions('10');
+  document.getElementById('tmpl-note').value='';
+  populateCategoryDatalist();
+  document.getElementById('template-modal').classList.add('open');
+}
+
+// テンプレート編集モーダルを開く（既存編集）
+function editTemplate(id){
+  const t=templates.find(x=>x.id===id);
+  if(!t) return;
+  editingTmplId=id;
+  document.getElementById('tmpl-modal-title').textContent='テンプレートを編集';
+  document.getElementById('tmpl-category').value=t.category||'';
+  document.getElementById('tmpl-name').value=t.name||'';
+  document.getElementById('tmpl-price').value=t.price||'';
+  document.getElementById('tmpl-unit').value=t.unit||'式';
+  const taxSel=document.getElementById('tmpl-tax');
+  taxSel.innerHTML=taxOptions(t.tax||'10');
+  document.getElementById('tmpl-note').value=t.note||'';
+  populateCategoryDatalist();
+  document.getElementById('template-modal').classList.add('open');
+}
+
+// テンプレート保存（管理ページのモーダルから）
+function saveTemplate(){
+  const cat=document.getElementById('tmpl-category').value.trim();
+  const name=document.getElementById('tmpl-name').value.trim();
+  if(!cat){ alert('カテゴリを入力してください'); return; }
+  if(!name){ alert('品目名を入力してください'); return; }
+  const t={
+    id:editingTmplId||('tmpl-'+Date.now()+Math.random().toString(36).slice(2,5)),
+    category:cat,
+    name:name,
+    price:Number(document.getElementById('tmpl-price').value)||0,
+    unit:document.getElementById('tmpl-unit').value.trim()||'式',
+    tax:document.getElementById('tmpl-tax').value||'10',
+    note:document.getElementById('tmpl-note').value.trim()
+  };
+  if(editingTmplId){
+    const idx=templates.findIndex(x=>x.id===editingTmplId);
+    if(idx>=0) templates[idx]=t;
+  } else {
+    templates.push(t);
+  }
+  persist();
+  closeModal('template-modal');
+  renderTemplates();
+  showToast('✓ テンプレートを保存しました');
+}
+
+function deleteTemplate(id){
+  const t=templates.find(x=>x.id===id);
+  if(!t) return;
+  pushUndo({type:"template",data:JSON.parse(JSON.stringify(t)),label:"テンプレートを削除しました"});
+  templates=templates.filter(x=>x.id!==id);
+  persist();
+  renderTemplates();
+  // 挿入ポップアップが開いていれば更新
+  const popup=document.getElementById('tmpl-insert-modal');
+  if(popup && popup.classList.contains('open')) renderTemplateInsertList();
+  showToast("テンプレートを削除しました");
+}
+
+// ===== 品目行 → テンプレート挿入ポップアップ =====
+let _tmplInsertTargetUid=null;
+
+function openTemplatePopup(lineUid){
+  _tmplInsertTargetUid=lineUid;
+  migrateTemplatesToSingle();
+  // カテゴリ絞込を初期化
+  const catSel=document.getElementById('tmpl-insert-cat-filter');
+  populateCategoryFilter(catSel,'');
+  // 検索ボックスをクリア
+  const searchEl=document.getElementById('tmpl-insert-search');
+  if(searchEl) searchEl.value='';
+  // 新規追加フォームを閉じる
+  const addBlock=document.getElementById('tmpl-inline-add');
+  if(addBlock) addBlock.style.display='none';
+  const addToggle=document.getElementById('tmpl-add-toggle-btn');
+  if(addToggle) addToggle.textContent='➕ 新規テンプレートを追加';
+  // 新規フォームの税率セレクトを構築
+  const newTax=document.getElementById('new-tmpl-tax');
+  if(newTax) newTax.innerHTML=taxOptions('10');
+  populateCategoryDatalist();
+  renderTemplateInsertList();
+  document.getElementById('tmpl-insert-modal').classList.add('open');
+}
+
+function renderTemplateInsertList(){
+  const el=document.getElementById('tmpl-insert-list');
+  if(!el) return;
+  const catFilter=document.getElementById('tmpl-insert-cat-filter')?.value||'';
+  const term=(document.getElementById('tmpl-insert-search')?.value||'').trim().toLowerCase();
+
+  let list=templates.filter(t=>t&&t.name);
+  if(catFilter) list=list.filter(t=>(t.category||'その他')===catFilter);
+  if(term) list=list.filter(t=>
+    (t.name||'').toLowerCase().includes(term) ||
+    (t.category||'').toLowerCase().includes(term) ||
+    (t.note||'').toLowerCase().includes(term)
+  );
+
+  if(!list.length){
+    el.innerHTML=`<div style="text-align:center;color:var(--text3);padding:24px;font-size:13px">${templates.length?'該当するテンプレートがありません':'まだテンプレートがありません。下の「➕ 新規テンプレートを追加」から作成できます。'}</div>`;
+    return;
+  }
+
+  // カテゴリ別にグルーピング
+  const groups={};
+  list.forEach(t=>{
+    const c=t.category||'その他';
+    if(!groups[c]) groups[c]=[];
+    groups[c].push(t);
+  });
+  const keys=Object.keys(groups).sort();
+
+  el.innerHTML=keys.map(cat=>`
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:5px;padding:0 4px">${escAttr(cat)}</div>
+      ${groups[cat].map(t=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:7px;margin-bottom:5px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(t.name)}</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:1px">¥${fmt(t.price||0)} / ${escAttr(t.unit||'式')}${t.note?'　📝'+escAttr(t.note):''}</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="applyTemplateToLine('${t.id}')" title="この品目を挿入" style="flex-shrink:0">＋ 挿入</button>
+          <button class="btn btn-secondary btn-sm" onclick="editTemplateFromPopup('${t.id}')" title="編集" style="flex-shrink:0;padding:5px 8px">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteTemplate('${t.id}'))" title="削除" style="flex-shrink:0;padding:5px 8px">🗑️</button>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+// ポップアップから品目を挿入
+function applyTemplateToLine(tmplId){
+  const t=templates.find(x=>x.id===tmplId);
+  if(!t) return;
+  const targetUid=_tmplInsertTargetUid;
+  const targetRow=targetUid?document.getElementById(targetUid):null;
+
+  if(targetRow){
+    // 対象の行が空（品目名が未入力）の場合は上書き
+    const inputs=targetRow.querySelectorAll('input, select');
+    const nameInput=inputs[0], qtyInput=inputs[1], priceInput=inputs[2], taxSel=inputs[3];
+    const isEmpty = !nameInput.value.trim() && (!priceInput.value || Number(priceInput.value)===0);
+
+    if(isEmpty){
+      // 空行を上書き
+      nameInput.value=t.name+(t.unit&&t.unit!=='式'?'（'+t.unit+'）':'');
+      if(!qtyInput.value||Number(qtyInput.value)===0) qtyInput.value='1';
+      priceInput.value=t.price||0;
+      // 税率設定
+      const targetTax=String(t.tax||'10');
+      for(let i=0;i<taxSel.options.length;i++){
+        if(taxSel.options[i].value===targetTax){taxSel.selectedIndex=i;break;}
+      }
+      calcTotals();
+      showToast('✓ テンプレートを挿入しました');
+    } else {
+      // 新しい行を追加（既存行は触らない）
+      addLineItem({name:t.name+(t.unit&&t.unit!=='式'?'（'+t.unit+'）':''), qty:1, price:t.price||0, tax:t.tax||'10'});
+      showToast('✓ 新しい行に追加しました');
+    }
+  } else {
+    // 対象行なし → 末尾に追加
+    addLineItem({name:t.name+(t.unit&&t.unit!=='式'?'（'+t.unit+'）':''), qty:1, price:t.price||0, tax:t.tax||'10'});
+    showToast('✓ テンプレートを追加しました');
+  }
+  closeModal('tmpl-insert-modal');
+}
+
+// ポップアップから編集 → ポップアップを閉じてテンプレート編集モーダルへ
+function editTemplateFromPopup(tmplId){
+  closeModal('tmpl-insert-modal');
+  setTimeout(()=>editTemplate(tmplId), 200);
+}
+
+// インライン新規追加フォームの開閉
+function toggleInlineTmplAdd(){
+  const box=document.getElementById('tmpl-inline-add');
+  const btn=document.getElementById('tmpl-add-toggle-btn');
+  if(!box||!btn) return;
+  const isOpen=box.style.display!=='none';
+  if(isOpen){
+    box.style.display='none';
+    btn.textContent='➕ 新規テンプレートを追加';
+  } else {
+    box.style.display='block';
+    btn.textContent='🔽 閉じる';
+    // 初期化
+    document.getElementById('new-tmpl-category').value='';
+    document.getElementById('new-tmpl-name').value='';
+    document.getElementById('new-tmpl-price').value='';
+    document.getElementById('new-tmpl-unit').value='式';
+    document.getElementById('new-tmpl-tax').innerHTML=taxOptions('10');
+    document.getElementById('new-tmpl-note').value='';
+    // フォーカス
+    setTimeout(()=>document.getElementById('new-tmpl-category')?.focus(),100);
+  }
+}
+
+// ポップアップから直接保存
+function saveInlineTemplate(){
+  const cat=document.getElementById('new-tmpl-category').value.trim();
+  const name=document.getElementById('new-tmpl-name').value.trim();
+  if(!cat){ alert('カテゴリを入力してください'); return; }
+  if(!name){ alert('品目名を入力してください'); return; }
+  const t={
+    id:'tmpl-'+Date.now()+Math.random().toString(36).slice(2,5),
+    category:cat,
+    name:name,
+    price:Number(document.getElementById('new-tmpl-price').value)||0,
+    unit:document.getElementById('new-tmpl-unit').value.trim()||'式',
+    tax:document.getElementById('new-tmpl-tax').value||'10',
+    note:document.getElementById('new-tmpl-note').value.trim()
+  };
+  templates.push(t);
+  persist();
+  toggleInlineTmplAdd();
+  // リスト再描画・カテゴリ更新
+  populateCategoryFilter(document.getElementById('tmpl-insert-cat-filter'),'');
+  populateCategoryDatalist();
+  renderTemplateInsertList();
+  showToast('✓ テンプレートを保存しました');
+}
+
+// 旧API互換（他の箇所から呼ばれていれば動くように）
+function openTemplateSelect(){ /* 旧モーダル削除済み・新popupへ誘導 */ openTemplatePopup(null); }
+function applyTemplate(id){ applyTemplateToLine(id); }
 
 // ===== LOGO & CROP =====
 function handleLogoUpload(e){
@@ -6833,13 +7348,7 @@ function initAppAfterAuth(){
   const hv=document.getElementById('home-header-version');
   if(hv) hv.textContent=APP_VERSION+' · '+APP_BUILD_TIME;
   loadSidebarTitle(); loadSettings(); loadLogo();
-  // settings側にテーマがあれば優先（Firebase同期済み）
-  if(settings && settings.appTheme && settings.appTheme!==currentTheme){
-    currentTheme=settings.appTheme;
-    localStorage.setItem('appTheme',currentTheme);
-    if(currentTheme==='default') document.documentElement.removeAttribute('data-theme');
-    else document.documentElement.setAttribute('data-theme',currentTheme);
-  }
+  // テーマは端末別保存（localStorageのみ）→ Firebase同期はしない
   // 書類タイプ別カラーを適用
   if(typeof applyDocColors==='function') applyDocColors();
   renderNavManagement();
@@ -9622,19 +10131,16 @@ function parseCSV(text){
 
 function applyTheme(name, el){
   currentTheme=name;
+  // 端末別保存（localStorageのみ、Firebaseには同期しない）
+  // → PC・スマホ・タブレットでそれぞれ別のテーマが使える
   localStorage.setItem('appTheme',name);
-  // Firebase同期もする（全デバイスで反映）
-  if(settings){
-    settings.appTheme=name;
-    persist();
-  }
   const root=document.documentElement;
   if(name==='default') root.removeAttribute('data-theme');
   else root.setAttribute('data-theme',name);
   document.querySelectorAll('.theme-swatch').forEach(s=>{
     s.classList.toggle('active', s.dataset.theme===name);
   });
-  showToast('テーマを変更しました ✓');
+  showToast('✓ テーマを変更しました（この端末のみ）');
 }
 
 function initTheme(){
@@ -10488,13 +10994,10 @@ const DEFAULT_NAV_MANAGEMENT=[
   {key:'customers',  icon:'👥',label:'顧客管理',     action:"showPage('customers',this)"},
   {key:'calendar',   icon:'📅',label:'作業カレンダー',action:"showPage('calendar',this)"},
   {key:'alerts',     icon:'🔔',label:'支払いアラート',action:"showPage('alerts',this)"},
-  {key:'report',     icon:'📈',label:'年次レポート',  action:"showPage('report',this)"},
-  {key:'templates',  icon:'📦',label:'作業テンプレート',action:"showPage('templates',this)"},
   {key:'payments',   icon:'💴',label:'入金管理',     action:"showPage('payments',this)"},
-  {key:'staff-report',icon:'📊',label:'スタッフ実績',action:"showPage('staff-report',this)"},
-  {key:'csv-export', icon:'📤',label:'CSVエクスポート',action:"showPage('csv-export',this)"},
   {key:'expenses',   icon:'💸',label:'経費管理',     action:"showPage('expenses',this)"},
-  {key:'backup',     icon:'🗄️',label:'バックアップ', action:"showPage('backup',this)"},
+  {key:'staff-report',icon:'📊',label:'スタッフ実績',action:"showPage('staff-report',this)"},
+  {key:'report',     icon:'📈',label:'年次レポート',  action:"showPage('report',this)"},
 ];
 
 function getNavManagementOrder(){
