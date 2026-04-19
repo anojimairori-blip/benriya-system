@@ -1132,7 +1132,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.22.5</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.23</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1156,7 +1156,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.22.5</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.23</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1191,7 +1191,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.22.5</div>
+    <div class="logo-version" id="sidebar-version">v3.23</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -2504,8 +2504,7 @@ if('serviceWorker' in navigator){
   <div class="modal-body" id="preview-body"></div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('preview-modal')">閉じる</button>
-    <button class="btn btn-secondary" onclick="shareDoc()">📤 共有・送信</button>
-    <button class="btn btn-primary" onclick="window.print()">🖨️ 印刷・PDF保存</button>
+    <button class="btn btn-primary" onclick="shareDoc()">📤 共有・送信</button>
   </div>
 </div>
 </div>
@@ -2519,6 +2518,7 @@ if('serviceWorker' in navigator){
   <div class="modal-header"><h3>共有・送信</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('share-modal')">✕</button></div>
   <div class="modal-body">
     <div class="share-option" onclick="shareLink()"><span class="share-icon">🔗</span><div><div style="font-weight:700">共有リンクを発行</div><div style="font-size:12px;color:var(--text2)">URLをコピー→LINE・メールに貼り付け</div></div></div>
+    <div class="share-option" id="share-option-native" onclick="shareNativePreview()" style="display:none"><span class="share-icon">📲</span><div><div style="font-weight:700">他のアプリで共有</div><div style="font-size:12px;color:var(--text2)">LINE・メール・メモなど（端末のアプリ）</div></div></div>
     <div class="share-option" onclick="sharePDF()"><span class="share-icon">📄</span><div><div style="font-weight:700">PDFをダウンロード</div><div style="font-size:12px;color:var(--text2)">端末にPDFを保存</div></div></div>
     <div class="share-option" onclick="sharePrint()"><span class="share-icon">🖨️</span><div><div style="font-weight:700">印刷</div><div style="font-size:12px;color:var(--text2)">プリンターで印刷</div></div></div>
   </div>
@@ -3443,8 +3443,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.22.5';
-const APP_BUILD_TIME='2026/04/20 00:49';
+const APP_VERSION='v3.23';
+const APP_BUILD_TIME='2026/04/20 01:00';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4932,8 +4932,70 @@ function previewDoc(id){
 }
 
 // ===== SHARE =====
-function shareDoc(){closeModal('preview-modal');document.getElementById('share-modal').classList.add('open');}
+function shareDoc(){
+  closeModal('preview-modal');
+  // スマホ & Web Share API対応 & ファイル共有可能ならネイティブ共有ボタンを表示
+  const nativeOpt=document.getElementById('share-option-native');
+  if(nativeOpt){
+    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const canShare = !!navigator.share;
+    nativeOpt.style.display = (isMobile && canShare) ? 'flex' : 'none';
+  }
+  document.getElementById('share-modal').classList.add('open');
+}
 function sharePrint(){closeModal('share-modal');window.print();}
+
+// 📲 スマホの「他のアプリで共有」: Web Share API で OS ネイティブ共有シートを起動
+// → LINE・メール・メモ等を含めてユーザーが選択できる（確実に動作）
+async function shareNativePreview(){
+  if(!navigator.share){
+    showToast('この端末では対応していません。「🔗 共有リンク」をご利用ください','#E67E22');
+    return;
+  }
+  const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
+  if(!d){ showToast('書類が選択されていません','#C0392B'); return; }
+  if(!currentUser){ showToast('ログインが必要です','#C0392B'); return; }
+
+  closeModal('share-modal');
+  showToast('🔗 共有リンクを生成中...','#3B82F6');
+
+  try{
+    // 共有リンクを生成
+    const {url, expiresAt} = await createDocShareLink(d.id, 7);
+    const expDate = new Date(expiresAt);
+    const expStr = `${expDate.getFullYear()}/${String(expDate.getMonth()+1).padStart(2,'0')}/${String(expDate.getDate()).padStart(2,'0')}`;
+
+    const cust=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
+    const honor=cust?.honorific||'御中';
+    const msg=`${d.customer||''} ${honor}\n\n${d.type}をお送りします。\n金額: ${fmt(d.grandTotal)}\n\n下記リンクからご確認ください（${expStr}まで有効）:\n${url}\n\n${settings.company||''}`;
+
+    // ネイティブ共有シートを起動
+    // title/text/url の全て渡すことで最大の互換性
+    try{
+      await navigator.share({
+        title: `${d.type} ${d.number||''}`,
+        text: msg,
+        url: url
+      });
+      showToast('✓ 共有しました','#10B981');
+    }catch(e){
+      if(e.name==='AbortError'){
+        // ユーザーがキャンセル - エラー扱いにしない
+        return;
+      }
+      // ネイティブ共有失敗 → フォールバック: クリップボードコピー
+      try{
+        await navigator.clipboard.writeText(msg);
+        showToast('共有できませんでした。メッセージをコピーしました','#F59E0B');
+      }catch(e2){
+        showToast('共有に失敗しました: '+e.message,'#C0392B');
+      }
+    }
+  }catch(e){
+    console.error('[shareNativePreview]',e);
+    showToast('共有リンクの生成に失敗: '+e.message,'#C0392B');
+  }
+}
 
 // ===== PDF生成 共通ヘルパー =====
 async function _generatePdfBlob(){
@@ -5069,17 +5131,28 @@ function _showShareLinkDialog(url, message, doc){
         <!-- 直接送信ボタン -->
         <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:14px">
           <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">📤 アプリで直接送信</div>
+          ${isMobile?`
+          <!-- スマホ: ネイティブ共有をメインに -->
+          <button class="btn btn-primary" style="width:100%;padding:12px;margin-bottom:8px" onclick="_sendShareLinkTo('native')">
+            📲 他のアプリで共有（LINE・メール等）
+          </button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn btn-secondary btn-sm" style="padding:10px" onclick="_sendShareLinkTo('email')">
+              ✉️ メール
+            </button>
+            <button class="btn btn-secondary btn-sm" style="padding:10px" onclick="_copyShareLinkMessage()">
+              📋 コピー
+            </button>
+          </div>`:`
+          <!-- PC: LINE Web / メール / コピー -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <button class="btn btn-sm" style="background:#06C755;color:white;border:none;padding:10px" onclick="_sendShareLinkTo('line')">
-              💬 LINEで送る
+              💬 LINE Webで送る
             </button>
             <button class="btn btn-secondary btn-sm" style="padding:10px" onclick="_sendShareLinkTo('email')">
               ✉️ メールで送る
             </button>
-            ${isMobile?`<button class="btn btn-secondary btn-sm" style="padding:10px;grid-column:1/-1" onclick="_sendShareLinkTo('native')">
-              📲 他のアプリで共有
-            </button>`:''}
-          </div>
+          </div>`}
         </div>
       </div>
     </div>
@@ -5176,11 +5249,23 @@ async function _sendShareLinkTo(method){
       return;
     }
     window.location.href=mailtoUrl;
-  } else if(method==='native' && navigator.share){
+  } else if(method==='native'){
+    if(!navigator.share){
+      showToast('この端末では「他のアプリで共有」に対応していません','#E67E22');
+      return;
+    }
     try{
       await navigator.share({title:`${d?.type||'書類'} ${d?.number||''}`, text:msg, url});
+      showToast('✓ 共有しました','#10B981');
     }catch(e){
-      if(e.name!=='AbortError') showToast('共有失敗: '+e.message,'#C0392B');
+      if(e.name==='AbortError') return; // ユーザーキャンセル
+      // フォールバック: クリップボードにコピー
+      try{
+        await navigator.clipboard.writeText(msg);
+        showToast('共有シートが開かなかったためメッセージをコピーしました','#F59E0B');
+      }catch(e2){
+        showToast('共有失敗: '+e.message,'#C0392B');
+      }
     }
   }
 }
