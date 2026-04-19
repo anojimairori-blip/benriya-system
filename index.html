@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://*.firebasestorage.app https://api.anthropic.com https://api.github.com https://raw.githubusercontent.com https://zipcloud.ibsnet.co.jp https://api.qrserver.com; frame-src https://flexsysv2026.firebaseapp.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://*.firebasestorage.app https://api.anthropic.com https://benriya-system.pages.dev https://zipcloud.ibsnet.co.jp https://api.qrserver.com; frame-src https://flexsysv2026.firebaseapp.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Permissions-Policy" content="geolocation=(self), camera=(self), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()">
@@ -1152,7 +1152,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.23.6</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.23.8</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1176,7 +1176,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.23.6</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.23.8</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1211,7 +1211,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.23.6</div>
+    <div class="logo-version" id="sidebar-version">v3.23.8</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1346,7 +1346,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version">v3.11.1 · 2026/04/18 09:00</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version"></span>
     </div>
     <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書')"><span class="btn-full-label">＋ 見積書</span><span class="btn-short-label">＋見積</span></button>
@@ -3463,8 +3463,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.23.6';
-const APP_BUILD_TIME='2026/04/20 02:16';
+const APP_VERSION='v3.23.8';
+const APP_BUILD_TIME='2026/04/20 02:31';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3477,7 +3477,10 @@ const APP_BUILD_TIME='2026/04/20 02:16';
 })();
 
 // ===== バージョンチェック（GitHub API経由：CORS対応） =====
-const GITHUB_API_URL='https://api.github.com/repos/anojimairori-blip/benriya-system/contents/index.html';
+// バージョンチェック: 本番サイト（Cloudflare Pages）の実HTMLを取得して比較
+// → 「GitHubにpushされたが Cloudflareがまだデプロイ完了してない」状態でのバナー表示を防ぐ
+// → 「今すぐ更新」で確実に新版が取得できるようになる
+const PRODUCTION_URL='https://benriya-system.pages.dev/index.html';
 
 // セマンティックバージョン比較: current >= latest なら false（通知不要）
 function _isNewerVersion(latest, current){
@@ -3508,8 +3511,9 @@ async function checkForUpdate(){
       return;
     }
 
-    const res=await fetch(GITHUB_API_URL+'?ref=main&_='+Date.now(),{
-      headers:{'Accept':'application/vnd.github.v3.raw'}
+    // ★ 本番サイトのHTMLを直接取得（Cloudflareにデプロイ済みのバージョンを取得）
+    const res=await fetch(PRODUCTION_URL+'?_='+Date.now(),{
+      cache:'no-store'
     });
     if(!res.ok) return;
     const text=await res.text();
@@ -3555,7 +3559,7 @@ function showUpdateBanner(latest){
 }
 
 function hardReload(){
-  // キャッシュを完全にクリアしてリロード（タイムスタンプ付きURLで強制再取得）
+  // キャッシュを完全にクリアしてリロード
   // バナーに表示されていた更新先バージョンを記録（ループ防止）
   try{
     const banner=document.getElementById('update-banner');
@@ -3564,21 +3568,30 @@ function hardReload(){
       if(m) localStorage.setItem('last_updated_to_version', m[1]);
     }
   }catch(e){}
-  const clearAll = ()=>{
+
+  // Service Worker のキャッシュをクリア
+  const clearCaches = async () => {
     try{
-      // Service Worker のキャッシュもクリア
       if('caches' in window){
-        caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).catch(()=>{});
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
       }
     }catch(e){}
-    // URLにタイムスタンプを付けて強制再取得（CDNキャッシュ回避）
-    const sep = location.search ? '&' : '?';
-    const url = location.origin + location.pathname + sep + '_v=' + Date.now() + location.hash;
-    // バナー却下時刻をリセット
-    localStorage.removeItem('update_banner_dismissed_at');
-    window.location.replace(url);
   };
-  clearAll();
+
+  // バナー却下時刻をリセット
+  localStorage.removeItem('update_banner_dismissed_at');
+
+  // キャッシュクリア後、シンプルにreload(true)
+  // → URLパラメータを付けないことで Cloudflare の 404 を回避
+  // → reload(true) でブラウザキャッシュもバイパス
+  clearCaches().then(()=>{
+    // 念のため少し待つ（caches.delete の完了を確実に）
+    setTimeout(()=>{
+      // hash部分を保持しつつクリーンなURLでリロード
+      window.location.reload();
+    }, 100);
+  });
 }
 
 function dismissUpdateBanner(){
@@ -3610,15 +3623,6 @@ const DEFAULT_DOC_STATUSES=[
 let docStatuses=JSON.parse(localStorage.getItem('docStatuses')||'null')||DEFAULT_DOC_STATUSES;
 
 function persistStatuses(){localStorage.setItem('docStatuses',JSON.stringify(docStatuses));}
-function getStatusBadgeClass(status){
-  const s=docStatuses.find(x=>x.value===status);
-  return s?s.badge:'badge-draft';
-}
-function getStatusStyle(status){
-  const s=docStatuses.find(x=>x.value===status);
-  if(!s)return'';
-  return`background:${s.bg};color:${s.color};`;
-}
 
 let editingDocId=null,editingCustId=null,editingJobId=null,editingTmplId=null;
 let currentPreviewDocId=null,selectedCustId=null;
@@ -3963,13 +3967,6 @@ function autoZip(input, addrId, statusId){
 }
 
 // Format price with comma display
-function fmtPriceInput(input){
-  const n=parseFloat(input.value.replace(/,/g,''));
-  const hint=input.nextElementSibling;
-  if(hint&&hint.classList.contains('price-display')){
-    hint.textContent=isNaN(n)?'':fmt(n);
-  }
-}
 
 // New doc type button handler
 function setDocType(type, btn){
@@ -4032,22 +4029,6 @@ function showCustDropdown(q=''){
 }
 
 // nc-zip auto-lookup
-async function onNcZipInput(input){
-  let v=input.value.replace(/[^0-9]/g,'');
-  if(v.length>3) v=v.slice(0,3)+'-'+v.slice(3,7);
-  input.value=v;
-  if(v.replace('-','').length===7){
-    try{
-      const r=await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${v.replace('-','')}`);
-      const j=await r.json();
-      if(j.status===200&&j.results?.length){
-        const a=j.results[0];
-        const addrEl=document.getElementById('nc-address');
-        if(addrEl) addrEl.value=a.address1+a.address2+a.address3;
-      }
-    }catch(e){}
-  }
-}
 
 // Update subject history datalist
 function updateSubjectHistory(){
@@ -4059,15 +4040,6 @@ function updateSubjectHistory(){
 
 // Autosave indicator
 let autosaveTimer=null;
-function triggerAutosave(){
-  const dot=document.getElementById('doc-autosave');
-  if(dot){dot.classList.add('saving');dot.title='保存中...';}
-  clearTimeout(autosaveTimer);
-  autosaveTimer=setTimeout(()=>{
-    if(dot){dot.classList.remove('saving');dot.classList.add('saved');dot.title='自動保存済';}
-    setTimeout(()=>{if(dot)dot.classList.remove('saved');},2000);
-  },1000);
-}
 
 // Tab key in last line-item → add new row
 // ===== SIDEBAR TOGGLE (PC) =====
@@ -4209,11 +4181,12 @@ function showPage(id, el, addToHistory=true){
     const main=document.querySelector('.main');
     if(main) main.scrollTop=0;
   }
-  // ★設定系ページでは nav-history-bar を非表示にする（タブで移動できるため）
-  const SETTINGS_PAGES=['settings','employees','tax','backup','csv-export','developer','templates','display-settings'];
+  // ★設定系ページとホームでは nav-history-bar を非表示にする
+  // （ホーム=履歴の起点で戻る場所がない、設定=タブで移動できる）
+  const NO_HISTORY_PAGES=['home','bulletin','settings','employees','tax','backup','csv-export','developer','templates','display-settings'];
   const historyBar=document.getElementById('nav-history-bar');
   if(historyBar){
-    if(SETTINGS_PAGES.includes(id)){
+    if(NO_HISTORY_PAGES.includes(id)){
       historyBar.style.display='none';
     } else {
       historyBar.style.display='';
@@ -4574,8 +4547,6 @@ function genNumber(type){
   const n=docs.filter(x=>x.type===type).length+1;
   return`${pre}-${ym}-${String(n).padStart(3,'0')}`;
 }
-
-function onDocTypeChange(){if(!editingDocId)document.getElementById('doc-number').value=genNumber(document.getElementById('doc-type').value);}
 
 // ===== CUSTOMER SEARCH PANEL (LEGACY: 互換性維持のため残存・新UIはインライン検索) =====
 function toggleCustSearch(){
@@ -5861,9 +5832,6 @@ const JP_HOLIDAYS={
 function isJpHoliday(dateStr){
   return !!JP_HOLIDAYS[dateStr];
 }
-function getJpHolidayName(dateStr){
-  return JP_HOLIDAYS[dateStr]||'';
-}
 function _formatLocalDate(d){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
@@ -6967,8 +6935,6 @@ async function lookupZip(zipId, addrId, statusId){
   }catch{if(stEl){stEl.style.color='var(--orange)';stEl.textContent='⚠️ オフライン時は手入力してください';}}
 }
 // 後方互換エイリアス
-function onSetZipInput(input){autoZip(input,'set-address','set-zip-status');}
-function onCustZipInput(input){autoZip(input,'cust-address',null);}
 
 
 // ===== SETTINGS =====
@@ -7134,13 +7100,6 @@ function stampAudit(entity, isNew){
   entity.updatedByName=user.name;
   entity.updatedAt=now;
   return entity;
-}
-
-function formatAuditInfo(entity){
-  if(!entity) return '';
-  const updatedBy=entity.updatedByName||entity.updatedBy||'-';
-  const updatedAt=entity.updatedAt?formatDateTime(entity.updatedAt):'-';
-  return `最終更新: ${updatedBy} (${updatedAt})`;
 }
 
 function formatDateTime(iso){
@@ -9489,183 +9448,7 @@ function importBackup(ev){
   reader.readAsText(file);ev.target.value='';
 }
 
-function addSampleData(){
-  // Admin-only check
-  if(!isAdminUnlocked){
-    alert('サンプルデータの追加は管理者専用です。従業員管理画面からログインしてください。');
-    requireAdmin('backup',null);
-    return;
-  }
-  // サンプルデータはadmin確認済みのため直接実行
-
-  const ts=Date.now();
-  const names=['山田太郎','鈴木花子','佐藤一郎','田中美咲','伊藤健二','渡辺恵子','中村光男','小林直子','加藤隆','松本幸子'];
-  const addrs=['北海道札幌市中央区北1条1-1','北海道札幌市北区北20条2-2','北海道札幌市豊平区平岸3-3','北海道札幌市清田区清田4-4','北海道函館市五稜郭5-5','北海道旭川市買物公園6-6','北海道釧路市鳥取7-7','北海道帯広市西8条8-8','北海道小樽市色内9-9','北海道苫小牧市大成10-10'];
-  const subjects=['エアコン取り付け','引越し作業','不用品処分','草刈り作業','ハウスクリーニング','水道修理','電球交換・修理','家具組み立て','外壁清掃','ゴミ屋敷片付け','窓ガラス清掃','屋根点検','庭木剪定','電気配線修理','雪かき作業'];
-  const cats=['電気・設備','引越し・運搬','清掃・片付け','庭・外構','修理・修繕'];
-  const now=new Date();
-
-  // ── スタッフ 5名 ──
-  const staffNames=['田中健太','鈴木由美','佐藤誠','山田優子','伊藤勝'];
-  const staffRoles=['現場責任者','作業員','作業員','営業担当','ドライバー'];
-  const newEmps=staffNames.map((name,i)=>({
-    id:`samp-e-${i}-${ts}`,name,role:staffRoles[i],type:'正社員',
-    tel:`090-${1111+i*1111}-${2222+i*1111}`,
-    email:`staff${i}@benriya.example.com`,
-    line:`benriya_staff${i}`,zip:`060-000${i}`,
-    address:addrs[i],birthday:`198${5+i}-0${i+1}-1${i+1}`,
-    memo:'サンプルスタッフ',photo:''
-  }));
-  employees.push(...newEmps);
-
-  // ── 拠点 5件 ──
-  const branchData=[
-    {name:'札幌本社',type:'本社',address:'北海道札幌市中央区北2条西3丁目1-1',tel:'011-111-1111'},
-    {name:'札幌北支店',type:'支店',address:'北海道札幌市北区北20条西4丁目2-2',tel:'011-222-2222'},
-    {name:'函館営業所',type:'営業所',address:'北海道函館市五稜郭町3-3',tel:'0138-33-3333'},
-    {name:'旭川支店',type:'支店',address:'北海道旭川市宮前通8丁目4-4',tel:'0166-44-4444'},
-    {name:'小樽営業所',type:'営業所',address:'北海道小樽市稲穂2丁目5-5',tel:'0134-55-5555'},
-  ];
-  const newBranches=branchData.map((b,i)=>({id:`samp-b-${i}-${ts}`,...b,fax:'',memo:'サンプル拠点'}));
-  branches.push(...newBranches);
-
-  // ── 顧客 10件 ──
-  const newCusts=names.map((name,i)=>({
-    id:`samp-c-${i}-${ts}`,name,
-    tel:`0${10+i}0-${1000+i*111}-${2000+i*222}`,
-    address:addrs[i],zip:`0${60+i}0-000${i}`,
-    email:`${name.replace(/\s/,'')}@example.com`,
-    fax:'',dept:'管理部',category:i%3===0?'法人':i%3===1?'個人':'リピーター',
-    memo:'サンプル顧客',
-    contacts:[{name:`${name}（担当）`,role:'現場担当',tel:`090-${9000+i}-${8000+i}`,email:''}]
-  }));
-  customers.push(...newCusts);
-
-  // ── 書類 各15件（見積・請求・領収 = 45件）──
-  const types=['見積書','請求書','領収書'];
-  const statuses={見積書:['下書き','送付済','送付済'],請求書:['送付済','送付済','入金済'],領収書:['入金済','入金済','入金済']};
-  let docCount=0;
-  types.forEach(type=>{
-    const pre={見積書:'EST',請求書:'INV',領収書:'REC'}[type];
-    for(let i=0;i<15;i++){
-      const cust=newCusts[i%10];
-      const emp=newEmps[i%5];
-      const daysBack=Math.floor(Math.random()*300)+1;
-      const dt=new Date(now);dt.setDate(dt.getDate()-daysBack);
-      const dateStr=dt.toISOString().split('T')[0];
-      const price=(Math.floor(Math.random()*16)+1)*5000;
-      const qty=Math.floor(Math.random()*3)+1;
-      const sub=price*qty;
-      const t10=Math.round(sub*0.1);
-      const statusArr=statuses[type];
-      const status=statusArr[i%statusArr.length];
-      const docId=`samp-d-${type}-${i}-${ts}`;
-      docs.push({
-        id:docId,type,
-        number:`${pre}-SAMP-${String(++docCount).padStart(3,'0')}`,
-        date:dateStr,dueDate:'',
-        customerId:cust.id,customer:cust.name,
-        subject:subjects[i%subjects.length],
-        category:cats[i%cats.length],
-        staff:emp.name,
-        branch:newBranches[i%5].id,
-        lines:[{name:subjects[i%subjects.length],qty,price,tax:'10'}],
-        subtotal:sub,tax10:t10,tax8:0,grandTotal:sub+t10,
-        status,notes:'サンプルデータ',createdAt:new Date().toISOString()
-      });
-      // 入金済の請求書には入金記録も追加
-      if(type==='請求書'&&status==='入金済'){
-        if(!payments[docId]) payments[docId]=[];
-        payments[docId].push({date:dateStr,amount:sub+t10,method:'銀行振込',memo:'サンプル入金'});
-      }
-    }
-  });
-
-  // ── 作業予定 10件 ──
-  const jobTitles=['エアコン取り付け','引越し補助','草刈り','ハウスクリーニング','電球交換','家具移動','外壁清掃','庭木剪定','雪かき','不用品搬出'];
-  for(let i=0;i<10;i++){
-    const daysAhead=Math.floor(Math.random()*30)-5;
-    const dt=new Date(now);dt.setDate(dt.getDate()+daysAhead);
-    jobs.push({
-      id:`samp-j-${i}-${ts}`,
-      date:dt.toISOString().split('T')[0],
-      time:`0${8+i%4}:00`,
-      customer:newCusts[i%10].name,
-      title:jobTitles[i],
-      category:cats[i%cats.length],
-      memo:'サンプル作業予定'
-    });
-  }
-
-  persist();
-  buildStaffSelect();
-  renderAll();buildMonthlyChart();renderCalendar();renderEmployees();renderBranches();
-  updateBackupStats();renderPayments();
-  alert(`✅ サンプルデータを追加しました！\nスタッフ ${newEmps.length}名 / 拠点 ${newBranches.length}件\n顧客 ${newCusts.length}件 / 書類 45件 / 作業 10件`);
-}
-
 // ===== QUOTE SAMPLES (10件) =====
-function addQuoteSamples(){
-  if(!isAdminUnlocked){
-    showToast('管理者ログインが必要です','#C0392B');
-    requireAdmin('backup',null);
-    return;
-  }
-  const ts=Date.now();
-  const now=new Date();
-  const quoteData=[
-    {subject:'エアコン取り付け（6畳用）',cat:'電気・設備',lines:[{name:'エアコン取り付け作業',qty:1,price:15000,tax:'10'},{name:'配管延長（追加）',qty:2,price:3000,tax:'10'},{name:'交通費',qty:1,price:1500,tax:'10'}]},
-    {subject:'引越し作業（1K）',cat:'引越し・運搬',lines:[{name:'引越し作業（半日）',qty:1,price:25000,tax:'10'},{name:'資材費（ダンボール等）',qty:1,price:2000,tax:'10'}]},
-    {subject:'不用品処分・回収',cat:'清掃・片付け',lines:[{name:'不用品回収作業',qty:1,price:18000,tax:'10'},{name:'処分費（軽トラ1台分）',qty:1,price:8000,tax:'0'},{name:'交通費',qty:1,price:2000,tax:'10'}]},
-    {subject:'草刈り作業（約50㎡）',cat:'庭・外構',lines:[{name:'草刈り作業',qty:1,price:20000,tax:'10'},{name:'草の処分費',qty:1,price:5000,tax:'0'}]},
-    {subject:'ハウスクリーニング（2LDK）',cat:'清掃・片付け',lines:[{name:'キッチンクリーニング',qty:1,price:15000,tax:'10'},{name:'浴室クリーニング',qty:1,price:12000,tax:'10'},{name:'トイレクリーニング',qty:2,price:5000,tax:'10'},{name:'洗面所クリーニング',qty:1,price:6000,tax:'10'}]},
-    {subject:'水道蛇口修理',cat:'修理・修繕',lines:[{name:'蛇口修理作業',qty:1,price:8000,tax:'10'},{name:'部品代（カートリッジ）',qty:1,price:3500,tax:'10'},{name:'出張費',qty:1,price:2000,tax:'10'}]},
-    {subject:'電球・照明器具交換',cat:'電気・設備',lines:[{name:'電球交換作業（1〜5個）',qty:1,price:5000,tax:'10'},{name:'LED電球代',qty:5,price:800,tax:'10'}]},
-    {subject:'家具組み立て（ベッド・棚）',cat:'その他',lines:[{name:'家具組み立て作業（2時間）',qty:1,price:12000,tax:'10'},{name:'追加時間（30分単位）',qty:2,price:2000,tax:'10'}]},
-    {subject:'外壁・窓ガラス清掃',cat:'清掃・片付け',lines:[{name:'窓ガラス清掃（外側・10枚）',qty:1,price:15000,tax:'10'},{name:'外壁高圧洗浄',qty:1,price:20000,tax:'10'},{name:'足場レンタル',qty:1,price:5000,tax:'0'}]},
-    {subject:'雪かき・除雪作業',cat:'その他',lines:[{name:'除雪作業（1時間）',qty:3,price:3000,tax:'10'},{name:'凍結防止剤散布',qty:1,price:2000,tax:'10'}]},
-  ];
-
-  // 顧客がいる場合はランダム選択、いない場合はダミー名
-  const custNames=customers.length>0
-    ? customers.map(c=>c.name)
-    : ['山田 太郎','鈴木 花子','佐藤 一郎','田中 美咲','伊藤 健二'];
-
-  quoteData.forEach((q,i)=>{
-    const daysBack=Math.floor(Math.random()*60)+1;
-    const dt=new Date(now);dt.setDate(dt.getDate()-daysBack);
-    const dateStr=dt.toISOString().split('T')[0];
-    const custName=custNames[i%custNames.length];
-    const cust=customers.find(c=>c.name===custName);
-    let sub=0,t10=0;
-    q.lines.forEach(l=>{const a=l.qty*l.price;sub+=a;if(l.tax==='10')t10+=a*0.1;});
-    const n=docs.filter(x=>x.type==='見積書').length+1;
-    const ym=String(new Date().getFullYear()).slice(2)+String(new Date().getMonth()+1).padStart(2,'0');
-    docs.push({
-      id:'qsamp-'+i+'-'+ts,
-      type:'見積書',
-      number:`EST-${ym}-${String(n).padStart(3,'0')}`,
-      date:dateStr,
-      dueDate:'',
-      customerId:cust?.id||'',
-      customer:custName,
-      subject:q.subject,
-      category:q.cat,
-      staff:employees[i%Math.max(employees.length,1)]?.name||'',
-      lines:q.lines,
-      subtotal:Math.round(sub),
-      tax10:Math.round(t10),
-      tax8:0,
-      grandTotal:Math.round(sub+t10),
-      status:'下書き',
-      notes:'',
-      createdAt:new Date().toISOString()
-    });
-  });
-  persist();renderAll();buildMonthlyChart();
-  showToast('見積書サンプル10件を追加しました ✓');
-  updateBackupStats();
-}
 
 // ===== DATA RESET =====
 function confirmReset(){
@@ -9697,25 +9480,6 @@ function updateResetPinDots(){
     const d=document.getElementById('rpd'+i);
     if(d) d.classList.toggle('filled',i<resetPinBuffer.length);
   }
-}
-async function executeReset(){
-  const ok=await _verifyPin(resetPinBuffer);
-  if(!ok){
-    document.getElementById('reset-pin-error').textContent='PINが違います';
-    resetPinBuffer='';updateResetPinDots();
-    const box=document.querySelector('#reset-modal .admin-lock-box');
-    if(box){box.classList.add('shake');setTimeout(()=>box.classList.remove('shake'),400);}
-    return;
-  }
-  // Execute reset
-  docs=[];customers=[];employees=[];branches=[];
-  payments={};docPhotos={};expenses=[];jobs=[];templates=[];
-  persist();
-  renderAll();buildMonthlyChart();renderEmployees();renderBranches();renderExpenses();renderPayments();renderTemplates();renderCalendar();updateBackupStats();
-  closeModal('reset-modal');
-  isAdminUnlocked=false;
-  showToast('データを初期化しました','#C0392B');
-  showPage('home',null);
 }
 
 // ===== REPORT PRINT & CSV =====
@@ -10383,159 +10147,7 @@ async function createDocShareLink(docId, expiryDays){
   return {url: shareUrl, token, expiresAt};
 }
 
-function generateQR(docId){
-  const d=docs.find(x=>x.id===docId);if(!d)return;
-  currentPreviewDocId=docId;
-  const cust=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
-  const honorific=cust?.honorific!=null?cust.honorific:'御中';
-
-  // 書類情報表示
-  document.getElementById('qr-doc-info').innerHTML=
-    `<div style="font-weight:700;font-size:14px;margin-bottom:4px">${escAttr(d.type)}　${escAttr(d.number)}</div>`+
-    `<div style="margin-bottom:2px">${escAttr(d.customer||'')}　<span style="background:var(--accent-light);color:var(--accent);padding:1px 7px;border-radius:99px;font-size:12px">${escAttr(honorific)}</span></div>`+
-    `<div style="color:var(--accent);font-weight:700;font-size:15px">${fmt(d.grandTotal)}</div>`+
-    `<div style="color:var(--text3);font-size:11px;margin-top:2px">${escAttr(d.date||'')}${d.subject?' / '+escAttr(d.subject):''}</div>`+
-    `<div style="margin-top:12px;background:var(--surface2);border-radius:8px;padding:10px;text-align:left">
-      <label style="font-size:11px;color:var(--text2);font-weight:600;display:block;margin-bottom:4px">🔗 共有リンクの有効期限</label>
-      <select id="qr-expiry-days" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;width:100%;margin-bottom:8px">
-        <option value="1">1日</option>
-        <option value="3">3日</option>
-        <option value="7" selected>7日間（推奨）</option>
-        <option value="14">14日</option>
-        <option value="30">30日</option>
-        <option value="90">90日</option>
-      </select>
-      <button class="btn btn-primary btn-sm" style="width:100%" onclick="regenerateDocShareQR('${d.id}')">🔗 共有リンクを生成（QR表示）</button>
-    </div>`;
-
-  const container=document.getElementById('qr-container');
-  container.innerHTML='<div style="width:240px;height:240px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;text-align:center;padding:20px;background:var(--surface2);border-radius:8px">上の「共有リンクを生成」ボタンを押してください</div>';
-  document.getElementById('qr-modal').classList.add('open');
-
-  // ボタン類を追加（共有URL表示 + LINE/メール送信）
-  const footer=document.querySelector('#qr-modal .modal-footer');
-  if(footer){
-    // 既存フッターを保持しつつ、共有ボタンを追加
-    const shareBar=document.getElementById('qr-share-bar');
-    if(shareBar) shareBar.remove();
-    const bar=document.createElement('div');
-    bar.id='qr-share-bar';
-    bar.style.cssText='display:none;flex-wrap:wrap;gap:6px;padding:0 20px 14px;order:-1;flex-direction:column';
-    bar.innerHTML=`
-      <div style="font-size:11px;color:var(--text3);margin-bottom:2px">📤 共有URL（コピーして送信）:</div>
-      <div style="display:flex;gap:4px">
-        <input type="text" id="qr-share-url" readonly style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:monospace;background:var(--surface2)">
-        <button class="btn btn-secondary btn-sm" onclick="copyDocShareUrl()">📋 コピー</button>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-secondary btn-sm" onclick="shareDocLink('line')" style="background:#06C755;color:white;border-color:#06C755">💬 LINE</button>
-        <button class="btn btn-secondary btn-sm" onclick="shareDocLink('email')">✉️ メール</button>
-        <button class="btn btn-secondary btn-sm" onclick="shareDocLink('native')">📲 共有シート</button>
-      </div>`;
-    footer.parentNode.insertBefore(bar, footer);
-  }
-}
-
 // 共有リンク生成 → QR表示
-async function regenerateDocShareQR(docId){
-  const days=parseInt(document.getElementById('qr-expiry-days')?.value)||7;
-  const container=document.getElementById('qr-container');
-  container.innerHTML='<div style="width:240px;height:240px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px">共有リンク生成中...</div>';
-
-  try{
-    const {url, expiresAt}=await createDocShareLink(docId, days);
-    // URLを保存
-    container._shareUrl=url;
-    // QR生成
-    const apiUrl=`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&ecc=M&data=${encodeURIComponent(url)}`;
-    const img=new Image();
-    img.crossOrigin='anonymous';
-    img.onload=()=>{
-      container.innerHTML='';
-      img.style.cssText='width:240px;height:240px;background:white;border-radius:8px;display:block';
-      img.alt='QRコード（書類共有URL）';
-      container.appendChild(img);
-    };
-    img.onerror=()=>{
-      container.innerHTML='';
-      try{
-        if(typeof QRCode!=='undefined'){
-          new QRCode(container,{text:url, width:240, height:240, colorDark:'#000', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.M});
-        } else throw new Error('QRCode lib not loaded');
-      }catch(e){
-        container.innerHTML='<div style="padding:20px;color:var(--danger)">QR生成失敗: '+escAttr(e.message)+'</div>';
-      }
-    };
-    img.src=apiUrl;
-
-    // 共有バーを表示
-    const bar=document.getElementById('qr-share-bar');
-    if(bar){
-      bar.style.display='flex';
-      const urlInput=document.getElementById('qr-share-url');
-      if(urlInput) urlInput.value=url;
-    }
-    const expDate=new Date(expiresAt);
-    showToast(`✓ 共有リンク生成（${expDate.getMonth()+1}/${expDate.getDate()}まで有効）`,'#10B981');
-  }catch(e){
-    console.error('[Doc share error]',e);
-    container.innerHTML='<div style="padding:20px;color:var(--danger);font-size:12px">エラー: '+escAttr(e.message)+'</div>';
-    showToast('共有リンクの生成に失敗: '+e.message,'#C0392B');
-  }
-}
-
-function copyDocShareUrl(){
-  const url=document.getElementById('qr-share-url')?.value;
-  if(!url){showToast('URLがありません','#C0392B');return;}
-  navigator.clipboard.writeText(url).then(()=>{
-    showToast('✓ URLをコピーしました','#10B981');
-  }).catch(()=>showToast('コピー失敗','#C0392B'));
-}
-
-async function shareDocLink(method){
-  const url=document.getElementById('qr-share-url')?.value;
-  if(!url){showToast('URLがありません','#C0392B');return;}
-  const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
-  const cust=d&&d.customerId?customers.find(x=>x.id===d.customerId):(d?customers.find(x=>x.name===d.customer):null);
-  const honor=cust?.honorific||'御中';
-  const msg=`${d?.customer||''} ${honor}\n\n${d?.type||''}をお送りします。\n金額: ${fmt(d?.grandTotal||0)}\n\n下記リンクからご確認・PDFダウンロードできます（期限付き）:\n${url}\n\n${settings.company||''}`;
-
-  if(method==='line'){
-    // モバイルとPCで挙動を変える
-    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if(isMobile){
-      // モバイル: LINEアプリが起動し、友達選択→送信
-      const lineUrl=`https://line.me/R/share?text=${encodeURIComponent(msg)}`;
-      window.location.href=lineUrl;
-    } else {
-      // PC: URLをコピーしてLINE PC版に手動貼り付けを促す
-      try{
-        await navigator.clipboard.writeText(msg);
-        showToast('✓ 共有テキストをコピーしました。LINE PC版で貼り付けてください','#06C755');
-        // LINE PC版のダウンロードページも開く（初めて使う人向け）
-        showConfirm('共有テキストをクリップボードにコピーしました。\n\nLINE PC版を起動しますか？\n[OK] LINE PC版のトーク画面を開く\n[キャンセル] 何もしない', ()=>{
-          // LINE PCの起動プロトコル（インストール済みの場合のみ動作）
-          window.location.href='line://';
-          setTimeout(()=>{
-            // 起動しなかった場合のフォールバック - LINE Web版を開く
-            showConfirm('LINEアプリが起動しませんでしたか？\nLINE Web版を開きますか？', ()=>{
-              window.open('https://web.line.me/','_blank');
-            });
-          }, 2000);
-        });
-      }catch(e){
-        showToast('コピー失敗。PDFダウンロードしてLINEに添付してください','#E67E22');
-      }
-    }
-  } else if(method==='email'){
-    const sub=`【${d?.type||'書類'}】${d?.number||''}`;
-    const bodyCRLF=String(msg).replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n/g,'\r\n');
-    window.location.href=`mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(bodyCRLF)}`;
-  } else if(method==='native' && navigator.share){
-    try{ await navigator.share({title:`${d?.type||'書類'} ${d?.number||''}`, text:msg, url}); }
-    catch(e){ if(e.name!=='AbortError') showToast('共有失敗: '+e.message,'#C0392B'); }
-  }
-}
 
 async function downloadQR(){
   const container=document.getElementById('qr-container');
@@ -11265,24 +10877,6 @@ function onNavRowDrop(e, idx){
 }
 
 // 旧API互換（ハンドル要素から呼ばれる場合）
-function onNavDragOver(e){
-  e.preventDefault();
-  return false;
-}
-function onNavDragLeave(e){}
-function onNavDrop(e,idx){
-  e.preventDefault();
-  e.stopPropagation();
-  if(_navDragSrc===null||_navDragSrc===idx) return;
-  const items=getNavManagementOrder();
-  const [moved]=items.splice(_navDragSrc,1);
-  items.splice(idx,0,moved);
-  saveNavManagementOrder(items);
-  renderNavManagement();
-  renderNavOrderEditor();
-  buildMobileDrawer();
-  showToast(`「${moved.label}」を移動しました ✓`);
-}
 
 function onNavDragEnd(e){
   document.querySelectorAll('.nav-mgmt-row').forEach(el=>{
