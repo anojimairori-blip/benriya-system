@@ -1152,7 +1152,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.23.8</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.23.9</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1176,7 +1176,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.23.8</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.23.9</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1211,7 +1211,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.23.8</div>
+    <div class="logo-version" id="sidebar-version">v3.23.9</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1567,10 +1567,10 @@ if('serviceWorker' in navigator){
             <input type="text" id="doc-color-quote-text" value="#C49A2D" onchange="onDocColorChange('quote',this.value)" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:monospace">
           </div>
           <div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">
-            <button class="color-preset" data-color="#C49A2D" onclick="setDocColor('quote','#C49A2D')" style="width:18px;height:18px;background:#C49A2D"></button>
-            <button class="color-preset" data-color="#D4A841" onclick="setDocColor('quote','#D4A841')" style="width:18px;height:18px;background:#D4A841"></button>
-            <button class="color-preset" data-color="#B8860B" onclick="setDocColor('quote','#B8860B')" style="width:18px;height:18px;background:#B8860B"></button>
-            <button class="color-preset" data-color="#7B6340" onclick="setDocColor('quote','#7B6340')" style="width:18px;height:18px;background:#7B6340"></button>
+            <button class="color-preset" data-color="#C49A2D" onclick="setDocColor('quote','#C49A2D')" style="width:18px;height:18px;background:#C49A2D" aria-label="色 #C49A2D"></button>
+            <button class="color-preset" data-color="#D4A841" onclick="setDocColor('quote','#D4A841')" style="width:18px;height:18px;background:#D4A841" aria-label="色 #D4A841"></button>
+            <button class="color-preset" data-color="#B8860B" onclick="setDocColor('quote','#B8860B')" style="width:18px;height:18px;background:#B8860B" aria-label="色 #B8860B"></button>
+            <button class="color-preset" data-color="#7B6340" onclick="setDocColor('quote','#7B6340')" style="width:18px;height:18px;background:#7B6340" aria-label="色 #7B6340"></button>
           </div>
         </div>
         <div style="background:var(--surface2);padding:12px;border-radius:8px">
@@ -1580,10 +1580,10 @@ if('serviceWorker' in navigator){
             <input type="text" id="doc-color-invoice-text" value="#1A73E8" onchange="onDocColorChange('invoice',this.value)" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:monospace">
           </div>
           <div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">
-            <button class="color-preset" data-color="#1A73E8" onclick="setDocColor('invoice','#1A73E8')" style="width:18px;height:18px;background:#1A73E8"></button>
-            <button class="color-preset" data-color="#1565C0" onclick="setDocColor('invoice','#1565C0')" style="width:18px;height:18px;background:#1565C0"></button>
-            <button class="color-preset" data-color="#0D47A1" onclick="setDocColor('invoice','#0D47A1')" style="width:18px;height:18px;background:#0D47A1"></button>
-            <button class="color-preset" data-color="#37474F" onclick="setDocColor('invoice','#37474F')" style="width:18px;height:18px;background:#37474F"></button>
+            <button class="color-preset" data-color="#1A73E8" onclick="setDocColor('invoice','#1A73E8')" style="width:18px;height:18px;background:#1A73E8" aria-label="色 #1A73E8"></button>
+            <button class="color-preset" data-color="#1565C0" onclick="setDocColor('invoice','#1565C0')" style="width:18px;height:18px;background:#1565C0" aria-label="色 #1565C0"></button>
+            <button class="color-preset" data-color="#0D47A1" onclick="setDocColor('invoice','#0D47A1')" style="width:18px;height:18px;background:#0D47A1" aria-label="色 #0D47A1"></button>
+            <button class="color-preset" data-color="#37474F" onclick="setDocColor('invoice','#37474F')" style="width:18px;height:18px;background:#37474F" aria-label="色 #37474F"></button>
           </div>
         </div>
         <div style="background:var(--surface2);padding:12px;border-radius:8px">
@@ -1593,10 +1593,10 @@ if('serviceWorker' in navigator){
             <input type="text" id="doc-color-receipt-text" value="#2D5A3D" onchange="onDocColorChange('receipt',this.value)" style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:monospace">
           </div>
           <div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap">
-            <button class="color-preset" data-color="#2D5A3D" onclick="setDocColor('receipt','#2D5A3D')" style="width:18px;height:18px;background:#2D5A3D"></button>
-            <button class="color-preset" data-color="#388E3C" onclick="setDocColor('receipt','#388E3C')" style="width:18px;height:18px;background:#388E3C"></button>
-            <button class="color-preset" data-color="#0A7A7A" onclick="setDocColor('receipt','#0A7A7A')" style="width:18px;height:18px;background:#0A7A7A"></button>
-            <button class="color-preset" data-color="#5BAD7E" onclick="setDocColor('receipt','#5BAD7E')" style="width:18px;height:18px;background:#5BAD7E"></button>
+            <button class="color-preset" data-color="#2D5A3D" onclick="setDocColor('receipt','#2D5A3D')" style="width:18px;height:18px;background:#2D5A3D" aria-label="色 #2D5A3D"></button>
+            <button class="color-preset" data-color="#388E3C" onclick="setDocColor('receipt','#388E3C')" style="width:18px;height:18px;background:#388E3C" aria-label="色 #388E3C"></button>
+            <button class="color-preset" data-color="#0A7A7A" onclick="setDocColor('receipt','#0A7A7A')" style="width:18px;height:18px;background:#0A7A7A" aria-label="色 #0A7A7A"></button>
+            <button class="color-preset" data-color="#5BAD7E" onclick="setDocColor('receipt','#5BAD7E')" style="width:18px;height:18px;background:#5BAD7E" aria-label="色 #5BAD7E"></button>
           </div>
         </div>
       </div>
@@ -3463,8 +3463,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.23.8';
-const APP_BUILD_TIME='2026/04/20 02:31';
+const APP_VERSION='v3.23.9';
+const APP_BUILD_TIME='2026/04/20 02:40';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4618,27 +4618,27 @@ function openInlineNewCust(){
   document.getElementById('inline-new-cust').style.display='block';
   const csp=document.getElementById('cust-search-panel');
   if(csp) csp.style.display='none';
-  ['nc-name','nc-tel','nc-fax','nc-email','nc-zip','nc-address','nc-dept','nc-contact','nc-role'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['nc-name','nc-tel','nc-zip','nc-address'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  // 敬称はデフォルト「御中」
+  const h=document.getElementById('nc-honorific'); if(h) h.value='御中';
 }
 function closeInlineNewCust(){document.getElementById('inline-new-cust').style.display='none';}
 function saveInlineNewCust(){
   const name=document.getElementById('nc-name').value.trim();
   if(!name){showToast('顧客名を入力してください','#C0392B');return;}
-  const contacts=[];
-  const cName=document.getElementById('nc-contact')?.value.trim()||'';
-  if(cName)contacts.push({name:cName,role:document.getElementById('nc-role')?.value.trim()||'',tel:'',email:''});
   const newCust={
     id:'cust-'+Date.now(),
     name,
     honorific:document.getElementById('nc-honorific')?.value||'御中',
     tel:document.getElementById('nc-tel')?.value||'',
-    fax:document.getElementById('nc-fax')?.value||'',
-    email:document.getElementById('nc-email')?.value||'',
+    fax:'',
+    email:'',
     zip:document.getElementById('nc-zip')?.value||'',
     address:document.getElementById('nc-address')?.value||'',
-    dept:document.getElementById('nc-dept')?.value||'',
+    dept:'',
     category:'',
-    memo:'',contacts
+    memo:'',
+    contacts:[]
   };
   customers.push(newCust);
   persist();
