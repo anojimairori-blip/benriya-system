@@ -429,8 +429,9 @@ tr:hover td{background:var(--bg)}
   box-shadow:0 2px 4px rgba(0,0,0,0.04);
   margin-top:0;
 }
-.settings-tabs-nav::-webkit-scrollbar{ height:3px }
-.settings-tabs-nav::-webkit-scrollbar-thumb{ background:var(--accent-light); border-radius:2px }
+.settings-tabs-nav::-webkit-scrollbar{ height:6px }
+.settings-tabs-nav::-webkit-scrollbar-thumb{ background:var(--accent-light); border-radius:3px }
+.settings-tabs-nav::-webkit-scrollbar-thumb:hover{ background:var(--accent) }
 
 .settings-tab{
   display:flex;
@@ -1017,8 +1018,12 @@ select{appearance:auto}
   .modal-overlay{padding:0;align-items:flex-end}
   .modal{border-radius:14px 14px 0 0;max-height:92vh;overflow-y:auto;max-width:100%!important}
   /* Buttons smaller */
-  .btn{font-size:12px;padding:7px 11px}
-  .btn-sm{font-size:11px;padding:4px 8px}
+  .btn{font-size:12px;padding:10px 14px;min-height:40px}
+  .btn-sm{font-size:11px;padding:8px 11px;min-height:36px}
+  /* タップ領域確保: アイコンボタン類は最低44x44 */
+  .close-btn,.btn-refresh,.del-btn,.hamburger,.sidebar-toggle{min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+  /* テーブル内の小さなボタンは min-height 36px */
+  table button.btn-sm{min-height:36px;min-width:36px}
   /* AIレシートボタン：モバイルでは縦並び・全幅・タップしやすく */
   .ai-receipt-btn,.ai-receipt-btn-sub{padding:14px 16px;font-size:14px;min-height:48px;flex:1 1 100%;width:100%}
 
@@ -1152,7 +1157,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.23.9</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.24.1</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1176,7 +1181,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.23.9</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.24.1</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1211,7 +1216,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.23.9</div>
+    <div class="logo-version" id="sidebar-version">v3.24.1</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1359,6 +1364,14 @@ if('serviceWorker' in navigator){
     <div id="home-user-info" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--text2)">
       <div style="display:flex;align-items:center;gap:6px"><span>👤 ログイン中:</span><strong id="home-current-user" style="color:var(--accent)">-</strong></div>
       <div style="display:flex;align-items:center;gap:6px"><span>✏️ 最終更新:</span><span id="home-last-update">-</span></div>
+    </div>
+    <!-- 👥 メンバーアクティビティ -->
+    <div id="home-members-info" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <strong style="font-size:12px;color:var(--text2)">👥 メンバー</strong>
+        <span style="font-size:10px;color:var(--text3)">🟢 オンライン / 🟡 1時間以内 / 🟠 今日 / ⚪ それ以前</span>
+      </div>
+      <div id="home-members-list" style="display:flex;flex-wrap:wrap;gap:8px"></div>
     </div>
     <!-- Mini stats -->
     <div class="stats-grid" id="home-stats" style="margin-bottom:20px"></div>
@@ -3463,8 +3476,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.23.9';
-const APP_BUILD_TIME='2026/04/20 02:40';
+const APP_VERSION='v3.24.1';
+const APP_BUILD_TIME='2026/04/20 07:18';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3683,6 +3696,8 @@ function renderHome(){
     const u=getAuditUser();
     hcu.textContent=`${u.name} (${u.email||'-'})`;
   }
+  // 👥 メンバーアクティビティを表示
+  renderMemberActivity();
   const hlu=document.getElementById('home-last-update');
   if(hlu){
     // 全データから最新の updatedAt を探す
@@ -4013,7 +4028,7 @@ function showCustDropdown(q=''){
         onmousedown="selectCust('${c.id}')"
         onmouseover="this.style.background='var(--accent-light)'"
         onmouseout="this.style.background=''">
-        <div style="font-size:13px;font-weight:700">${c.name}</div>
+        <div style="font-size:13px;font-weight:700">${escAttr(c.name)}</div>
         <div style="font-size:11px;color:var(--text3);margin-top:1px">${[c.tel,c.address].filter(Boolean).join('　')}</div>
       </div>`).join('');
   }
@@ -4225,6 +4240,13 @@ function showPage(id, el, addToHistory=true){
     pageHistory.push(id);
     if(pageHistory.length>30) pageHistory.shift();
     pageHistoryIndex=pageHistory.length-1;
+    // ブラウザ履歴にも追加（戻るボタン対応）
+    // 共有リンク表示中は hash を保持
+    try{
+      if(!location.hash || !/^#(?:share|docshare)=/.test(location.hash)){
+        history.pushState({pageId:id}, '', location.pathname);
+      }
+    }catch(e){}
   }
   updateHistoryBar(id);
   // Page renders
@@ -4270,6 +4292,22 @@ function histForward(){
   if(pageHistoryIndex>=pageHistory.length-1) return;
   pageHistoryIndex++;
   showPage(pageHistory[pageHistoryIndex], null, false);
+}
+
+// ブラウザの「戻る/進む」ボタンを独自ヒストリと同期
+// （多くのユーザーはブラウザの戻るボタンを使う癖があるため）
+let _popstateInited = false;
+function initBrowserHistorySync(){
+  if(_popstateInited) return;
+  _popstateInited = true;
+  window.addEventListener('popstate', (e)=>{
+    // 共有リンク表示中は何もしない
+    if(location.hash && /^#(?:share|docshare)=/.test(location.hash)) return;
+    // 独自ヒストリの戻るを起動
+    if(pageHistoryIndex > 0){
+      histBack();
+    }
+  });
 }
 function quickSave(){
   persist();
@@ -4567,7 +4605,7 @@ function filterCustSearch(){
   const list=customers.filter(c=>!q||c.name.toLowerCase().includes(q)||(c.tel||'').includes(q)||(c.address||'').toLowerCase().includes(q)||(c.dept||'').toLowerCase().includes(q));
   if(!list.length){el.innerHTML=`<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px">該当する顧客がいません</div>`;return;}
   el.innerHTML=list.slice(0,30).map(c=>`<div class="cust-result-item ${selectedCustId===c.id?'selected':''}" onclick="selectCust('${c.id}')">
-    <div class="cust-result-name">${c.name}<span style="font-size:11px;font-weight:400;color:var(--text3);margin-left:5px">${c.honorific||'御中'}</span></div>
+    <div class="cust-result-name">${escAttr(c.name)}<span style="font-size:11px;font-weight:400;color:var(--text3);margin-left:5px">${c.honorific||'御中'}</span></div>
     <div class="cust-result-sub">${[c.zip,c.address,c.tel,c.dept].filter(Boolean).join('　')}</div>
   </div>`).join('');
 }
@@ -4584,7 +4622,7 @@ function renderSelectedCust(c){
   document.getElementById('selected-cust-card').innerHTML=`
     <div class="cust-info-card" style="padding:10px 12px;line-height:1.6">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-        <div class="cust-name-big" style="margin:0;font-size:14px"><span class="cust-name-text">${c.name}</span><span style="font-size:11px;font-weight:500;margin-left:5px;background:white;color:var(--accent);padding:1px 7px;border-radius:99px;border:1px solid #B8D8C4">${c.honorific||'御中'}</span></div>
+        <div class="cust-name-big" style="margin:0;font-size:14px"><span class="cust-name-text">${escAttr(c.name)}</span><span style="font-size:11px;font-weight:500;margin-left:5px;background:white;color:var(--accent);padding:1px 7px;border-radius:99px;border:1px solid #B8D8C4">${c.honorific||'御中'}</span></div>
         <button class="btn btn-secondary btn-sm" onclick="changeCust()" style="padding:2px 8px;font-size:10px;margin-left:auto">🔄 変更</button>
       </div>
       <div style="font-size:11.5px;color:var(--text2)">
@@ -4602,7 +4640,7 @@ function renderSelectedCust(c){
   if(c.contacts&&c.contacts.length){
     document.getElementById('doc-contact-area').style.display='block';
     const sel=document.getElementById('doc-contact');
-    sel.innerHTML='<option value="">（担当者を選択）</option>'+c.contacts.map(ct=>`<option value="${ct.name}">${ct.name}${ct.role?' ('+ct.role+')':''}</option>`).join('');
+    sel.innerHTML='<option value="">（担当者を選択）</option>'+c.contacts.map(ct=>`<option value="${escAttr(ct.name)}">${escAttr(ct.name)}${ct.role?' ('+escAttr(ct.role)+')':''}</option>`).join('');
   }else document.getElementById('doc-contact-area').style.display='none';
 }
 
@@ -4653,7 +4691,7 @@ function saveInlineNewCust(){
 // ===== MAP MODAL =====
 function openMapModal(custId){
   const c=customers.find(x=>x.id===custId);if(!c)return;
-  document.getElementById('map-modal-title').textContent=`🗺️ ${c.name} — 地図・距離情報`;
+  document.getElementById('map-modal-title').textContent=`🗺️ ${escAttr(c.name)} — 地図・距離情報`;
   const custUrl=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.address||'')}`;
   const myAddr=settings.address||'';
   const dirUrl=myAddr&&c.address?`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(myAddr)}&destination=${encodeURIComponent(c.address)}`:'';
@@ -4976,7 +5014,7 @@ async function shareNativePreview(){
 
     const cust=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
     const honor=cust?.honorific||'御中';
-    const msg=`${d.customer||''} ${honor}\n\n${d.type}をお送りします。\n金額: ${fmt(d.grandTotal)}\n\n下記リンクからご確認ください（${expStr}まで有効）:\n${url}\n\n${settings.company||''}`;
+    const msg=`${escAttr(d.customer||'')} ${honor}\n\n${d.type}をお送りします。\n金額: ${fmt(d.grandTotal)}\n\n下記リンクからご確認ください（${expStr}まで有効）:\n${url}\n\n${settings.company||''}`;
 
     // ネイティブ共有シートを起動
     // title/text/url の全て渡すことで最大の互換性
@@ -5084,7 +5122,7 @@ async function _createAndShowShareLink(d){
 
     const cust=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
     const honor=cust?.honorific||'御中';
-    const msg=`${d.customer||''} ${honor}\n\n${d.type}をお送りします。\n金額: ${fmt(d.grandTotal)}\n\n下記リンクからご確認ください（${expStr}まで有効）:\n${url}\n\n${settings.company||''}`;
+    const msg=`${escAttr(d.customer||'')} ${honor}\n\n${d.type}をお送りします。\n金額: ${fmt(d.grandTotal)}\n\n下記リンクからご確認ください（${expStr}まで有効）:\n${url}\n\n${settings.company||''}`;
 
     _showShareLinkDialog(url, msg, d);
   }catch(e){
@@ -5302,9 +5340,9 @@ function renderCustomerList(){
     const mc=(c.contacts||[])[0];
     // JS文字列に安全に埋め込むためのエスケープ（\ ' " 改行 タブ 全てエスケープ）
     const escName=(c.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t');
-    return`<tr>
+    return`<tr style="cursor:pointer" onclick="if(event.target.closest('button,a,span[onclick]'))return;openCustDetail('${c.id}',true)" title="クリックで詳細表示">
       <td style="white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis">
-        <a href="#" onclick="openCustDetail('${c.id}',true);return false" style="color:var(--accent);font-weight:700;text-decoration:none">${escAttr(c.name)}</a>
+        <a href="#" onclick="event.stopPropagation();openCustDetail('${c.id}',true);return false" style="color:var(--accent);font-weight:700;text-decoration:none">${escAttr(c.name)}</a>
         <span style="font-size:11px;color:var(--text3);margin-left:5px">${escAttr(c.honorific||'御中')}</span>
       </td>
       <td style="font-size:12px;color:var(--text2);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis">${mc?escAttr(mc.name+(mc.role?' ('+mc.role+')':'')):'—'}</td>
@@ -5336,7 +5374,7 @@ function openCustDetail(idOrName,byId){
   if(!c)return;
   const honorific=c.honorific!=null?c.honorific:'御中';
   document.getElementById('cust-detail-name').innerHTML=
-    `${c.name}<span style="font-size:13px;font-weight:500;background:var(--accent-light);color:var(--accent);padding:2px 9px;border-radius:99px;margin-left:8px;vertical-align:middle">${honorific}</span>`;
+    `${escAttr(c.name)}<span style="font-size:13px;font-weight:500;background:var(--accent-light);color:var(--accent);padding:2px 9px;border-radius:99px;margin-left:8px;vertical-align:middle">${honorific}</span>`;
   const custDocs=docs.filter(d=>d.customer===c.name||d.customerId===c.id).reverse();
   const mapUrl=c.address?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.address)}`:'';
   const myAddr=settings.address||'';
@@ -5348,8 +5386,8 @@ function openCustDetail(idOrName,byId){
   const contact0=c.contacts?.[0];
   const addrSample=[(c.zip?'〒'+c.zip:''),c.address].filter(Boolean).join(' ');
   const envelopeSample=c.address?
-    `${addrSample}<br><strong style="font-size:14px">${c.name}　${honorific}</strong>` : '';
-  const docSample=`${c.dept||''}${c.dept?'<br>':''}${c.name}　${honorific}`;
+    `${addrSample}<br><strong style="font-size:14px">${escAttr(c.name)}　${honorific}</strong>` : '';
+  const docSample=`${c.dept||''}${c.dept?'<br>':''}${escAttr(c.name)}　${honorific}`;
   const contactSample=contact0?`${contact0.role||'担当'} ${contact0.name} 様`:'';
 
   document.getElementById('cust-detail-body').innerHTML=`
@@ -5705,7 +5743,7 @@ function saveCustomer(){
 
 function deleteCustomer(id){
   const c=customers.find(x=>x.id===id);if(!c)return;
-  pushUndo({type:'customer',data:JSON.parse(JSON.stringify(c)),label:`顧客「${c.name}」を削除しました`});
+  pushUndo({type:'customer',data:JSON.parse(JSON.stringify(c)),label:`顧客「${escAttr(c.name)}」を削除しました`});
   customers=customers.filter(x=>x.id!==id);persist();renderAll();showToast("顧客を削除しました");
 }
 
@@ -6163,7 +6201,7 @@ function renderJobList(){
   const tbody=document.getElementById('job-list-body');if(!tbody)return;
   const mj=jobs.filter(j=>{const dt=new Date(j.date);return dt.getFullYear()===calYear&&dt.getMonth()===calMonth;}).sort((a,b)=>a.date.localeCompare(b.date));
   if(!mj.length){tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px">この月の作業はありません</td></tr>`;return;}
-  tbody.innerHTML=mj.map(j=>`<tr><td>${j.date}</td><td>${j.customer||'—'}</td><td>${j.title}</td><td>${j.category?`<span style="background:${CATS[j.category]||'#999'}20;color:${CATS[j.category]||'#999'};font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px">${j.category}</span>`:'—'}</td><td>${j.time||'—'}</td>
+  tbody.innerHTML=mj.map(j=>`<tr><td>${escAttr(j.date)}</td><td>${escAttr(j.customer||'—')}</td><td>${escAttr(j.title||'')}</td><td>${j.category?`<span style="background:${CATS[j.category]||'#999'}20;color:${CATS[j.category]||'#999'};font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px">${escAttr(j.category)}</span>`:'—'}</td><td>${escAttr(j.time||'—')}</td>
     <td style="display:flex;gap:3px;padding:6px 8px">
       <button class="btn btn-secondary btn-sm" onclick="editJob('${j.id}')">編集</button>
       <button class="btn btn-gold btn-sm" onclick="openNewDoc('見積書','${(j.customer||'').replace(/'/g,"\\'")}')">見積書へ</button>
@@ -6333,7 +6371,7 @@ function renderAlerts(){
   if(!all.length){el.innerHTML=`<div style="text-align:center;color:var(--text3);padding:32px">請求中の書類はありません</div>`;return;}
   el.innerHTML=all.map(d=>{const isOd=d._t==='overdue',isSn=d._t==='soon';const bg=isOd?'var(--red-light)':isSn?'var(--orange-light)':'var(--surface)';const bc=isOd?'#F5C6C2':isSn?'#F0C090':'var(--border)';const tc=isOd?'var(--red)':isSn?'var(--orange)':'var(--text2)';const lbl=isOd?`${Math.abs(d.diff)}日超過`:d.dueDate?`残${d.diff}日`:'期限未設定';
     return`<div style="background:${bg};border:1px solid ${bc};border-radius:var(--radius);padding:12px 15px;margin-bottom:7px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <div style="flex:1;min-width:180px"><div style="font-weight:700;font-size:14px">${d.customer}</div><div style="font-size:12px;color:var(--text2);margin-top:1px">${d.subject||d.number}　発行：${d.date}${d.dueDate?' 期限：'+d.dueDate:''}</div></div>
+      <div style="flex:1;min-width:180px"><div style="font-weight:700;font-size:14px">${escAttr(d.customer||"")}</div><div style="font-size:12px;color:var(--text2);margin-top:1px">${d.subject||d.number}　発行：${d.date}${d.dueDate?' 期限：'+d.dueDate:''}</div></div>
       <div style="font-size:15px;font-weight:700">${fmt(d.grandTotal)}</div>
       <span style="font-size:12px;font-weight:700;color:${tc};background:white;padding:3px 9px;border-radius:99px">${lbl}</span>
       <button class="btn btn-secondary btn-sm" onclick="previewDoc('${d.id}')">表示</button>
@@ -7325,6 +7363,8 @@ function initFirebaseAuth(){
       if(mue) mue.textContent=user.email||'';
       // データ読み込み
       await fbLoadAll(user.uid);
+      // 最終ログイン時刻を記録（全メンバー共有）
+      try{ await recordMemberLogin(user); }catch(e){}
       initAppAfterAuth();
     }else{
       currentUser = null;
@@ -7334,7 +7374,133 @@ function initFirebaseAuth(){
   });
 }
 
-// ===== アクセス許可管理 =====
+// ホーム画面の「👥 メンバー」リストを描画
+async function renderMemberActivity(){
+  const el = document.getElementById('home-members-list');
+  if(!el) return;
+  const F = window._FB;
+  if(!F){
+    el.innerHTML = '<span style="color:var(--text3);font-size:11px">ローカルモード（共有情報なし）</span>';
+    return;
+  }
+  // キャッシュがなければ読み込み
+  let logins = _memberLoginsCache;
+  if(!logins || Object.keys(logins).length === 0){
+    logins = await loadMemberLogins();
+  }
+  // 自分のメールも確実に含める（自分は今ログイン中）
+  const myEmail = (currentUser?.email||'').toLowerCase();
+  if(myEmail && !logins[myEmail]){
+    const myName = getAuditUser().name;
+    logins[myEmail] = {at: new Date().toISOString(), device:'PC', name: myName};
+  }
+  const entries = Object.entries(logins);
+  if(entries.length === 0){
+    el.innerHTML = '<span style="color:var(--text3);font-size:11px">まだ誰もログインしていません</span>';
+    return;
+  }
+  // 最終ログインが新しい順にソート
+  entries.sort((a,b)=>{
+    const aT = a[1].at ? new Date(a[1].at).getTime() : 0;
+    const bT = b[1].at ? new Date(b[1].at).getTime() : 0;
+    return bT - aT;
+  });
+  el.innerHTML = entries.map(([email, info])=>{
+    const status = getOnlineStatus(info.at);
+    const isMe = email === myEmail;
+    const time = isMe ? '今ログイン中' : relativeTime(info.at);
+    const device = info.device || 'PC';
+    const name = escAttr(info.name || email.split('@')[0]);
+    return `<div title="${escAttr(email)}" style="display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;font-size:11px${isMe?';background:var(--accent-light);border-color:var(--accent)':''}">
+      <span style="font-size:13px">${status.icon}</span>
+      <strong style="color:${isMe?'var(--accent)':'var(--text)'};font-size:11px">${name}</strong>
+      <span style="color:var(--text3);font-size:10px">${time}・${escAttr(device)}</span>
+    </div>`;
+  }).join('');
+}
+
+
+// system/access_control に lastLogins フィールドで保存
+// 構造: { lastLogins: { "email1": {at:"ISO", device:"PC|スマホ", name:"野島昭男"}, ... } }
+
+let _memberLoginsCache = {};
+
+async function recordMemberLogin(user){
+  const F = window._FB;
+  if(!F || !user) return;
+  const email = (user.email||'').toLowerCase().trim();
+  if(!email) return;
+  try{
+    const ref = F.doc(F.db, 'system', 'access_control');
+    const snap = await F.getDoc(ref);
+    const data = snap.exists() ? snap.data() : {};
+    const lastLogins = data.lastLogins || {};
+    // デバイス判定
+    const ua = navigator.userAgent || '';
+    let device = 'PC';
+    if(/iPad/i.test(ua)) device = 'タブレット';
+    else if(/iPhone|Android.*Mobile/i.test(ua)) device = 'スマホ';
+    else if(/Android/i.test(ua)) device = 'タブレット';
+    // 表示名（従業員リストから取得 → なければ Google displayName）
+    const emp = (employees||[]).find(e=>(e.google||'').toLowerCase()===email);
+    const name = emp?.name || user.displayName || email.split('@')[0];
+    lastLogins[email] = {
+      at: new Date().toISOString(),
+      device,
+      name
+    };
+    // 部分更新（mergeでフィールド単位の更新）
+    await F.setDoc(ref, {lastLogins}, {merge:true});
+    _memberLoginsCache = lastLogins;
+  }catch(e){
+    // エラーは無視（ログインを妨げない）
+  }
+}
+
+async function loadMemberLogins(){
+  const F = window._FB;
+  if(!F) return {};
+  try{
+    const snap = await F.getDoc(F.doc(F.db, 'system', 'access_control'));
+    if(!snap.exists()) return {};
+    const data = snap.data();
+    _memberLoginsCache = data.lastLogins || {};
+    return _memberLoginsCache;
+  }catch(e){
+    return _memberLoginsCache;
+  }
+}
+
+// 「N分前」「N時間前」などの相対時間表示
+function relativeTime(isoStr){
+  if(!isoStr) return '不明';
+  const past = new Date(isoStr).getTime();
+  if(isNaN(past)) return '不明';
+  const diffSec = Math.floor((Date.now() - past)/1000);
+  if(diffSec < 0) return '今';
+  if(diffSec < 60) return diffSec+'秒前';
+  const min = Math.floor(diffSec/60);
+  if(min < 60) return min+'分前';
+  const hour = Math.floor(min/60);
+  if(hour < 24) return hour+'時間前';
+  const day = Math.floor(hour/24);
+  if(day < 30) return day+'日前';
+  const month = Math.floor(day/30);
+  if(month < 12) return month+'ヶ月前';
+  return Math.floor(month/12)+'年前';
+}
+
+// オンライン状態の判定（10分以内なら 🟢）
+function getOnlineStatus(isoStr){
+  if(!isoStr) return {icon:'⚪', label:'未ログイン', color:'var(--text3)'};
+  const diffMin = (Date.now() - new Date(isoStr).getTime()) / 60000;
+  if(diffMin < 10) return {icon:'🟢', label:'オンライン', color:'var(--accent)'};
+  if(diffMin < 60) return {icon:'🟡', label:'最近', color:'#F39C12'};
+  if(diffMin < 60*24) return {icon:'🟠', label:'今日', color:'#E67E22'};
+  return {icon:'⚪', label:'非アクティブ', color:'var(--text3)'};
+}
+
+
 
 // Firestoreの共有ドキュメントから許可リストを取得してチェック
 async function checkAccessAllowed(email){
@@ -7464,6 +7630,8 @@ function initAppAfterAuth(){
     showToast('✅ システムが v'+APP_VERSION+' に更新されました！', '#27AE60');
     window._showUpdateBannerOnLoad=null;
   }
+  // ブラウザ戻るボタンを独自ヒストリと同期
+  initBrowserHistorySync();
   // 起動時マイグレーション（旧データとの互換性）
   if(typeof migratePaymentsToArray==='function') migratePaymentsToArray();
   // ヘッダーのバージョン表示を更新
@@ -7728,7 +7896,7 @@ function saveEmployee(){
 
 function deleteEmployee(id){
   const e=employees.find(x=>x.id===id);if(!e)return;
-  pushUndo({type:'employee',data:JSON.parse(JSON.stringify(e)),label:`従業員「${e.name}」を削除しました`});
+  pushUndo({type:'employee',data:JSON.parse(JSON.stringify(e)),label:`従業員「${escAttr(e.name||"")}」を削除しました`});
   employees=employees.filter(x=>x.id!==id);persist();renderEmployees();buildStaffSelect();
 }
 
@@ -7737,7 +7905,7 @@ function buildStaffSelect(){
   const existing=document.getElementById('doc-staff-select');
   if(!existing)return;
   const val=existing.value;
-  existing.innerHTML='<option value="">（担当者を選択）</option>'+employees.map(e=>`<option value="${e.name}">${e.name}${e.role?' ('+e.role+')':''}</option>`).join('');
+  existing.innerHTML='<option value="">（担当者を選択）</option>'+employees.map(e=>`<option value="${escAttr(e.name||"")}">${escAttr(e.name||"")}${e.role?' ('+e.role+')':''}</option>`).join('');
   existing.value=val;
 }
 
@@ -7818,7 +7986,7 @@ function renderPayments(){
     const recs=(payments[d.id]||[]);
     return`<tr>
       <td style="font-family:monospace;font-size:12px">${d.number}</td>
-      <td style="font-weight:500">${d.customer}</td>
+      <td style="font-weight:500">${escAttr(d.customer||"")}</td>
       <td style="text-align:right">${fmt(d.grandTotal)}</td>
       <td style="text-align:right;color:var(--accent);font-weight:600">${fmt(paid)}</td>
       <td style="text-align:right;color:${bal>0?'var(--red)':'var(--text3)'};font-weight:600">${bal>0?fmt(bal):'完済'}</td>
@@ -7838,7 +8006,7 @@ function renderPayments(){
 function openPaymentModal(docId){
   currentPayDocId=docId;
   const d=docs.find(x=>x.id===docId);if(!d)return;
-  document.getElementById('pay-modal-title').textContent=`入金管理：${d.customer}`;
+  document.getElementById('pay-modal-title').textContent=`入金管理：${escAttr(d.customer||"")}`;
   document.getElementById('pay-date').value=today();
   document.getElementById('pay-amount').value='';
   document.getElementById('pay-memo').value='';
@@ -8028,7 +8196,7 @@ function renderStaffReport(){
           ${emp?.photo?`<img src="${emp.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover">`
             :isUnassigned?`<div style="width:28px;height:28px;border-radius:50%;background:#FFE4D6;color:#E67E22;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">!</div>`
             :`<div style="width:28px;height:28px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${e.name.charAt(0)}</div>`}
-          <span style="font-size:13px;font-weight:600;color:var(--accent);text-decoration:underline">${e.name}</span>
+          <span style="font-size:13px;font-weight:600;color:var(--accent);text-decoration:underline">${escAttr(e.name||"")}</span>
           ${isUnassigned?`<button onclick="event.stopPropagation();showUnassignedDocs(${y},${m||'null'})" style="font-size:10px;padding:2px 8px;border-radius:99px;background:#E67E22;color:white;border:none;cursor:pointer;margin-left:4px">📋 一覧</button>`:''}
         </div>
         <div style="text-align:right;font-size:13px">${e.count}件</div>
@@ -8090,8 +8258,8 @@ function showStaffDetailDocs(staffName, year, month){
           return`<div style="display:flex;align-items:center;gap:8px;padding:10px 8px;border-bottom:1px solid var(--border)">
             <span class="badge ${tc[d.type]||''}" style="font-size:10px;flex-shrink:0">${d.type}</span>
             <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.number} - ${d.subject||'（件名なし）'}</div>
-              <div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.customer||'—'} / ${d.date||''}</div>
+              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.number} - ${escAttr(d.subject||'（件名なし）')}</div>
+              <div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(d.customer||'—')} / ${d.date||''}</div>
             </div>
             <span style="font-size:13px;font-weight:700;flex-shrink:0">${fmt(d.grandTotal)}</span>
             <button class="btn btn-secondary btn-sm" onclick="closeModal('staff-detail-modal');setTimeout(()=>editDoc('${d.id}'),100)" style="flex-shrink:0">編集</button>
@@ -8132,8 +8300,8 @@ function showUnassignedDocs(year, month){
           return`<div style="display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--border)">
             <span class="badge ${tc[d.type]||''}" style="font-size:10px">${d.type}</span>
             <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.number} - ${d.subject||'（件名なし）'}</div>
-              <div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.customer||'—'} / ${d.date||''}</div>
+              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.number} - ${escAttr(d.subject||'（件名なし）')}</div>
+              <div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(d.customer||'—')} / ${d.date||''}</div>
             </div>
             <span style="font-size:13px;font-weight:700;flex-shrink:0">${fmt(d.grandTotal)}</span>
             <button class="btn btn-secondary btn-sm" onclick="closeModal('unassigned-modal');setTimeout(()=>editDoc('${d.id}'),100)" style="flex-shrink:0">編集</button>
@@ -8996,7 +9164,7 @@ function doUndo(){
 // ===== EXPENSES =====
 function buildExpStaffSelect(){
   const sel=document.getElementById('exp-staff');if(!sel)return;
-  sel.innerHTML='<option value="">（選択）</option>'+employees.map(e=>`<option value="${e.name}">${e.name}</option>`).join('');
+  sel.innerHTML='<option value="">（選択）</option>'+employees.map(e=>`<option value="${escAttr(e.name||"")}">${escAttr(e.name||"")}</option>`).join('');
 }
 
 function calcExpTax(){
@@ -9641,14 +9809,14 @@ function exportCSV(format){
     csv='"伝票No","日付","借方勘定科目","借方補助科目","借方金額","貸方勘定科目","貸方補助科目","貸方金額","摘要","税区分"\n';
     list.forEach((d,i)=>{
       csv+=[String(i+1).padStart(6,'0'),d.date,'売掛金','',d.grandTotal,'売上高','',d.grandTotal,
-        `${d.customer} ${d.subject||''}`,d.tax10>0?'課税売上10%':d.tax8>0?'課税売上8%':'非課税'
+        `${escAttr(d.customer||"")} ${escAttr(d.subject||'')}`,d.tax10>0?'課税売上10%':d.tax8>0?'課税売上8%':'非課税'
       ].map(esc).join(',')+'\n';
     });
   }else if(format==='money'){
     filename=`moneyforward_import_${today()}.csv`;
     csv='取引日,取引内容,金額（収入）,金額（支出）,口座,大分類,中分類,メモ\n';
     csv+=list.map(d=>[
-      d.date, `${d.customer} ${d.subject||''}`, d.grandTotal, '',
+      d.date, `${escAttr(d.customer||"")} ${escAttr(d.subject||'')}`, d.grandTotal, '',
       settings.bank||'', '売上', d.category||'', d.number
     ].map(esc).join(',')).join('\n');
   }else if(format==='customers'){
@@ -10406,7 +10574,7 @@ function buildJobCustSelect(selectedName){
   const sel=document.getElementById('job-customer-select');
   if(!sel)return;
   sel.innerHTML='<option value="">（顧客を選択）</option>'
-    +customers.map(c=>`<option value="${c.name}" ${c.name===selectedName?'selected':''}>${c.name}${c.honorific?' '+c.honorific:''}</option>`).join('');
+    +customers.map(c=>`<option value="${escAttr(c.name)}" ${c.name===selectedName?'selected':''}>${escAttr(c.name)}${c.honorific?' '+c.honorific:''}</option>`).join('');
   if(selectedName) sel.value=selectedName;
 }
 
