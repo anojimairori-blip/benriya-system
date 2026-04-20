@@ -175,7 +175,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .theme-name{font-size:11px;font-weight:600;color:var(--text2)}
 
 /* MAIN */
-.main{flex:1;overflow-y:auto;overflow-x:hidden;height:100vh;min-width:0;max-width:100%;-webkit-overflow-scrolling:touch;display:block}
+.main{flex:1;overflow-y:auto;overflow-x:hidden;height:100vh;min-width:0;max-width:100%;-webkit-overflow-scrolling:touch;display:block;min-height:0}
 .main-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:var(--main-header-h);min-height:var(--main-header-h);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;gap:12px;flex-wrap:nowrap;flex-shrink:0;box-sizing:border-box;overflow:hidden}
 .main-header h2{font-size:16px;font-weight:700;white-space:nowrap}
 .btn-full-label{display:inline}
@@ -235,6 +235,36 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* ★ flex を使わずブロック表示にして、自然な高さで .main がスクロールする */
 .page.active{display:block}
 .page .content{scroll-margin-top:calc(var(--main-header-h) + var(--history-bar-h) + 8px)}
+
+/* ===== v3.25.1: 設定系ページのスクロール保証 =====
+   sticky 2段（main-header + settings-tabs-nav）構成のページで、
+   どんな祖先要素の flex/grid の影響を受けても .main にスクロールを委譲するための明示指定 */
+#page-settings.active,
+#page-employees.active,
+#page-tax.active,
+#page-backup.active,
+#page-templates.active,
+#page-display-settings.active,
+#page-csv-export.active,
+#page-developer.active{
+  display:block;
+  overflow:visible;
+  min-height:0;   /* 親 flex の min-content 罠を回避 */
+  height:auto;    /* 固定高さが誤って入らないよう明示 */
+}
+/* 設定ページ内 .content は縦に自然に伸びる（height 固定しない） */
+#page-settings.active > .content,
+#page-employees.active > .content,
+#page-tax.active > .content,
+#page-backup.active > .content,
+#page-templates.active > .content,
+#page-display-settings.active > .content,
+#page-csv-export.active > .content,
+#page-developer.active > .content{
+  overflow:visible;
+  min-height:0;
+  /* スクロールは祖先の .main に委譲する */
+}
 
 /* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
@@ -3436,8 +3466,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.25.0';
-const APP_BUILD_TIME='2026/04/21 09:00';
+const APP_VERSION='v3.25.1';
+const APP_BUILD_TIME='2026/04/21 10:30';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7679,6 +7709,11 @@ function initAppAfterAuth(){
   // ヘッダーのバージョン表示を更新
   const hv=document.getElementById('home-header-version');
   if(hv) hv.textContent=APP_VERSION+' · '+APP_BUILD_TIME;
+  // サイドバー・モバイルドロワーのバージョン表示も動的更新
+  const sv=document.getElementById('sidebar-version');
+  if(sv) sv.textContent=APP_VERSION;
+  const mv=document.getElementById('mobile-version-text');
+  if(mv) mv.textContent=APP_VERSION;
   loadSidebarTitle(); loadSettings(); loadLogo();
   // テーマは端末別保存（localStorageのみ）→ Firebase同期はしない
   // 書類タイプ別カラーを適用
