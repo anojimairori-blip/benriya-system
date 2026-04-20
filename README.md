@@ -1,3 +1,3 @@
-# 弁利屋書類システム
+# Flexsys2026
 
-便利屋向け書類管理システム（Firebase + GitHub Pages）
+Flexsys2026（Firebase + GitHub Pages）
