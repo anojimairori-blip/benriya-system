@@ -1,8 +1,0 @@
-name = "benriya-system"
-compatibility_date = "2024-09-25"
-compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "."
-
-# Browser Rendering バインディング（Puppeteer 用）
-[[browser]]
-binding = "MYBROWSER"
