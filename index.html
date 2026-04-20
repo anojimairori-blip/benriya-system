@@ -362,7 +362,7 @@ tr:hover td{background:var(--bg)}
 
 /* LOGO CROP — 正しい実装 */
 /* crop-stageはposition:relativeで画像を基準にoverlay要素を配置 */
-.crop-stage{position:relative;border-radius:8px;overflow:hidden;line-height:0;touch-action:none;cursor:crosshair;background:#f0f0f0;min-height:180px}
+.crop-stage{position:relative;border-radius:8px;overflow:hidden;line-height:0;touch-action:none;cursor:crosshair;background:#f0f0f0;min-height:260px}
 .crop-stage img{display:block;width:100%;height:auto;pointer-events:none;user-select:none;border-radius:8px}
 /* 暗幕overlayを4枚に分割（上・下・左・右）— 歪みなし */
 .crop-mask-top,.crop-mask-bottom,.crop-mask-left,.crop-mask-right{
@@ -1159,7 +1159,7 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.24.10</h1>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.24.12</h1>
     <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
     <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
@@ -1183,7 +1183,7 @@ if('serviceWorker' in navigator){
   <div class="mobile-drawer-header">
     <div style="display:flex;flex-direction:column;align-items:flex-start">
       <span class="mobile-drawer-title" id="drawer-title">便利屋 書類システム</span>
-      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.24.10</span>
+      <span style="font-size:10px;opacity:0.6;margin-top:2px" id="mobile-version-text">v3.24.12</span>
     </div>
     <button class="mobile-drawer-close" onclick="closeDrawer()">✕</button>
   </div>
@@ -1218,7 +1218,7 @@ if('serviceWorker' in navigator){
         <button onclick="cancelTitleEdit()" style="padding:5px 8px;background:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;color:rgba(255,255,255,.7);font-size:12px;cursor:pointer;font-family:inherit">✕</button>
       </div>
     </div>
-    <div class="logo-version" id="sidebar-version">v3.24.10</div>
+    <div class="logo-version" id="sidebar-version">v3.24.12</div>
     <!-- ユーザー情報 -->
     <div id="sidebar-user" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.15)">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1926,25 +1926,7 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
-<!-- BRANCHES -->
-<div id="page-branches" class="page" style="display:none">
-  <div class="main-header">
-    <h2>🏢 拠点・支店管理</h2>
-    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
-      <button class="btn btn-primary" onclick="openBranchModal()">＋ 拠点を追加</button>
-    </div>
-  </div>
-  <div class="content">
-    <div id="branch-list"></div>
-    <div class="section-title" style="margin-top:20px">拠点別売上</div>
-    <div class="card">
-      <table>
-        <thead><tr><th>拠点名</th><th>書類件数</th><th>売上合計</th><th>スタッフ数</th><th></th></tr></thead>
-        <tbody id="branch-stats-body"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+<!-- v3.24.11: 拠点・支店管理機能を完全削除（整合性なしのため廃止） -->
 
 <!-- CSV EXPORT -->
 <div id="page-csv-export" class="page">
@@ -2879,7 +2861,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 
 <!-- CROP MODAL -->
 <div class="modal-overlay" id="crop-modal">
-<div class="modal" style="max-width:680px">
+<div class="modal" style="max-width:860px">
   <div class="modal-header">
     <h3>✂️ ロゴをトリミング</h3>
     <button class="close-btn" aria-label="閉じる" onclick="closeModal('crop-modal')">✕</button>
@@ -3122,30 +3104,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 </div>
 </div>
 
-<!-- BRANCH MODAL -->
-<div class="modal-overlay" id="branch-modal">
-<div class="modal" style="max-width:500px">
-  <div class="modal-header"><h3 id="branch-modal-title">拠点を追加</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('branch-modal')">✕</button></div>
-  <div class="modal-body">
-    <div class="form-row cols2">
-      <div class="form-group"><label>拠点名 ＊</label><input type="text" id="br-name" placeholder="札幌本社"></div>
-      <div class="form-group"><label>種別</label>
-        <select id="br-type"><option value="本社">本社</option><option value="支店">支店</option><option value="営業所">営業所</option></select>
-      </div>
-    </div>
-    <div class="form-row cols2">
-      <div class="form-group"><label>電話番号</label><input type="text" id="br-tel" placeholder="011-234-5678" onblur="autoTel(this)"></div>
-      <div class="form-group"><label>FAX</label><input type="text" id="br-fax" placeholder="011-234-5679" onblur="autoTel(this)"></div>
-    </div>
-    <div class="form-row"><div class="form-group"><label>住所</label><input type="text" id="br-address" placeholder="北海道札幌市中央区○○1-2-3"></div></div>
-    <div class="form-row"><div class="form-group"><label>メモ</label><textarea id="br-memo" placeholder="備考など"></textarea></div></div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-secondary" onclick="closeModal('branch-modal')">キャンセル</button>
-    <button class="btn btn-primary" onclick="saveBranch()">💾 保存する</button>
-  </div>
-</div>
-</div>
+<!-- v3.24.11: branch-modal 削除（拠点機能廃止に伴う） -->
 
 <!-- PHOTO MODAL (per doc) -->
 <div class="modal-overlay" id="photo-modal">
@@ -3483,13 +3442,13 @@ let settings=JSON.parse(localStorage.getItem('settings_v4')||'{}');
 let jobs=JSON.parse(localStorage.getItem('jobs_v4')||'[]');
 let templates=JSON.parse(localStorage.getItem('templates_v4')||'[]');
 let employees=JSON.parse(localStorage.getItem('employees_v4')||'[]');
-let branches=JSON.parse(localStorage.getItem('branches_v6')||'[]');
+let branchesDeprecated = null; // v3.24.11: 拠点機能は廃止。localStorage 'branches_v6' は残存するが読み書きしない
 let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.24.10';
-const APP_BUILD_TIME='2026/04/21 22:45';
+const APP_VERSION='v3.24.12';
+const APP_BUILD_TIME='2026/04/22 00:15';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4267,7 +4226,7 @@ const PAGE_LABELS={
   home:'ホーム',dashboard:'ダッシュボード',quotes:'見積書一覧',invoices:'請求書一覧',receipts:'領収書一覧',
   customers:'顧客管理',calendar:'作業カレンダー',alerts:'支払いアラート',report:'年次レポート',
   templates:'作業テンプレート',payments:'入金管理',employees:'従業員管理',
-  'staff-report':'スタッフ実績',branches:'拠点・支店','csv-export':'CSVエクスポート',
+  'staff-report':'スタッフ実績','csv-export':'CSVエクスポート',
   expenses:'経費管理',backup:'バックアップ・復旧',settings:'会社設定',tax:'税率設定'
 };
 
@@ -4346,7 +4305,6 @@ function showPage(id, el, addToHistory=true){
   if(id==='templates') renderTemplates();
   if(id==='payments') renderPayments();
   if(id==='staff-report') renderStaffReport();
-  if(id==='branches') renderBranches();
   if(id==='expenses') renderExpenses();
   if(id==='bulletin') renderBulletins();
   if(id==='backup') updateBackupStats();
@@ -4418,16 +4376,20 @@ function buildDocPages(){
     const type={quotes:'見積書',invoices:'請求書',receipts:'領収書'}[id];
     const statusOpts=`<option value="">すべての状態</option>`+
       docStatuses.map(s=>`<option value="${s.value}">${s.label}</option>`).join('');
+    // v3.24.12: 初期アクティブボタンを dfState[id].mode に合わせて動的に決定
+    // （領収書は dfState.receipts.mode='month' なので「今月」が active になる）
+    const curMode=dfState[id]?.mode||'all';
+    const ac=(m)=>curMode===m?'active':'';
     el.innerHTML=`
       <div class="date-filter-bar" id="dfbar-${id}">
-        <button class="df-btn active" onclick="setDf('${id}','all',this)">すべて</button>
-        <button class="df-btn" onclick="setDf('${id}','today',this)">今日</button>
-        <button class="df-btn" onclick="setDf('${id}','month',this)">今月</button>
-        <button class="df-btn" onclick="setDf('${id}','last',this)">先月</button>
-        <button class="df-btn" onclick="setDf('${id}','last2',this)">先々月</button>
-        <button class="df-btn" onclick="setDf('${id}','year',this)">今年</button>
-        <button class="df-btn" onclick="setDf('${id}','range',this)">期間指定</button>
-        <div class="df-range" id="dfrange-${id}" style="display:none">
+        <button class="df-btn ${ac('all')}" onclick="setDf('${id}','all',this)">すべて</button>
+        <button class="df-btn ${ac('today')}" onclick="setDf('${id}','today',this)">今日</button>
+        <button class="df-btn ${ac('month')}" onclick="setDf('${id}','month',this)">今月</button>
+        <button class="df-btn ${ac('last')}" onclick="setDf('${id}','last',this)">先月</button>
+        <button class="df-btn ${ac('last2')}" onclick="setDf('${id}','last2',this)">先々月</button>
+        <button class="df-btn ${ac('year')}" onclick="setDf('${id}','year',this)">今年</button>
+        <button class="df-btn ${ac('range')}" onclick="setDf('${id}','range',this)">期間指定</button>
+        <div class="df-range" id="dfrange-${id}" style="display:${curMode==='range'?'flex':'none'}">
           <input type="date" id="dffrom-${id}" onchange="renderDocPageFiltered('${id}','${type}')">
           <span>〜</span>
           <input type="date" id="dfto-${id}" onchange="renderDocPageFiltered('${id}','${type}')">
@@ -4508,7 +4470,7 @@ async function refreshAllData(btnEl){
     const renderFns=[
       'buildDocPages','renderAll','renderEmployees','renderExpenses',
       'renderCalendar','renderPayments','renderTemplates','renderAlerts',
-      'renderBranches','renderBulletins','buildMonthlyChart',
+      'renderBulletins','buildMonthlyChart',
       'renderReport','renderStaffReport','updateBackupStats','updateBulletinBadge'
     ];
     renderFns.forEach(fname=>{
@@ -7083,12 +7045,16 @@ function saveSettings(){
     const zd=toHalf(settings.zip).replace(/[^0-9]/g,'').slice(0,7);
     settings.zip=zd.length>3?zd.slice(0,3)+'-'+zd.slice(3):zd;
   }
-  // Tel/FAXはautoTelで正規化してから保存
+  // Tel/FAXはautoTelで正規化してから保存（v3.24.11: 独自3-3-4ロジックを廃止。
+  // 4桁市外局番(0123千歳等)や2桁(03,06)を取りこぼしていた根本原因を修正）
   ['tel','fax'].forEach(k=>{
     if(settings[k]){
-      const digits=toHalf(settings[k]).replace(/[^0-9]/g,'');
-      if(digits.length===11) settings[k]=digits.slice(0,3)+'-'+digits.slice(3,7)+'-'+digits.slice(7);
-      else if(digits.length===10) settings[k]=digits.slice(0,3)+'-'+digits.slice(3,6)+'-'+digits.slice(6);
+      const el=document.getElementById('set-'+k);
+      if(el){
+        el.value=settings[k];
+        autoTel(el);          // autoTel は冪等なので何度呼んでも安全
+        settings[k]=el.value;
+      }
     }
   });
   persist();
@@ -7170,7 +7136,6 @@ async function fbLoadAll(uid){
     if(data.jobs)       jobs       = data.jobs;
     if(data.templates)  templates  = data.templates;
     if(data.employees)  employees  = data.employees;
-    if(data.branches)   branches   = data.branches;
     if(data.payments)   payments   = data.payments;
     if(data.expenses){
       // Firebase上は画像が __local_only__ プレースホルダーになっているため、
@@ -7246,7 +7211,6 @@ function persist(){
     localStorage.setItem('jobs_v4',      JSON.stringify(jobs));
     localStorage.setItem('templates_v4', JSON.stringify(templates));
     localStorage.setItem('employees_v4', JSON.stringify(employees));
-    localStorage.setItem('branches_v6',  JSON.stringify(branches));
     localStorage.setItem('payments_v6',  JSON.stringify(payments));
     localStorage.setItem('docPhotos_v6', JSON.stringify(docPhotos));
     localStorage.setItem('expenses_v7',  JSON.stringify(expenses));
@@ -7267,7 +7231,6 @@ async function persistNow(){
     localStorage.setItem('jobs_v4',      JSON.stringify(jobs));
     localStorage.setItem('templates_v4', JSON.stringify(templates));
     localStorage.setItem('employees_v4', JSON.stringify(employees));
-    localStorage.setItem('branches_v6',  JSON.stringify(branches));
     localStorage.setItem('payments_v6',  JSON.stringify(payments));
     localStorage.setItem('docPhotos_v6', JSON.stringify(docPhotos));
     localStorage.setItem('expenses_v7',  JSON.stringify(expenses));
@@ -7328,7 +7291,7 @@ async function _fbPersist(){
     const rawPayload = {
       docs: docsForFB,
       customers, settings, jobs, templates,
-      employees, branches, payments,
+      employees, payments,
       expenses: expensesForFB,
       bulletins,
       updatedAt: new Date().toISOString(),
@@ -7735,7 +7698,7 @@ function initAppAfterAuth(){
   buildDocPages(); buildStaffSelect(); buildExpStaffSelect(); updateBackupStats();
   renderAll(); buildMonthlyChart(); initReportYears(); initSrYears();
   renderCalendar(); renderTemplates(); renderAlerts();
-  renderEmployees(); renderBranches(); renderPayments(); renderExpenses(); renderBulletins();
+  renderEmployees(); renderPayments(); renderExpenses(); renderBulletins();
   document.getElementById('doc-date').value = today();
   buildStatusSelect('doc-status', docStatuses[0]?.value||'下書き');
   const now=new Date(), y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,'0');
@@ -8162,86 +8125,10 @@ function deletePayRecord(docId,idx){
   persist();renderPayRecords(docId);openPaymentModal(docId);renderPayments();renderAll();
 }
 
-// ===== BRANCHES =====
-let editingBranchId=null;
-function renderBranches(){
-  const el=document.getElementById('branch-list');
-  if(!el)return;
-  if(!branches.length){
-    el.innerHTML=`<div style="text-align:center;color:var(--text3);padding:32px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)">拠点が登録されていません。「＋ 拠点を追加」から登録してください。</div>`;
-  }else{
-    el.innerHTML=branches.map(b=>`<div class="branch-card">
-      <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span style="font-size:15px;font-weight:700">${b.name}</span>
-          <span class="branch-badge ${b.type==='本社'?'branch-hq':'branch-sub'}">${b.type}</span>
-        </div>
-        <div style="font-size:12px;color:var(--text2);display:flex;flex-wrap:wrap;gap:6px 16px">
-          ${b.address?`<span>📍 ${b.address}</span>`:''}
-          ${b.tel?`<span>📞 ${escAttr(b.tel)}</span>`:''}
-          ${b.fax?`<span>FAX: ${escAttr(b.fax)}</span>`:''}
-          ${b.memo?`<span>📝 ${escAttr(b.memo)}</span>`:''}
-        </div>
-      </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
-        <button class="btn btn-secondary btn-sm" onclick="editBranch('${b.id}')">編集</button>
-        <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteBranch('${b.id}'))">削除</button>
-      </div>
-    </div>`).join('');
-  }
-  const tbody=document.getElementById('branch-stats-body');
-  if(!tbody)return;
-  if(!branches.length){tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px">拠点なし</td></tr>`;return;}
-  tbody.innerHTML=branches.map(b=>{
-    const bDocs=docs.filter(d=>d.branch===b.id||d.branch===b.name);
-    const bEmps=employees.filter(e=>e.branch===b.id||e.branch===b.name);
-    const total=bDocs.filter(d=>['請求書','領収書'].includes(d.type)).reduce((s,d)=>s+(d.grandTotal||0),0);
-    return`<tr>
-      <td style="font-weight:600">${b.name} <span class="branch-badge ${b.type==='本社'?'branch-hq':'branch-sub'}" style="font-size:10px">${b.type}</span></td>
-      <td style="text-align:right">${bDocs.length}件</td>
-      <td style="text-align:right;font-weight:600">${fmt(total)}</td>
-      <td style="text-align:right">${bEmps.length}名</td>
-      <td><button class="btn btn-secondary btn-sm" onclick="openNewDoc('見積書')">書類作成</button></td>
-    </tr>`;
-  }).join('');
-}
-function openBranchModal(){
-  editingBranchId=null;
-  document.getElementById('branch-modal-title').textContent='拠点を追加';
-  ['br-name','br-tel','br-fax','br-address','br-memo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('br-type').value='支店';
-  document.getElementById('branch-modal').classList.add('open');
-}
-function editBranch(id){
-  const b=branches.find(x=>x.id===id);if(!b)return;
-  editingBranchId=id;
-  document.getElementById('branch-modal-title').textContent='拠点を編集';
-  document.getElementById('br-name').value=b.name||'';
-  document.getElementById('br-type').value=b.type||'支店';
-  document.getElementById('br-tel').value=b.tel||'';
-  document.getElementById('br-fax').value=b.fax||'';
-  document.getElementById('br-address').value=b.address||'';
-  document.getElementById('br-memo').value=b.memo||'';
-  document.getElementById('branch-modal').classList.add('open');
-}
-function saveBranch(){
-  const name=document.getElementById('br-name').value.trim();
-  if(!name){alert('拠点名を入力してください');return;}
-  const b={
-    id:editingBranchId||('br-'+Date.now()),
-    name,type:document.getElementById('br-type').value,
-    tel:document.getElementById('br-tel').value,
-    fax:document.getElementById('br-fax').value,
-    address:document.getElementById('br-address').value,
-    memo:document.getElementById('br-memo').value
-  };
-  if(editingBranchId){branches[branches.findIndex(x=>x.id===editingBranchId)]=b;}
-  else branches.push(b);
-  persist();closeModal('branch-modal');renderBranches();showToast('拠点情報を保存しました ✓');
-}
-function deleteBranch(id){
-  branches=branches.filter(x=>x.id!==id);persist();renderBranches();
-}
+// ===== BRANCHES (v3.24.11: 機能削除済み) =====
+// renderBranches / openBranchModal / editBranch / saveBranch / deleteBranch
+// は v3.24.11 で全削除。localStorage 'branches_v6' はユーザーデータ保護のため残存するが、
+// アプリからの読み書きは一切行わない（branchesDeprecated 変数は null）。
 
 // ===== STAFF REPORT =====
 function initSrYears(){
@@ -9656,7 +9543,7 @@ function updateBackupStats(){
 function exportBackup(){
   const data={
     version:'v7',timestamp:new Date().toISOString(),
-    docs,customers,settings,jobs,templates,employees,branches,payments,docPhotos,expenses
+    docs,customers,settings,jobs,templates,employees,payments,docPhotos,expenses
   };
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
@@ -9688,12 +9575,11 @@ function importBackup(ev){
       if(data.jobs)jobs=data.jobs;
       if(data.templates)templates=data.templates;
       if(data.employees)employees=data.employees;
-      if(data.branches)branches=data.branches;
       if(data.payments)payments=data.payments;
       if(data.docPhotos)docPhotos=data.docPhotos;
       if(data.expenses)expenses=data.expenses;
       if(data.bulletins)bulletins=data.bulletins;
-      persist();loadSettings();loadLogo();renderAll();buildMonthlyChart();renderEmployees();renderBranches();renderExpenses();renderTemplates();
+      persist();loadSettings();loadLogo();renderAll();buildMonthlyChart();renderEmployees();renderExpenses();renderTemplates();
       if(statusEl){statusEl.style.color='var(--accent)';statusEl.textContent=`✓ 復旧完了：書類 ${docs.length}件、顧客 ${customers.length}件を読み込みました (${data.timestamp?new Date(data.timestamp).toLocaleString('ja-JP'):'不明'})`;}
       updateBackupStats();
       }); // end showConfirm
