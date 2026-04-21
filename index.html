@@ -1141,7 +1141,10 @@ if(typeof QRCode === 'undefined'){
   const db = getFirestore(app);
   const storage = getStorage(app);
   const provider = new GoogleAuthProvider();
-  provider.addScope('https://www.googleapis.com/auth/calendar.events');
+  // カレンダー一覧取得(calendarList)とイベント操作の両方に対応するため
+  // 'calendar' スコープに拡張(v3.25.3)。以前の 'calendar.events' のみでは
+  // /users/me/calendarList が 403 Insufficient Permission で失敗していた
+  provider.addScope('https://www.googleapis.com/auth/calendar');
   provider.setCustomParameters({prompt:'consent'});
 
   // グローバルに公開
@@ -3369,6 +3372,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
       <button class="btn btn-secondary btn-sm" onclick="window.open('https://calendar.google.com','_blank')">📅 Googleカレンダーを開く</button>
       <button class="btn btn-secondary btn-sm" onclick="syncAllJobsToGcal()">🔄 全予定を再同期</button>
+      <button class="btn btn-secondary btn-sm" onclick="window.open('https://myaccount.google.com/permissions','_blank')" title="権限をリセットする場合こちらから">🔐 Google権限を確認</button>
     </div>
 
     <details style="margin-top:14px;font-size:12px;color:var(--text2)">
@@ -3381,6 +3385,13 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
         <li>作業を追加すると自動的にGoogleカレンダーに反映されます</li>
       </ol>
       <p style="margin-top:8px;color:var(--text3)">※ もし認証エラーが出る場合は、一度ログアウトして再ログインしてください</p>
+      <p style="margin-top:4px;color:var(--red);font-weight:600">⚠️ 「Insufficient Permission」エラーが出た場合:</p>
+      <ol style="padding-left:20px;margin-top:4px;line-height:1.7;color:var(--text2)">
+        <li>上の「🔐 Google権限を確認」を開く</li>
+        <li>このアプリの権限を一度削除</li>
+        <li>Flexsys2026 からログアウト → 再ログイン</li>
+        <li>権限ダイアログで「予定の閲覧・作成・変更・削除」を「許可」</li>
+      </ol>
     </details>
   </div>
   <div class="modal-footer">
@@ -3465,8 +3476,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.25.2';
-const APP_BUILD_TIME='2026/04/21 11:00';
+const APP_VERSION='v3.25.3';
+const APP_BUILD_TIME='2026/04/22 04:27';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3980,6 +3991,89 @@ function showToast(msg, color='#27AE60'){
   d.style.background=color;d.textContent=msg;
   document.body.appendChild(d);
   setTimeout(()=>d.remove(),2200);
+}
+
+// ===== 永続エラーバナー (v3.25.3) =====
+// 自動で消えない + コピーボタン付き。技術的なエラー情報の記録・共有用
+// 複数のエラーは縦に積み重なって表示される
+function showErrorBanner(title, detail, opts){
+  opts = opts || {};
+  const kind = opts.kind || 'error';  // error / warn / info
+  const palette = {
+    error: {bg:'#FDECEA', border:'#C0392B', fg:'#8B1A12', btn:'#C0392B'},
+    warn:  {bg:'#FDF6E3', border:'#D68910', fg:'#7D5A0C', btn:'#D68910'},
+    info:  {bg:'#E8F0FB', border:'#1A73E8', fg:'#1546A0', btn:'#1A73E8'}
+  };
+  const p = palette[kind] || palette.error;
+  const icon = {error:'⚠️', warn:'⚡', info:'ℹ️'}[kind] || '⚠️';
+
+  // コンテナ (なければ作る)
+  let container = document.getElementById('error-banner-container');
+  if(!container){
+    container = document.createElement('div');
+    container.id = 'error-banner-container';
+    container.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;flex-direction:column;gap:4px;padding:4px;pointer-events:none';
+    document.body.appendChild(container);
+  }
+
+  const id = 'err-banner-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  const banner = document.createElement('div');
+  banner.id = id;
+  banner.style.cssText = `background:${p.bg};border-left:4px solid ${p.border};color:${p.fg};padding:10px 14px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:flex-start;gap:10px;font-family:inherit;font-size:13px;line-height:1.5;pointer-events:auto;max-width:100%;word-break:break-word`;
+
+  const fullText = (title ? title+'\n' : '') + (detail||'');
+  banner.innerHTML = `
+    <div style="flex-shrink:0;font-size:18px;line-height:1">${icon}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;margin-bottom:2px">${escAttr(title||'エラー')}</div>
+      <div id="${id}-detail" style="font-size:12px;color:${p.fg};opacity:.9;white-space:pre-wrap;max-height:120px;overflow-y:auto;font-family:monospace">${escAttr(detail||'')}</div>
+    </div>
+    <div style="flex-shrink:0;display:flex;gap:6px;align-items:center">
+      <button type="button" id="${id}-copy" style="background:${p.btn};color:white;border:none;padding:5px 10px;border-radius:5px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap" title="エラー内容をクリップボードにコピー">📋 コピー</button>
+      <button type="button" id="${id}-close" aria-label="閉じる" style="background:transparent;color:${p.fg};border:none;font-size:18px;cursor:pointer;padding:2px 6px;line-height:1;opacity:.7" title="閉じる">✕</button>
+    </div>`;
+  container.appendChild(banner);
+
+  // コピーボタン
+  document.getElementById(id+'-copy').addEventListener('click', async ()=>{
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(fullText);
+      } else {
+        // フォールバック
+        const ta = document.createElement('textarea');
+        ta.value = fullText;
+        ta.style.position='fixed';ta.style.left='-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      const btn = document.getElementById(id+'-copy');
+      if(btn){
+        const orig = btn.textContent;
+        btn.textContent = '✓ コピーしました';
+        setTimeout(()=>{if(btn) btn.textContent = orig;}, 1500);
+      }
+    }catch(e){
+      showToast('コピーに失敗: '+e.message, '#C0392B');
+    }
+  });
+
+  // 閉じるボタン
+  document.getElementById(id+'-close').addEventListener('click', ()=>{
+    banner.remove();
+    // コンテナが空になったら削除
+    if(container && !container.children.length) container.remove();
+  });
+
+  return id;
+}
+
+// エラーバナーを全クリア(ログイン画面遷移時など)
+function clearAllErrorBanners(){
+  const c = document.getElementById('error-banner-container');
+  if(c) c.remove();
 }
 
 // 2-step delete confirm
@@ -10478,7 +10572,19 @@ async function syncJobToGcal(job){
       persist();
     }
   }catch(e){
-    showToast(`📅 Googleカレンダー同期エラー: ${e.message}`,'#C0392B');
+    // v3.25.3: 永続エラーバナーで表示(消えない・コピー可)
+    const msg = String(e.message||'');
+    if(/Insufficient Permission|insufficient.*scope|403/i.test(msg)){
+      showErrorBanner(
+        'Googleカレンダーの権限が不足しています',
+        '同期エラー(予定「'+(job.title||job.customer||'無題')+'」): '+msg+'\n\n【解決方法】\n'
+        +'1. Google アカウント権限ページで Flexsys2026 の権限を削除\n'
+        +'2. 当アプリからログアウト→再ログインで「カレンダー操作」を許可',
+        {kind:'error'}
+      );
+    } else {
+      showErrorBanner('📅 Googleカレンダー同期エラー', '予定「'+(job.title||job.customer||'無題')+'」\n'+msg, {kind:'error'});
+    }
   }
 }
 
@@ -10526,7 +10632,22 @@ async function fetchGcalCalendarList(){
     const res=await callGcalApi('/users/me/calendarList','GET');
     return res.items||[];
   }catch(e){
-    showToast(`カレンダー一覧取得エラー: ${e.message}`,'#C0392B');
+    const msg = String(e.message||'');
+    // スコープ不足エラーを丁寧に案内(v3.25.3)
+    if(/Insufficient Permission|insufficient.*scope|403/i.test(msg)){
+      showErrorBanner(
+        'Googleカレンダーの権限が不足しています',
+        'カレンダー一覧取得エラー: '+msg+'\n\n【解決方法】\n'
+        +'1. Google アカウント権限ページ (https://myaccount.google.com/permissions) を開く\n'
+        +'2. このアプリ(Flexsys2026)の権限を一度削除\n'
+        +'3. Flexsys2026 からログアウト\n'
+        +'4. 再ログイン時に「予定の閲覧・作成・変更・削除」を含む権限ダイアログが出るので「許可」\n'
+        +'5. 再度この画面を開く',
+        {kind:'error'}
+      );
+    } else {
+      showErrorBanner('カレンダー一覧取得エラー', msg, {kind:'error'});
+    }
     return [];
   }
 }
