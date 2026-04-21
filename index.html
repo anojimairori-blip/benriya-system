@@ -1080,6 +1080,159 @@ select{appearance:auto}
 @media(max-width:400px){
   .stats-grid{grid-template-columns:1fr}
 }
+
+/* ===== ヘルプパネル (v3.25.4) ===== */
+.help-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border:1px solid var(--border);border-radius:50%;
+  background:var(--surface);color:var(--text2);
+  cursor:pointer;font-family:inherit;font-size:16px;font-weight:700;
+  transition:all .15s;padding:0;
+}
+.help-btn:hover{
+  background:var(--accent-light);color:var(--accent);
+  border-color:var(--accent);transform:scale(1.05);
+}
+.help-btn:active{transform:scale(.95)}
+
+.help-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.35);z-index:199;
+  opacity:0;transition:opacity .25s;
+}
+.help-overlay.open{display:block;opacity:1}
+
+.help-panel{
+  position:fixed;top:0;right:-600px;
+  width:540px;max-width:92vw;height:100vh;
+  background:var(--surface);box-shadow:-4px 0 24px rgba(0,0,0,.15);
+  z-index:200;display:flex;flex-direction:column;
+  transition:right .3s cubic-bezier(.2,.8,.2,1);
+  font-family:inherit;
+}
+.help-panel.open{right:0}
+
+.help-panel-header{
+  flex-shrink:0;padding:14px 18px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-light));
+  color:white;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;border-bottom:1px solid rgba(0,0,0,.05);
+}
+.help-panel-header .hp-title-wrap{flex:1;min-width:0}
+.help-panel-header .hp-overline{
+  font-size:11px;opacity:.85;font-weight:600;
+  letter-spacing:.5px;margin-bottom:2px;
+}
+.help-panel-header h3{
+  margin:0;font-size:16px;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.help-panel-header .hp-close{
+  flex-shrink:0;width:34px;height:34px;border:none;
+  background:rgba(255,255,255,.2);color:white;border-radius:50%;
+  cursor:pointer;font-size:18px;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;
+}
+.help-panel-header .hp-close:hover{background:rgba(255,255,255,.35)}
+
+.help-panel-pdfbar{
+  flex-shrink:0;padding:10px 18px;background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.help-panel-pdfbar button{
+  flex:1;min-width:0;padding:8px 10px;
+  border:1px solid var(--border);border-radius:7px;
+  background:var(--surface);color:var(--text);
+  font-family:inherit;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.help-panel-pdfbar button:hover{
+  background:var(--accent-light);color:var(--accent);
+  border-color:var(--accent);
+}
+
+.help-panel-body{
+  flex:1;overflow-y:auto;padding:16px 18px 22px;
+  color:var(--text);line-height:1.75;font-size:13.5px;
+  -webkit-overflow-scrolling:touch;
+}
+.help-panel-body h4{
+  margin:16px 0 6px;font-size:14px;font-weight:700;color:var(--accent);
+  padding-bottom:4px;border-bottom:2px solid var(--accent-light);
+}
+.help-panel-body h4:first-child{margin-top:0}
+.help-panel-body p{margin:0 0 8px;color:var(--text2)}
+.help-panel-body ul, .help-panel-body ol{
+  margin:4px 0 10px;padding-left:22px;color:var(--text2);
+}
+.help-panel-body li{margin-bottom:4px}
+.help-panel-body strong{color:var(--text);font-weight:700}
+.help-panel-body .hp-step{
+  display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;
+}
+.help-panel-body .hp-step-num{
+  flex-shrink:0;width:24px;height:24px;border-radius:50%;
+  background:var(--accent);color:white;font-weight:700;font-size:12px;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+}
+.help-panel-body .hp-step-txt{flex:1;padding-top:2px}
+.help-panel-body .hp-tip{
+  background:var(--blue-light);border-left:3px solid var(--blue);
+  padding:8px 11px;margin:10px 0;border-radius:5px;font-size:12.5px;
+  color:#1546A0;
+}
+.help-panel-body .hp-warn{
+  background:#FDF6E3;border-left:3px solid #D68910;
+  padding:8px 11px;margin:10px 0;border-radius:5px;font-size:12.5px;
+  color:#7D5A0C;
+}
+.help-panel-body code{
+  background:var(--surface2);padding:1px 6px;border-radius:3px;
+  font-family:'Courier New',monospace;font-size:12px;
+}
+
+.help-panel-toc{
+  flex-shrink:0;padding:10px 18px 14px;
+  background:var(--surface2);border-top:1px solid var(--border);
+}
+.help-panel-toc-label{
+  font-size:11px;font-weight:700;color:var(--text3);
+  margin-bottom:6px;letter-spacing:.5px;
+}
+.help-panel-toc-list{
+  display:flex;flex-wrap:wrap;gap:4px;max-height:70px;overflow-y:auto;
+}
+.help-panel-toc-list button{
+  padding:4px 9px;border:1px solid var(--border);border-radius:99px;
+  background:var(--surface);color:var(--text2);
+  font-family:inherit;font-size:11px;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.help-panel-toc-list button:hover{
+  background:var(--accent-light);color:var(--accent);border-color:var(--accent);
+}
+.help-panel-toc-list button.active{
+  background:var(--accent);color:white;border-color:var(--accent);font-weight:600;
+}
+
+/* モバイル: 下からスライドアップ */
+@media(max-width:768px){
+  .help-btn{width:34px;height:34px;font-size:15px}
+  .help-panel{
+    width:100%;max-width:100%;right:auto;left:0;
+    top:auto;bottom:-100vh;height:88vh;
+    border-radius:16px 16px 0 0;
+    transition:bottom .3s cubic-bezier(.2,.8,.2,1);
+  }
+  .help-panel.open{right:auto;bottom:0}
+  .help-panel-header{padding:12px 14px}
+  .help-panel-pdfbar{padding:8px 14px}
+  .help-panel-body{padding:14px 14px 20px;font-size:13px}
+}
+
 </style>
 <!-- QR Code library (CDN with offline fallback) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
@@ -3476,8 +3629,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.25.3';
-const APP_BUILD_TIME='2026/04/22 04:27';
+const APP_VERSION='v3.25.4';
+const APP_BUILD_TIME='2026/04/22 04:44';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4074,6 +4227,427 @@ function showErrorBanner(title, detail, opts){
 function clearAllErrorBanners(){
   const c = document.getElementById('error-banner-container');
   if(c) c.remove();
+}
+
+// ===================================================================
+// ===== ヘルプパネル (v3.25.4) =====
+// 各ページの❓ボタンからページ別ヘルプを横スライドパネルで表示する
+// 本格的な資料はPDFへのリンクから取得可能
+// ===================================================================
+const MANUAL_PDF_URL = '/Flexsys2026_操作マニュアル.pdf';
+const SPEC_PDF_URL   = '/Flexsys2026_仕様書.pdf';
+
+// ページID → ヘルプコンテンツの対応表
+// bodyはHTML文字列(インラインスタイルは避け、CSSクラス .hp-step / .hp-tip / .hp-warn を使用)
+const HELP_CONTENT = {
+  'bulletin': {
+    title: '📌 掲示板',
+    body: `
+      <p>スタッフ同士の社内連絡用ページです。お客様には見えません。</p>
+      <h4>投稿する</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 新規投稿</strong> をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">タイトルと本文を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">カテゴリを選ぶ(お知らせ/注意/緊急/業務連絡/その他)</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">重要度を★で指定(1〜5 または なし)</div></div>
+      <div class="hp-step"><div class="hp-step-num">5</div><div class="hp-step-txt">必要なら掲載期限・ピン留めを設定</div></div>
+      <div class="hp-tip">💡 朝の始業時にまずチェックする習慣を。ピン留め投稿と★4以上は最優先で。</div>
+    `
+  },
+  'home': {
+    title: '🏠 ホーム',
+    body: `
+      <p>アプリを開いて最初に表示されるページです。各機能へのショートカットと、本日の作業・掲示板のハイライトが並びます。</p>
+      <h4>よく使うボタン</h4>
+      <ul>
+        <li><strong>🔄 更新</strong> - 他のスタッフが更新した最新データを取り直します</li>
+        <li><strong>❓ ヘルプ</strong> - そのページの使い方を表示(このパネル)</li>
+      </ul>
+      <h4>サイドバー</h4>
+      <p>左側のメニューから各ページに移動できます。スマホでは左上の「≡」ボタンで表示されます。</p>
+      <div class="hp-tip">💡 戻るときは画面左上の「← 戻る」ボタンを使ってください(ブラウザの戻るではなく)。入力中のデータが失われません。</div>
+    `
+  },
+  'dashboard': {
+    title: '📊 ダッシュボード',
+    body: `
+      <p>売上・件数などの集計情報を一目で確認できるページです。</p>
+      <h4>表示される情報</h4>
+      <ul>
+        <li>本日の売上・今月の売上</li>
+        <li>未回収の請求書(要フォロー件数)</li>
+        <li>最近の書類発行状況</li>
+        <li>顧客別売上 TOP5</li>
+      </ul>
+      <h4>ドリルダウン</h4>
+      <p>各集計カードをクリックすると、該当する書類の一覧にジャンプして詳細を確認できます。</p>
+    `
+  },
+  'quotes': {
+    title: '📝 見積書',
+    body: `
+      <p>お客様への料金提示のための書類を作成します。見積 → 受注 → 作業 → 請求 → 入金、の最初のステップです。</p>
+      <h4>新規作成の手順</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 新規見積書</strong> をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">書類番号は <code>EST-YYMM-NNN</code> で自動採番。日付も今日が自動入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">顧客検索で既存顧客を選択 or その場で新規登録</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">件名を入力(例:「水道修理工事」)</div></div>
+      <div class="hp-step"><div class="hp-step-num">5</div><div class="hp-step-txt"><strong>＋ 行を追加</strong> で明細を入力。テンプレートからワンクリック挿入も可能</div></div>
+      <div class="hp-step"><div class="hp-step-num">6</div><div class="hp-step-txt">税率を確認(デフォルト10%)して保存</div></div>
+      <h4>プレビュー・共有</h4>
+      <p><strong>👁️ プレビュー</strong>で印刷イメージ確認 → <strong>📤 共有</strong>からPDFダウンロード/共有リンク/LINE送信/メール送信が可能。</p>
+      <div class="hp-tip">💡 見積書一覧で <strong>→ 請求書化</strong> ボタンを押すと、内容を引き継いで請求書を作れます。</div>
+      <div class="hp-warn">⚠️ 書類番号は自動採番です。基本的に手動で変更しないでください。</div>
+    `
+  },
+  'invoices': {
+    title: '📋 請求書',
+    body: `
+      <p>作業完了後にお客様に請求するための書類を作成します。</p>
+      <h4>作成の流れ</h4>
+      <p>見積書からの引き継ぎが便利です: 見積書一覧で対象書類の <strong>→ 請求書化</strong> をクリックすると、顧客情報・明細・金額がそのままコピーされた状態でフォームが開きます。</p>
+      <h4>見積書との違い</h4>
+      <ul>
+        <li>プレフィックスは <code>INV</code> (例: INV-2604-012)</li>
+        <li><strong>支払期限</strong> の入力欄がある(通常 月末/翌月末)</li>
+      </ul>
+      <h4>ステータス管理</h4>
+      <p>作成 → 送付済 → 入金済、と段階的に変えていきます。支払期限が近い/過ぎている請求書は、左メニューの <strong>🔔 支払いアラート</strong> で一覧チェックできます。</p>
+      <div class="hp-tip">💡 入金があったら「入金管理」ページで入金額・日付・方法を記録すると、経理がきれいに追えます。</div>
+    `
+  },
+  'receipts': {
+    title: '🧾 領収書',
+    body: `
+      <p>お金を受け取った証明書です。請求書から引き継いで作ることが多いです。</p>
+      <h4>作成の流れ</h4>
+      <p>請求書一覧で対象書類の <strong>→ 領収書化</strong> をクリック。但し書き(例:「○○工事代として」)を入力して保存します。</p>
+      <h4>領収書特有の項目</h4>
+      <ul>
+        <li>プレフィックスは <code>REC</code> (例: REC-2604-003)</li>
+        <li><strong>但し書き</strong> 欄(法的要件に注意)</li>
+        <li>入金日の記録</li>
+      </ul>
+      <div class="hp-warn">⚠️ 収入印紙が必要な金額(5万円以上)の領収書を発行する場合は、実物に印紙を貼ってください。</div>
+    `
+  },
+  'customers': {
+    title: '👥 顧客管理',
+    body: `
+      <p>お客様の情報を一元管理するページです。書類を作る前に顧客登録をしておくと、次回からは検索で呼び出せます。</p>
+      <h4>新規登録の手順</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 顧客追加</strong> をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">法人か個人かを選択</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">会社名または氏名、電話、住所を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">郵便番号を7桁入れると <strong>住所が自動で入ります</strong></div></div>
+      <div class="hp-step"><div class="hp-step-num">5</div><div class="hp-step-txt">敬称を選択(御中/様/殿/なし)</div></div>
+      <div class="hp-step"><div class="hp-step-num">6</div><div class="hp-step-txt">保存</div></div>
+      <h4>担当者登録(任意)</h4>
+      <p>法人の場合、複数の担当者(名前・部署・連絡先)を追加できます。書類作成時に担当者を指定できるようになります。</p>
+      <div class="hp-tip">💡 電話番号はハイフンあり・なしどちらでもOK。自動で整形されます。</div>
+    `
+  },
+  'calendar': {
+    title: '📅 作業カレンダー',
+    body: `
+      <p>作業予定を登録・確認できるカレンダーです。スタッフ全員のスケジュールが一目でわかります。</p>
+      <h4>予定を追加</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt">カレンダー上で日付をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">タイトル・時刻・お客様名・担当者を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">登録済み顧客を選ぶと住所も自動引き継ぎ</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">保存</div></div>
+      <h4>表示切り替え</h4>
+      <p>上部のボタンで「月」「週」「日」表示を切り替え可能。作業の詳細を見たい時は「日」がおすすめ。</p>
+      <h4>Googleカレンダー連携</h4>
+      <p><strong>📅 Google連携</strong> ボタンから設定。ONにすると追加した予定が自動的にGoogleカレンダーに同期され、スマホの標準カレンダーでも確認できます。</p>
+      <div class="hp-warn">⚠️ 権限エラーが出た場合、「🔐 Google権限を確認」から一度権限を削除 → 再ログインしてください。</div>
+    `
+  },
+  'alerts': {
+    title: '🔔 支払いアラート',
+    body: `
+      <p>支払期限が近い/過ぎている請求書を一覧表示するページです。こまめにチェックして回収漏れを防ぎましょう。</p>
+      <h4>表示される情報</h4>
+      <ul>
+        <li><strong>期限超過</strong> - 支払期限を過ぎた請求書(最優先でフォロー)</li>
+        <li><strong>期限間近</strong> - あと数日で期限が来る請求書</li>
+        <li>未回収合計額</li>
+      </ul>
+      <div class="hp-tip">💡 「期限間近」の日数は設定画面の「会社情報」→「支払いアラート日数」で調整できます。</div>
+    `
+  },
+  'payments': {
+    title: '💴 入金管理',
+    body: `
+      <p>お客様からの入金記録を管理するページです。</p>
+      <h4>入金を記録</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt">対象の請求書を選択</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">入金額・入金日・入金方法(現金/銀行振込/他)を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">保存すると請求書のステータスが「入金済」に自動更新</div></div>
+      <div class="hp-tip">💡 一部入金にも対応。複数回に分けて入金があった場合、それぞれ記録できます。</div>
+    `
+  },
+  'expenses': {
+    title: '💸 経費管理',
+    body: `
+      <p>材料費・燃料費・交通費などの経費を記録します。レシート写真から自動で金額を読み取れます。</p>
+      <h4>経費の登録(OCRあり)</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 新規</strong> をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt"><strong>📷 レシート読取</strong> でスマホカメラ起動 or 画像選択</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">AIが日付・金額を自動入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">カテゴリ・支払方法を補完</div></div>
+      <div class="hp-step"><div class="hp-step-num">5</div><div class="hp-step-txt">関連書類(案件)を紐付け(任意)</div></div>
+      <div class="hp-step"><div class="hp-step-num">6</div><div class="hp-step-txt">保存</div></div>
+      <h4>CSV出力</h4>
+      <p>右上 <strong>📤 CSV出力</strong> から、freee / 弥生会計 / マネーフォワード形式で出力可能。月末や決算時に会計ソフトへ取り込めます。</p>
+      <div class="hp-warn">⚠️ OCRは完璧ではありません。必ず金額と日付を目視で確認してから保存してください。</div>
+    `
+  },
+  'staff-report': {
+    title: '📊 スタッフ実績',
+    body: `
+      <p>従業員別の作業実績や売上貢献度を確認するページです。</p>
+      <h4>見られる情報</h4>
+      <ul>
+        <li>担当した作業件数</li>
+        <li>担当書類の売上合計</li>
+        <li>期間別の推移</li>
+      </ul>
+      <div class="hp-tip">💡 評価や賞与検討の参考資料として活用できます。</div>
+    `
+  },
+  'report': {
+    title: '📈 年次レポート',
+    body: `
+      <p>年度ごとの売上集計と月別推移を確認するページです。</p>
+      <h4>主な機能</h4>
+      <ul>
+        <li>月別の見積/請求/領収件数</li>
+        <li>月別の売上合計</li>
+        <li>顧客別売上 TOP5</li>
+        <li>前月比の変化率</li>
+      </ul>
+      <h4>出力</h4>
+      <p>右上 <strong>🖨️ 帳票印刷・CSV</strong> から、印刷用レイアウトの表示とCSV出力が可能。決算資料作成に便利です。</p>
+    `
+  },
+  'templates': {
+    title: '📦 作業テンプレート',
+    body: `
+      <p>よく使う作業項目(名称・単価・単位)をテンプレート登録しておくと、書類作成時にワンクリックで明細に追加できます。</p>
+      <h4>テンプレートの作成</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ テンプレート追加</strong></div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">名称(例:「排水管清掃」)・単価・単位を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">保存</div></div>
+      <h4>使い方</h4>
+      <p>見積書・請求書・領収書の作成画面で、明細欄の「テンプレートから追加」ボタンから選択。数量だけ入力すれば明細が完成します。</p>
+      <div class="hp-tip">💡 よく使う項目を10〜20個登録しておくと、書類作成が劇的に速くなります。</div>
+    `
+  },
+  'settings': {
+    title: '🏢 会社情報',
+    body: `
+      <p>書類に印字される自社情報を登録・編集するページです。</p>
+      <h4>登録する情報</h4>
+      <ul>
+        <li>会社名・代表者名</li>
+        <li>住所・電話・FAX・メール</li>
+        <li>振込先銀行口座</li>
+        <li>会社ロゴ(画像アップロード)</li>
+        <li>支払いアラートの日数</li>
+      </ul>
+      <div class="hp-warn">⚠️ ここで設定した情報は書類に印字されるので、誤字脱字がないよう十分確認してください。</div>
+    `
+  },
+  'employees': {
+    title: '👷 従業員管理',
+    body: `
+      <p>従業員情報とアプリへのアクセス許可を管理するページです。<strong>管理者のみ</strong>開けます。</p>
+      <h4>従業員の登録</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 従業員追加</strong></div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">氏名・Email・電話・役職を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">「管理者」チェックを入れると全権限付与</div></div>
+      <h4>アクセス許可管理</h4>
+      <p>許可Emailリストに従業員のGmailを登録することで、そのGmailでのログインを許可します。登録していないEmailではログインできません。</p>
+      <div class="hp-tip">💡 従業員が退職した場合は、許可Emailリストから必ずそのEmailを削除してください。</div>
+    `
+  },
+  'tax': {
+    title: '🧾 税率設定',
+    body: `
+      <p>書類明細で選択できる消費税率を追加・管理するページです。</p>
+      <h4>できること</h4>
+      <ul>
+        <li>新しい税率を追加(例: 将来の増税対応)</li>
+        <li>既存税率の有効/無効切り替え</li>
+        <li>初期値とする税率の指定</li>
+        <li>既存書類の税率を一括更新(例: 10% → 15%)</li>
+      </ul>
+      <div class="hp-warn">⚠️ 税率の一括更新は元に戻せません。必ずバックアップを取ってから実行してください。</div>
+      <div class="hp-tip">💡 既存書類を個別に変更したい場合は、該当書類を開いて編集してください。</div>
+    `
+  },
+  'backup': {
+    title: '🗄️ バックアップ・復旧',
+    body: `
+      <p>データをJSONファイルとして書き出し・取り込みできるページです。</p>
+      <h4>バックアップを取る</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>📥 全データをJSONでダウンロード</strong></div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">ダウンロードされたファイルを安全な場所に保管</div></div>
+      <h4>復旧(取り込み)</h4>
+      <p><strong>📤 JSONファイルを取り込み</strong>から、以前保存したバックアップを復元できます。既存データに上書き/追加が選べます。</p>
+      <div class="hp-tip">💡 月1回程度、手動バックアップを取って外部ストレージに保管すると安心です。</div>
+      <div class="hp-warn">⚠️ データはクラウドに自動保存されていますが、操作ミスで大量削除した場合などに備えてバックアップは重要です。</div>
+    `
+  },
+  'display-settings': {
+    title: '🎨 表示・外観',
+    body: `
+      <p>アプリの見た目をカスタマイズするページです。</p>
+      <h4>テーマ(6種類)</h4>
+      <ul>
+        <li><strong>ナチュラル</strong> - 木目調のライトテーマ(デフォルト)</li>
+        <li><strong>ダーク</strong> - 目に優しい夜間向け</li>
+        <li><strong>ネイビー</strong> - 濃紺ビジネス調</li>
+        <li><strong>ポップ</strong> - カラフル</li>
+        <li><strong>サンセット</strong> - オレンジ系</li>
+        <li><strong>ミント</strong> - 淡い緑系</li>
+      </ul>
+      <div class="hp-tip">💡 テーマは<strong>端末ごとに別々に保存</strong>されます。PCはナチュラル、スマホはダーク、といった使い分けが可能です。</div>
+    `
+  },
+  'csv-export': {
+    title: '📤 CSV出力',
+    body: `
+      <p>書類・経費データをCSVファイルとして出力できるページです。会計ソフトへの取り込みに使います。</p>
+      <h4>対応フォーマット</h4>
+      <ul>
+        <li><strong>freee</strong> - freee標準インポート形式</li>
+        <li><strong>弥生会計</strong> - 弥生標準インポート形式</li>
+        <li><strong>マネーフォワード</strong> - マネーフォワードクラウド会計形式</li>
+        <li><strong>標準</strong> - 汎用的な表形式(Excel等で使用)</li>
+      </ul>
+      <h4>使い方</h4>
+      <p>期間(開始日〜終了日)を指定し、希望のフォーマットボタンをクリックしてダウンロード。会計ソフトのインポート機能で取り込みます。</p>
+    `
+  },
+  'developer': {
+    title: '🛠️ 開発者メニュー',
+    body: `
+      <p>システムの保守・復旧用の機能が集まった画面です。<strong>開発者PIN必須</strong>。</p>
+      <h4>主な機能</h4>
+      <ul>
+        <li>アプリのバージョン・ビルド日時の確認</li>
+        <li>強制リセット(キャッシュ・Service Worker削除)</li>
+        <li>管理者PINの変更</li>
+        <li>全データ初期化(危険・要PIN)</li>
+      </ul>
+      <div class="hp-warn">⚠️ 「全データ初期化」は元に戻せません。必ず事前にバックアップを取ってから実行してください。</div>
+      <div class="hp-tip">💡 「画面が更新されない」「ログインループ」などのトラブル時は、まず「強制リセット」を試してください。</div>
+    `
+  }
+};
+
+// ヘルプパネルを開く
+function openHelpPanel(pageId){
+  const panel = document.getElementById('help-panel');
+  const overlay = document.getElementById('help-overlay');
+  if(!panel || !overlay) return;
+  _renderHelpContent(pageId || 'home');
+  _renderHelpToc(pageId || 'home');
+  overlay.classList.add('open');
+  panel.classList.add('open');
+  // Esc キーで閉じる
+  document.addEventListener('keydown', _helpEscHandler);
+  // パネル内のスクロール位置を先頭に
+  const body = document.getElementById('help-panel-body');
+  if(body) body.scrollTop = 0;
+}
+
+// ヘルプパネルを閉じる
+function closeHelpPanel(){
+  const panel = document.getElementById('help-panel');
+  const overlay = document.getElementById('help-overlay');
+  if(!panel || !overlay) return;
+  panel.classList.remove('open');
+  overlay.classList.remove('open');
+  document.removeEventListener('keydown', _helpEscHandler);
+}
+
+function _helpEscHandler(e){
+  if(e.key === 'Escape') closeHelpPanel();
+}
+
+// ヘルプ本文のレンダリング
+function _renderHelpContent(pageId){
+  const content = HELP_CONTENT[pageId] || HELP_CONTENT['home'];
+  const titleEl = document.getElementById('help-panel-title');
+  const bodyEl = document.getElementById('help-panel-body');
+  if(titleEl) titleEl.textContent = content.title;
+  // ヘルプコンテンツはハードコードされた信頼済みHTML(ユーザー入力ではない)
+  if(bodyEl) bodyEl.innerHTML = content.body;
+}
+
+// ヘルプ目次(他ページへのジャンプ)のレンダリング
+function _renderHelpToc(currentPageId){
+  const tocEl = document.getElementById('help-panel-toc-list');
+  if(!tocEl) return;
+  const order = ['home','dashboard','bulletin','quotes','invoices','receipts',
+                 'customers','calendar','alerts','payments','expenses',
+                 'staff-report','report','templates',
+                 'settings','employees','tax','backup','display-settings',
+                 'csv-export','developer'];
+  tocEl.innerHTML = order.filter(k=>HELP_CONTENT[k]).map(k=>{
+    const c = HELP_CONTENT[k];
+    const active = (k === currentPageId) ? ' active' : '';
+    return `<button type="button" class="hp-toc-btn${active}" data-help-jump="${escAttr(k)}">${escAttr(c.title)}</button>`;
+  }).join('');
+  // クリックハンドラ
+  tocEl.querySelectorAll('[data-help-jump]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const pid = btn.getAttribute('data-help-jump');
+      _renderHelpContent(pid);
+      _renderHelpToc(pid);
+      const body = document.getElementById('help-panel-body');
+      if(body) body.scrollTop = 0;
+    });
+  });
+}
+
+// PDF を別タブで開く
+function openManualPdf(){
+  window.open(MANUAL_PDF_URL, '_blank', 'noopener,noreferrer');
+}
+function openSpecPdf(){
+  window.open(SPEC_PDF_URL, '_blank', 'noopener,noreferrer');
+}
+
+// 全ページの main-header に ❓ヘルプボタンを動的注入
+// page-XXX の XXX 部分をヘルプIDとして使用
+function injectHelpButtons(){
+  document.querySelectorAll('.page').forEach(pageEl=>{
+    const pid = (pageEl.id||'').replace(/^page-/, '');
+    if(!pid) return;
+    const header = pageEl.querySelector('.main-header');
+    if(!header) return;
+    let actions = header.querySelector('.header-actions');
+    // header-actions が無いページは作る(タイトルの右側に配置するため)
+    if(!actions){
+      actions = document.createElement('div');
+      actions.className = 'header-actions';
+      header.appendChild(actions);
+    }
+    // 既に挿入済みならスキップ
+    if(actions.querySelector('.help-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'help-btn';
+    btn.setAttribute('aria-label', 'このページのヘルプを開く');
+    btn.setAttribute('title', 'このページのヘルプ');
+    btn.textContent = '❓';
+    btn.addEventListener('click', ()=>openHelpPanel(pid));
+    // 先頭に挿入(🔄更新ボタンの左側に出す)
+    actions.insertBefore(btn, actions.firstChild);
+  });
 }
 
 // 2-step delete confirm
@@ -11846,6 +12420,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
   buildMobileDrawer();
   injectHamburgers();
+  // v3.25.4: 各ページの main-header に ❓ヘルプボタンを注入
+  if(typeof injectHelpButtons==='function') injectHelpButtons();
 });
 
 // ===== TAX SETTINGS PAGE =====
@@ -12013,5 +12589,27 @@ function executeBulkTaxUpdate(){
 }
 
 </script>
+
+<!-- ===== ヘルプパネル (v3.25.4) ===== -->
+<div id="help-overlay" class="help-overlay" onclick="closeHelpPanel()"></div>
+<aside id="help-panel" class="help-panel" role="dialog" aria-labelledby="help-panel-title" aria-modal="true">
+  <div class="help-panel-header">
+    <div class="hp-title-wrap">
+      <div class="hp-overline">📖 使い方ヘルプ</div>
+      <h3 id="help-panel-title">ヘルプ</h3>
+    </div>
+    <button type="button" class="hp-close" onclick="closeHelpPanel()" aria-label="閉じる">✕</button>
+  </div>
+  <div class="help-panel-pdfbar">
+    <button type="button" onclick="openManualPdf()" title="新しいタブで操作マニュアル(PDF)を開く">📄 操作マニュアル(全文PDF)</button>
+    <button type="button" onclick="openSpecPdf()" title="新しいタブで仕様書(PDF)を開く">📘 仕様書(全文PDF)</button>
+  </div>
+  <div class="help-panel-body" id="help-panel-body"></div>
+  <div class="help-panel-toc">
+    <div class="help-panel-toc-label">他のページのヘルプ</div>
+    <div class="help-panel-toc-list" id="help-panel-toc-list"></div>
+  </div>
+</aside>
+
 </body>
 </html>
