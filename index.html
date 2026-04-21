@@ -175,7 +175,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .theme-name{font-size:11px;font-weight:600;color:var(--text2)}
 
 /* MAIN */
-.main{flex:1;overflow-y:auto;overflow-x:hidden;height:100vh;min-width:0;max-width:100%;-webkit-overflow-scrolling:touch;display:block}
+.main{flex:1;overflow-y:auto;overflow-x:hidden;height:100vh;min-width:0;max-width:100%;-webkit-overflow-scrolling:touch;display:block;min-height:0}
 .main-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:var(--main-header-h);min-height:var(--main-header-h);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;gap:12px;flex-wrap:nowrap;flex-shrink:0;box-sizing:border-box;overflow:hidden}
 .main-header h2{font-size:16px;font-weight:700;white-space:nowrap}
 .btn-full-label{display:inline}
@@ -235,6 +235,36 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* ★ flex を使わずブロック表示にして、自然な高さで .main がスクロールする */
 .page.active{display:block}
 .page .content{scroll-margin-top:calc(var(--main-header-h) + var(--history-bar-h) + 8px)}
+
+/* ===== v3.25.1: 設定系ページのスクロール保証 =====
+   sticky 2段（main-header + settings-tabs-nav）構成のページで、
+   どんな祖先要素の flex/grid の影響を受けても .main にスクロールを委譲するための明示指定 */
+#page-settings.active,
+#page-employees.active,
+#page-tax.active,
+#page-backup.active,
+#page-templates.active,
+#page-display-settings.active,
+#page-csv-export.active,
+#page-developer.active{
+  display:block;
+  overflow:visible;
+  min-height:0;   /* 親 flex の min-content 罠を回避 */
+  height:auto;    /* 固定高さが誤って入らないよう明示 */
+}
+/* 設定ページ内 .content は縦に自然に伸びる（height 固定しない） */
+#page-settings.active > .content,
+#page-employees.active > .content,
+#page-tax.active > .content,
+#page-backup.active > .content,
+#page-templates.active > .content,
+#page-display-settings.active > .content,
+#page-csv-export.active > .content,
+#page-developer.active > .content{
+  overflow:visible;
+  min-height:0;
+  /* スクロールは祖先の .main に委譲する */
+}
 
 /* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
@@ -834,12 +864,6 @@ select{appearance:auto}
 .photo-label-tab:hover{border-color:var(--accent);color:var(--accent)}
 .photo-label-tab.active{background:var(--accent);color:white;border-color:var(--accent)}
 
-/* BRANCH */
-.branch-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px}
-.branch-badge{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700}
-.branch-hq{background:var(--accent-light);color:var(--accent)}
-.branch-sub{background:var(--blue-light);color:var(--blue)}
-
 /* QR */
 .qr-wrap{display:inline-block;padding:12px;background:white;border-radius:8px;border:1px solid var(--border)}
 
@@ -1056,6 +1080,159 @@ select{appearance:auto}
 @media(max-width:400px){
   .stats-grid{grid-template-columns:1fr}
 }
+
+/* ===== ヘルプパネル (v3.25.4) ===== */
+.help-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border:1px solid var(--border);border-radius:50%;
+  background:var(--surface);color:var(--text2);
+  cursor:pointer;font-family:inherit;font-size:16px;font-weight:700;
+  transition:all .15s;padding:0;
+}
+.help-btn:hover{
+  background:var(--accent-light);color:var(--accent);
+  border-color:var(--accent);transform:scale(1.05);
+}
+.help-btn:active{transform:scale(.95)}
+
+.help-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.35);z-index:199;
+  opacity:0;transition:opacity .25s;
+}
+.help-overlay.open{display:block;opacity:1}
+
+.help-panel{
+  position:fixed;top:0;right:-600px;
+  width:540px;max-width:92vw;height:100vh;
+  background:var(--surface);box-shadow:-4px 0 24px rgba(0,0,0,.15);
+  z-index:200;display:flex;flex-direction:column;
+  transition:right .3s cubic-bezier(.2,.8,.2,1);
+  font-family:inherit;
+}
+.help-panel.open{right:0}
+
+.help-panel-header{
+  flex-shrink:0;padding:14px 18px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-light));
+  color:white;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;border-bottom:1px solid rgba(0,0,0,.05);
+}
+.help-panel-header .hp-title-wrap{flex:1;min-width:0}
+.help-panel-header .hp-overline{
+  font-size:11px;opacity:.85;font-weight:600;
+  letter-spacing:.5px;margin-bottom:2px;
+}
+.help-panel-header h3{
+  margin:0;font-size:16px;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.help-panel-header .hp-close{
+  flex-shrink:0;width:34px;height:34px;border:none;
+  background:rgba(255,255,255,.2);color:white;border-radius:50%;
+  cursor:pointer;font-size:18px;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;
+}
+.help-panel-header .hp-close:hover{background:rgba(255,255,255,.35)}
+
+.help-panel-pdfbar{
+  flex-shrink:0;padding:10px 18px;background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.help-panel-pdfbar button{
+  flex:1;min-width:0;padding:8px 10px;
+  border:1px solid var(--border);border-radius:7px;
+  background:var(--surface);color:var(--text);
+  font-family:inherit;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.help-panel-pdfbar button:hover{
+  background:var(--accent-light);color:var(--accent);
+  border-color:var(--accent);
+}
+
+.help-panel-body{
+  flex:1;overflow-y:auto;padding:16px 18px 22px;
+  color:var(--text);line-height:1.75;font-size:13.5px;
+  -webkit-overflow-scrolling:touch;
+}
+.help-panel-body h4{
+  margin:16px 0 6px;font-size:14px;font-weight:700;color:var(--accent);
+  padding-bottom:4px;border-bottom:2px solid var(--accent-light);
+}
+.help-panel-body h4:first-child{margin-top:0}
+.help-panel-body p{margin:0 0 8px;color:var(--text2)}
+.help-panel-body ul, .help-panel-body ol{
+  margin:4px 0 10px;padding-left:22px;color:var(--text2);
+}
+.help-panel-body li{margin-bottom:4px}
+.help-panel-body strong{color:var(--text);font-weight:700}
+.help-panel-body .hp-step{
+  display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;
+}
+.help-panel-body .hp-step-num{
+  flex-shrink:0;width:24px;height:24px;border-radius:50%;
+  background:var(--accent);color:white;font-weight:700;font-size:12px;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+}
+.help-panel-body .hp-step-txt{flex:1;padding-top:2px}
+.help-panel-body .hp-tip{
+  background:var(--blue-light);border-left:3px solid var(--blue);
+  padding:8px 11px;margin:10px 0;border-radius:5px;font-size:12.5px;
+  color:#1546A0;
+}
+.help-panel-body .hp-warn{
+  background:#FDF6E3;border-left:3px solid #D68910;
+  padding:8px 11px;margin:10px 0;border-radius:5px;font-size:12.5px;
+  color:#7D5A0C;
+}
+.help-panel-body code{
+  background:var(--surface2);padding:1px 6px;border-radius:3px;
+  font-family:'Courier New',monospace;font-size:12px;
+}
+
+.help-panel-toc{
+  flex-shrink:0;padding:10px 18px 14px;
+  background:var(--surface2);border-top:1px solid var(--border);
+}
+.help-panel-toc-label{
+  font-size:11px;font-weight:700;color:var(--text3);
+  margin-bottom:6px;letter-spacing:.5px;
+}
+.help-panel-toc-list{
+  display:flex;flex-wrap:wrap;gap:4px;max-height:70px;overflow-y:auto;
+}
+.help-panel-toc-list button{
+  padding:4px 9px;border:1px solid var(--border);border-radius:99px;
+  background:var(--surface);color:var(--text2);
+  font-family:inherit;font-size:11px;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.help-panel-toc-list button:hover{
+  background:var(--accent-light);color:var(--accent);border-color:var(--accent);
+}
+.help-panel-toc-list button.active{
+  background:var(--accent);color:white;border-color:var(--accent);font-weight:600;
+}
+
+/* モバイル: 下からスライドアップ */
+@media(max-width:768px){
+  .help-btn{width:34px;height:34px;font-size:15px}
+  .help-panel{
+    width:100%;max-width:100%;right:auto;left:0;
+    top:auto;bottom:-100vh;height:88vh;
+    border-radius:16px 16px 0 0;
+    transition:bottom .3s cubic-bezier(.2,.8,.2,1);
+  }
+  .help-panel.open{right:auto;bottom:0}
+  .help-panel-header{padding:12px 14px}
+  .help-panel-pdfbar{padding:8px 14px}
+  .help-panel-body{padding:14px 14px 20px;font-size:13px}
+}
+
 </style>
 <!-- QR Code library (CDN with offline fallback) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
@@ -1117,7 +1294,10 @@ if(typeof QRCode === 'undefined'){
   const db = getFirestore(app);
   const storage = getStorage(app);
   const provider = new GoogleAuthProvider();
-  provider.addScope('https://www.googleapis.com/auth/calendar.events');
+  // カレンダー一覧取得(calendarList)とイベント操作の両方に対応するため
+  // 'calendar' スコープに拡張(v3.25.3)。以前の 'calendar.events' のみでは
+  // /users/me/calendarList が 403 Insufficient Permission で失敗していた
+  provider.addScope('https://www.googleapis.com/auth/calendar');
   provider.setCustomParameters({prompt:'consent'});
 
   // グローバルに公開
@@ -1795,7 +1975,6 @@ if('serviceWorker' in navigator){
     </div>
     </div>
   </div>
-</div>
 <!-- EMPLOYEES (Admin only) -->
 <div id="page-employees" class="page">
   <div class="main-header">
@@ -1921,26 +2100,6 @@ if('serviceWorker' in navigator){
     </div>
     <div class="section-title" style="margin-top:20px">スタッフ別 月次推移</div>
     <div class="chart-wrap"><div class="bar-chart" id="sr-chart" style="height:160px"></div></div>
-  </div>
-</div>
-
-<!-- BRANCHES -->
-<div id="page-branches" class="page" style="display:none">
-  <div class="main-header">
-    <h2>🏢 拠点・支店管理</h2>
-    <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
-      <button class="btn btn-primary" onclick="openBranchModal()">＋ 拠点を追加</button>
-    </div>
-  </div>
-  <div class="content">
-    <div id="branch-list"></div>
-    <div class="section-title" style="margin-top:20px">拠点別売上</div>
-    <div class="card">
-      <table>
-        <thead><tr><th>拠点名</th><th>書類件数</th><th>売上合計</th><th>スタッフ数</th><th></th></tr></thead>
-        <tbody id="branch-stats-body"></tbody>
-      </table>
-    </div>
   </div>
 </div>
 
@@ -2614,7 +2773,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
       <div class="form-group"><label>郵便番号</label>
         <div style="display:flex;gap:6px;align-items:center">
           <span style="color:var(--text2)">〒</span>
-          <input type="text" id="cust-zip" maxlength="8" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{3}-?[0-9]{4}" style="flex:1"
+          <input type="text" id="cust-zip" maxlength="9" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{3}-?[0-9]{4}" style="flex:1"
             oninput="autoZip(this,'cust-address',null)">
           <button class="btn btn-secondary btn-sm" onclick="lookupZip('cust-zip','cust-address',null)">住所取得</button>
         </div>
@@ -3120,31 +3279,6 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
 </div>
 </div>
 
-<!-- BRANCH MODAL -->
-<div class="modal-overlay" id="branch-modal">
-<div class="modal" style="max-width:500px">
-  <div class="modal-header"><h3 id="branch-modal-title">拠点を追加</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('branch-modal')">✕</button></div>
-  <div class="modal-body">
-    <div class="form-row cols2">
-      <div class="form-group"><label>拠点名 ＊</label><input type="text" id="br-name" placeholder="札幌本社"></div>
-      <div class="form-group"><label>種別</label>
-        <select id="br-type"><option value="本社">本社</option><option value="支店">支店</option><option value="営業所">営業所</option></select>
-      </div>
-    </div>
-    <div class="form-row cols2">
-      <div class="form-group"><label>電話番号</label><input type="text" id="br-tel" placeholder="011-234-5678" onblur="autoTel(this)"></div>
-      <div class="form-group"><label>FAX</label><input type="text" id="br-fax" placeholder="011-234-5679" onblur="autoTel(this)"></div>
-    </div>
-    <div class="form-row"><div class="form-group"><label>住所</label><input type="text" id="br-address" placeholder="北海道札幌市中央区○○1-2-3"></div></div>
-    <div class="form-row"><div class="form-group"><label>メモ</label><textarea id="br-memo" placeholder="備考など"></textarea></div></div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-secondary" onclick="closeModal('branch-modal')">キャンセル</button>
-    <button class="btn btn-primary" onclick="saveBranch()">💾 保存する</button>
-  </div>
-</div>
-</div>
-
 <!-- PHOTO MODAL (per doc) -->
 <div class="modal-overlay" id="photo-modal">
 <div class="modal" style="max-width:720px">
@@ -3391,6 +3525,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
       <button class="btn btn-secondary btn-sm" onclick="window.open('https://calendar.google.com','_blank')">📅 Googleカレンダーを開く</button>
       <button class="btn btn-secondary btn-sm" onclick="syncAllJobsToGcal()">🔄 全予定を再同期</button>
+      <button class="btn btn-secondary btn-sm" onclick="window.open('https://myaccount.google.com/permissions','_blank')" title="権限をリセットする場合こちらから">🔐 Google権限を確認</button>
     </div>
 
     <details style="margin-top:14px;font-size:12px;color:var(--text2)">
@@ -3403,6 +3538,13 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
         <li>作業を追加すると自動的にGoogleカレンダーに反映されます</li>
       </ol>
       <p style="margin-top:8px;color:var(--text3)">※ もし認証エラーが出る場合は、一度ログアウトして再ログインしてください</p>
+      <p style="margin-top:4px;color:var(--red);font-weight:600">⚠️ 「Insufficient Permission」エラーが出た場合:</p>
+      <ol style="padding-left:20px;margin-top:4px;line-height:1.7;color:var(--text2)">
+        <li>上の「🔐 Google権限を確認」を開く</li>
+        <li>このアプリの権限を一度削除</li>
+        <li>Flexsys2026 からログアウト → 再ログイン</li>
+        <li>権限ダイアログで「予定の閲覧・作成・変更・削除」を「許可」</li>
+      </ol>
     </details>
   </div>
   <div class="modal-footer">
@@ -3481,13 +3623,14 @@ let settings=JSON.parse(localStorage.getItem('settings_v4')||'{}');
 let jobs=JSON.parse(localStorage.getItem('jobs_v4')||'[]');
 let templates=JSON.parse(localStorage.getItem('templates_v4')||'[]');
 let employees=JSON.parse(localStorage.getItem('employees_v4')||'[]');
-let branches=JSON.parse(localStorage.getItem('branches_v6')||'[]');
+// 拠点機能は v3.25.0 で廃止（残存する localStorage は起動時クリア）
+try{ localStorage.removeItem('branches_v6'); }catch(e){}
 let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.24.3';
-const APP_BUILD_TIME='2026/04/20 08:17';
+const APP_VERSION='v3.25.4';
+const APP_BUILD_TIME='2026/04/22 04:44';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4003,6 +4146,510 @@ function showToast(msg, color='#27AE60'){
   setTimeout(()=>d.remove(),2200);
 }
 
+// ===== 永続エラーバナー (v3.25.3) =====
+// 自動で消えない + コピーボタン付き。技術的なエラー情報の記録・共有用
+// 複数のエラーは縦に積み重なって表示される
+function showErrorBanner(title, detail, opts){
+  opts = opts || {};
+  const kind = opts.kind || 'error';  // error / warn / info
+  const palette = {
+    error: {bg:'#FDECEA', border:'#C0392B', fg:'#8B1A12', btn:'#C0392B'},
+    warn:  {bg:'#FDF6E3', border:'#D68910', fg:'#7D5A0C', btn:'#D68910'},
+    info:  {bg:'#E8F0FB', border:'#1A73E8', fg:'#1546A0', btn:'#1A73E8'}
+  };
+  const p = palette[kind] || palette.error;
+  const icon = {error:'⚠️', warn:'⚡', info:'ℹ️'}[kind] || '⚠️';
+
+  // コンテナ (なければ作る)
+  let container = document.getElementById('error-banner-container');
+  if(!container){
+    container = document.createElement('div');
+    container.id = 'error-banner-container';
+    container.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;flex-direction:column;gap:4px;padding:4px;pointer-events:none';
+    document.body.appendChild(container);
+  }
+
+  const id = 'err-banner-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+  const banner = document.createElement('div');
+  banner.id = id;
+  banner.style.cssText = `background:${p.bg};border-left:4px solid ${p.border};color:${p.fg};padding:10px 14px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:flex-start;gap:10px;font-family:inherit;font-size:13px;line-height:1.5;pointer-events:auto;max-width:100%;word-break:break-word`;
+
+  const fullText = (title ? title+'\n' : '') + (detail||'');
+  banner.innerHTML = `
+    <div style="flex-shrink:0;font-size:18px;line-height:1">${icon}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;margin-bottom:2px">${escAttr(title||'エラー')}</div>
+      <div id="${id}-detail" style="font-size:12px;color:${p.fg};opacity:.9;white-space:pre-wrap;max-height:120px;overflow-y:auto;font-family:monospace">${escAttr(detail||'')}</div>
+    </div>
+    <div style="flex-shrink:0;display:flex;gap:6px;align-items:center">
+      <button type="button" id="${id}-copy" style="background:${p.btn};color:white;border:none;padding:5px 10px;border-radius:5px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap" title="エラー内容をクリップボードにコピー">📋 コピー</button>
+      <button type="button" id="${id}-close" aria-label="閉じる" style="background:transparent;color:${p.fg};border:none;font-size:18px;cursor:pointer;padding:2px 6px;line-height:1;opacity:.7" title="閉じる">✕</button>
+    </div>`;
+  container.appendChild(banner);
+
+  // コピーボタン
+  document.getElementById(id+'-copy').addEventListener('click', async ()=>{
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(fullText);
+      } else {
+        // フォールバック
+        const ta = document.createElement('textarea');
+        ta.value = fullText;
+        ta.style.position='fixed';ta.style.left='-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      const btn = document.getElementById(id+'-copy');
+      if(btn){
+        const orig = btn.textContent;
+        btn.textContent = '✓ コピーしました';
+        setTimeout(()=>{if(btn) btn.textContent = orig;}, 1500);
+      }
+    }catch(e){
+      showToast('コピーに失敗: '+e.message, '#C0392B');
+    }
+  });
+
+  // 閉じるボタン
+  document.getElementById(id+'-close').addEventListener('click', ()=>{
+    banner.remove();
+    // コンテナが空になったら削除
+    if(container && !container.children.length) container.remove();
+  });
+
+  return id;
+}
+
+// エラーバナーを全クリア(ログイン画面遷移時など)
+function clearAllErrorBanners(){
+  const c = document.getElementById('error-banner-container');
+  if(c) c.remove();
+}
+
+// ===================================================================
+// ===== ヘルプパネル (v3.25.4) =====
+// 各ページの❓ボタンからページ別ヘルプを横スライドパネルで表示する
+// 本格的な資料はPDFへのリンクから取得可能
+// ===================================================================
+const MANUAL_PDF_URL = '/Flexsys2026_操作マニュアル.pdf';
+const SPEC_PDF_URL   = '/Flexsys2026_仕様書.pdf';
+
+// ページID → ヘルプコンテンツの対応表
+// bodyはHTML文字列(インラインスタイルは避け、CSSクラス .hp-step / .hp-tip / .hp-warn を使用)
+const HELP_CONTENT = {
+  'bulletin': {
+    title: '📌 掲示板',
+    body: `
+      <p>スタッフ同士の社内連絡用ページです。お客様には見えません。</p>
+      <h4>投稿する</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 新規投稿</strong> をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">タイトルと本文を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">カテゴリを選ぶ(お知らせ/注意/緊急/業務連絡/その他)</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">重要度を★で指定(1〜5 または なし)</div></div>
+      <div class="hp-step"><div class="hp-step-num">5</div><div class="hp-step-txt">必要なら掲載期限・ピン留めを設定</div></div>
+      <div class="hp-tip">💡 朝の始業時にまずチェックする習慣を。ピン留め投稿と★4以上は最優先で。</div>
+    `
+  },
+  'home': {
+    title: '🏠 ホーム',
+    body: `
+      <p>アプリを開いて最初に表示されるページです。各機能へのショートカットと、本日の作業・掲示板のハイライトが並びます。</p>
+      <h4>よく使うボタン</h4>
+      <ul>
+        <li><strong>🔄 更新</strong> - 他のスタッフが更新した最新データを取り直します</li>
+        <li><strong>❓ ヘルプ</strong> - そのページの使い方を表示(このパネル)</li>
+      </ul>
+      <h4>サイドバー</h4>
+      <p>左側のメニューから各ページに移動できます。スマホでは左上の「≡」ボタンで表示されます。</p>
+      <div class="hp-tip">💡 戻るときは画面左上の「← 戻る」ボタンを使ってください(ブラウザの戻るではなく)。入力中のデータが失われません。</div>
+    `
+  },
+  'dashboard': {
+    title: '📊 ダッシュボード',
+    body: `
+      <p>売上・件数などの集計情報を一目で確認できるページです。</p>
+      <h4>表示される情報</h4>
+      <ul>
+        <li>本日の売上・今月の売上</li>
+        <li>未回収の請求書(要フォロー件数)</li>
+        <li>最近の書類発行状況</li>
+        <li>顧客別売上 TOP5</li>
+      </ul>
+      <h4>ドリルダウン</h4>
+      <p>各集計カードをクリックすると、該当する書類の一覧にジャンプして詳細を確認できます。</p>
+    `
+  },
+  'quotes': {
+    title: '📝 見積書',
+    body: `
+      <p>お客様への料金提示のための書類を作成します。見積 → 受注 → 作業 → 請求 → 入金、の最初のステップです。</p>
+      <h4>新規作成の手順</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 新規見積書</strong> をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">書類番号は <code>EST-YYMM-NNN</code> で自動採番。日付も今日が自動入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">顧客検索で既存顧客を選択 or その場で新規登録</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">件名を入力(例:「水道修理工事」)</div></div>
+      <div class="hp-step"><div class="hp-step-num">5</div><div class="hp-step-txt"><strong>＋ 行を追加</strong> で明細を入力。テンプレートからワンクリック挿入も可能</div></div>
+      <div class="hp-step"><div class="hp-step-num">6</div><div class="hp-step-txt">税率を確認(デフォルト10%)して保存</div></div>
+      <h4>プレビュー・共有</h4>
+      <p><strong>👁️ プレビュー</strong>で印刷イメージ確認 → <strong>📤 共有</strong>からPDFダウンロード/共有リンク/LINE送信/メール送信が可能。</p>
+      <div class="hp-tip">💡 見積書一覧で <strong>→ 請求書化</strong> ボタンを押すと、内容を引き継いで請求書を作れます。</div>
+      <div class="hp-warn">⚠️ 書類番号は自動採番です。基本的に手動で変更しないでください。</div>
+    `
+  },
+  'invoices': {
+    title: '📋 請求書',
+    body: `
+      <p>作業完了後にお客様に請求するための書類を作成します。</p>
+      <h4>作成の流れ</h4>
+      <p>見積書からの引き継ぎが便利です: 見積書一覧で対象書類の <strong>→ 請求書化</strong> をクリックすると、顧客情報・明細・金額がそのままコピーされた状態でフォームが開きます。</p>
+      <h4>見積書との違い</h4>
+      <ul>
+        <li>プレフィックスは <code>INV</code> (例: INV-2604-012)</li>
+        <li><strong>支払期限</strong> の入力欄がある(通常 月末/翌月末)</li>
+      </ul>
+      <h4>ステータス管理</h4>
+      <p>作成 → 送付済 → 入金済、と段階的に変えていきます。支払期限が近い/過ぎている請求書は、左メニューの <strong>🔔 支払いアラート</strong> で一覧チェックできます。</p>
+      <div class="hp-tip">💡 入金があったら「入金管理」ページで入金額・日付・方法を記録すると、経理がきれいに追えます。</div>
+    `
+  },
+  'receipts': {
+    title: '🧾 領収書',
+    body: `
+      <p>お金を受け取った証明書です。請求書から引き継いで作ることが多いです。</p>
+      <h4>作成の流れ</h4>
+      <p>請求書一覧で対象書類の <strong>→ 領収書化</strong> をクリック。但し書き(例:「○○工事代として」)を入力して保存します。</p>
+      <h4>領収書特有の項目</h4>
+      <ul>
+        <li>プレフィックスは <code>REC</code> (例: REC-2604-003)</li>
+        <li><strong>但し書き</strong> 欄(法的要件に注意)</li>
+        <li>入金日の記録</li>
+      </ul>
+      <div class="hp-warn">⚠️ 収入印紙が必要な金額(5万円以上)の領収書を発行する場合は、実物に印紙を貼ってください。</div>
+    `
+  },
+  'customers': {
+    title: '👥 顧客管理',
+    body: `
+      <p>お客様の情報を一元管理するページです。書類を作る前に顧客登録をしておくと、次回からは検索で呼び出せます。</p>
+      <h4>新規登録の手順</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 顧客追加</strong> をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">法人か個人かを選択</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">会社名または氏名、電話、住所を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">郵便番号を7桁入れると <strong>住所が自動で入ります</strong></div></div>
+      <div class="hp-step"><div class="hp-step-num">5</div><div class="hp-step-txt">敬称を選択(御中/様/殿/なし)</div></div>
+      <div class="hp-step"><div class="hp-step-num">6</div><div class="hp-step-txt">保存</div></div>
+      <h4>担当者登録(任意)</h4>
+      <p>法人の場合、複数の担当者(名前・部署・連絡先)を追加できます。書類作成時に担当者を指定できるようになります。</p>
+      <div class="hp-tip">💡 電話番号はハイフンあり・なしどちらでもOK。自動で整形されます。</div>
+    `
+  },
+  'calendar': {
+    title: '📅 作業カレンダー',
+    body: `
+      <p>作業予定を登録・確認できるカレンダーです。スタッフ全員のスケジュールが一目でわかります。</p>
+      <h4>予定を追加</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt">カレンダー上で日付をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">タイトル・時刻・お客様名・担当者を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">登録済み顧客を選ぶと住所も自動引き継ぎ</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">保存</div></div>
+      <h4>表示切り替え</h4>
+      <p>上部のボタンで「月」「週」「日」表示を切り替え可能。作業の詳細を見たい時は「日」がおすすめ。</p>
+      <h4>Googleカレンダー連携</h4>
+      <p><strong>📅 Google連携</strong> ボタンから設定。ONにすると追加した予定が自動的にGoogleカレンダーに同期され、スマホの標準カレンダーでも確認できます。</p>
+      <div class="hp-warn">⚠️ 権限エラーが出た場合、「🔐 Google権限を確認」から一度権限を削除 → 再ログインしてください。</div>
+    `
+  },
+  'alerts': {
+    title: '🔔 支払いアラート',
+    body: `
+      <p>支払期限が近い/過ぎている請求書を一覧表示するページです。こまめにチェックして回収漏れを防ぎましょう。</p>
+      <h4>表示される情報</h4>
+      <ul>
+        <li><strong>期限超過</strong> - 支払期限を過ぎた請求書(最優先でフォロー)</li>
+        <li><strong>期限間近</strong> - あと数日で期限が来る請求書</li>
+        <li>未回収合計額</li>
+      </ul>
+      <div class="hp-tip">💡 「期限間近」の日数は設定画面の「会社情報」→「支払いアラート日数」で調整できます。</div>
+    `
+  },
+  'payments': {
+    title: '💴 入金管理',
+    body: `
+      <p>お客様からの入金記録を管理するページです。</p>
+      <h4>入金を記録</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt">対象の請求書を選択</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">入金額・入金日・入金方法(現金/銀行振込/他)を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">保存すると請求書のステータスが「入金済」に自動更新</div></div>
+      <div class="hp-tip">💡 一部入金にも対応。複数回に分けて入金があった場合、それぞれ記録できます。</div>
+    `
+  },
+  'expenses': {
+    title: '💸 経費管理',
+    body: `
+      <p>材料費・燃料費・交通費などの経費を記録します。レシート写真から自動で金額を読み取れます。</p>
+      <h4>経費の登録(OCRあり)</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 新規</strong> をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt"><strong>📷 レシート読取</strong> でスマホカメラ起動 or 画像選択</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">AIが日付・金額を自動入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">カテゴリ・支払方法を補完</div></div>
+      <div class="hp-step"><div class="hp-step-num">5</div><div class="hp-step-txt">関連書類(案件)を紐付け(任意)</div></div>
+      <div class="hp-step"><div class="hp-step-num">6</div><div class="hp-step-txt">保存</div></div>
+      <h4>CSV出力</h4>
+      <p>右上 <strong>📤 CSV出力</strong> から、freee / 弥生会計 / マネーフォワード形式で出力可能。月末や決算時に会計ソフトへ取り込めます。</p>
+      <div class="hp-warn">⚠️ OCRは完璧ではありません。必ず金額と日付を目視で確認してから保存してください。</div>
+    `
+  },
+  'staff-report': {
+    title: '📊 スタッフ実績',
+    body: `
+      <p>従業員別の作業実績や売上貢献度を確認するページです。</p>
+      <h4>見られる情報</h4>
+      <ul>
+        <li>担当した作業件数</li>
+        <li>担当書類の売上合計</li>
+        <li>期間別の推移</li>
+      </ul>
+      <div class="hp-tip">💡 評価や賞与検討の参考資料として活用できます。</div>
+    `
+  },
+  'report': {
+    title: '📈 年次レポート',
+    body: `
+      <p>年度ごとの売上集計と月別推移を確認するページです。</p>
+      <h4>主な機能</h4>
+      <ul>
+        <li>月別の見積/請求/領収件数</li>
+        <li>月別の売上合計</li>
+        <li>顧客別売上 TOP5</li>
+        <li>前月比の変化率</li>
+      </ul>
+      <h4>出力</h4>
+      <p>右上 <strong>🖨️ 帳票印刷・CSV</strong> から、印刷用レイアウトの表示とCSV出力が可能。決算資料作成に便利です。</p>
+    `
+  },
+  'templates': {
+    title: '📦 作業テンプレート',
+    body: `
+      <p>よく使う作業項目(名称・単価・単位)をテンプレート登録しておくと、書類作成時にワンクリックで明細に追加できます。</p>
+      <h4>テンプレートの作成</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ テンプレート追加</strong></div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">名称(例:「排水管清掃」)・単価・単位を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">保存</div></div>
+      <h4>使い方</h4>
+      <p>見積書・請求書・領収書の作成画面で、明細欄の「テンプレートから追加」ボタンから選択。数量だけ入力すれば明細が完成します。</p>
+      <div class="hp-tip">💡 よく使う項目を10〜20個登録しておくと、書類作成が劇的に速くなります。</div>
+    `
+  },
+  'settings': {
+    title: '🏢 会社情報',
+    body: `
+      <p>書類に印字される自社情報を登録・編集するページです。</p>
+      <h4>登録する情報</h4>
+      <ul>
+        <li>会社名・代表者名</li>
+        <li>住所・電話・FAX・メール</li>
+        <li>振込先銀行口座</li>
+        <li>会社ロゴ(画像アップロード)</li>
+        <li>支払いアラートの日数</li>
+      </ul>
+      <div class="hp-warn">⚠️ ここで設定した情報は書類に印字されるので、誤字脱字がないよう十分確認してください。</div>
+    `
+  },
+  'employees': {
+    title: '👷 従業員管理',
+    body: `
+      <p>従業員情報とアプリへのアクセス許可を管理するページです。<strong>管理者のみ</strong>開けます。</p>
+      <h4>従業員の登録</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 従業員追加</strong></div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">氏名・Email・電話・役職を入力</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">「管理者」チェックを入れると全権限付与</div></div>
+      <h4>アクセス許可管理</h4>
+      <p>許可Emailリストに従業員のGmailを登録することで、そのGmailでのログインを許可します。登録していないEmailではログインできません。</p>
+      <div class="hp-tip">💡 従業員が退職した場合は、許可Emailリストから必ずそのEmailを削除してください。</div>
+    `
+  },
+  'tax': {
+    title: '🧾 税率設定',
+    body: `
+      <p>書類明細で選択できる消費税率を追加・管理するページです。</p>
+      <h4>できること</h4>
+      <ul>
+        <li>新しい税率を追加(例: 将来の増税対応)</li>
+        <li>既存税率の有効/無効切り替え</li>
+        <li>初期値とする税率の指定</li>
+        <li>既存書類の税率を一括更新(例: 10% → 15%)</li>
+      </ul>
+      <div class="hp-warn">⚠️ 税率の一括更新は元に戻せません。必ずバックアップを取ってから実行してください。</div>
+      <div class="hp-tip">💡 既存書類を個別に変更したい場合は、該当書類を開いて編集してください。</div>
+    `
+  },
+  'backup': {
+    title: '🗄️ バックアップ・復旧',
+    body: `
+      <p>データをJSONファイルとして書き出し・取り込みできるページです。</p>
+      <h4>バックアップを取る</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>📥 全データをJSONでダウンロード</strong></div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">ダウンロードされたファイルを安全な場所に保管</div></div>
+      <h4>復旧(取り込み)</h4>
+      <p><strong>📤 JSONファイルを取り込み</strong>から、以前保存したバックアップを復元できます。既存データに上書き/追加が選べます。</p>
+      <div class="hp-tip">💡 月1回程度、手動バックアップを取って外部ストレージに保管すると安心です。</div>
+      <div class="hp-warn">⚠️ データはクラウドに自動保存されていますが、操作ミスで大量削除した場合などに備えてバックアップは重要です。</div>
+    `
+  },
+  'display-settings': {
+    title: '🎨 表示・外観',
+    body: `
+      <p>アプリの見た目をカスタマイズするページです。</p>
+      <h4>テーマ(6種類)</h4>
+      <ul>
+        <li><strong>ナチュラル</strong> - 木目調のライトテーマ(デフォルト)</li>
+        <li><strong>ダーク</strong> - 目に優しい夜間向け</li>
+        <li><strong>ネイビー</strong> - 濃紺ビジネス調</li>
+        <li><strong>ポップ</strong> - カラフル</li>
+        <li><strong>サンセット</strong> - オレンジ系</li>
+        <li><strong>ミント</strong> - 淡い緑系</li>
+      </ul>
+      <div class="hp-tip">💡 テーマは<strong>端末ごとに別々に保存</strong>されます。PCはナチュラル、スマホはダーク、といった使い分けが可能です。</div>
+    `
+  },
+  'csv-export': {
+    title: '📤 CSV出力',
+    body: `
+      <p>書類・経費データをCSVファイルとして出力できるページです。会計ソフトへの取り込みに使います。</p>
+      <h4>対応フォーマット</h4>
+      <ul>
+        <li><strong>freee</strong> - freee標準インポート形式</li>
+        <li><strong>弥生会計</strong> - 弥生標準インポート形式</li>
+        <li><strong>マネーフォワード</strong> - マネーフォワードクラウド会計形式</li>
+        <li><strong>標準</strong> - 汎用的な表形式(Excel等で使用)</li>
+      </ul>
+      <h4>使い方</h4>
+      <p>期間(開始日〜終了日)を指定し、希望のフォーマットボタンをクリックしてダウンロード。会計ソフトのインポート機能で取り込みます。</p>
+    `
+  },
+  'developer': {
+    title: '🛠️ 開発者メニュー',
+    body: `
+      <p>システムの保守・復旧用の機能が集まった画面です。<strong>開発者PIN必須</strong>。</p>
+      <h4>主な機能</h4>
+      <ul>
+        <li>アプリのバージョン・ビルド日時の確認</li>
+        <li>強制リセット(キャッシュ・Service Worker削除)</li>
+        <li>管理者PINの変更</li>
+        <li>全データ初期化(危険・要PIN)</li>
+      </ul>
+      <div class="hp-warn">⚠️ 「全データ初期化」は元に戻せません。必ず事前にバックアップを取ってから実行してください。</div>
+      <div class="hp-tip">💡 「画面が更新されない」「ログインループ」などのトラブル時は、まず「強制リセット」を試してください。</div>
+    `
+  }
+};
+
+// ヘルプパネルを開く
+function openHelpPanel(pageId){
+  const panel = document.getElementById('help-panel');
+  const overlay = document.getElementById('help-overlay');
+  if(!panel || !overlay) return;
+  _renderHelpContent(pageId || 'home');
+  _renderHelpToc(pageId || 'home');
+  overlay.classList.add('open');
+  panel.classList.add('open');
+  // Esc キーで閉じる
+  document.addEventListener('keydown', _helpEscHandler);
+  // パネル内のスクロール位置を先頭に
+  const body = document.getElementById('help-panel-body');
+  if(body) body.scrollTop = 0;
+}
+
+// ヘルプパネルを閉じる
+function closeHelpPanel(){
+  const panel = document.getElementById('help-panel');
+  const overlay = document.getElementById('help-overlay');
+  if(!panel || !overlay) return;
+  panel.classList.remove('open');
+  overlay.classList.remove('open');
+  document.removeEventListener('keydown', _helpEscHandler);
+}
+
+function _helpEscHandler(e){
+  if(e.key === 'Escape') closeHelpPanel();
+}
+
+// ヘルプ本文のレンダリング
+function _renderHelpContent(pageId){
+  const content = HELP_CONTENT[pageId] || HELP_CONTENT['home'];
+  const titleEl = document.getElementById('help-panel-title');
+  const bodyEl = document.getElementById('help-panel-body');
+  if(titleEl) titleEl.textContent = content.title;
+  // ヘルプコンテンツはハードコードされた信頼済みHTML(ユーザー入力ではない)
+  if(bodyEl) bodyEl.innerHTML = content.body;
+}
+
+// ヘルプ目次(他ページへのジャンプ)のレンダリング
+function _renderHelpToc(currentPageId){
+  const tocEl = document.getElementById('help-panel-toc-list');
+  if(!tocEl) return;
+  const order = ['home','dashboard','bulletin','quotes','invoices','receipts',
+                 'customers','calendar','alerts','payments','expenses',
+                 'staff-report','report','templates',
+                 'settings','employees','tax','backup','display-settings',
+                 'csv-export','developer'];
+  tocEl.innerHTML = order.filter(k=>HELP_CONTENT[k]).map(k=>{
+    const c = HELP_CONTENT[k];
+    const active = (k === currentPageId) ? ' active' : '';
+    return `<button type="button" class="hp-toc-btn${active}" data-help-jump="${escAttr(k)}">${escAttr(c.title)}</button>`;
+  }).join('');
+  // クリックハンドラ
+  tocEl.querySelectorAll('[data-help-jump]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const pid = btn.getAttribute('data-help-jump');
+      _renderHelpContent(pid);
+      _renderHelpToc(pid);
+      const body = document.getElementById('help-panel-body');
+      if(body) body.scrollTop = 0;
+    });
+  });
+}
+
+// PDF を別タブで開く
+function openManualPdf(){
+  window.open(MANUAL_PDF_URL, '_blank', 'noopener,noreferrer');
+}
+function openSpecPdf(){
+  window.open(SPEC_PDF_URL, '_blank', 'noopener,noreferrer');
+}
+
+// 全ページの main-header に ❓ヘルプボタンを動的注入
+// page-XXX の XXX 部分をヘルプIDとして使用
+function injectHelpButtons(){
+  document.querySelectorAll('.page').forEach(pageEl=>{
+    const pid = (pageEl.id||'').replace(/^page-/, '');
+    if(!pid) return;
+    const header = pageEl.querySelector('.main-header');
+    if(!header) return;
+    let actions = header.querySelector('.header-actions');
+    // header-actions が無いページは作る(タイトルの右側に配置するため)
+    if(!actions){
+      actions = document.createElement('div');
+      actions.className = 'header-actions';
+      header.appendChild(actions);
+    }
+    // 既に挿入済みならスキップ
+    if(actions.querySelector('.help-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'help-btn';
+    btn.setAttribute('aria-label', 'このページのヘルプを開く');
+    btn.setAttribute('title', 'このページのヘルプ');
+    btn.textContent = '❓';
+    btn.addEventListener('click', ()=>openHelpPanel(pid));
+    // 先頭に挿入(🔄更新ボタンの左側に出す)
+    actions.insertBefore(btn, actions.firstChild);
+  });
+}
+
 // 2-step delete confirm
 function armDelete(btn, onConfirm){
   if(btn.dataset.armed==='1'){
@@ -4033,36 +4680,53 @@ function toHalf(str){
 
 // ===== 電話・FAX 自動フォーマット =====
 // 全角変換 + 数字以外除去 + ハイフン自動挿入
-function autoTel(input){
-  // 数字だけ取り出して最大11桁
-  const d=toHalf(input.value).replace(/[^0-9]/g,'').slice(0,11);
-  if(!d){input.value='';return;}
-  let v=d;
-  if(d.length===11)      v=d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7);
-  else if(d.length===10){
+// 純粋関数: 文字列を受け取って整形済み文字列を返す（autoTel / saveSettings から共用）
+function formatTel(raw){
+  if(raw==null) return '';
+  const d=toHalf(String(raw)).replace(/[^0-9]/g,'').slice(0,11);
+  if(!d) return '';
+  if(d.length===11)      return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7);
+  if(d.length===10){
     // フリーダイヤル等（4桁市外局番）
-    if(/^(0120|0800|0570|0990|0180)/.test(d)) v=d.slice(0,4)+'-'+d.slice(4,7)+'-'+d.slice(7);
+    if(/^(0120|0800|0570|0990|0180)/.test(d)) return d.slice(0,4)+'-'+d.slice(4,7)+'-'+d.slice(7);
     // 4桁市外局番（北海道地方）
-    else if(/^(0123|0124|0125|0126|0133|0134|0135|0136|0137|0138|0139|0142|0143|0144|0145|0146|0152|0153|0154|0155|0156|0157|0158|0162|0163|0164|0165|0166|0167)/.test(d)) v=d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6);
+    if(/^(0123|0124|0125|0126|0133|0134|0135|0136|0137|0138|0139|0142|0143|0144|0145|0146|0152|0153|0154|0155|0156|0157|0158|0162|0163|0164|0165|0166|0167)/.test(d)) return d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6);
     // 2桁市外局番（東京03、大阪06）
-    else if(/^(03|06)/.test(d)) v=d.slice(0,2)+'-'+d.slice(2,6)+'-'+d.slice(6);
+    if(/^(03|06)/.test(d)) return d.slice(0,2)+'-'+d.slice(2,6)+'-'+d.slice(6);
     // 通常の3桁市外局番
-    else v=d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
+    return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
   }
-  else if(d.length===9)  v=d.slice(0,2)+'-'+d.slice(2,5)+'-'+d.slice(5);
+  if(d.length===9)  return d.slice(0,2)+'-'+d.slice(2,5)+'-'+d.slice(5);
+  // 8桁以下: 整形せず数字のみを返す（途中入力・短縮番号を破壊しない）
+  return d;
+}
+
+function autoTel(input){
+  if(!input) return;
+  const v=formatTel(input.value);
   // 変化がなければ何もしない（二重変換防止）
   if(input.value!==v) input.value=v;
 }
 
+// ===== 郵便番号 整形（純粋関数） =====
+// 数字のみ最大7桁、3桁以下はハイフン無し、4桁以上で "3-4" ハイフン挿入
+function formatZip(raw){
+  if(raw==null) return '';
+  const digits=toHalf(String(raw)).replace(/[^0-9]/g,'').slice(0,7);
+  if(!digits) return '';
+  if(digits.length<=3) return digits;
+  return digits.slice(0,3)+'-'+digits.slice(3);
+}
+
 // ===== 郵便番号 自動フォーマット =====
 // 全角変換 + 7桁抽出 + ハイフン挿入 + 自動住所検索
+// 変化がある時のみ input.value を書き換え（カーソル飛び・IME/autofill の 0 残留を防止）
 function autoZip(input, addrId, statusId){
-  const raw=toHalf(input.value);
-  let digits=raw.replace(/[^0-9]/g,'').slice(0,7);
-  if(!digits){ input.value=''; return; }  // 空なら何もしない
-  let v=digits;
-  if(digits.length>3) v=digits.slice(0,3)+'-'+digits.slice(3);
-  input.value=v;
+  if(!input) return;
+  const v=formatZip(input.value);
+  if(input.value!==v) input.value=v;
+  // ハイフン除いた桁数で判定（7桁なら住所自動取得）
+  const digits=v.replace(/-/g,'');
   if(digits.length===7){
     lookupZip(input.id, addrId, statusId);
   }
@@ -4265,7 +4929,7 @@ const PAGE_LABELS={
   home:'ホーム',dashboard:'ダッシュボード',quotes:'見積書一覧',invoices:'請求書一覧',receipts:'領収書一覧',
   customers:'顧客管理',calendar:'作業カレンダー',alerts:'支払いアラート',report:'年次レポート',
   templates:'作業テンプレート',payments:'入金管理',employees:'従業員管理',
-  'staff-report':'スタッフ実績',branches:'拠点・支店','csv-export':'CSVエクスポート',
+  'staff-report':'スタッフ実績','csv-export':'CSVエクスポート',
   expenses:'経費管理',backup:'バックアップ・復旧',settings:'会社設定',tax:'税率設定'
 };
 
@@ -4344,7 +5008,6 @@ function showPage(id, el, addToHistory=true){
   if(id==='templates') renderTemplates();
   if(id==='payments') renderPayments();
   if(id==='staff-report') renderStaffReport();
-  if(id==='branches') renderBranches();
   if(id==='expenses') renderExpenses();
   if(id==='bulletin') renderBulletins();
   if(id==='backup') updateBackupStats();
@@ -4506,7 +5169,7 @@ async function refreshAllData(btnEl){
     const renderFns=[
       'buildDocPages','renderAll','renderEmployees','renderExpenses',
       'renderCalendar','renderPayments','renderTemplates','renderAlerts',
-      'renderBranches','renderBulletins','buildMonthlyChart',
+      'renderBulletins','buildMonthlyChart',
       'renderReport','renderStaffReport','updateBackupStats','updateBulletinBadge'
     ];
     renderFns.forEach(fname=>{
@@ -5045,7 +5708,7 @@ function previewDoc(id){
     </div>
 
     <table class="preview-table">
-      <thead><tr><th style="width:38%">品目・作業内容</th><th style="width:9%;text-align:right">数量</th><th style="width:18%;text-align:right">単価</th><th style="width:12%;text-align:center">税率</th><th style="width:23%;text-align:right">金額</th></tr></thead>
+      <thead><tr><th style="width:44%">品目・作業内容</th><th style="text-align:right">数量</th><th style="text-align:right">単価</th><th style="text-align:center">税率</th><th style="text-align:right">金額</th></tr></thead>
       <tbody>${(d.lines||[]).map(l=>{
         const taxDisplay = (l.tax==='0'||l.tax===0) ? '非課税'
           : /^new-/.test(String(l.tax)) ? '10%' // レガシーの壊れたID → デフォルト10%表示
@@ -7076,18 +7739,10 @@ function saveSettings(){
   // 監査情報
   stampAudit(settings, !settings.createdAt);
   // defaultTax は税率設定画面で保存
-  // 郵便番号を正規化（不正な値を除去）
-  if(settings.zip){
-    const zd=toHalf(settings.zip).replace(/[^0-9]/g,'').slice(0,7);
-    settings.zip=zd.length>3?zd.slice(0,3)+'-'+zd.slice(3):zd;
-  }
-  // Tel/FAXはautoTelで正規化してから保存
+  // 郵便番号・電話番号を共通フォーマッタで正規化（autoZip/autoTel と完全同一ロジック）
+  if(settings.zip) settings.zip = formatZip(settings.zip);
   ['tel','fax'].forEach(k=>{
-    if(settings[k]){
-      const digits=toHalf(settings[k]).replace(/[^0-9]/g,'');
-      if(digits.length===11) settings[k]=digits.slice(0,3)+'-'+digits.slice(3,7)+'-'+digits.slice(7);
-      else if(digits.length===10) settings[k]=digits.slice(0,3)+'-'+digits.slice(3,6)+'-'+digits.slice(6);
-    }
+    if(settings[k]) settings[k] = formatTel(settings[k]);
   });
   persist();
   const msg=document.getElementById('settings-saved');
@@ -7168,7 +7823,6 @@ async function fbLoadAll(uid){
     if(data.jobs)       jobs       = data.jobs;
     if(data.templates)  templates  = data.templates;
     if(data.employees)  employees  = data.employees;
-    if(data.branches)   branches   = data.branches;
     if(data.payments)   payments   = data.payments;
     if(data.expenses){
       // Firebase上は画像が __local_only__ プレースホルダーになっているため、
@@ -7244,7 +7898,6 @@ function persist(){
     localStorage.setItem('jobs_v4',      JSON.stringify(jobs));
     localStorage.setItem('templates_v4', JSON.stringify(templates));
     localStorage.setItem('employees_v4', JSON.stringify(employees));
-    localStorage.setItem('branches_v6',  JSON.stringify(branches));
     localStorage.setItem('payments_v6',  JSON.stringify(payments));
     localStorage.setItem('docPhotos_v6', JSON.stringify(docPhotos));
     localStorage.setItem('expenses_v7',  JSON.stringify(expenses));
@@ -7265,7 +7918,6 @@ async function persistNow(){
     localStorage.setItem('jobs_v4',      JSON.stringify(jobs));
     localStorage.setItem('templates_v4', JSON.stringify(templates));
     localStorage.setItem('employees_v4', JSON.stringify(employees));
-    localStorage.setItem('branches_v6',  JSON.stringify(branches));
     localStorage.setItem('payments_v6',  JSON.stringify(payments));
     localStorage.setItem('docPhotos_v6', JSON.stringify(docPhotos));
     localStorage.setItem('expenses_v7',  JSON.stringify(expenses));
@@ -7326,7 +7978,7 @@ async function _fbPersist(){
     const rawPayload = {
       docs: docsForFB,
       customers, settings, jobs, templates,
-      employees, branches, payments,
+      employees, payments,
       expenses: expensesForFB,
       bulletins,
       updatedAt: new Date().toISOString(),
@@ -7724,6 +8376,11 @@ function initAppAfterAuth(){
   // ヘッダーのバージョン表示を更新
   const hv=document.getElementById('home-header-version');
   if(hv) hv.textContent=APP_VERSION+' · '+APP_BUILD_TIME;
+  // サイドバー・モバイルドロワーのバージョン表示も動的更新
+  const sv=document.getElementById('sidebar-version');
+  if(sv) sv.textContent=APP_VERSION;
+  const mv=document.getElementById('mobile-version-text');
+  if(mv) mv.textContent=APP_VERSION;
   loadSidebarTitle(); loadSettings(); loadLogo();
   // テーマは端末別保存（localStorageのみ）→ Firebase同期はしない
   // 書類タイプ別カラーを適用
@@ -7733,7 +8390,7 @@ function initAppAfterAuth(){
   buildDocPages(); buildStaffSelect(); buildExpStaffSelect(); updateBackupStats();
   renderAll(); buildMonthlyChart(); initReportYears(); initSrYears();
   renderCalendar(); renderTemplates(); renderAlerts();
-  renderEmployees(); renderBranches(); renderPayments(); renderExpenses(); renderBulletins();
+  renderEmployees(); renderPayments(); renderExpenses(); renderBulletins();
   document.getElementById('doc-date').value = today();
   buildStatusSelect('doc-status', docStatuses[0]?.value||'下書き');
   const now=new Date(), y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,'0');
@@ -8158,87 +8815,6 @@ function deletePayRecord(docId,idx){
     if(docIdx>=0) docs[docIdx].status=paid>=d.grandTotal?'入金済':paid>0?'送付済':'送付済';
   }
   persist();renderPayRecords(docId);openPaymentModal(docId);renderPayments();renderAll();
-}
-
-// ===== BRANCHES =====
-let editingBranchId=null;
-function renderBranches(){
-  const el=document.getElementById('branch-list');
-  if(!el)return;
-  if(!branches.length){
-    el.innerHTML=`<div style="text-align:center;color:var(--text3);padding:32px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)">拠点が登録されていません。「＋ 拠点を追加」から登録してください。</div>`;
-  }else{
-    el.innerHTML=branches.map(b=>`<div class="branch-card">
-      <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span style="font-size:15px;font-weight:700">${b.name}</span>
-          <span class="branch-badge ${b.type==='本社'?'branch-hq':'branch-sub'}">${b.type}</span>
-        </div>
-        <div style="font-size:12px;color:var(--text2);display:flex;flex-wrap:wrap;gap:6px 16px">
-          ${b.address?`<span>📍 ${b.address}</span>`:''}
-          ${b.tel?`<span>📞 ${escAttr(b.tel)}</span>`:''}
-          ${b.fax?`<span>FAX: ${escAttr(b.fax)}</span>`:''}
-          ${b.memo?`<span>📝 ${escAttr(b.memo)}</span>`:''}
-        </div>
-      </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
-        <button class="btn btn-secondary btn-sm" onclick="editBranch('${b.id}')">編集</button>
-        <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteBranch('${b.id}'))">削除</button>
-      </div>
-    </div>`).join('');
-  }
-  const tbody=document.getElementById('branch-stats-body');
-  if(!tbody)return;
-  if(!branches.length){tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px">拠点なし</td></tr>`;return;}
-  tbody.innerHTML=branches.map(b=>{
-    const bDocs=docs.filter(d=>d.branch===b.id||d.branch===b.name);
-    const bEmps=employees.filter(e=>e.branch===b.id||e.branch===b.name);
-    const total=bDocs.filter(d=>['請求書','領収書'].includes(d.type)).reduce((s,d)=>s+(d.grandTotal||0),0);
-    return`<tr>
-      <td style="font-weight:600">${b.name} <span class="branch-badge ${b.type==='本社'?'branch-hq':'branch-sub'}" style="font-size:10px">${b.type}</span></td>
-      <td style="text-align:right">${bDocs.length}件</td>
-      <td style="text-align:right;font-weight:600">${fmt(total)}</td>
-      <td style="text-align:right">${bEmps.length}名</td>
-      <td><button class="btn btn-secondary btn-sm" onclick="openNewDoc('見積書')">書類作成</button></td>
-    </tr>`;
-  }).join('');
-}
-function openBranchModal(){
-  editingBranchId=null;
-  document.getElementById('branch-modal-title').textContent='拠点を追加';
-  ['br-name','br-tel','br-fax','br-address','br-memo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('br-type').value='支店';
-  document.getElementById('branch-modal').classList.add('open');
-}
-function editBranch(id){
-  const b=branches.find(x=>x.id===id);if(!b)return;
-  editingBranchId=id;
-  document.getElementById('branch-modal-title').textContent='拠点を編集';
-  document.getElementById('br-name').value=b.name||'';
-  document.getElementById('br-type').value=b.type||'支店';
-  document.getElementById('br-tel').value=b.tel||'';
-  document.getElementById('br-fax').value=b.fax||'';
-  document.getElementById('br-address').value=b.address||'';
-  document.getElementById('br-memo').value=b.memo||'';
-  document.getElementById('branch-modal').classList.add('open');
-}
-function saveBranch(){
-  const name=document.getElementById('br-name').value.trim();
-  if(!name){alert('拠点名を入力してください');return;}
-  const b={
-    id:editingBranchId||('br-'+Date.now()),
-    name,type:document.getElementById('br-type').value,
-    tel:document.getElementById('br-tel').value,
-    fax:document.getElementById('br-fax').value,
-    address:document.getElementById('br-address').value,
-    memo:document.getElementById('br-memo').value
-  };
-  if(editingBranchId){branches[branches.findIndex(x=>x.id===editingBranchId)]=b;}
-  else branches.push(b);
-  persist();closeModal('branch-modal');renderBranches();showToast('拠点情報を保存しました ✓');
-}
-function deleteBranch(id){
-  branches=branches.filter(x=>x.id!==id);persist();renderBranches();
 }
 
 // ===== STAFF REPORT =====
@@ -9654,7 +10230,7 @@ function updateBackupStats(){
 function exportBackup(){
   const data={
     version:'v7',timestamp:new Date().toISOString(),
-    docs,customers,settings,jobs,templates,employees,branches,payments,docPhotos,expenses
+    docs,customers,settings,jobs,templates,employees,payments,docPhotos,expenses
   };
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
@@ -9686,12 +10262,11 @@ function importBackup(ev){
       if(data.jobs)jobs=data.jobs;
       if(data.templates)templates=data.templates;
       if(data.employees)employees=data.employees;
-      if(data.branches)branches=data.branches;
       if(data.payments)payments=data.payments;
       if(data.docPhotos)docPhotos=data.docPhotos;
       if(data.expenses)expenses=data.expenses;
       if(data.bulletins)bulletins=data.bulletins;
-      persist();loadSettings();loadLogo();renderAll();buildMonthlyChart();renderEmployees();renderBranches();renderExpenses();renderTemplates();
+      persist();loadSettings();loadLogo();renderAll();buildMonthlyChart();renderEmployees();renderExpenses();renderTemplates();
       if(statusEl){statusEl.style.color='var(--accent)';statusEl.textContent=`✓ 復旧完了：書類 ${docs.length}件、顧客 ${customers.length}件を読み込みました (${data.timestamp?new Date(data.timestamp).toLocaleString('ja-JP'):'不明'})`;}
       updateBackupStats();
       }); // end showConfirm
@@ -10571,7 +11146,19 @@ async function syncJobToGcal(job){
       persist();
     }
   }catch(e){
-    showToast(`📅 Googleカレンダー同期エラー: ${e.message}`,'#C0392B');
+    // v3.25.3: 永続エラーバナーで表示(消えない・コピー可)
+    const msg = String(e.message||'');
+    if(/Insufficient Permission|insufficient.*scope|403/i.test(msg)){
+      showErrorBanner(
+        'Googleカレンダーの権限が不足しています',
+        '同期エラー(予定「'+(job.title||job.customer||'無題')+'」): '+msg+'\n\n【解決方法】\n'
+        +'1. Google アカウント権限ページで Flexsys2026 の権限を削除\n'
+        +'2. 当アプリからログアウト→再ログインで「カレンダー操作」を許可',
+        {kind:'error'}
+      );
+    } else {
+      showErrorBanner('📅 Googleカレンダー同期エラー', '予定「'+(job.title||job.customer||'無題')+'」\n'+msg, {kind:'error'});
+    }
   }
 }
 
@@ -10619,7 +11206,22 @@ async function fetchGcalCalendarList(){
     const res=await callGcalApi('/users/me/calendarList','GET');
     return res.items||[];
   }catch(e){
-    showToast(`カレンダー一覧取得エラー: ${e.message}`,'#C0392B');
+    const msg = String(e.message||'');
+    // スコープ不足エラーを丁寧に案内(v3.25.3)
+    if(/Insufficient Permission|insufficient.*scope|403/i.test(msg)){
+      showErrorBanner(
+        'Googleカレンダーの権限が不足しています',
+        'カレンダー一覧取得エラー: '+msg+'\n\n【解決方法】\n'
+        +'1. Google アカウント権限ページ (https://myaccount.google.com/permissions) を開く\n'
+        +'2. このアプリ(Flexsys2026)の権限を一度削除\n'
+        +'3. Flexsys2026 からログアウト\n'
+        +'4. 再ログイン時に「予定の閲覧・作成・変更・削除」を含む権限ダイアログが出るので「許可」\n'
+        +'5. 再度この画面を開く',
+        {kind:'error'}
+      );
+    } else {
+      showErrorBanner('カレンダー一覧取得エラー', msg, {kind:'error'});
+    }
     return [];
   }
 }
@@ -11818,6 +12420,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
   buildMobileDrawer();
   injectHamburgers();
+  // v3.25.4: 各ページの main-header に ❓ヘルプボタンを注入
+  if(typeof injectHelpButtons==='function') injectHelpButtons();
 });
 
 // ===== TAX SETTINGS PAGE =====
@@ -11985,5 +12589,27 @@ function executeBulkTaxUpdate(){
 }
 
 </script>
+
+<!-- ===== ヘルプパネル (v3.25.4) ===== -->
+<div id="help-overlay" class="help-overlay" onclick="closeHelpPanel()"></div>
+<aside id="help-panel" class="help-panel" role="dialog" aria-labelledby="help-panel-title" aria-modal="true">
+  <div class="help-panel-header">
+    <div class="hp-title-wrap">
+      <div class="hp-overline">📖 使い方ヘルプ</div>
+      <h3 id="help-panel-title">ヘルプ</h3>
+    </div>
+    <button type="button" class="hp-close" onclick="closeHelpPanel()" aria-label="閉じる">✕</button>
+  </div>
+  <div class="help-panel-pdfbar">
+    <button type="button" onclick="openManualPdf()" title="新しいタブで操作マニュアル(PDF)を開く">📄 操作マニュアル(全文PDF)</button>
+    <button type="button" onclick="openSpecPdf()" title="新しいタブで仕様書(PDF)を開く">📘 仕様書(全文PDF)</button>
+  </div>
+  <div class="help-panel-body" id="help-panel-body"></div>
+  <div class="help-panel-toc">
+    <div class="help-panel-toc-label">他のページのヘルプ</div>
+    <div class="help-panel-toc-list" id="help-panel-toc-list"></div>
+  </div>
+</aside>
+
 </body>
 </html>
