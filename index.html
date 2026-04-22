@@ -3629,7 +3629,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.25.4';
+const APP_VERSION='v3.25.5';
 const APP_BUILD_TIME='2026/04/22 04:44';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -5708,7 +5708,7 @@ function previewDoc(id){
     </div>
 
     <table class="preview-table">
-      <thead><tr><th style="width:44%">品目・作業内容</th><th style="text-align:right">数量</th><th style="text-align:right">単価</th><th style="text-align:center">税率</th><th style="text-align:right">金額</th></tr></thead>
+      <thead><tr><th style="width:38%">品目・作業内容</th><th style="width:9%;text-align:right">数量</th><th style="width:18%;text-align:right">単価</th><th style="width:12%;text-align:center">税率</th><th style="width:23%;text-align:right">金額</th></tr></thead>
       <tbody>${(d.lines||[]).map(l=>{
         const taxDisplay = (l.tax==='0'||l.tax===0) ? '非課税'
           : /^new-/.test(String(l.tax)) ? '10%' // レガシーの壊れたID → デフォルト10%表示
