@@ -768,7 +768,7 @@ select{appearance:auto}
 .backup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
 .backup-icon{font-size:28px;width:40px;text-align:center}
 
-.preview-doc{background:white;max-width:640px;margin:0 auto;padding:42px;border-radius:var(--radius);border:1px solid var(--border);font-family:'Noto Serif JP',serif;color:#111;overflow-x:hidden}
+.preview-doc{background:white;max-width:640px;margin:0 auto;padding:42px;border-radius:var(--radius);border:1px solid var(--border);font-family:'Noto Serif JP',serif;color:#111;overflow:hidden;box-sizing:border-box}
 .preview-doc h2{font-size:22px;font-weight:600;text-align:center;margin-bottom:18px;border-bottom:2px solid #111;padding-bottom:11px}
 .preview-meta{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 .preview-to .company{font-size:16px;font-weight:600}
@@ -776,7 +776,7 @@ select{appearance:auto}
 .preview-from p{text-align:right;margin:0}
 .preview-from strong{display:inline-block}
 .preview-logo{max-width:100px;max-height:50px;object-fit:contain;display:block;margin-left:auto;margin-bottom:5px}
-.preview-table{width:100%;border-collapse:collapse;margin-bottom:15px;font-size:12px;table-layout:fixed;word-break:break-word}
+.preview-table{width:100%;max-width:100%;border-collapse:collapse;margin-bottom:15px;font-size:12px;table-layout:fixed;word-break:break-word;box-sizing:border-box}
 
 /* 件名（品目テーブル直上） */
 .preview-subject{display:flex;align-items:flex-end;gap:10px;margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #888}
@@ -799,9 +799,8 @@ select{appearance:auto}
   .stamp{display:none !important}
   .sample-badge{display:none !important}
 }
-.preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #DDD;overflow:hidden}
-.preview-table td{padding:6px 9px;border:1px solid #DDD;overflow:hidden}
-.preview-table th:last-child,.preview-table td:last-child{padding-right:6px}
+.preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #DDD;overflow:hidden;box-sizing:border-box}
+.preview-table td{padding:6px 9px;border:1px solid #DDD;overflow:hidden;box-sizing:border-box}
 .preview-total table{margin-left:auto;font-size:13px}
 .preview-total td{padding:4px 7px}
 .preview-total .grand{font-size:16px;font-weight:700;border-top:2px solid #111}
@@ -895,7 +894,34 @@ select{appearance:auto}
 .pin-key.del{color:var(--red);font-size:13px}
 .pin-error{color:var(--red);font-size:13px;min-height:20px}
 
-@media print{body *{visibility:hidden}.preview-doc,.preview-doc *{visibility:visible}.preview-doc{position:fixed;inset:0;margin:0;border:none;border-radius:0;padding:28px;max-width:100%}}
+@media print{
+  /* 全体を非表示 */
+  body *{visibility:hidden !important}
+  /* プレビュー本体とその子孫だけ表示 */
+  .preview-doc,.preview-doc *{visibility:visible !important}
+  /* プレビューを印刷ページに合わせて配置 */
+  .preview-doc{
+    position:fixed !important;
+    inset:0 !important;
+    margin:0 !important;
+    border:none !important;
+    border-radius:0 !important;
+    padding:28px !important;
+    max-width:100% !important;
+    overflow:visible !important;
+    box-shadow:none !important;
+    background:white !important;
+  }
+  /* モーダルが閉じている状態でも印刷できるよう、プレビューモーダルを強制表示 */
+  #preview-modal{display:flex !important;visibility:visible !important;background:none !important;position:static !important;padding:0 !important;overflow:visible !important;align-items:flex-start !important}
+  #preview-modal .modal{visibility:visible !important;box-shadow:none !important;background:none !important;padding:0 !important;margin:0 !important;max-width:100% !important;width:100% !important;border-radius:0 !important;border:none !important}
+  #preview-modal .modal-body{visibility:visible !important;padding:0 !important;background:none !important;overflow:visible !important}
+  /* モーダルのヘッダー・フッターは印刷しない */
+  #preview-modal .modal-header,#preview-modal .modal-footer{display:none !important}
+  /* 他のオーバーレイ・通知・ナビは完全に消す */
+  .modal-overlay:not(#preview-modal){display:none !important}
+  .toast-container,.update-banner,.app-version-banner,.drawer-overlay,.bottom-nav,.hamburger,.sidebar,.main-header,.nav-history-bar{display:none !important}
+}
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 /* ===== MOBILE DRAWER ===== */
 .hamburger{display:none;background:none;border:none;cursor:pointer;padding:10px;color:var(--text);flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
@@ -2707,7 +2733,9 @@ if('serviceWorker' in navigator){
   <div class="modal-body" id="preview-body"></div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('preview-modal')">閉じる</button>
-    <button class="btn btn-primary" onclick="shareDoc()">📤 共有・送信</button>
+    <button class="btn btn-secondary" onclick="printPreview()">🖨️ 印刷</button>
+    <button class="btn btn-secondary" onclick="sharePreviewLink()">🔗 共有</button>
+    <button class="btn btn-primary" onclick="shareDoc()">📤 送信</button>
   </div>
 </div>
 </div>
@@ -3630,8 +3658,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.25.6';
-const APP_BUILD_TIME='2026/04/22 04:44';
+const APP_VERSION='v3.25.7';
+const APP_BUILD_TIME='2026/04/30 17:55';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5709,7 +5737,7 @@ function previewDoc(id){
     </div>
 
     <table class="preview-table">
-      <thead><tr><th style="width:38%">品目・作業内容</th><th style="width:9%;text-align:right">数量</th><th style="width:18%;text-align:right">単価</th><th style="width:12%;text-align:center">税率</th><th style="width:23%;text-align:right">金額</th></tr></thead>
+      <thead><tr><th style="width:38%">品目・作業内容</th><th style="width:9%;text-align:right">数量</th><th style="width:18%;text-align:right">単価</th><th style="width:12%;text-align:center">税率</th><th style="text-align:right">金額</th></tr></thead>
       <tbody>${(d.lines||[]).map(l=>{
         const taxDisplay = (l.tax==='0'||l.tax===0) ? '非課税'
           : /^new-/.test(String(l.tax)) ? '10%' // レガシーの壊れたID → デフォルト10%表示
@@ -5741,7 +5769,34 @@ function shareDoc(){
   }
   document.getElementById('share-modal').classList.add('open');
 }
-function sharePrint(){closeModal('share-modal');window.print();}
+
+// 🖨️ プレビューから直接印刷（プレビューモーダルを閉じずに印刷）
+// → @media print のCSSルールが .preview-doc を見つけられるように、
+//   プレビューモーダルを開いたまま window.print() を呼ぶ
+function printPreview(){
+  // プレビューモーダルが開いていることを保証（念のため）
+  document.getElementById('preview-modal').classList.add('open');
+  // 次フレームで印刷ダイアログを開く（DOM反映を待つ）
+  requestAnimationFrame(()=>{ try{ window.print(); }catch(e){ console.error('[printPreview]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); } });
+}
+
+// 🔗 プレビューから直接共有リンクを発行（送信メニューを開かずに）
+function sharePreviewLink(){
+  // shareLink() は preview/share いずれのモーダルが開いていても currentPreviewDocId を使うので
+  // プレビューモーダルを閉じてから呼んでOK
+  closeModal('preview-modal');
+  shareLink();
+}
+
+// 🖨️ 共有モーダルからの印刷（プレビューを再表示してから印刷）
+// → モーダルが両方閉じている状態で window.print() を呼ぶと真っ白になるバグを修正
+function sharePrint(){
+  closeModal('share-modal');
+  // プレビューモーダルを再度開く（@media print が .preview-doc を見つけられるように）
+  document.getElementById('preview-modal').classList.add('open');
+  // DOM更新を待ってから印刷
+  setTimeout(()=>{ try{ window.print(); }catch(e){ console.error('[sharePrint]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); } }, 80);
+}
 
 // 📲 スマホの「他のアプリで共有」: Web Share API で OS ネイティブ共有シートを起動
 // → LINE・メール・メモ等を含めてユーザーが選択できる（確実に動作）
