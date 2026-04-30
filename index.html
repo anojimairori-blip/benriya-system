@@ -770,10 +770,11 @@ select{appearance:auto}
 
 .preview-doc{background:white;max-width:640px;margin:0 auto;padding:42px;border-radius:var(--radius);border:1px solid var(--border);font-family:'Noto Serif JP',serif;color:#111;overflow:hidden;box-sizing:border-box}
 .preview-doc h2{font-size:22px;font-weight:600;text-align:center;margin-bottom:18px;border-bottom:2px solid #111;padding-bottom:11px}
-.preview-meta{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.preview-meta{display:flex;gap:18px;margin-bottom:18px;width:100%;box-sizing:border-box;align-items:flex-start}
+.preview-to{flex:1;min-width:0;box-sizing:border-box}
 .preview-to .company{font-size:16px;font-weight:600}
-.preview-from{font-size:12px;text-align:right;line-height:1.9}
-.preview-from p{text-align:right;margin:0}
+.preview-from{flex:1;font-size:12px;text-align:right;line-height:1.9;min-width:0;box-sizing:border-box;padding:0;margin:0}
+.preview-from p{text-align:right;margin:0;padding:0}
 .preview-from strong{display:inline-block}
 .preview-logo{max-width:100px;max-height:50px;object-fit:contain;display:block;margin-left:auto;margin-bottom:5px}
 .preview-table{width:100%;max-width:100%;border-collapse:collapse;margin-bottom:15px;font-size:12px;table-layout:fixed;word-break:break-word;box-sizing:border-box}
@@ -895,32 +896,70 @@ select{appearance:auto}
 .pin-error{color:var(--red);font-size:13px;min-height:20px}
 
 @media print{
-  /* 全体を非表示 */
-  body *{visibility:hidden !important}
-  /* プレビュー本体とその子孫だけ表示 */
-  .preview-doc,.preview-doc *{visibility:visible !important}
-  /* プレビューを印刷ページに合わせて配置 */
-  .preview-doc{
-    position:fixed !important;
-    inset:0 !important;
+  /* @page で印刷余白を制御（ブラウザのヘッダー/フッターは別途消す必要あり） */
+  @page{margin:12mm}
+  /* body直下の要素を全部消す（#preview-modal だけ残す） */
+  body > *:not(#preview-modal){display:none !important}
+  /* プレビューモーダル系統は visibility:visible を強制（line 760 の body *{visibility:hidden} を上書き） */
+  #preview-modal,#preview-modal *{visibility:visible !important}
+  /* プレビューモーダルを通常のブロック要素として表示し直す */
+  #preview-modal{
+    display:block !important;
+    position:static !important;
+    background:none !important;
+    padding:0 !important;
     margin:0 !important;
+    overflow:visible !important;
+    inset:auto !important;
+    width:auto !important;
+    height:auto !important;
+  }
+  #preview-modal .modal{
+    display:block !important;
+    position:static !important;
+    background:none !important;
+    box-shadow:none !important;
+    max-width:100% !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
     border:none !important;
     border-radius:0 !important;
-    padding:28px !important;
+  }
+  #preview-modal .modal-header,
+  #preview-modal .modal-footer{display:none !important}
+  #preview-modal .modal-body{
+    display:block !important;
+    padding:0 !important;
+    background:none !important;
+    overflow:visible !important;
+  }
+  /* プレビュー本体: position:fixed を使わない（複数ページに繰り返されるバグ回避） */
+  .preview-doc{
+    display:block !important;
+    position:static !important;
+    margin:0 auto !important;
+    border:none !important;
+    border-radius:0 !important;
+    padding:0 !important;
     max-width:100% !important;
     overflow:visible !important;
     box-shadow:none !important;
     background:white !important;
+    page-break-inside:avoid;
   }
-  /* モーダルが閉じている状態でも印刷できるよう、プレビューモーダルを強制表示 */
-  #preview-modal{display:flex !important;visibility:visible !important;background:none !important;position:static !important;padding:0 !important;overflow:visible !important;align-items:flex-start !important}
-  #preview-modal .modal{visibility:visible !important;box-shadow:none !important;background:none !important;padding:0 !important;margin:0 !important;max-width:100% !important;width:100% !important;border-radius:0 !important;border:none !important}
-  #preview-modal .modal-body{visibility:visible !important;padding:0 !important;background:none !important;overflow:visible !important}
-  /* モーダルのヘッダー・フッターは印刷しない */
-  #preview-modal .modal-header,#preview-modal .modal-footer{display:none !important}
-  /* 他のオーバーレイ・通知・ナビは完全に消す */
-  .modal-overlay:not(#preview-modal){display:none !important}
-  .toast-container,.update-banner,.app-version-banner,.drawer-overlay,.bottom-nav,.hamburger,.sidebar,.main-header,.nav-history-bar{display:none !important}
+  /* 書類タイプ別カラー（罫線色）を印刷でも保持 */
+  .preview-doc.doc-quote{border-top:6px solid var(--doc-color-quote) !important}
+  .preview-doc.doc-invoice{border-top:6px solid var(--doc-color-invoice) !important}
+  .preview-doc.doc-receipt{border-top:6px solid var(--doc-color-receipt) !important}
+  /* 背景色・色を印刷時に保持 */
+  .preview-doc h2,
+  .preview-doc .preview-table th,
+  .preview-doc .grand td,
+  .preview-doc .preview-subject{
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+  }
 }
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 /* ===== MOBILE DRAWER ===== */
@@ -3658,8 +3697,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.25.7';
-const APP_BUILD_TIME='2026/04/30 17:55';
+const APP_VERSION='v3.25.8';
+const APP_BUILD_TIME='2026/04/30 18:55';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
