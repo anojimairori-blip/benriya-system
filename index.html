@@ -1729,7 +1729,7 @@ if('serviceWorker' in navigator){
 
 <!-- CUSTOMERS -->
 <div id="page-customers" class="page">
-  <div class="main-header"><h2>👥 顧客管理</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openCustomerModal()">＋ 顧客追加</button></div></div>
+  <div class="main-header"><h2>👥 顧客管理</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-secondary" onclick="openAddressLabelModal()" title="顧客の住所をA4ラベルシール用にPDF出力">📮 ラベル印刷</button><button class="btn btn-primary" onclick="openCustomerModal()">＋ 顧客追加</button></div></div>
   <div class="content">
     <div class="tabs">
       <div class="tab active" onclick="switchCustTab('list',this)">顧客一覧</div>
@@ -3777,8 +3777,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.27.1';
-const APP_BUILD_TIME='2026/05/03 07:58';
+const APP_VERSION='v3.28.0';
+const APP_BUILD_TIME='2026/05/03 08:11';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6301,6 +6301,197 @@ async function bulkExportPdf(docIds, filename, type){
       if(wasPreviewOpen) previewModal.classList.add('open');
       else previewModal.classList.remove('open');
     }
+  }
+}
+
+// ===== v3.28.0: F3 DM住所ラベル印刷 =====
+// A4・21面ラベルシール（A-ONE 28729 / コクヨ KPC-E1211 等の標準規格）
+// 1ラベル: 63.5mm × 38.1mm、3列×7行
+function openAddressLabelModal(){
+  // 既存があれば削除
+  const existing=document.getElementById('addr-label-modal');
+  if(existing) existing.remove();
+
+  const html=`
+    <div class="modal-overlay open" id="addr-label-modal">
+      <div class="modal" style="max-width:680px">
+        <div class="modal-header">
+          <h3>📮 住所ラベル印刷（A4・21面）</h3>
+          <button class="close-btn" aria-label="閉じる" onclick="closeAddressLabelModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;margin-bottom:12px;color:var(--text2)">選択した顧客の住所をA4ラベルシール（21面・標準規格）にレイアウトしてPDF出力します。<br>住所が登録されていない顧客は顧客名のみ出力します（手書きスペース）。</p>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <input type="text" id="addr-label-search" oninput="filterAddressLabelList()" placeholder="🔍 顧客名・住所で絞り込み" style="padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;flex:1;min-width:160px;outline:none">
+            <button class="btn btn-secondary btn-sm" onclick="addrLabelSelectAll(true)">全選択</button>
+            <button class="btn btn-secondary btn-sm" onclick="addrLabelSelectAll(false)">全解除</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">
+            <span id="addr-label-count">0件選択中</span>
+            <span style="float:right">21枚で1シート（超過分は次のシートへ）</span>
+          </div>
+          <div id="addr-label-list" style="max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;background:var(--surface)"></div>
+        </div>
+        <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn btn-secondary" onclick="closeAddressLabelModal()">キャンセル</button>
+          <button class="btn btn-primary" onclick="executeAddressLabelPdf()">📄 PDF出力</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+  renderAddressLabelList();
+}
+
+function closeAddressLabelModal(){
+  const m=document.getElementById('addr-label-modal');
+  if(m) m.remove();
+}
+
+function renderAddressLabelList(){
+  const list=document.getElementById('addr-label-list');
+  if(!list) return;
+  const q=(document.getElementById('addr-label-search')?.value||'').toLowerCase().trim();
+  // 既存の選択状態を保持
+  const checkedSet=new Set();
+  document.querySelectorAll('input[name="addr-label-select"]:checked').forEach(cb=>checkedSet.add(cb.value));
+
+  let filtered=customers.slice();
+  if(q){
+    filtered=filtered.filter(c=>{
+      const text=(c.name||'')+(c.address||'')+(c.zip||'')+(c.dept||'');
+      return text.toLowerCase().includes(q);
+    });
+  }
+  // ソート: 顧客名昇順
+  filtered.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+
+  if(filtered.length===0){
+    list.innerHTML='<div style="text-align:center;padding:30px;color:var(--text3)">該当する顧客がありません</div>';
+    updateAddressLabelCount();
+    return;
+  }
+  list.innerHTML=filtered.map(c=>{
+    const checked=checkedSet.has(c.id)?'checked':'';
+    const noAddr=!c.address;
+    const addrTag=noAddr?'<span style="background:#FDF6E3;color:#7D5A0C;font-size:10px;padding:1px 6px;border-radius:99px;margin-left:6px;flex-shrink:0">住所なし</span>':'';
+    return `
+      <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer;font-size:12px">
+        <input type="checkbox" name="addr-label-select" value="${escAttr(c.id)}" ${checked} onchange="updateAddressLabelCount()">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:4px">
+            <span style="font-weight:600">${escAttr(c.name||'(名称未設定)')}</span>
+            <span style="color:var(--text3)">${escAttr(c.honorific||'御中')}</span>
+            ${addrTag}
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+            ${c.zip?'〒'+escAttr(c.zip)+' ':''}${escAttr(c.address||'(住所未登録)')}
+          </div>
+        </div>
+      </label>`;
+  }).join('');
+  updateAddressLabelCount();
+}
+
+function filterAddressLabelList(){
+  renderAddressLabelList();
+}
+
+function addrLabelSelectAll(state){
+  document.querySelectorAll('input[name="addr-label-select"]').forEach(cb=>{cb.checked=state;});
+  updateAddressLabelCount();
+}
+
+function updateAddressLabelCount(){
+  const n=document.querySelectorAll('input[name="addr-label-select"]:checked').length;
+  const el=document.getElementById('addr-label-count');
+  if(el) el.textContent=n+'件選択中';
+}
+
+async function executeAddressLabelPdf(){
+  const checks=document.querySelectorAll('input[name="addr-label-select"]:checked');
+  const selectedIds=Array.from(checks).map(c=>c.value);
+  if(selectedIds.length===0){
+    showToast('顧客を1人以上選択してください','#C0392B');
+    return;
+  }
+  // 選択された顧客データを取得（モーダル内の表示順を保持）
+  const selectedCustomers=[];
+  for(const id of selectedIds){
+    const c=customers.find(x=>x.id===id);
+    if(c) selectedCustomers.push(c);
+  }
+  if(selectedCustomers.length===0){
+    showToast('対象顧客が見つかりません','#C0392B');
+    return;
+  }
+  closeAddressLabelModal();
+  await renderAndExportAddressLabels(selectedCustomers);
+}
+
+// 21面ラベルシートを生成してPDF出力
+async function renderAndExportAddressLabels(customerList){
+  if(typeof html2pdf==='undefined'){
+    showToast('PDFライブラリが読み込まれていません','#C0392B');
+    return;
+  }
+  showToast(`📮 ${customerList.length}件のラベルを生成中...`);
+
+  // 隠しコンテナ
+  const container=document.createElement('div');
+  container.id='addr-label-container';
+  container.style.cssText='position:fixed;left:-99999px;top:0;background:white;z-index:-1';
+  document.body.appendChild(container);
+
+  try{
+    // 21枚ごとにシート分割
+    const PER_SHEET=21;
+    const sheets=[];
+    for(let i=0; i<customerList.length; i+=PER_SHEET){
+      sheets.push(customerList.slice(i, i+PER_SHEET));
+    }
+
+    let html='';
+    sheets.forEach((sheet, sheetIdx)=>{
+      const cells=[];
+      for(let i=0; i<PER_SHEET; i++){
+        const c=sheet[i];
+        if(c){
+          const honorific=c.honorific!=null?c.honorific:'御中';
+          const hasAddress=!!c.address;
+          const zipHtml=c.zip?`<div style="font-size:9pt;color:#444;margin-bottom:1mm">〒${escAttr(c.zip)}</div>`:'';
+          const addrHtml=hasAddress?`<div style="font-size:10pt;line-height:1.35;flex:1;word-wrap:break-word;overflow-wrap:break-word">${escAttr(c.address)}</div>`:'<div style="flex:1"></div>';
+          const nameHtml=`<div style="font-size:11pt;font-weight:bold;text-align:right;margin-top:auto">${escAttr(c.name||'')}<span style="margin-left:4mm;font-weight:normal">${escAttr(honorific)}</span></div>`;
+          cells.push(`<div style="border:0.2mm solid #eee;padding:3mm;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box">${zipHtml}${addrHtml}${nameHtml}</div>`);
+        } else {
+          // 空セル(プレースホルダ)
+          cells.push('<div style="border:0.2mm solid #eee;box-sizing:border-box"></div>');
+        }
+      }
+      // A4 21面シート: 上下8.5mm余白、左右7mm余白、3列×7行、列間隔2.5mm
+      html+=`<div style="width:210mm;height:297mm;padding:8.5mm 7mm;box-sizing:border-box;${sheetIdx<sheets.length-1?'page-break-after:always;':''}">
+        <div style="display:grid;grid-template-columns:63.5mm 63.5mm 63.5mm;grid-template-rows:repeat(7,38.1mm);column-gap:2.5mm;row-gap:0;width:100%;height:100%">
+          ${cells.join('')}
+        </div>
+      </div>`;
+    });
+    container.innerHTML=html;
+
+    const today_str=today();
+    const filename=`住所ラベル_${today_str}_${customerList.length}件.pdf`;
+    const opt={
+      margin:0,
+      filename:filename,
+      image:{type:'jpeg', quality:0.98},
+      html2canvas:{scale:2, useCORS:true, allowTaint:false, backgroundColor:'#ffffff', logging:false},
+      jsPDF:{unit:'mm', format:'a4', orientation:'portrait', compress:true},
+      pagebreak:{mode:['css','legacy']}
+    };
+    await html2pdf().set(opt).from(container).save();
+    showToast(`✓ ${customerList.length}件のラベルをPDF出力しました`,'#27AE60');
+  }catch(e){
+    showErrorBanner('住所ラベルPDF生成エラー', String(e?.message||e), {kind:'error'});
+  }finally{
+    container.remove();
   }
 }
 
