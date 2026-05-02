@@ -2713,6 +2713,18 @@ if('serviceWorker' in navigator){
         <!-- Inline new customer (collapsed) -->
         <div id="inline-new-cust" style="display:none;background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:8px">
           <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">＋ 新規顧客を登録</div>
+          <!-- v3.26.0: 貼り付けパーサー(顧客モーダルと同等) -->
+          <details style="margin-bottom:10px">
+            <summary style="cursor:pointer;font-weight:700;color:var(--accent);font-size:12px;user-select:none">📋 貼り付けで自動入力（クリックで開く）</summary>
+            <div style="margin-top:6px">
+              <p style="font-size:11px;color:var(--text2);margin-bottom:6px;line-height:1.5">名刺・メール署名・お客様情報などをまるごと貼り付けると、自動で各欄に振り分けます。</p>
+              <textarea id="nc-paste-area" rows="3" placeholder="ここに名刺やメール署名などを貼り付け" style="width:100%;font-size:12px;padding:6px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
+              <div style="display:flex;gap:6px;align-items:center;margin-top:4px">
+                <button class="btn btn-primary btn-sm" onclick="parseAndFillInlineCustomer()" style="font-size:12px">📋 解析して自動入力</button>
+                <span id="nc-paste-status" style="font-size:11px;color:var(--text3)"></span>
+              </div>
+            </div>
+          </details>
           <div class="form-row cols2" style="margin-bottom:8px">
             <div class="form-group"><label>顧客名 ＊</label><input type="text" id="nc-name"></div>
             <div class="form-group"><label>敬称</label>
@@ -2734,7 +2746,13 @@ if('serviceWorker' in navigator){
           </div>
           <div class="form-row cols2" style="margin-bottom:8px">
             <div class="form-group"><label>電話番号</label><input type="text" id="nc-tel" onblur="autoTel(this)"></div>
-            <div class="form-group"></div>
+            <div class="form-group"><label>FAX</label><input type="text" id="nc-fax" onblur="autoTel(this)"></div>
+          </div>
+          <div class="form-row cols2" style="margin-bottom:8px">
+            <div class="form-group" style="grid-column:span 2"><label>メールアドレス</label><input type="email" id="nc-email"></div>
+          </div>
+          <div class="form-row" style="margin-bottom:8px">
+            <div class="form-group"><label>メモ</label><textarea id="nc-memo" rows="2" style="font-family:inherit;resize:vertical"></textarea></div>
           </div>
           <div style="display:flex;gap:6px;justify-content:flex-end">
             <button class="btn btn-secondary btn-sm" onclick="closeInlineNewCust()">キャンセル</button>
@@ -3751,8 +3769,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.25.12';
-const APP_BUILD_TIME='2026/04/30 12:00';
+const APP_VERSION='v3.26.0';
+const APP_BUILD_TIME='2026/05/03 06:00';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4296,6 +4314,12 @@ function showErrorBanner(title, detail, opts){
   banner.id = id;
   banner.style.cssText = `background:${p.bg};border-left:4px solid ${p.border};color:${p.fg};padding:10px 14px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:flex-start;gap:10px;font-family:inherit;font-size:13px;line-height:1.5;pointer-events:auto;max-width:100%;word-break:break-word`;
 
+  // v3.26.0: アクションボタン (opts.actionLabel + opts.actionFn が指定されたら表示)
+  const hasAction = !!(opts.actionLabel && typeof opts.actionFn === 'function');
+  const actionBtnHtml = hasAction
+    ? `<button type="button" id="${id}-action" style="background:${p.btn};color:white;border:none;padding:5px 10px;border-radius:5px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">${escAttr(opts.actionLabel)}</button>`
+    : '';
+
   const fullText = (title ? title+'\n' : '') + (detail||'');
   banner.innerHTML = `
     <div style="flex-shrink:0;font-size:18px;line-height:1">${icon}</div>
@@ -4303,11 +4327,30 @@ function showErrorBanner(title, detail, opts){
       <div style="font-weight:700;margin-bottom:2px">${escAttr(title||'エラー')}</div>
       <div id="${id}-detail" style="font-size:12px;color:${p.fg};opacity:.9;white-space:pre-wrap;max-height:120px;overflow-y:auto;font-family:monospace">${escAttr(detail||'')}</div>
     </div>
-    <div style="flex-shrink:0;display:flex;gap:6px;align-items:center">
+    <div style="flex-shrink:0;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      ${actionBtnHtml}
       <button type="button" id="${id}-copy" style="background:${p.btn};color:white;border:none;padding:5px 10px;border-radius:5px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap" title="エラー内容をクリップボードにコピー">📋 コピー</button>
       <button type="button" id="${id}-close" aria-label="閉じる" style="background:transparent;color:${p.fg};border:none;font-size:18px;cursor:pointer;padding:2px 6px;line-height:1;opacity:.7" title="閉じる">✕</button>
     </div>`;
   container.appendChild(banner);
+
+  // v3.26.0: アクションボタンのハンドラ登録
+  if(hasAction){
+    const actionBtn = document.getElementById(id+'-action');
+    if(actionBtn){
+      actionBtn.addEventListener('click', async ()=>{
+        try{
+          await opts.actionFn();
+        }catch(e){
+          showToast('処理失敗: '+(e?.message||e), '#C0392B');
+          return;
+        }
+        // 実行後はバナーを閉じる(成功扱い)
+        banner.remove();
+        if(container && !container.children.length) container.remove();
+      });
+    }
+  }
 
   // コピーボタン
   document.getElementById(id+'-copy').addEventListener('click', async ()=>{
@@ -5528,9 +5571,11 @@ function openInlineNewCust(){
   document.getElementById('inline-new-cust').style.display='block';
   const csp=document.getElementById('cust-search-panel');
   if(csp) csp.style.display='none';
-  ['nc-name','nc-tel','nc-zip','nc-address'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  // v3.26.0: クリア対象に新フィールドとペーストエリアを追加
+  ['nc-name','nc-tel','nc-fax','nc-zip','nc-address','nc-email','nc-memo','nc-paste-area'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   // 敬称はデフォルト「御中」
   const h=document.getElementById('nc-honorific'); if(h) h.value='御中';
+  const st=document.getElementById('nc-paste-status'); if(st) st.textContent='';
 }
 function closeInlineNewCust(){document.getElementById('inline-new-cust').style.display='none';}
 function saveInlineNewCust(){
@@ -5541,15 +5586,17 @@ function saveInlineNewCust(){
     name,
     honorific:document.getElementById('nc-honorific')?.value||'御中',
     tel:document.getElementById('nc-tel')?.value||'',
-    fax:'',
-    email:'',
+    fax:document.getElementById('nc-fax')?.value||'',
+    email:document.getElementById('nc-email')?.value||'',
     zip:document.getElementById('nc-zip')?.value||'',
     address:document.getElementById('nc-address')?.value||'',
     dept:'',
     category:'',
-    memo:'',
+    memo:document.getElementById('nc-memo')?.value||'',
     contacts:[]
   };
+  // v3.26.0: 規約準拠 — CRUDで stampAudit を呼ぶ
+  if(typeof stampAudit==='function') stampAudit(newCust, true);
   customers.push(newCust);
   persist();
   updateCustomerDatalist();
@@ -6602,9 +6649,146 @@ function parseAndFillCustomer(){
     if(telEl && telEl.value) autoTel(telEl);
     if(faxEl && faxEl.value) autoTel(faxEl);
   }
-  if(typeof autoZip==='function'){
+  // v3.26.0: 住所が既に取れていれば zipcloud 逆引きで上書きしない（番地・建物名の保護）
+  if(typeof autoZip==='function' && !result.address){
     const zipEl=document.getElementById('cust-zip');
     if(zipEl && zipEl.value) autoZip(zipEl,'cust-address',null);
+  }
+
+  if(status){
+    if(applied>0) status.textContent=`✓ ${applied}項目を自動入力しました`;
+    else status.textContent='⚠️ 認識できませんでした。ラベルを追加してください';
+  }
+  if(typeof showToast==='function' && applied>0){
+    showToast(`✓ ${applied}項目を自動入力`, '#10B981');
+  }
+}
+
+// ===== v3.26.0: 書類モーダルのインライン新規顧客追加用パーサー =====
+// parseAndFillCustomer と同じロジックで、対象フィールドが nc-* 系
+function parseAndFillInlineCustomer(){
+  const area=document.getElementById('nc-paste-area');
+  const status=document.getElementById('nc-paste-status');
+  if(!area) return;
+  const raw=area.value.trim();
+  if(!raw){
+    if(status) status.textContent='⚠️ テキストを貼り付けてください';
+    return;
+  }
+
+  const lines=raw.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const result={name:'',zip:'',address:'',tel:'',fax:'',email:'',memo:''};
+
+  const patterns={
+    name:    /^(?:会社名|社名|店舗名|屋号|顧客名|氏名|お名前|名前|宛名|Name|お客様名)[\s:：=\-･・]*/i,
+    zip:     /^(?:〒|郵便番号|Zip|Postal[\s\-]?Code?)[\s:：=\-･・]*/i,
+    address: /^(?:住所|所在地|Address|Addr|送付先|住所１|住所2)[\s:：=\-･・]*/i,
+    tel:     /^(?:TEL|電話|電話番号|℡|Tel\.?|Phone|Mobile|携帯)[\s:：=\-･・]*/i,
+    fax:     /^(?:FAX|ファックス|ＦＡＸ|Fax\.?)[\s:：=\-･・]*/i,
+    email:   /^(?:E[\-\s]?mail|メール|メールアドレス|Email|E-Mail|@)[\s:：=\-･・]*/i,
+  };
+  const zipLooseRe=/(?:〒\s*)?(\d{3}[\s\-]?\d{4})/;
+  const telLooseRe=/(\(?0\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{3,4}|0\d{9,10}|\+81[\s\-]?\d[\s\-]?\d{4}[\s\-]?\d{4})/;
+  const emailLooseRe=/([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})/;
+  let addrLines=[];
+
+  for(const line of lines){
+    let matched=false;
+    for(const [key, pat] of Object.entries(patterns)){
+      if(pat.test(line)){
+        let value=line.replace(pat,'').trim();
+        value=value.replace(/^[:：\s]+/,'').trim();
+        if(!value) { matched=true; break; }
+        if(key==='name'){
+          if(!result.name) result.name=value;
+        } else if(key==='zip'){
+          const m=value.match(/\d{3}[\s\-]?\d{4}/);
+          if(m) result.zip=m[0].replace(/\s/g,'');
+        } else if(key==='address'){
+          addrLines.push(value);
+        } else if(key==='tel'){
+          const m=value.match(telLooseRe);
+          if(m) result.tel=m[1];
+        } else if(key==='fax'){
+          const m=value.match(telLooseRe);
+          if(m) result.fax=m[1];
+        } else if(key==='email'){
+          const m=value.match(emailLooseRe);
+          if(m) result.email=m[1];
+        }
+        matched=true;
+        break;
+      }
+    }
+    if(matched) continue;
+
+    const em=line.match(emailLooseRe);
+    if(em && !result.email){ result.email=em[1]; continue; }
+
+    const zm=line.match(zipLooseRe);
+    if(zm && !result.zip){
+      result.zip=zm[1].replace(/\s/g,'');
+      const rest=line.replace(zm[0],'').trim();
+      if(rest && /[都道府県市区町村]/.test(rest)) addrLines.push(rest);
+      continue;
+    }
+
+    const tm=line.match(telLooseRe);
+    if(tm){
+      if(!result.tel) result.tel=tm[1];
+      else if(!result.fax) result.fax=tm[1];
+      continue;
+    }
+
+    if(/[都道府県市区町村]/.test(line) && line.length>3){
+      addrLines.push(line);
+      continue;
+    }
+
+    if(!result.name){
+      result.name=line;
+      continue;
+    }
+
+    if(result.memo) result.memo+='\n'+line;
+    else result.memo=line;
+  }
+
+  if(addrLines.length) result.address=addrLines.join(' ');
+
+  // 入力欄に反映
+  let applied=0;
+  const fill=(id,val)=>{
+    if(!val) return;
+    const el=document.getElementById(id);
+    if(el){ el.value=val; applied++; }
+  };
+  fill('nc-name', result.name);
+  fill('nc-zip', result.zip);
+  fill('nc-address', result.address);
+  fill('nc-tel', result.tel);
+  fill('nc-fax', result.fax);
+  fill('nc-email', result.email);
+  if(result.memo){
+    const memoEl=document.getElementById('nc-memo');
+    if(memoEl){
+      if(memoEl.value.trim()) memoEl.value = memoEl.value.trim()+'\n'+result.memo;
+      else memoEl.value = result.memo;
+      applied++;
+    }
+  }
+
+  // ハイフン整形
+  if(typeof autoTel==='function'){
+    const telEl=document.getElementById('nc-tel');
+    const faxEl=document.getElementById('nc-fax');
+    if(telEl && telEl.value) autoTel(telEl);
+    if(faxEl && faxEl.value) autoTel(faxEl);
+  }
+  // 住所が既に取れていれば zipcloud 逆引きで上書きしない（番地・建物名の保護）
+  if(typeof autoZip==='function' && !result.address){
+    const zipEl=document.getElementById('nc-zip');
+    if(zipEl && zipEl.value) autoZip(zipEl,'nc-address',null);
   }
 
   if(status){
@@ -8810,7 +8994,8 @@ function buildStaffSelect(){
 // ===== MODAL =====
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function openModal(id){document.getElementById(id).classList.add('open');}
-document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+// v3.26.0: 背景クリックでモーダルを閉じる挙動を廃止（入力中データの消失防止）
+// 閉じるには ✕ ボタン or キャンセルボタンのみ使用
 
 // ===== PAYMENTS =====
 function getPaymentStatus(doc){
@@ -9059,7 +9244,7 @@ function showStaffDetailDocs(staffName, year, month){
   const total=list.reduce((s,d)=>s+(d.grandTotal||0),0);
   const periodLabel=month?`${year}年${month}月`:`${year}年（年間）`;
 
-  const html=`<div class="modal-overlay open" id="staff-detail-modal" onclick="if(event.target===this)closeModal('staff-detail-modal')">
+  const html=`<div class="modal-overlay open" id="staff-detail-modal">
     <div class="modal" style="max-width:780px">
       <div class="modal-header">
         <h3>👤 ${staffName} さんの取引一覧 <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${periodLabel}</span></h3>
@@ -9102,7 +9287,7 @@ function showUnassignedDocs(year, month){
     return true;
   }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
 
-  const html=`<div class="modal-overlay open" id="unassigned-modal" onclick="if(event.target===this)closeModal('unassigned-modal')">
+  const html=`<div class="modal-overlay open" id="unassigned-modal">
     <div class="modal" style="max-width:700px">
       <div class="modal-header">
         <h3>📋 担当未割当の書類（${list.length}件）</h3>
@@ -11199,6 +11384,30 @@ function clearGcalToken(){
   sessionStorage.removeItem('google_token_at');
 }
 
+// v3.26.0: Googleアクセストークンを再取得(ログイン状態を維持しつつ accessToken だけ再発行)
+// signInWithPopup を呼ぶことで、既ログイン中でもポップアップ経由でtokenを取り直せる
+async function reauthGcal(){
+  const F = window._FB;
+  if(!F){ showToast('Firebase未初期化のため再認証できません', '#C0392B'); return false; }
+  try{
+    const result = await F.signInWithPopup(F.auth, F.provider);
+    const cred = F.GoogleAuthProvider.credentialFromResult(result);
+    if(cred?.accessToken){
+      window._gcalToken = { token: cred.accessToken, at: Date.now() };
+      sessionStorage.setItem('google_access_token', cred.accessToken);
+      sessionStorage.setItem('google_token_at', String(Date.now()));
+      // Gcal設定モーダルが開いていればステータス表示を更新
+      const tokenStatus = document.getElementById('gcal-token-status');
+      if(tokenStatus) tokenStatus.textContent = '✅ 認証済み';
+      return true;
+    }
+    return false;
+  }catch(e){
+    // ユーザーがポップアップを閉じた / 認証拒否 など
+    return false;
+  }
+}
+
 // 作業をGoogleカレンダーのイベントに変換
 function jobToGcalEvent(job){
   const cust=job.customer?customers.find(c=>c.name===job.customer):null;
@@ -11284,6 +11493,27 @@ async function callGcalApi(path, method, body){
 // 作業をGoogleカレンダーに同期
 async function syncJobToGcal(job){
   if(!isGcalEnabled()) return;
+  // v3.26.0: トークン事前チェック ─ 無ければ自動で再認証フローを起動
+  if(!getGcalAccessToken()){
+    showToast('🔐 Googleカレンダー認証が必要です。ポップアップで許可してください', '#3498DB');
+    const ok = await reauthGcal();
+    if(!ok){
+      showErrorBanner(
+        '📅 Googleカレンダー同期エラー',
+        '予定「'+(job.title||job.customer||'無題')+'」を同期できませんでした。\n再認証に失敗または拒否されました。',
+        {kind:'error', actionLabel:'🔐 もう一度認証する', actionFn: async ()=>{
+          const r = await reauthGcal();
+          if(r){
+            showToast('✓ 認証成功。同期を再実行します');
+            await syncJobToGcal(job);
+          } else {
+            showToast('再認証に失敗しました', '#C0392B');
+          }
+        }}
+      );
+      return;
+    }
+  }
   const calId=encodeURIComponent(getGcalCalendarId());
   const event=jobToGcalEvent(job);
   try{
@@ -11309,6 +11539,21 @@ async function syncJobToGcal(job){
         +'1. Google アカウント権限ページで Flexsys2026 の権限を削除\n'
         +'2. 当アプリからログアウト→再ログインで「カレンダー操作」を許可',
         {kind:'error'}
+      );
+    } else if(/アクセストークン|認証期限切れ|401/i.test(msg)){
+      // v3.26.0: トークン関連エラーは再認証ボタンで即解決可能に
+      showErrorBanner(
+        '📅 Googleカレンダー認証が必要です',
+        '予定「'+(job.title||job.customer||'無題')+'」\n'+msg,
+        {kind:'error', actionLabel:'🔐 もう一度認証する', actionFn: async ()=>{
+          const r = await reauthGcal();
+          if(r){
+            showToast('✓ 認証成功。同期を再実行します');
+            await syncJobToGcal(job);
+          } else {
+            showToast('再認証に失敗しました', '#C0392B');
+          }
+        }}
       );
     } else {
       showErrorBanner('📅 Googleカレンダー同期エラー', '予定「'+(job.title||job.customer||'無題')+'」\n'+msg, {kind:'error'});
@@ -11715,7 +11960,7 @@ function replyToBulletin(parentId){
 
 // 簡易テキスト入力ダイアログ
 function showInputDialog(label, onOk){
-  const html=`<div class="modal-overlay open" id="input-dialog-modal" onclick="if(event.target===this)closeModal('input-dialog-modal')">
+  const html=`<div class="modal-overlay open" id="input-dialog-modal">
     <div class="modal" style="max-width:500px">
       <div class="modal-header"><h3>${label}</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('input-dialog-modal')">✕</button></div>
       <div class="modal-body">
@@ -12077,7 +12322,7 @@ function showDocsDrilldown(rangeType, opts){
 function _renderDrilldownDocs(title, filterDesc, list){
   const total=list.reduce((s,d)=>s+(d.grandTotal||0),0);
   const tc={'見積書':'badge-quote','請求書':'badge-invoice','領収書':'badge-receipt'};
-  const html=`<div class="modal-overlay open" id="drilldown-modal" onclick="if(event.target===this)closeModal('drilldown-modal')">
+  const html=`<div class="modal-overlay open" id="drilldown-modal">
     <div class="modal" style="max-width:780px">
       <div class="modal-header">
         <h3>📊 ${title} <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${filterDesc}</span></h3>
@@ -12111,7 +12356,7 @@ function _renderDrilldownExpenses(title, filterDesc, list){
   list.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const total=list.reduce((s,e)=>s+(e.total||0),0);
   const sc={'未精算':'badge-draft','精算済':'badge-paid'};
-  const html=`<div class="modal-overlay open" id="drilldown-modal" onclick="if(event.target===this)closeModal('drilldown-modal')">
+  const html=`<div class="modal-overlay open" id="drilldown-modal">
     <div class="modal" style="max-width:780px">
       <div class="modal-header">
         <h3>💸 ${title} <span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${filterDesc}</span></h3>
