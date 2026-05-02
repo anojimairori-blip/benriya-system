@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://*.firebasestorage.app https://api.anthropic.com https://benriya-system.pages.dev https://zipcloud.ibsnet.co.jp https://api.qrserver.com; frame-src https://flexsysv2026.firebaseapp.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.com https://www.gstatic.com https://apis.google.com; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebase.com https://*.firebasestorage.app https://api.anthropic.com https://benriya-system.pages.dev https://zipcloud.ibsnet.co.jp https://api.qrserver.com https://api.open-meteo.com https://msearch.gsi.go.jp; frame-src https://flexsysv2026.firebaseapp.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:; upgrade-insecure-requests">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Permissions-Policy" content="geolocation=(self), camera=(self), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()">
@@ -1719,7 +1719,7 @@ if('serviceWorker' in navigator){
   <div class="content" id="content-quotes"></div>
 </div>
 <div id="page-invoices" class="page">
-  <div class="main-header"><h2>📋 請求書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-blue" onclick="openNewDoc('請求書')">＋ 新規請求書</button></div></div>
+  <div class="main-header"><h2>📋 請求書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-secondary" onclick="openBulkPdfModal('請求書')" title="請求書を複数まとめてPDF出力">📑 まとめてPDF</button><button class="btn btn-blue" onclick="openNewDoc('請求書')">＋ 新規請求書</button></div></div>
   <div class="content" id="content-invoices"></div>
 </div>
 <div id="page-receipts" class="page">
@@ -3777,8 +3777,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.26.1';
-const APP_BUILD_TIME='2026/05/03 06:56';
+const APP_VERSION='v3.27.0';
+const APP_BUILD_TIME='2026/05/03 07:30';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5446,6 +5446,7 @@ function renderDocRows(tbodyId,list,showType){
     <td style="white-space:nowrap;display:flex;gap:3px;padding:6px 8px;flex-wrap:wrap">
       <button class="btn btn-secondary btn-sm" onclick="previewDoc('${d.id}')">表示</button>
       <button class="btn btn-secondary btn-sm" onclick="editDoc('${d.id}')">編集</button>
+      <button class="btn btn-secondary btn-sm" title="この書類を複製して新規作成" onclick="duplicateDoc('${d.id}')">📋 複製</button>
       ${d.type==='見積書'?`<button class="btn btn-blue btn-sm" onclick="convertDoc('${d.id}','請求書')">→請求</button>`:''}
       ${d.type==='請求書'?`<button class="btn btn-primary btn-sm" onclick="convertDoc('${d.id}','領収書')">→領収</button>`:''}
       <button class="btn-photo-action" title="作業写真の管理・共有" onclick="openPhotoModal('${d.id}')">📷 写真${(docPhotos[d.id]||[]).length>0?`<span class="photo-count">${docPhotos[d.id].length}</span>`:''}</button>
@@ -5847,6 +5848,46 @@ function convertDoc(id,toType){
   }); // end showConfirm
 }
 
+// v3.27.0: A6 書類複製 - 同じ種別で書類をコピーして新規作成モードで開く
+function duplicateDoc(id){
+  const d=docs.find(x=>x.id===id);if(!d)return;
+  showConfirm(`この${d.type}を複製しますか？\n（顧客・件名・品目を引き継いだ新規${d.type}が開きます）`, ()=>{
+    editingDocId=null;
+    document.getElementById('doc-type').value=d.type;
+    document.getElementById('doc-number').value=genNumber(d.type);
+    document.getElementById('doc-date').value=today();
+    document.getElementById('doc-subject').value=d.subject||'';
+    document.getElementById('doc-category').value=d.category||'';
+    document.getElementById('doc-notes').value=d.notes||'';
+    buildStatusSelect('doc-status', docStatuses[0]?.value||'下書き');
+    document.getElementById('doc-modal-title').textContent=d.type+'（複製）';
+    const q2=document.getElementById('cust-search-q');if(q2)q2.value='';
+    document.getElementById('inline-new-cust').style.display='none';
+    const c=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
+    selectedCustId=c?.id||null;
+    if(c)renderSelectedCust(c);else document.getElementById('selected-cust-card').style.display='none';
+    // 自社担当スタッフを引き継ぎ
+    buildStaffSelect();
+    const ss=document.getElementById('doc-staff-select');
+    if(ss&&d.staff) ss.value=d.staff;
+    // 顧客担当者を引き継ぎ
+    setTimeout(()=>{
+      const ds=document.getElementById('doc-contact');
+      if(ds&&d.contact) ds.value=d.contact;
+    },100);
+    // 支払期限の自動計算（請求書の場合）
+    if(d.type==='請求書'){
+      const days=settings.payDays||14;
+      const due=new Date();due.setDate(due.getDate()+days);
+      const dueEl=document.getElementById('doc-due-date');
+      if(dueEl) dueEl.value=due.toISOString().split('T')[0];
+    }
+    document.getElementById('line-items-container').innerHTML='';
+    (d.lines||[]).forEach(l=>addLineItem(l));calcTotals();
+    document.getElementById('doc-modal').classList.add('open');
+  });
+}
+
 // ===== PREVIEW =====
 function previewDoc(id){
   const d=docs.find(x=>x.id===id);if(!d)return;
@@ -6006,6 +6047,27 @@ async function shareNativePreview(){
 }
 
 // ===== PDF生成 共通ヘルパー =====
+// v3.27.0: B5 PDFファイル名カスタマイズ用ヘルパー
+function buildPdfFilename(d){
+  if(!d) return 'document.pdf';
+  // ファイル名禁則文字をアンダースコアに置換
+  const sanitize = (s) => String(s||'').replace(/[\/\\:*?"<>|]/g, '_').replace(/\s+/g, '_').trim();
+  const type = d.type || '書類';
+  const cust = d.customer ? sanitize(d.customer) : '';
+  const honorific = (() => {
+    if(!d.customer) return '';
+    const c = customers.find(x => x.name === d.customer);
+    return c?.honorific || '';
+  })();
+  const dateStr = d.date || today();
+  // 例: 見積書_テスト株式会社御中_2026-05-03.pdf
+  // 顧客名がない場合は: 見積書_2026-05-03.pdf
+  const parts = [type];
+  if(cust) parts.push(cust + (honorific ? sanitize(honorific) : ''));
+  parts.push(dateStr);
+  return parts.join('_') + '.pdf';
+}
+
 async function _generatePdfBlob(){
   // 監査情報・スタンプを一時的に非表示にしてPDF化（印刷時と同じ見た目）
   const previewDoc=document.querySelector('#preview-body .preview-doc');
@@ -6017,7 +6079,8 @@ async function _generatePdfBlob(){
   if(typeof html2pdf==='undefined') throw new Error('PDFライブラリが読み込まれていません');
 
   const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
-  const fname=d?`${d.type}_${d.number||'doc'}.pdf`:'document.pdf';
+  // v3.27.0: B5 PDFファイル名カスタマイズ - 「種別_顧客名敬称_日付.pdf」形式
+  const fname=d?buildPdfFilename(d):'document.pdf';
 
   const opt={
     margin: [10,10,10,10],
@@ -6034,6 +6097,170 @@ async function _generatePdfBlob(){
   } finally {
     // 元に戻す
     hideEls.forEach((el,i)=>{el.style.display=oldDisplay[i]||'';});
+  }
+}
+
+// ===== v3.27.0: B2 まとめてPDF出力 =====
+// 請求書一覧から「今月分」または「選択したもの」を1つのPDFに連結出力
+function openBulkPdfModal(type){
+  const now=new Date();
+  const y=now.getFullYear();
+  const m=now.getMonth();
+  // 今月分
+  const thisMonth=docs.filter(d=>{
+    if(d.type!==type) return false;
+    if(!d.date) return false;
+    const dt=new Date(d.date);
+    return dt.getFullYear()===y && dt.getMonth()===m;
+  });
+  // 全期間（直近50件・新しい順）
+  const all=docs.filter(d=>d.type===type).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,50);
+
+  const html=`
+    <div class="modal-overlay open" id="bulk-pdf-modal">
+      <div class="modal" style="max-width:640px">
+        <div class="modal-header">
+          <h3>📑 ${escAttr(type)}まとめてPDF出力</h3>
+          <button class="close-btn" aria-label="閉じる" onclick="closeBulkPdfModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;margin-bottom:14px;color:var(--text2)">複数の${escAttr(type)}を1つのPDFファイルに連結して出力します。</p>
+          <div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:14px;margin-bottom:14px">
+            <p style="font-size:12px;font-weight:700;margin-bottom:8px">📅 今月分まとめて</p>
+            <button class="btn btn-primary" style="width:100%" onclick="executeBulkPdf('thisMonth','${escAttr(type)}')" ${thisMonth.length===0?'disabled':''}>${y}年${String(m+1).padStart(2,'0')}月分すべて（${thisMonth.length}件）をPDF出力</button>
+          </div>
+          <div style="background:var(--surface2);border-radius:8px;padding:14px">
+            <p style="font-size:12px;font-weight:700;margin-bottom:8px">📋 選択して出力（直近50件から選択）</p>
+            <div style="display:flex;gap:6px;margin-bottom:6px">
+              <button class="btn btn-secondary btn-sm" onclick="bulkPdfSelectAll(true)">全選択</button>
+              <button class="btn btn-secondary btn-sm" onclick="bulkPdfSelectAll(false)">全解除</button>
+              <span id="bulk-pdf-count" style="font-size:11px;color:var(--text3);align-self:center;margin-left:auto">0件選択中</span>
+            </div>
+            <div id="bulk-pdf-checklist" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:4px;background:var(--surface)">
+              ${all.length===0?'<div style="text-align:center;padding:20px;color:var(--text3)">対象書類がありません</div>':
+                all.map(d=>`
+                  <label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--border);cursor:pointer;font-size:12px">
+                    <input type="checkbox" name="bulk-pdf-select" value="${escAttr(d.id)}" onchange="updateBulkPdfCount()">
+                    <span style="font-family:monospace;color:var(--text3);width:120px;flex-shrink:0">${escAttr(d.number||'(番号なし)')}</span>
+                    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escAttr(d.customer||'—')} / ${escAttr(d.subject||'')}</span>
+                    <span style="color:var(--text3);font-size:11px;flex-shrink:0">${escAttr(d.date||'')}</span>
+                  </label>
+                `).join('')}
+            </div>
+            <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="executeBulkPdf('selected','${escAttr(type)}')">📄 選択したものをPDF出力</button>
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content:flex-end">
+          <button class="btn btn-secondary" onclick="closeBulkPdfModal()">閉じる</button>
+        </div>
+      </div>
+    </div>`;
+  // 既存があれば削除して再作成
+  const existing=document.getElementById('bulk-pdf-modal');
+  if(existing) existing.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function closeBulkPdfModal(){
+  const m=document.getElementById('bulk-pdf-modal');
+  if(m) m.remove();
+}
+
+function bulkPdfSelectAll(state){
+  document.querySelectorAll('input[name="bulk-pdf-select"]').forEach(cb=>{cb.checked=state;});
+  updateBulkPdfCount();
+}
+
+function updateBulkPdfCount(){
+  const n=document.querySelectorAll('input[name="bulk-pdf-select"]:checked').length;
+  const el=document.getElementById('bulk-pdf-count');
+  if(el) el.textContent=n+'件選択中';
+}
+
+async function executeBulkPdf(mode, type){
+  const now=new Date();
+  const y=now.getFullYear();
+  const m=now.getMonth();
+  let docIds=[];
+  if(mode==='thisMonth'){
+    docIds=docs.filter(d=>{
+      if(d.type!==type) return false;
+      if(!d.date) return false;
+      const dt=new Date(d.date);
+      return dt.getFullYear()===y && dt.getMonth()===m;
+    }).sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(d=>d.id);
+  } else if(mode==='selected'){
+    const checks=document.querySelectorAll('input[name="bulk-pdf-select"]:checked');
+    docIds=Array.from(checks).map(c=>c.value);
+  }
+  if(docIds.length===0){
+    showToast('対象がありません','#C0392B');
+    return;
+  }
+  // ファイル名
+  const monthStr=`${y}年${String(m+1).padStart(2,'0')}月`;
+  const filename = mode==='thisMonth'
+    ? `${type}まとめ_${monthStr}_${docIds.length}件.pdf`
+    : `${type}まとめ_${docIds.length}件.pdf`;
+  closeBulkPdfModal();
+  await bulkExportPdf(docIds, filename, type);
+}
+
+// 複数書類を1つのPDFに連結出力
+async function bulkExportPdf(docIds, filename, type){
+  if(typeof html2pdf==='undefined'){
+    showToast('PDFライブラリが読み込まれていません','#C0392B');
+    return;
+  }
+  showToast(`📑 ${docIds.length}件のPDFを生成中... しばらくお待ちください`);
+  // 元の状態を保存
+  const previewModal=document.getElementById('preview-modal');
+  const previewBody=document.getElementById('preview-body');
+  const wasPreviewOpen = previewModal && previewModal.classList.contains('open');
+  const originalPreviewBodyHtml = previewBody ? previewBody.innerHTML : '';
+  const originalPreviewDocId = currentPreviewDocId;
+
+  // 隠しコンテナを作成（A4幅を再現）
+  const container=document.createElement('div');
+  container.id='bulk-pdf-container';
+  container.style.cssText='position:fixed;left:-99999px;top:0;width:794px;background:white;z-index:-1';
+  document.body.appendChild(container);
+
+  try{
+    const htmlParts=[];
+    for(let i=0; i<docIds.length; i++){
+      const d=docs.find(x=>x.id===docIds[i]);
+      if(!d) continue;
+      // previewDoc を使ってHTML生成（preview-modalを開かずに使うため、一時的に表示せずrender）
+      previewDoc(d.id);
+      const html = previewBody ? previewBody.innerHTML : '';
+      // モーダルが開いている状態でHTMLが入る → モーダルを閉じる前に取り出し
+      htmlParts.push(`<div class="preview-doc-wrapper" style="${i<docIds.length-1?'page-break-after:always;':''}padding:20px">${html}</div>`);
+    }
+    container.innerHTML = htmlParts.join('');
+
+    const opt={
+      margin:[10,10,10,10],
+      filename:filename,
+      image:{type:'jpeg', quality:0.95},
+      html2canvas:{scale:1.5, useCORS:true, allowTaint:false, backgroundColor:'#ffffff', logging:false},
+      jsPDF:{unit:'mm', format:'a4', orientation:'portrait', compress:true},
+      pagebreak:{mode:['css','legacy']}
+    };
+    await html2pdf().set(opt).from(container).save();
+    showToast(`✓ ${docIds.length}件をPDF出力しました`,'#27AE60');
+  }catch(e){
+    showErrorBanner('まとめてPDF生成エラー', String(e?.message||e), {kind:'error'});
+  }finally{
+    // 一時コンテナを削除
+    container.remove();
+    // 元の状態を復元
+    if(previewBody) previewBody.innerHTML = originalPreviewBodyHtml;
+    currentPreviewDocId = originalPreviewDocId;
+    if(previewModal){
+      if(wasPreviewOpen) previewModal.classList.add('open');
+      else previewModal.classList.remove('open');
+    }
   }
 }
 
@@ -6968,6 +7195,161 @@ const JP_HOLIDAYS={
 function isJpHoliday(dateStr){
   return !!JP_HOLIDAYS[dateStr];
 }
+
+// ===== v3.27.0: B6 天気予報 =====
+// 千歳市フォールバック座標（緯度・経度）
+const FALLBACK_LAT_LNG = {lat: 42.8205, lng: 141.6520, name: '千歳市(フォールバック)'};
+
+// 会社住所から緯度経度を解決（国土地理院API）
+async function resolveCompanyLatLng(){
+  const currentAddr = (settings.zip||'') + '|' + (settings.address||'');
+  // キャッシュチェック（住所が同じなら再取得不要）
+  try{
+    const cachedAddr = localStorage.getItem('companyLatLng_addr_v1');
+    const cached = localStorage.getItem('companyLatLng_v1');
+    if(cachedAddr === currentAddr && cached){
+      return JSON.parse(cached);
+    }
+  }catch(e){}
+
+  // 住所が空ならフォールバック
+  const queryAddr = settings.address || settings.zip || '';
+  if(!queryAddr){
+    return FALLBACK_LAT_LNG;
+  }
+
+  // 国土地理院 Geocoding API
+  try{
+    const q = encodeURIComponent(queryAddr);
+    const r = await fetch(`https://msearch.gsi.go.jp/address-search/AddressSearch?q=${q}`);
+    if(!r.ok) throw new Error('GSI API '+r.status);
+    const j = await r.json();
+    if(Array.isArray(j) && j.length > 0 && j[0].geometry?.coordinates){
+      // GSIは [経度, 緯度] の順 (GeoJSON規格)
+      const [lng, lat] = j[0].geometry.coordinates;
+      const result = {lat, lng, name: j[0].properties?.title || queryAddr};
+      try{
+        localStorage.setItem('companyLatLng_v1', JSON.stringify(result));
+        localStorage.setItem('companyLatLng_addr_v1', currentAddr);
+      }catch(e){}
+      return result;
+    }
+  }catch(e){
+    // 失敗 → フォールバック
+  }
+  return FALLBACK_LAT_LNG;
+}
+
+// WMO weather codeを絵文字に変換
+function weatherCodeToIcon(code){
+  if(code === 0) return '☀️';
+  if(code === 1) return '🌤️';
+  if(code === 2) return '⛅';
+  if(code === 3) return '☁️';
+  if(code === 45 || code === 48) return '🌫️';
+  if(code >= 51 && code <= 57) return '🌦️';
+  if(code >= 61 && code <= 67) return '🌧️';
+  if(code >= 71 && code <= 77) return '❄️';
+  if(code >= 80 && code <= 82) return '🌧️';
+  if(code === 85 || code === 86) return '❄️';
+  if(code >= 95 && code <= 99) return '⛈️';
+  return '';
+}
+
+// 天気予報を取得（1時間キャッシュ）
+let _weatherCache = null;
+async function fetchWeatherForecast(){
+  // メモリキャッシュ
+  if(_weatherCache && (Date.now() - _weatherCache.at) < 60*60*1000){
+    return _weatherCache.data;
+  }
+  // localStorageキャッシュ
+  try{
+    const stored = localStorage.getItem('weatherCache_v1');
+    if(stored){
+      const obj = JSON.parse(stored);
+      if(obj && obj.at && (Date.now() - obj.at) < 60*60*1000){
+        _weatherCache = obj;
+        return obj.data;
+      }
+    }
+  }catch(e){}
+
+  // 緯度経度を取得
+  const loc = await resolveCompanyLatLng();
+  // OpenMeteo API
+  try{
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lng}&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&forecast_days=16`;
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('OpenMeteo API '+r.status);
+    const j = await r.json();
+    // データ整形: {date: {code, max, min}}
+    const data = {};
+    if(j.daily && j.daily.time){
+      for(let i=0; i<j.daily.time.length; i++){
+        data[j.daily.time[i]] = {
+          code: j.daily.weather_code?.[i],
+          max: j.daily.temperature_2m_max?.[i],
+          min: j.daily.temperature_2m_min?.[i]
+        };
+      }
+    }
+    const cached = {at: Date.now(), data, locName: loc.name};
+    _weatherCache = cached;
+    try{ localStorage.setItem('weatherCache_v1', JSON.stringify(cached)); }catch(e){}
+    return data;
+  }catch(e){
+    return {};
+  }
+}
+
+// カレンダー表示後に天気アイコンを各日付セルに反映
+async function applyWeatherToCalendar(){
+  try{
+    const data = await fetchWeatherForecast();
+    if(!data || Object.keys(data).length === 0) return;
+    // FullCalendar の dayGrid セルに反映
+    document.querySelectorAll('.fc-daygrid-day[data-date]').forEach(cell=>{
+      const date = cell.getAttribute('data-date');
+      const w = data[date];
+      if(!w || w.code===undefined) return;
+      // 既存の天気アイコンがあれば削除
+      const existing = cell.querySelector('.fx-weather');
+      if(existing) existing.remove();
+      const icon = weatherCodeToIcon(w.code);
+      if(!icon) return;
+      const numEl = cell.querySelector('.fc-daygrid-day-number');
+      if(!numEl) return;
+      const span = document.createElement('span');
+      span.className = 'fx-weather';
+      span.style.cssText = 'margin-left:4px;font-size:13px';
+      span.title = `天気: ${icon} 最高${Math.round(w.max||0)}℃ 最低${Math.round(w.min||0)}℃`;
+      span.textContent = icon;
+      numEl.appendChild(span);
+    });
+    // レガシーカレンダーのセルにも反映
+    document.querySelectorAll('#cal-grid .cal-day[data-date]').forEach(cell=>{
+      const date = cell.getAttribute('data-date');
+      const w = data[date];
+      if(!w || w.code===undefined) return;
+      const existing = cell.querySelector('.fx-weather');
+      if(existing) existing.remove();
+      const icon = weatherCodeToIcon(w.code);
+      if(!icon) return;
+      const numEl = cell.querySelector('.day-num');
+      if(!numEl) return;
+      const span = document.createElement('span');
+      span.className = 'fx-weather';
+      span.style.cssText = 'margin-left:4px;font-size:12px';
+      span.title = `天気: ${icon} 最高${Math.round(w.max||0)}℃ 最低${Math.round(w.min||0)}℃`;
+      span.textContent = icon;
+      numEl.appendChild(span);
+    });
+  }catch(e){
+    // 天気取得失敗は無視（カレンダー本体の動作に影響させない）
+  }
+}
+
 function _formatLocalDate(d){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
@@ -7213,9 +7595,17 @@ function renderCalendar(){
       datesSet:(info)=>{
         _syncCalMonthFromFc();
         renderJobList();
+        // v3.27.0: B6 月切替時に天気アイコンを反映
+        if(typeof applyWeatherToCalendar==='function'){
+          setTimeout(()=>applyWeatherToCalendar(), 50);
+        }
       }
     });
     _fc.render();
+    // v3.27.0: B6 初回描画後に天気アイコンを反映
+    if(typeof applyWeatherToCalendar==='function'){
+      setTimeout(()=>applyWeatherToCalendar(), 100);
+    }
     // リサイズ追従（ウィンドウ・サイドバー折りたたみ・回転対応）
     if(!window._fcResizeBound){
       window._fcResizeBound=true;
@@ -7272,7 +7662,7 @@ function renderLegacyCalendar(){
     const isHol=isJpHoliday(ds);
     // v3.26.1: 祝日は赤、土曜は青、日曜は赤
     const dowColor=isHol?'#D93025':(dow===5?'#1A73E8':dow===6?'#D93025':'');
-    html+=`<div class="cal-day other-month"><div class="day-num" style="color:${dowColor||'var(--text3)'}">${d.getDate()}</div></div>`;
+    html+=`<div class="cal-day other-month" data-date="${ds}"><div class="day-num" style="color:${dowColor||'var(--text3)'}">${d.getDate()}</div></div>`;
   }
   for(let d=1;d<=last.getDate();d++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -7284,7 +7674,7 @@ function renderLegacyCalendar(){
     const dowColor=isHol?'#D93025':(dow===5?'#1A73E8':dow===6?'#D93025':'');
     const cellBg=isHol?'background:rgba(217,48,37,0.05)':'';
     const dj=jobs.filter(j=>j.date===ds);
-    html+=`<div class="cal-day${ds===ts?' today':''}" style="${cellBg}" onclick="openJobModal('${ds}')">
+    html+=`<div class="cal-day${ds===ts?' today':''}" data-date="${ds}" style="${cellBg}" onclick="openJobModal('${ds}')">
       <div class="day-num" style="${dowColor?`color:${dowColor};font-weight:700`:''}">${d}</div>
       ${isHol?`<div style="font-size:9px;color:#D93025;font-weight:700;margin-top:1px;line-height:1.2">🎌 ${escAttr(holName)}</div>`:''}
       ${dj.slice(0,2).map(j=>`<div class="cal-event type-job" onclick="event.stopPropagation();editJob('${j.id}')">${j.time?j.time+' ':''} ${escAttr(j.title||'')}</div>`).join('')}
@@ -7292,6 +7682,10 @@ function renderLegacyCalendar(){
     </div>`;
   }
   grid.innerHTML=html;renderJobList();
+  // v3.27.0: B6 天気アイコンを反映
+  if(typeof applyWeatherToCalendar==='function'){
+    setTimeout(()=>applyWeatherToCalendar(), 50);
+  }
 }
 function calPrev(){
   if(_fc){_fc.prev();return;}
