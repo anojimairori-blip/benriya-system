@@ -1441,15 +1441,16 @@ if('serviceWorker' in navigator){
 }
 </script>
 <!-- FullCalendar (Phase A: 月表示+ドラッグ) -->
+<!-- v3.26.1: SRIハッシュが不一致でブラウザに弾かれてレガシーフォールバックしていた問題を修正 -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"
-  integrity="sha384-qibYXUYNRM4rzVM/jrnpVTzX6pFnjUokUGlYllI2fJQ/9pK1KqyFlD0wR4VlR3Dv"
+  integrity="sha384-5JIwZN3kuxX2zKsavvNmbZ3zhZZMUtu/eQiK3BbXukpSXp0Cd2ZP4OAYKx7mrPgI"
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!-- html2pdf for PDF export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
   integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/ja.global.min.js"
-  integrity="sha384-mBcHSuG3w3rP9ElOVo2iZqcV2BlXdVgV+bw0R2Aqwyxt9xTsWjB8/gLRZ+5hFwK7"
+  integrity="sha384-gUPFb+preAP7G8z2MPaXHkJsLqrQFY8fIMTOMo4skGOxG/PcHI324sHK/ZdM8okF"
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
@@ -1531,7 +1532,10 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-item" id="nav-bulletin" onclick="showPage('bulletin',this)" style="background:#E67E22;color:white;border-radius:8px;margin:4px 8px 8px;padding:10px 12px;font-weight:700"><span class="nav-icon">📌</span><span class="nav-label" style="color:white">掲示板</span><span class="nav-tooltip">掲示板</span><span id="bulletin-badge" style="display:none;background:white;color:#E67E22;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;margin-left:auto"></span></div>
+    <!-- v3.26.1: 掲示板ボタンを他のnav-itemと同じ通常表示に統一(オレンジ強調を削除) -->
+    <div class="nav-item" id="nav-bulletin" onclick="showPage('bulletin',this)"><span class="nav-icon">📌</span><span class="nav-label">掲示板</span><span class="nav-tooltip">掲示板</span><span id="bulletin-badge" style="display:none;background:#D93025;color:white;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;margin-left:auto">New</span></div>
+    <!-- v3.26.1: 掲示板の新着投稿日時を小さく表示(新着あり時のみ) -->
+    <div id="bulletin-new-info" style="display:none;font-size:10px;color:var(--text3);margin:-4px 12px 4px 38px;line-height:1.3"></div>
     <div class="nav-section">メイン</div>
     <div class="nav-item" onclick="showPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">ホーム</span><span class="nav-tooltip">ホーム</span></div>
     <div class="nav-item" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">ダッシュボード</span><span class="nav-tooltip">ダッシュボード</span></div>
@@ -2711,8 +2715,16 @@ if('serviceWorker' in navigator){
           <button class="btn btn-secondary btn-sm" onclick="openInlineNewCust()" style="white-space:nowrap">＋ 新規登録</button>
         </div>
         <!-- Inline new customer (collapsed) -->
-        <div id="inline-new-cust" style="display:none;background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:8px">
-          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px">＋ 新規顧客を登録</div>
+        <!-- v3.26.1: 背景色を accent-light に変更 + タイトル右上にボタン配置 + 下部ボタン削除 -->
+        <div id="inline-new-cust" style="display:none;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:12px;margin-bottom:8px">
+          <!-- v3.26.1: タイトル + 右上のキャンセル/登録ボタン群 -->
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <div style="font-size:13px;font-weight:700;color:var(--accent)">＋ 新規顧客を登録</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-secondary btn-sm" onclick="closeInlineNewCust()">✕ キャンセル</button>
+              <button class="btn btn-primary btn-sm" onclick="saveInlineNewCust()">💾 登録して選択</button>
+            </div>
+          </div>
           <!-- v3.26.0: 貼り付けパーサー(顧客モーダルと同等) -->
           <details style="margin-bottom:10px">
             <summary style="cursor:pointer;font-weight:700;color:var(--accent);font-size:12px;user-select:none">📋 貼り付けで自動入力（クリックで開く）</summary>
@@ -2751,12 +2763,8 @@ if('serviceWorker' in navigator){
           <div class="form-row cols2" style="margin-bottom:8px">
             <div class="form-group" style="grid-column:span 2"><label>メールアドレス</label><input type="email" id="nc-email"></div>
           </div>
-          <div class="form-row" style="margin-bottom:8px">
+          <div class="form-row" style="margin-bottom:0">
             <div class="form-group"><label>メモ</label><textarea id="nc-memo" rows="2" style="font-family:inherit;resize:vertical"></textarea></div>
-          </div>
-          <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button class="btn btn-secondary btn-sm" onclick="closeInlineNewCust()">キャンセル</button>
-            <button class="btn btn-primary btn-sm" onclick="saveInlineNewCust()">💾 登録して選択</button>
           </div>
         </div>
       </div>
@@ -3769,8 +3777,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.26.0';
-const APP_BUILD_TIME='2026/05/03 06:00';
+const APP_VERSION='v3.26.1';
+const APP_BUILD_TIME='2026/05/03 06:56';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5174,7 +5182,7 @@ function showPage(id, el, addToHistory=true){
   if(id==='payments') renderPayments();
   if(id==='staff-report') renderStaffReport();
   if(id==='expenses') renderExpenses();
-  if(id==='bulletin') renderBulletins();
+  if(id==='bulletin'){renderBulletins(); markBulletinAsViewed();}
   if(id==='backup') updateBackupStats();
   if(id==='dashboard') renderDashboard();
   if(id==='tax') renderTaxPage();
@@ -5369,6 +5377,8 @@ function renderAll(){
   renderDocPageFiltered('receipts','領収書');
   renderCustomerList();
   updateCustomerDatalist();
+  // v3.26.1: 掲示板新着バッジ更新(他端末からの投稿同期時にも反映)
+  if(typeof updateBulletinNavBadge==='function') updateBulletinNavBadge();
   // ホーム画面が表示中なら再描画
   if(currentPageId==='home') renderHome();
 }
@@ -5424,7 +5434,7 @@ function renderDocRows(tbodyId,list,showType){
       :`<span class="badge badge-draft">${escAttr(d.status||'下書き')}</span>`;
     // onclick文字列のJSリテラル安全化
     const custForJs=(d.customer||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/\r/g,'\\r');
-    return`<tr style="cursor:pointer" onclick="previewDoc('${d.id}')" title="クリックでプレビュー">
+    return`<tr style="cursor:pointer" onclick="if(event.target.closest('button,a,span[onclick]'))return;previewDoc('${d.id}')" title="クリックでプレビュー(ボタン以外)">
     <td style="font-family:monospace;font-size:12px">${escAttr(d.number||'')}</td>
     ${showType?`<td><span class="badge ${tc[d.type]||''}">${escAttr(d.type||'')}</span></td>`:''}
     <td><a href="#" onclick="openCustDetail('${custForJs}');return false" style="color:var(--accent);text-decoration:none;font-weight:500">${escAttr(d.customer||'—')}</a></td>
@@ -7258,17 +7268,25 @@ function renderLegacyCalendar(){
   for(let i=0;i<firstDayMon;i++){
     const d=new Date(calYear,calMonth,1-firstDayMon+i);
     const dow=(d.getDay()+6)%7;
-    const dowColor=dow===5?'#1A73E8':dow===6?'#D93025':'';
+    const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const isHol=isJpHoliday(ds);
+    // v3.26.1: 祝日は赤、土曜は青、日曜は赤
+    const dowColor=isHol?'#D93025':(dow===5?'#1A73E8':dow===6?'#D93025':'');
     html+=`<div class="cal-day other-month"><div class="day-num" style="color:${dowColor||'var(--text3)'}">${d.getDate()}</div></div>`;
   }
   for(let d=1;d<=last.getDate();d++){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const dt=new Date(calYear,calMonth,d);
     const dow=(dt.getDay()+6)%7;
-    const dowColor=dow===5?'#1A73E8':dow===6?'#D93025':'';
+    // v3.26.1: 祝日チェック
+    const isHol=isJpHoliday(ds);
+    const holName=isHol?JP_HOLIDAYS[ds]:'';
+    const dowColor=isHol?'#D93025':(dow===5?'#1A73E8':dow===6?'#D93025':'');
+    const cellBg=isHol?'background:rgba(217,48,37,0.05)':'';
     const dj=jobs.filter(j=>j.date===ds);
-    html+=`<div class="cal-day${ds===ts?' today':''}" onclick="openJobModal('${ds}')">
-      <div class="day-num" style="${dowColor?`color:${dowColor}`:''}">${d}</div>
+    html+=`<div class="cal-day${ds===ts?' today':''}" style="${cellBg}" onclick="openJobModal('${ds}')">
+      <div class="day-num" style="${dowColor?`color:${dowColor};font-weight:700`:''}">${d}</div>
+      ${isHol?`<div style="font-size:9px;color:#D93025;font-weight:700;margin-top:1px;line-height:1.2">🎌 ${escAttr(holName)}</div>`:''}
       ${dj.slice(0,2).map(j=>`<div class="cal-event type-job" onclick="event.stopPropagation();editJob('${j.id}')">${j.time?j.time+' ':''} ${escAttr(j.title||'')}</div>`).join('')}
       ${dj.length>2?`<div style="font-size:9px;color:var(--text3)">+${dj.length-2}件</div>`:''}
     </div>`;
@@ -11718,6 +11736,26 @@ const BULLETIN_CATS={
 const STAR_LABELS=['','重要度低','やや重要','重要','かなり重要','最重要'];
 const STAR_COLORS=['','#95A5A6','#F39C12','#E67E22','#E74C3C','#C0392B'];
 
+// ===== v3.26.1: 掲示板の新着検知 =====
+// 「すべての新着」判定: メイン投稿+返信を含めて lastViewedAt 以降の投稿をカウント
+function getBulletinNewInfo(){
+  const lastViewed = localStorage.getItem('bulletinLastViewedAt') || '1970-01-01T00:00:00.000Z';
+  const newPosts = (bulletins||[]).filter(b => b && b.postedAt && b.postedAt > lastViewed);
+  if(newPosts.length === 0) return {count: 0, latestAt: null};
+  // postedAt 降順で最新を取得
+  let latest = newPosts[0].postedAt;
+  for(const p of newPosts){
+    if(p.postedAt > latest) latest = p.postedAt;
+  }
+  return {count: newPosts.length, latestAt: latest};
+}
+
+// 掲示板を既読扱いにする(掲示板ページを開いた時に呼ぶ)
+function markBulletinAsViewed(){
+  localStorage.setItem('bulletinLastViewedAt', new Date().toISOString());
+  if(typeof updateBulletinBadge==='function') updateBulletinBadge();
+}
+
 function renderBulletins(){
   const el=document.getElementById('bulletin-list');
   if(!el) return;
@@ -11807,17 +11845,47 @@ function openBulletinDetail(id){
 }
 
 function updateBulletinBadge(){
+  // v3.26.1: 重要度バッジ + 新着判定 + 日時表示の統合版
   const badge=document.getElementById('bulletin-badge');
-  if(!badge) return;
+  const newInfo=document.getElementById('bulletin-new-info');
   const now=new Date().toISOString().split('T')[0];
-  const highPriority=bulletins.filter(b=>b.priority>=4&&(!b.expiry||b.expiry>=now)).length;
-  if(highPriority>0){
-    badge.textContent=highPriority;
-    badge.style.display='inline';
-  } else {
-    badge.style.display='none';
+  const highPriority=(bulletins||[]).filter(b=>!b.parentId && b.priority>=4 && (!b.expiry||b.expiry>=now)).length;
+  const info=getBulletinNewInfo();
+
+  // バッジ本体: 重要度バッジ優先 → 新着Newバッジ → 非表示
+  if(badge){
+    if(highPriority>0){
+      badge.textContent=highPriority;
+      badge.style.background='#D93025';
+      badge.style.display='inline-block';
+    } else if(info.count>0){
+      badge.textContent='New';
+      badge.style.background='#1A73E8';
+      badge.style.display='inline-block';
+    } else {
+      badge.style.display='none';
+    }
+  }
+
+  // 下部の新着日時表示(新着があれば常に表示)
+  if(newInfo){
+    if(info.count>0 && info.latestAt){
+      try{
+        const d=new Date(info.latestAt);
+        const f=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+        newInfo.textContent='新着 '+f+(info.count>1?` (${info.count}件)`:'');
+        newInfo.style.display='block';
+      }catch(e){
+        newInfo.style.display='none';
+      }
+    } else {
+      newInfo.style.display='none';
+    }
   }
 }
+
+// v3.26.1: 別名エイリアス(renderAllからの呼び出しで使用)
+function updateBulletinNavBadge(){ updateBulletinBadge(); }
 
 function openBulletinModal(){
   editingBulletinId=null;
