@@ -3777,8 +3777,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.27.0';
-const APP_BUILD_TIME='2026/05/03 07:30';
+const APP_VERSION='v3.27.1';
+const APP_BUILD_TIME='2026/05/03 07:58';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5244,7 +5244,42 @@ function quickSave(){
 }
 
 // ===== DATE FILTER LOGIC =====
-const dfState={quotes:{mode:'all',from:'',to:''},invoices:{mode:'all',from:'',to:''},receipts:{mode:'month',from:'',to:''}};
+// v3.27.1: dfState を localStorage から復元、選択を永続化
+// 既存の'month'デフォルト矛盾(HTMLは「すべて」active表示)も修正、receipts も 'all' に統一
+const _DF_STATE_KEY = 'dfState_v1';
+const _VALID_DF_MODES = ['all','today','month','last','last2','year','range'];
+function _loadDfState(){
+  try{
+    const saved = localStorage.getItem(_DF_STATE_KEY);
+    if(saved){
+      const obj = JSON.parse(saved);
+      const pick = (k) => {
+        const m = obj?.[k]?.mode;
+        return _VALID_DF_MODES.includes(m) ? m : 'all';
+      };
+      return {
+        quotes:   {mode: pick('quotes'),   from:'', to:''},
+        invoices: {mode: pick('invoices'), from:'', to:''},
+        receipts: {mode: pick('receipts'), from:'', to:''}
+      };
+    }
+  }catch(e){}
+  return {
+    quotes:   {mode:'all', from:'', to:''},
+    invoices: {mode:'all', from:'', to:''},
+    receipts: {mode:'all', from:'', to:''}
+  };
+}
+const dfState=_loadDfState();
+function _saveDfState(){
+  try{
+    localStorage.setItem(_DF_STATE_KEY, JSON.stringify({
+      quotes:   {mode: dfState.quotes.mode},
+      invoices: {mode: dfState.invoices.mode},
+      receipts: {mode: dfState.receipts.mode}
+    }));
+  }catch(e){}
+}
 
 function buildDocPages(){
   ['quotes','invoices','receipts'].forEach(id=>{
@@ -5252,16 +5287,19 @@ function buildDocPages(){
     const type={quotes:'見積書',invoices:'請求書',receipts:'領収書'}[id];
     const statusOpts=`<option value="">すべての状態</option>`+
       docStatuses.map(s=>`<option value="${s.value}">${s.label}</option>`).join('');
+    // v3.27.1: 保存された mode に応じてactiveクラスを設定
+    const curMode=dfState[id].mode||'all';
+    const ac=(m)=>curMode===m?' active':'';
     el.innerHTML=`
       <div class="date-filter-bar" id="dfbar-${id}">
-        <button class="df-btn active" onclick="setDf('${id}','all',this)">すべて</button>
-        <button class="df-btn" onclick="setDf('${id}','today',this)">今日</button>
-        <button class="df-btn" onclick="setDf('${id}','month',this)">今月</button>
-        <button class="df-btn" onclick="setDf('${id}','last',this)">先月</button>
-        <button class="df-btn" onclick="setDf('${id}','last2',this)">先々月</button>
-        <button class="df-btn" onclick="setDf('${id}','year',this)">今年</button>
-        <button class="df-btn" onclick="setDf('${id}','range',this)">期間指定</button>
-        <div class="df-range" id="dfrange-${id}" style="display:none">
+        <button class="df-btn${ac('all')}" onclick="setDf('${id}','all',this)">すべて</button>
+        <button class="df-btn${ac('today')}" onclick="setDf('${id}','today',this)">今日</button>
+        <button class="df-btn${ac('month')}" onclick="setDf('${id}','month',this)">今月</button>
+        <button class="df-btn${ac('last')}" onclick="setDf('${id}','last',this)">先月</button>
+        <button class="df-btn${ac('last2')}" onclick="setDf('${id}','last2',this)">先々月</button>
+        <button class="df-btn${ac('year')}" onclick="setDf('${id}','year',this)">今年</button>
+        <button class="df-btn${ac('range')}" onclick="setDf('${id}','range',this)">期間指定</button>
+        <div class="df-range" id="dfrange-${id}" style="display:${curMode==='range'?'flex':'none'}">
           <input type="date" id="dffrom-${id}" onchange="renderDocPageFiltered('${id}','${type}')">
           <span>〜</span>
           <input type="date" id="dfto-${id}" onchange="renderDocPageFiltered('${id}','${type}')">
@@ -5277,6 +5315,8 @@ function buildDocPages(){
 
 function setDf(id,mode,el){
   dfState[id].mode=mode;
+  // v3.27.1: 選択を localStorage に保存（次回起動時に復元）
+  _saveDfState();
   document.querySelectorAll(`#dfbar-${id} .df-btn`).forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   const range=document.getElementById('dfrange-'+id);
