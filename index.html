@@ -793,6 +793,37 @@ select{appearance:auto}
 .backup-icon{font-size:28px;width:40px;text-align:center}
 
 .preview-doc{background:white;max-width:640px;margin:0 auto;padding:32px 32px;border-radius:var(--radius);border:1px solid var(--border);font-family:'Noto Serif JP',serif;color:#111;overflow:hidden;box-sizing:border-box}
+
+/* v3.31.1: モバイル時のプレビュー崩れ対策。
+   .preview-doc は A4幅 (max-width:640px) を想定したレイアウトのため、
+   スマホ幅(<=768px)では押し込められて顧客名/住所/ロゴ位置がズレる。
+   transform:scale() で全体を縮小表示することで、印刷時と同じレイアウトを保ちつつ
+   スマホ画面に収める。スマホではピンチズームで部分拡大可能。 */
+@media(max-width:768px){
+  #preview-modal #preview-body{
+    /* スケール後のオーバーフロー対策 */
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:8px !important;
+  }
+  #preview-modal .preview-doc{
+    /* A4幅相当を維持（640px → 約53%スケール） */
+    width:640px;
+    max-width:640px;
+    transform:scale(0.53);
+    transform-origin:top left;
+    margin:0 !important;
+    /* 縮小後の実高さに合わせて見かけ上の高さを調整（53% = 47%余白を相殺） */
+    margin-bottom:-47% !important;
+  }
+}
+@media(max-width:400px){
+  #preview-modal .preview-doc{
+    /* iPhone SE等の狭い画面ではさらに縮小 */
+    transform:scale(0.45);
+    margin-bottom:-55% !important;
+  }
+}
 .preview-doc h2{font-size:22px;font-weight:600;text-align:center;margin-bottom:18px;border-bottom:2px solid #111;padding-bottom:11px}
 .preview-meta{display:flex;gap:18px;margin-bottom:18px;width:100%;box-sizing:border-box;align-items:flex-start}
 .preview-to{flex:1 1 0;min-width:0;box-sizing:border-box;overflow-wrap:break-word;word-break:break-word}
@@ -972,10 +1003,15 @@ select{appearance:auto}
     border-radius:0 !important;
     padding:0 !important;
     max-width:100% !important;
+    width:auto !important;
     overflow:visible !important;
     box-shadow:none !important;
     background:white !important;
     page-break-inside:avoid;
+    /* v3.31.1: モバイル時のtransform:scaleを印刷時に確実にリセット */
+    transform:none !important;
+    transform-origin:initial !important;
+    margin-bottom:0 !important;
   }
   /* 書類タイプ別カラー（罫線色）を印刷でも保持 */
   .preview-doc.doc-quote{border-top:6px solid var(--doc-color-quote) !important}
@@ -3827,8 +3863,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.31.0';
-const APP_BUILD_TIME='2026/05/03 11:19';
+const APP_VERSION='v3.31.1';
+const APP_BUILD_TIME='2026/05/03 11:32';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
