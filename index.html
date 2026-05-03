@@ -798,8 +798,11 @@ select{appearance:auto}
    .preview-doc は A4幅 (max-width:640px) を想定したレイアウトのため、
    スマホ幅(<=768px)では押し込められて顧客名/住所/ロゴ位置がズレる。
    transform:scale() で全体を縮小表示することで、印刷時と同じレイアウトを保ちつつ
-   スマホ画面に収める。スマホではピンチズームで部分拡大可能。 */
-@media(max-width:768px){
+   スマホ画面に収める。スマホではピンチズームで部分拡大可能。
+   v3.31.2: A4縦印刷の使用可能幅(~702px)が(max-width:768px)にもマッチするため、
+   印刷時にもtransform:scaleが効いてしまい印刷プレビューが真っ白になるバグ対策。
+   `screen and`を付けて画面表示時のみマッチするように修正。 */
+@media screen and (max-width:768px){
   #preview-modal #preview-body{
     /* スケール後のオーバーフロー対策 */
     overflow-x:auto;
@@ -817,7 +820,7 @@ select{appearance:auto}
     margin-bottom:-47% !important;
   }
 }
-@media(max-width:400px){
+@media screen and (max-width:400px){
   #preview-modal .preview-doc{
     /* iPhone SE等の狭い画面ではさらに縮小 */
     transform:scale(0.45);
@@ -3863,8 +3866,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.31.1';
-const APP_BUILD_TIME='2026/05/03 11:32';
+const APP_VERSION='v3.31.2';
+const APP_BUILD_TIME='2026/05/03 11:39';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
