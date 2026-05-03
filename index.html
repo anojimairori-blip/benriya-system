@@ -1161,7 +1161,9 @@ select{appearance:auto}
   table{min-width:500px}
   /* Modal full-screen on mobile */
   .modal-overlay{padding:0;align-items:flex-end}
-  .modal{border-radius:14px 14px 0 0;max-height:92vh;overflow-y:auto;max-width:100%!important}
+  /* v3.28.3: iOS Safariのアドレスバー対策。100vhはアドレスバー込み高さで実際より大きいため
+     visual viewportに連動する100dvhを使う。古いブラウザは100vhにフォールバック */
+  .modal{border-radius:14px 14px 0 0;max-height:92vh;max-height:92dvh;overflow-y:auto;max-width:100%!important}
   /* Buttons smaller */
   .btn{font-size:12px;padding:10px 14px;min-height:40px}
   .btn-sm{font-size:11px;padding:8px 11px;min-height:36px}
@@ -1192,6 +1194,9 @@ select{appearance:auto}
   .modal-body{overflow-x:hidden}
   /* 長いテキスト対策 */
   .modal-body input,.modal-body select,.modal-body textarea{max-width:100%;box-sizing:border-box}
+  /* v3.28.3: iPhoneホームインジケータ領域の確保
+     env(safe-area-inset-bottom)で実機のセーフエリアを考慮した余白を追加 */
+  .modal-footer{padding-bottom:calc(14px + env(safe-area-inset-bottom, 0px))}
   /* Hide nav history breadcrumb on very small screens */
   .nav-hist-breadcrumb{display:none}
   /* Report grids */
@@ -3778,8 +3783,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.28.1';
-const APP_BUILD_TIME='2026/05/03 08:18';
+const APP_VERSION='v3.28.3';
+const APP_BUILD_TIME='2026/05/03 10:40';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6457,10 +6462,12 @@ async function bulkExportPdf(docIds, filename, type){
   const originalPreviewBodyHtml = previewBody ? previewBody.innerHTML : '';
   const originalPreviewDocId = currentPreviewDocId;
 
-  // 隠しコンテナを作成（A4幅を再現）
+  // v3.28.2: 画面外配置(left:-99999px)だとhtml2canvasがキャプチャ失敗するため、
+  // 透明・操作不可で画面内左上に配置する
   const container=document.createElement('div');
   container.id='bulk-pdf-container';
-  container.style.cssText='position:fixed;left:-99999px;top:0;width:794px;background:white;z-index:-1';
+  container.style.cssText='position:fixed;left:0;top:0;width:794px;background:white;'
+    +'opacity:0;pointer-events:none;z-index:-1;overflow:hidden';
   document.body.appendChild(container);
 
   try{
@@ -6476,11 +6483,24 @@ async function bulkExportPdf(docIds, filename, type){
     }
     container.innerHTML = htmlParts.join('');
 
+    // v3.28.2: ブラウザのレンダリング完了を待つ
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
     const opt={
       margin:[10,10,10,10],
       filename:filename,
       image:{type:'jpeg', quality:0.95},
-      html2canvas:{scale:1.5, useCORS:true, allowTaint:false, backgroundColor:'#ffffff', logging:false},
+      html2canvas:{
+        scale:1.5,
+        useCORS:true,
+        allowTaint:false,
+        backgroundColor:'#ffffff',
+        logging:false,
+        scrollX:0,
+        scrollY:0,
+        windowWidth: container.scrollWidth || 794,
+        windowHeight: container.scrollHeight || 1123
+      },
       jsPDF:{unit:'mm', format:'a4', orientation:'portrait', compress:true},
       pagebreak:{mode:['css','legacy']}
     };
@@ -6633,10 +6653,12 @@ async function renderAndExportAddressLabels(customerList){
   }
   showToast(`📮 ${customerList.length}件のラベルを生成中...`);
 
-  // 隠しコンテナ
+  // v3.28.2: 画面外配置(left:-99999px)だとhtml2canvasがキャプチャ失敗するため、
+  // 透明・操作不可で画面内左上に配置する
   const container=document.createElement('div');
   container.id='addr-label-container';
-  container.style.cssText='position:fixed;left:-99999px;top:0;background:white;z-index:-1';
+  container.style.cssText='position:fixed;left:0;top:0;width:210mm;background:white;'
+    +'opacity:0;pointer-events:none;z-index:-1;overflow:hidden';
   document.body.appendChild(container);
 
   try{
@@ -6673,13 +6695,26 @@ async function renderAndExportAddressLabels(customerList){
     });
     container.innerHTML=html;
 
+    // v3.28.2: ブラウザのレンダリング完了を待つ(2フレーム待機で確実に)
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+
     const today_str=today();
     const filename=`住所ラベル_${today_str}_${customerList.length}件.pdf`;
     const opt={
       margin:0,
       filename:filename,
       image:{type:'jpeg', quality:0.98},
-      html2canvas:{scale:2, useCORS:true, allowTaint:false, backgroundColor:'#ffffff', logging:false},
+      html2canvas:{
+        scale:2,
+        useCORS:true,
+        allowTaint:false,
+        backgroundColor:'#ffffff',
+        logging:false,
+        scrollX:0,
+        scrollY:0,
+        windowWidth: container.scrollWidth || 794,
+        windowHeight: container.scrollHeight || 1123
+      },
       jsPDF:{unit:'mm', format:'a4', orientation:'portrait', compress:true},
       pagebreak:{mode:['css','legacy']}
     };
@@ -7919,7 +7954,8 @@ function renderCalendar(){
       initialView:'dayGridMonth',
       locale:'ja',
       firstDay:1, // 月曜始まり
-      height:'auto',
+      // v3.28.3: height:'auto' だとモバイルでtimeGridWeek/Dayの親高さが0になり描画失敗するため固定
+      height: 700,
       headerToolbar:{
         left:'prev,next today',
         center:'title',
