@@ -2677,6 +2677,7 @@ if('serviceWorker' in navigator){
     <div style="display:flex;align-items:center;gap:10px">
       <h3 id="doc-modal-title" style="font-size:15px">新規書類作成</h3>
       <span id="doc-autosave" class="autosave-dot" title="自動保存状態"></span>
+      <span id="doc-autosave-text" style="font-size:11px;color:var(--text3)" title="v3.28.1: 30秒ごとに自動保存されます"></span>
     </div>
     <button class="close-btn" aria-label="閉じる" onclick="closeModal('doc-modal')">✕</button>
   </div>
@@ -3777,8 +3778,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.28.0';
-const APP_BUILD_TIME='2026/05/03 08:11';
+const APP_VERSION='v3.28.1';
+const APP_BUILD_TIME='2026/05/03 08:18';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5498,6 +5499,28 @@ function renderDocRows(tbodyId,list,showType){
 
 // ===== NEW DOC =====
 function openNewDoc(type,custName){
+  // v3.28.1: N1 下書き検出（再帰時はスキップ）
+  if(!window._skipDraftCheck){
+    const draft=(typeof _loadDocDraft==='function')?_loadDocDraft():null;
+    if(draft){
+      const minutesAgo=Math.floor((Date.now()-(draft.savedAt||0))/60000);
+      const timeLabel=minutesAgo>0?`${minutesAgo}分前`:'1分以内';
+      const subj=draft.subject||'(件名未入力)';
+      const dtype=draft.type||'書類';
+      _showDocDraftConfirm(
+        `${dtype}の下書きが残っています(${timeLabel})。\n件名: ${subj}\n\n復元しますか?`,
+        ()=>{ _restoreDocDraft(draft); },
+        ()=>{
+          _clearDocDraft();
+          window._skipDraftCheck=true;
+          openNewDoc(type, custName);
+          window._skipDraftCheck=false;
+        }
+      );
+      return;
+    }
+  }
+  window._skipDraftCheck=false;
   editingDocId=null;selectedCustId=null;
   const t=type||'見積書';
   document.getElementById('doc-modal-title').textContent='新規'+t+'作成';
@@ -5646,6 +5669,19 @@ function saveInlineNewCust(){
     memo:document.getElementById('nc-memo')?.value||'',
     contacts:[]
   };
+  // v3.28.1: N8 重複検出(インライン新規顧客は常に新規=必ずチェック)
+  const dup=_findDuplicateCustomer(newCust, null);
+  if(dup){
+    showConfirm(
+      `⚠️ 既存顧客「${dup.existing.name}」と${dup.field}が一致しています。\nこのまま新規登録すると重複になる可能性があります。\n続行しますか?`,
+      ()=>_finalizeSaveInlineNewCust(newCust)
+    );
+    return;
+  }
+  _finalizeSaveInlineNewCust(newCust);
+}
+
+function _finalizeSaveInlineNewCust(newCust){
   // v3.26.0: 規約準拠 — CRUDで stampAudit を呼ぶ
   if(typeof stampAudit==='function') stampAudit(newCust, true);
   customers.push(newCust);
@@ -5655,7 +5691,7 @@ function saveInlineNewCust(){
   renderSelectedCust(newCust);
   closeInlineNewCust();
   renderCustomerList();
-  showToast(`顧客「${name} ${newCust.honorific}」を登録しました ✓`);
+  showToast(`顧客「${newCust.name} ${newCust.honorific}」を登録しました ✓`);
 }
 
 // ===== MAP MODAL =====
@@ -5793,6 +5829,8 @@ function saveDoc(){
   stampAudit(d, !existing);
   if(editingDocId){docs[docs.findIndex(x=>x.id===editingDocId)]=d;}else docs.push(d);
   persist();currentPreviewDocId=d.id;closeModal('doc-modal');renderAll();buildMonthlyChart();
+  // v3.28.1: N1 保存成功時に下書きをクリア
+  if(typeof _clearDocDraft==='function') _clearDocDraft();
   showToast(`${d.type}を保存しました ✓`);
   return d;
 }
@@ -5847,6 +5885,165 @@ function deleteDoc(id){
   const d=docs.find(x=>x.id===id);if(!d)return;
   pushUndo({type:'doc',data:JSON.parse(JSON.stringify(d)),label:`書類「${d.number}」を削除しました`});
   docs=docs.filter(x=>x.id!==id);persist();renderAll();buildMonthlyChart();showToast("書類を削除しました");
+}
+
+// ===== v3.28.1: N1 書類下書き自動保存 =====
+// 書類モーダルが開いている間、30秒ごとに localStorage に下書きを退避
+// 復元時は「復元する / 破棄して新規」の2選択ダイアログ
+const _DOC_DRAFT_KEY='docDraft_v1';
+let _docDraftLastSaveAt=0;
+
+// 書類モーダルから現在の入力状態を取得
+function _captureDocDraftFromModal(){
+  const modal=document.getElementById('doc-modal');
+  if(!modal||!modal.classList.contains('open')) return null;
+  const lines=(typeof getLineItems==='function')?getLineItems():[];
+  return {
+    type:document.getElementById('doc-type')?.value||'',
+    number:document.getElementById('doc-number')?.value||'',
+    date:document.getElementById('doc-date')?.value||'',
+    dueDate:document.getElementById('doc-due-date')?.value||'',
+    customerId:selectedCustId||'',
+    contact:document.getElementById('doc-contact')?.value||'',
+    staff:document.getElementById('doc-staff-select')?.value||'',
+    subject:document.getElementById('doc-subject')?.value||'',
+    category:document.getElementById('doc-category')?.value||'',
+    notes:document.getElementById('doc-notes')?.value||'',
+    status:document.getElementById('doc-status')?.value||'',
+    lines:lines,
+    editingDocId:editingDocId||null,
+    savedAt:Date.now()
+  };
+}
+
+// 自動保存（30秒ごとにタイマーから呼ばれる）
+function _saveDocDraft(){
+  try{
+    const draft=_captureDocDraftFromModal();
+    if(!draft) return false;
+    // 中身が空（何も入力されていない）なら保存しない
+    if(!draft.subject && !draft.customerId && (!draft.lines||draft.lines.length===0) && !draft.notes) return false;
+    localStorage.setItem(_DOC_DRAFT_KEY, JSON.stringify(draft));
+    _docDraftLastSaveAt=draft.savedAt;
+    return true;
+  }catch(e){return false;}
+}
+
+// 下書き読み込み
+function _loadDocDraft(){
+  try{
+    const s=localStorage.getItem(_DOC_DRAFT_KEY);
+    if(!s) return null;
+    return JSON.parse(s);
+  }catch(e){return null;}
+}
+
+// 下書きクリア
+function _clearDocDraft(){
+  try{ localStorage.removeItem(_DOC_DRAFT_KEY); }catch(e){}
+  _docDraftLastSaveAt=0;
+  _updateDocDraftStatus();
+}
+
+// モーダル右上のステータス表示を更新
+function _updateDocDraftStatus(){
+  const dotEl=document.getElementById('doc-autosave');
+  const textEl=document.getElementById('doc-autosave-text');
+  if(!_docDraftLastSaveAt){
+    if(dotEl) dotEl.className='autosave-dot';
+    if(textEl) textEl.textContent='';
+    return;
+  }
+  const elapsedSec=Math.floor((Date.now()-_docDraftLastSaveAt)/1000);
+  if(dotEl) dotEl.className='autosave-dot saved';
+  if(textEl){
+    if(elapsedSec<60) textEl.textContent=`💾 自動保存済 (${elapsedSec}秒前)`;
+    else textEl.textContent=`💾 自動保存済 (${Math.floor(elapsedSec/60)}分前)`;
+  }
+}
+
+// 下書きを書類モーダルに復元
+function _restoreDocDraft(draft){
+  if(!draft) return;
+  editingDocId=draft.editingDocId||null;
+  selectedCustId=draft.customerId||null;
+
+  const titleEl=document.getElementById('doc-modal-title');
+  if(titleEl) titleEl.textContent=(draft.editingDocId?'編集':'新規')+(draft.type||'書類')+'（下書きから復元）';
+
+  const auditEl=document.getElementById('doc-audit-info');
+  if(auditEl) auditEl.style.display='none';
+
+  const setVal=(id,val)=>{const el=document.getElementById(id);if(el) el.value=val||'';};
+  setVal('doc-type',draft.type);
+  setVal('doc-number',draft.number);
+  setVal('doc-date',draft.date);
+  setVal('doc-due-date',draft.dueDate);
+  setVal('doc-contact',draft.contact);
+  setVal('doc-subject',draft.subject);
+  setVal('doc-category',draft.category);
+  setVal('doc-notes',draft.notes);
+
+  // ステータス選択を動的に構築
+  if(typeof buildStatusSelect==='function'){
+    buildStatusSelect('doc-status', draft.status||(docStatuses[0]?.value||'下書き'));
+  }
+
+  // スタッフ選択
+  if(typeof buildStaffSelect==='function'){
+    buildStaffSelect();
+    setTimeout(()=>{ setVal('doc-staff-select', draft.staff); },80);
+  }
+
+  // 顧客カードの復元
+  const q2=document.getElementById('cust-search-q');if(q2) q2.value='';
+  const inlineNew=document.getElementById('inline-new-cust');if(inlineNew) inlineNew.style.display='none';
+  if(draft.customerId){
+    const c=customers.find(x=>x.id===draft.customerId);
+    if(c && typeof renderSelectedCust==='function'){
+      renderSelectedCust(c);
+    } else {
+      const card=document.getElementById('selected-cust-card');
+      if(card) card.style.display='none';
+    }
+  } else {
+    const card=document.getElementById('selected-cust-card');
+    if(card) card.style.display='none';
+  }
+
+  // 行アイテムを復元
+  const container=document.getElementById('line-items-container');
+  if(container) container.innerHTML='';
+  if(typeof addLineItem==='function'){
+    (draft.lines||[]).forEach(l=>addLineItem(l));
+  }
+  if(typeof calcTotals==='function') calcTotals();
+
+  // モーダルを開く
+  document.getElementById('doc-modal').classList.add('open');
+  _docDraftLastSaveAt=draft.savedAt||Date.now();
+  _updateDocDraftStatus();
+  showToast('📝 下書きから復元しました');
+}
+
+// 下書き検出時の確認ダイアログ（復元する / 破棄して新規 の2択）
+function _showDocDraftConfirm(msg, onRestore, onDiscard){
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center';
+  const uid='dd'+Date.now();
+  const box=document.createElement('div');
+  box.style.cssText='background:var(--surface);border-radius:14px;padding:28px 24px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center';
+  box.innerHTML='<div style="font-size:28px;margin-bottom:12px">📝</div>'
+    +'<p style="font-size:14px;color:var(--text);margin-bottom:20px;line-height:1.7;white-space:pre-line">'+msg+'</p>'
+    +'<div style="display:flex;gap:10px;justify-content:center">'
+    +'<button id="dd-discard-'+uid+'" style="padding:9px 18px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);font-family:inherit;font-size:13px;cursor:pointer;color:var(--text)">破棄して新規</button>'
+    +'<button id="dd-restore-'+uid+'" style="padding:9px 18px;border:none;border-radius:8px;background:var(--accent);color:white;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">復元する</button>'
+    +'</div>';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('dd-restore-'+uid).onclick=()=>{overlay.remove();onRestore&&onRestore();};
+  document.getElementById('dd-discard-'+uid).onclick=()=>{overlay.remove();onDiscard&&onDiscard();};
+  // overlayクリックでは閉じない（明示的な選択を強制）
 }
 
 function convertDoc(id,toType){
@@ -7273,6 +7470,35 @@ function updateMapPreview(){
   return;
 }
 
+// ===== v3.28.1: N8 顧客重複検出 =====
+// 新規登録時のみ実行(編集時は対象外)
+// 完全一致判定: 電話/FAX/メール/顧客名/郵便番号+住所
+function _findDuplicateCustomer(newCust, excludeId){
+  const _digits = (s)=>String(s||'').replace(/\D/g,'');
+  const _norm = (s)=>String(s||'').trim().toLowerCase();
+  const checks=[];
+  if(newCust.tel)   checks.push({field:'電話番号',     val:_digits(newCust.tel),  src:'tel'});
+  if(newCust.fax)   checks.push({field:'FAX番号',       val:_digits(newCust.fax),  src:'fax'});
+  if(newCust.email) checks.push({field:'メールアドレス', val:_norm(newCust.email), src:'email'});
+  if(newCust.name)  checks.push({field:'顧客名',         val:_norm(newCust.name),  src:'name'});
+  if(newCust.zip && newCust.address) checks.push({field:'郵便番号+住所', val:_digits(newCust.zip)+'|'+_norm(newCust.address), src:'addr'});
+  for(const c of customers){
+    if(excludeId && c.id===excludeId) continue;
+    for(const chk of checks){
+      let cmp;
+      if(chk.src==='tel')   cmp=_digits(c.tel);
+      else if(chk.src==='fax')   cmp=_digits(c.fax);
+      else if(chk.src==='email') cmp=_norm(c.email);
+      else if(chk.src==='name')  cmp=_norm(c.name);
+      else if(chk.src==='addr')  cmp=_digits(c.zip)+'|'+_norm(c.address);
+      if(cmp && chk.val && cmp===chk.val){
+        return {existing:c, field:chk.field};
+      }
+    }
+  }
+  return null;
+}
+
 function saveCustomer(){
   const name=document.getElementById('cust-name').value.trim();if(!name){alert('顧客名を入力してください');return;}
   const honorific=document.getElementById('cust-honorific')?.value??'御中';
@@ -7290,6 +7516,21 @@ function saveCustomer(){
     category:document.getElementById('cust-category').value,
     contacts:getContacts()
   };
+  // v3.28.1: N8 重複検出(新規時のみ)
+  if(!editingCustId){
+    const dup=_findDuplicateCustomer(c, null);
+    if(dup){
+      showConfirm(
+        `⚠️ 既存顧客「${dup.existing.name}」と${dup.field}が一致しています。\nこのまま新規登録すると重複になる可能性があります。\n続行しますか?`,
+        ()=>_finalizeSaveCustomer(c)
+      );
+      return;
+    }
+  }
+  _finalizeSaveCustomer(c);
+}
+
+function _finalizeSaveCustomer(c){
   const existingCust=editingCustId?customers.find(x=>x.id===editingCustId):null;
   if(existingCust){c.createdBy=existingCust.createdBy;c.createdByName=existingCust.createdByName;c.createdAt=existingCust.createdAt;}
   stampAudit(c, !existingCust);
@@ -9635,7 +9876,16 @@ function buildStaffSelect(){
 }
 
 // ===== MODAL =====
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  // v3.28.1: N1 書類モーダルが閉じる時、表示用の経過時間カウンタをリセット（下書き本体はlocalStorageに残す）
+  if(id==='doc-modal'){
+    const dotEl=document.getElementById('doc-autosave');
+    const textEl=document.getElementById('doc-autosave-text');
+    if(dotEl) dotEl.className='autosave-dot';
+    if(textEl) textEl.textContent='';
+  }
+}
 function openModal(id){document.getElementById(id).classList.add('open');}
 // v3.26.0: 背景クリックでモーダルを閉じる挙動を廃止（入力中データの消失防止）
 // 閉じるには ✕ ボタン or キャンセルボタンのみ使用
@@ -13514,6 +13764,21 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   injectHamburgers();
   // v3.25.4: 各ページの main-header に ❓ヘルプボタンを注入
   if(typeof injectHelpButtons==='function') injectHelpButtons();
+  // v3.28.1: N1 書類モーダルが開いている間、30秒ごとに下書き自動保存
+  setInterval(()=>{
+    const modal=document.getElementById('doc-modal');
+    if(modal && modal.classList.contains('open') && typeof _saveDocDraft==='function'){
+      _saveDocDraft();
+      _updateDocDraftStatus();
+    }
+  }, 30000);
+  // v3.28.1: N1 ステータス表示の経過時間を5秒ごとに更新
+  setInterval(()=>{
+    const modal=document.getElementById('doc-modal');
+    if(modal && modal.classList.contains('open') && _docDraftLastSaveAt && typeof _updateDocDraftStatus==='function'){
+      _updateDocDraftStatus();
+    }
+  }, 5000);
 });
 
 // ===== TAX SETTINGS PAGE =====
