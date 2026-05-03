@@ -663,6 +663,21 @@ tr:hover td{background:var(--bg)}
   .fc .fc-daygrid-day-frame{min-height:36px}
   .fc-event{font-size:8px}
   .fc .fc-button{font-size:9px;padding:3px 5px}
+  /* v3.30.0: FullCalendarがモバイル幅で.fc-view-harness高さを0pxにする
+     既知バグ対策。サイドパネルClaude調査で原因確定。
+     scrollgridの最小幅強制を解除して、view-harnessの高さ計算を正常化する */
+  #fullcalendar-el .fc-scrollgrid{
+    width:100% !important;
+    min-width:0 !important;
+  }
+  /* view-harnessが0pxになった時の保険（最低限の表示領域確保） */
+  #fullcalendar-el .fc-view-harness{
+    min-height:500px !important;
+  }
+  /* viewのposition:absoluteを解除（harness=0で完全折りたたみ防止） */
+  #fullcalendar-el .fc-view{
+    position:relative !important;
+  }
 }
 .cal-event.type-job{background:var(--accent-light);color:var(--accent)}
 
@@ -1766,9 +1781,9 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
-    <div class="card" style="padding:16px;min-height:720px">
+    <div class="card" style="padding:16px">
       <!-- FullCalendar コンテナ -->
-      <div id="fullcalendar-el" style="min-height:700px"></div>
+      <div id="fullcalendar-el"></div>
       <!-- フォールバック（FullCalendar未読込時の従来UI） -->
       <div id="legacy-calendar-fallback" style="display:none">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
@@ -3787,8 +3802,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.29.0';
-const APP_BUILD_TIME='2026/05/03 10:52';
+const APP_VERSION='v3.30.0';
+const APP_BUILD_TIME='2026/05/03 11:10';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7973,8 +7988,10 @@ function renderCalendar(){
       initialView:'dayGridMonth',
       locale:'ja',
       firstDay:1, // 月曜始まり
-      // v3.28.3: height:'auto' だとモバイルでtimeGridWeek/Dayの親高さが0になり描画失敗するため固定
-      height: 700,
+      // v3.30.0: heightを'auto'に変更。サイドパネルClaude調査結果より、
+      // モバイル幅でheight:数値だとFullCalendar内部の.fc-view-harness高さ計算が
+      // 0pxのまま放置されるバグ確定。'auto'+CSS矯正(.fc-scrollgrid width:100%等)で解決
+      height: 'auto',
       headerToolbar:{
         left:'prev,next today',
         center:'title',
@@ -8149,6 +8166,9 @@ function renderCalendar(){
       try{
         const ro=new ResizeObserver(_fcResize);
         ro.observe(el);
+        // v3.30.0: 親.cardも観察対象に(モバイルでドロワー開閉等の幅変化に追従)
+        const card=el.closest('.card');
+        if(card) ro.observe(card);
       }catch(e){}
     }
   } else {
