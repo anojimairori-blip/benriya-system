@@ -681,6 +681,14 @@ tr:hover td{background:var(--bg)}
 }
 .cal-event.type-job{background:var(--accent-light);color:var(--accent)}
 
+/* v3.31.0: モバイル専用カレンダービュー（Googleカレンダー連携リンク方式）切替 */
+.mobile-only-cal{display:none}
+.desktop-only-cal{display:block}
+@media(max-width:768px){
+  .mobile-only-cal{display:block}
+  .desktop-only-cal{display:none !important}
+}
+
 /* SHARE */
 .share-option{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px}
 .share-option:hover{border-color:var(--accent);background:var(--accent-light)}
@@ -1781,7 +1789,24 @@ if('serviceWorker' in navigator){
     </div>
   </div>
   <div class="content">
-    <div class="card" style="padding:16px">
+    <!-- v3.31.0: モバイル専用カレンダービュー（Googleカレンダー連携リンク方式） -->
+    <div id="mobile-cal-view" class="mobile-only-cal" style="display:none">
+      <div class="card" style="padding:18px;background:linear-gradient(135deg, #4285F4 0%, #34A853 100%);color:white;border:none;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="font-size:32px">📅</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:700">Googleカレンダーで全体を見る</div>
+            <div style="font-size:11px;opacity:0.9;margin-top:2px">月・週・日表示はGoogleカレンダーアプリで確認</div>
+          </div>
+        </div>
+        <button onclick="openGoogleCalendarMobile()" style="width:100%;padding:12px 14px;background:white;color:#4285F4;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">📅 Googleカレンダーを開く</button>
+      </div>
+      <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:14px;font-size:11px;color:var(--text2);line-height:1.6">
+        💡 Googleカレンダー連携機能で、Flexsysに登録した作業予定はGoogleカレンダーにも自動同期されています。スマホではGoogleカレンダーアプリの方が見やすく、通知もしっかり届きます。
+      </div>
+    </div>
+    <!-- デスクトップ用 FullCalendar -->
+    <div class="card desktop-only-cal" style="padding:16px">
       <!-- FullCalendar コンテナ -->
       <div id="fullcalendar-el"></div>
       <!-- フォールバック（FullCalendar未読込時の従来UI） -->
@@ -3802,8 +3827,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.30.0';
-const APP_BUILD_TIME='2026/05/03 11:10';
+const APP_VERSION='v3.31.0';
+const APP_BUILD_TIME='2026/05/03 11:19';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5169,27 +5194,32 @@ function showPage(id, el, addToHistory=true){
   if(id==='display-settings'){ renderNavOrderEditor(); initTheme(); }
   if(id==='developer') updateDeveloperInfo();
   if(id==='calendar'){
-    // v3.29.0: モバイルでカレンダーが空白のまま描画されないバグ対策
-    // FullCalendar はページが非表示状態だと幅0で初期化されるため、
-    // 表示後に updateSize / render を複数回タイミングをずらして実行
-    setTimeout(()=>{
-      if(_fc){
-        try{ _fc.updateSize(); }catch(e){}
-        try{ _fc.render(); }catch(e){}
-      } else {
-        renderCalendar();
-      }
-    },50);
-    // 念のため200ms後にもう一度updateSize（モバイルでアドレスバー隠しなどで再計算が必要なケース）
-    setTimeout(()=>{
-      if(_fc){
-        try{ _fc.updateSize(); }catch(e){}
-      }
-    },200);
-    // window resize イベントを発火させて、内部リスナーを起動
-    setTimeout(()=>{
-      try{ window.dispatchEvent(new Event('resize')); }catch(e){}
-    },300);
+    // v3.31.0: モバイルではFullCalendar初期化スキップ。renderCalendarを呼んでmobile UIを表示
+    if(window.innerWidth <= 768){
+      renderCalendar();
+    } else {
+      // v3.29.0: デスクトップでカレンダーが空白のまま描画されないバグ対策
+      // FullCalendar はページが非表示状態だと幅0で初期化されるため、
+      // 表示後に updateSize / render を複数回タイミングをずらして実行
+      setTimeout(()=>{
+        if(_fc){
+          try{ _fc.updateSize(); }catch(e){}
+          try{ _fc.render(); }catch(e){}
+        } else {
+          renderCalendar();
+        }
+      },50);
+      // 念のため200ms後にもう一度updateSize
+      setTimeout(()=>{
+        if(_fc){
+          try{ _fc.updateSize(); }catch(e){}
+        }
+      },200);
+      // window resize イベントを発火させて、内部リスナーを起動
+      setTimeout(()=>{
+        try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+      },300);
+    }
   }
   // Mobile drawer sync
   document.querySelectorAll('#mobile-drawer-nav .nav-item').forEach(n=>{
@@ -7969,7 +7999,27 @@ function _syncCalMonthFromFc(){
   calMonth=d.getMonth();
 }
 
+// v3.31.0: モバイル時にGoogleカレンダーアプリ/Webを開く
+function openGoogleCalendarMobile(){
+  // PCでも対応：calendar.google.comはGoogleカレンダーアプリにディープリンクする
+  // モバイルではアプリがインストールされていれば自動でアプリが起動、なければWebで開く
+  window.open('https://calendar.google.com/calendar/u/0/r', '_blank');
+}
+
 function renderCalendar(){
+  // v3.31.0: モバイル(<=768px)ではFullCalendar初期化をスキップ
+  // モバイルではGoogleカレンダー連携リンク方式UI(#mobile-cal-view)を使う
+  // モバイルでもFullCalendarを初期化しないことで、リソース節約と描画バグ完全回避
+  if(window.innerWidth <= 768){
+    // 既存の_fcがある場合は破棄（デスクトップから縮小してモバイルになった時の対策）
+    if(_fc){
+      try{ _fc.destroy(); }catch(e){}
+      _fc=null;
+    }
+    // 「今月の作業」リストだけ更新
+    if(typeof renderJobList==='function') renderJobList();
+    return;
+  }
   const el=document.getElementById('fullcalendar-el');
   const fallback=document.getElementById('legacy-calendar-fallback');
   // FullCalendar が読込まれていなければ従来UIにフォールバック
@@ -13858,6 +13908,21 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       _updateDocDraftStatus();
     }
   }, 5000);
+  // v3.31.0: ウィンドウリサイズで768pxの境界をまたいだ時、カレンダーUIを切り替える
+  let _calLastIsMobile = window.innerWidth <= 768;
+  let _calResizeTimer = null;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(_calResizeTimer);
+    _calResizeTimer = setTimeout(()=>{
+      const isMobile = window.innerWidth <= 768;
+      if(isMobile === _calLastIsMobile) return; // 境界跨ぎなし
+      _calLastIsMobile = isMobile;
+      // カレンダーページを表示中なら再描画
+      if(currentPageId === 'calendar' && typeof renderCalendar === 'function'){
+        renderCalendar();
+      }
+    }, 200);
+  });
 });
 
 // ===== TAX SETTINGS PAGE =====
