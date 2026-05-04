@@ -1800,7 +1800,7 @@ if('serviceWorker' in navigator){
 
 <!-- CUSTOMERS -->
 <div id="page-customers" class="page">
-  <div class="main-header"><h2>👥 顧客管理</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-secondary" onclick="openAddressLabelModal()" title="顧客の住所をA4ラベルシール用にPDF出力">📮 ラベル印刷</button><button class="btn btn-primary" onclick="openCustomerModal()">＋ 顧客追加</button></div></div>
+  <div class="main-header"><h2>👥 顧客管理</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-secondary" onclick="openAddressLabelModal()" title="顧客の住所をA4ラベルシール用に印刷／PDF保存">📮 ラベル印刷</button><button class="btn btn-primary" onclick="openCustomerModal()">＋ 顧客追加</button></div></div>
   <div class="content">
     <div class="tabs">
       <div class="tab active" onclick="switchCustTab('list',this)">顧客一覧</div>
@@ -3866,8 +3866,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.31.4';
-const APP_BUILD_TIME='2026/05/04 20:44';
+const APP_VERSION='v3.32.0';
+const APP_BUILD_TIME='2026/05/04 20:53';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6656,7 +6656,7 @@ function openAddressLabelModal(){
           <button class="close-btn" aria-label="閉じる" onclick="closeAddressLabelModal()">✕</button>
         </div>
         <div class="modal-body">
-          <p style="font-size:13px;margin-bottom:12px;color:var(--text2)">選択した顧客の住所をA4ラベルシール（21面・標準規格）にレイアウトしてPDF出力します。<br>住所が登録されていない顧客は顧客名のみ出力します（手書きスペース）。</p>
+          <p style="font-size:13px;margin-bottom:12px;color:var(--text2)">選択した顧客の住所をA4ラベルシール（21面・標準規格）にレイアウトして印刷します。<br>「PDFに保存」を選べばPDFファイルに、プリンタを選べば紙に直接印刷できます。<br>住所が登録されていない顧客は顧客名のみ出力します（手書きスペース）。</p>
           <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
             <input type="text" id="addr-label-search" oninput="filterAddressLabelList()" placeholder="🔍 顧客名・住所で絞り込み" style="padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;flex:1;min-width:160px;outline:none">
             <button class="btn btn-secondary btn-sm" onclick="addrLabelSelectAll(true)">全選択</button>
@@ -6670,7 +6670,7 @@ function openAddressLabelModal(){
         </div>
         <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:8px">
           <button class="btn btn-secondary" onclick="closeAddressLabelModal()">キャンセル</button>
-          <button class="btn btn-primary" onclick="executeAddressLabelPdf()">📄 PDF出力</button>
+          <button class="btn btn-primary" onclick="executeAddressLabelPdf()">🖨️ 印刷 / PDFに保存</button>
         </div>
       </div>
     </div>`;
@@ -6764,96 +6764,132 @@ async function executeAddressLabelPdf(){
   await renderAndExportAddressLabels(selectedCustomers);
 }
 
-// 21面ラベルシートを生成してPDF出力
+// 21面ラベルシートを生成して印刷（v3.32.0）
+// html2canvas経由のPDF生成は body{overflow:hidden;height:100%} と相性が悪く
+// canvas高さ0になる問題が解決困難だったため、ブラウザ標準の印刷ダイアログ経由方式に変更。
+// ユーザーは「PDFに保存」を選べばPDF化、プリンタを選べば紙に印刷できる。
 async function renderAndExportAddressLabels(customerList){
-  if(typeof html2pdf==='undefined'){
-    showToast('PDFライブラリが読み込まれていません','#C0392B');
+  if(!customerList || customerList.length === 0){
+    showToast('対象顧客が選択されていません','#C0392B');
     return;
   }
-  showToast(`📮 ${customerList.length}件のラベルを生成中...`);
+  showToast(`📮 ${customerList.length}件のラベルを準備中...`);
 
-  // v3.28.2: 画面外配置(left:-99999px)だとhtml2canvasがキャプチャ失敗するため、
-  // 透明・操作不可で画面内左上に配置する
-  // v3.31.4: overflow:hidden だと A4縦(1127px)のシートがコンテナ内でクリップされ
-  // html2canvasが高さ0でキャプチャするバグが残っていたため visible に変更
-  const container=document.createElement('div');
-  container.id='addr-label-container';
-  container.style.cssText='position:fixed;left:0;top:0;width:210mm;background:white;'
-    +'opacity:0;pointer-events:none;z-index:-1;overflow:visible';
-  document.body.appendChild(container);
-
-  // v3.31.3: bodyのoverflow:hidden + height:100% が原因で、html2canvasのクローン内で
-  // ラベルシート(1127px)がbody(742px)を超えると高さ0扱いになるバグ対策。
-  // PDF生成中だけ一時的にbodyのoverflowを解除する。
-  const _prevBodyOverflow = document.body.style.overflow;
-  document.body.style.overflow = 'visible';
-
-  try{
-    // 21枚ごとにシート分割
-    const PER_SHEET=21;
-    const sheets=[];
-    for(let i=0; i<customerList.length; i+=PER_SHEET){
-      sheets.push(customerList.slice(i, i+PER_SHEET));
-    }
-
-    let html='';
-    sheets.forEach((sheet, sheetIdx)=>{
-      const cells=[];
-      for(let i=0; i<PER_SHEET; i++){
-        const c=sheet[i];
-        if(c){
-          const honorific=c.honorific!=null?c.honorific:'御中';
-          const hasAddress=!!c.address;
-          const zipHtml=c.zip?`<div style="font-size:9pt;color:#444;margin-bottom:1mm">〒${escAttr(c.zip)}</div>`:'';
-          const addrHtml=hasAddress?`<div style="font-size:10pt;line-height:1.35;flex:1;word-wrap:break-word;overflow-wrap:break-word">${escAttr(c.address)}</div>`:'<div style="flex:1"></div>';
-          const nameHtml=`<div style="font-size:11pt;font-weight:bold;text-align:right;margin-top:auto">${escAttr(c.name||'')}<span style="margin-left:4mm;font-weight:normal">${escAttr(honorific)}</span></div>`;
-          cells.push(`<div style="border:0.2mm solid #eee;padding:3mm;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box">${zipHtml}${addrHtml}${nameHtml}</div>`);
-        } else {
-          // 空セル(プレースホルダ)
-          cells.push('<div style="border:0.2mm solid #eee;box-sizing:border-box"></div>');
-        }
-      }
-      // A4 21面シート: 上下8.5mm余白、左右7mm余白、3列×7行、列間隔2.5mm
-      html+=`<div style="width:210mm;height:297mm;padding:8.5mm 7mm;box-sizing:border-box;${sheetIdx<sheets.length-1?'page-break-after:always;':''}">
-        <div style="display:grid;grid-template-columns:63.5mm 63.5mm 63.5mm;grid-template-rows:repeat(7,38.1mm);column-gap:2.5mm;row-gap:0;width:100%;height:100%">
-          ${cells.join('')}
-        </div>
-      </div>`;
-    });
-    container.innerHTML=html;
-
-    // v3.28.2: ブラウザのレンダリング完了を待つ(2フレーム待機で確実に)
-    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-
-    const today_str=today();
-    const filename=`住所ラベル_${today_str}_${customerList.length}件.pdf`;
-    const opt={
-      margin:0,
-      filename:filename,
-      image:{type:'jpeg', quality:0.98},
-      html2canvas:{
-        scale:2,
-        useCORS:true,
-        allowTaint:false,
-        backgroundColor:'#ffffff',
-        logging:false,
-        scrollX:0,
-        scrollY:0,
-        windowWidth: container.scrollWidth || 794,
-        windowHeight: container.scrollHeight || 1123
-      },
-      jsPDF:{unit:'mm', format:'a4', orientation:'portrait', compress:true},
-      pagebreak:{mode:['css','legacy']}
-    };
-    await html2pdf().set(opt).from(container).save();
-    showToast(`✓ ${customerList.length}件のラベルをPDF出力しました`,'#27AE60');
-  }catch(e){
-    showErrorBanner('住所ラベルPDF生成エラー', String(e?.message||e), {kind:'error'});
-  }finally{
-    container.remove();
-    // v3.31.3: bodyのoverflowを元に戻す
-    document.body.style.overflow = _prevBodyOverflow;
+  // 21枚ごとにシート分割
+  const PER_SHEET=21;
+  const sheets=[];
+  for(let i=0; i<customerList.length; i+=PER_SHEET){
+    sheets.push(customerList.slice(i, i+PER_SHEET));
   }
+
+  // セルHTML生成
+  const escAttrLocal = (typeof escAttr === 'function') ? escAttr : (s)=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  let sheetsHtml='';
+  sheets.forEach((sheet, sheetIdx)=>{
+    const cells=[];
+    for(let i=0; i<PER_SHEET; i++){
+      const c=sheet[i];
+      if(c){
+        const honorific=c.honorific!=null?c.honorific:'御中';
+        const hasAddress=!!c.address;
+        const zipHtml=c.zip?`<div class="lbl-zip">〒${escAttrLocal(c.zip)}</div>`:'';
+        const addrHtml=hasAddress?`<div class="lbl-addr">${escAttrLocal(c.address)}</div>`:'<div class="lbl-addr"></div>';
+        const nameHtml=`<div class="lbl-name">${escAttrLocal(c.name||'')}<span class="lbl-honor">${escAttrLocal(honorific)}</span></div>`;
+        cells.push(`<div class="lbl-cell">${zipHtml}${addrHtml}${nameHtml}</div>`);
+      } else {
+        cells.push('<div class="lbl-cell lbl-empty"></div>');
+      }
+    }
+    sheetsHtml+=`<div class="lbl-sheet${sheetIdx<sheets.length-1?' lbl-pagebreak':''}"><div class="lbl-grid">${cells.join('')}</div></div>`;
+  });
+
+  const today_str=today();
+  const docTitle=`住所ラベル_${today_str}_${customerList.length}件`;
+
+  // 印刷専用のフルHTMLドキュメントを生成
+  const printHtml = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>${escAttrLocal(docTitle)}</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin:0; padding:0; background:white; font-family:'Noto Sans JP','Hiragino Sans','Yu Gothic','Meiryo',sans-serif; color:#000; }
+  /* A4 21面シート: 上下8.5mm余白、左右7mm余白、3列×7行、列間隔2.5mm */
+  .lbl-sheet { width:210mm; height:297mm; padding:8.5mm 7mm; box-sizing:border-box; }
+  .lbl-pagebreak { page-break-after: always; }
+  .lbl-grid {
+    display:grid;
+    grid-template-columns:63.5mm 63.5mm 63.5mm;
+    grid-template-rows:repeat(7,38.1mm);
+    column-gap:2.5mm;
+    row-gap:0;
+    width:100%;
+    height:100%;
+  }
+  .lbl-cell {
+    border:0.2mm solid #ddd;
+    padding:3mm;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-sizing:border-box;
+  }
+  .lbl-empty { border-color:#eee; }
+  .lbl-zip { font-size:9pt; color:#444; margin-bottom:1mm; }
+  .lbl-addr { font-size:10pt; line-height:1.35; flex:1; word-wrap:break-word; overflow-wrap:break-word; }
+  .lbl-name { font-size:11pt; font-weight:bold; text-align:right; margin-top:auto; }
+  .lbl-honor { margin-left:4mm; font-weight:normal; }
+  /* 操作ガイド（印刷時は非表示） */
+  .print-guide {
+    background:#f0f9ff; border:1px solid #3b82f6; padding:14px 18px;
+    margin:14px; border-radius:8px; font-size:13px; line-height:1.7;
+  }
+  .print-guide h3 { margin:0 0 8px; font-size:15px; color:#1e40af; }
+  .print-guide button {
+    background:#3b82f6; color:white; border:none; border-radius:6px;
+    padding:8px 16px; font-size:14px; cursor:pointer; font-family:inherit;
+    margin-right:8px;
+  }
+  .print-guide button:hover { background:#2563eb; }
+  @media print {
+    .print-guide { display:none !important; }
+    .lbl-cell { border-color:#ccc; }
+  }
+</style>
+</head>
+<body>
+<div class="print-guide">
+  <h3>📮 ${escAttrLocal(docTitle)}</h3>
+  <p style="margin:0 0 10px">
+    下のボタンを押すと印刷ダイアログが開きます。<br>
+    <strong>「PDFに保存」</strong>を選ぶとPDF化、<strong>プリンタ名</strong>を選ぶと紙に印刷されます。
+  </p>
+  <button onclick="window.print()">🖨️ 印刷 / PDFに保存</button>
+  <button onclick="window.close()" style="background:#9ca3af">閉じる</button>
+</div>
+${sheetsHtml}
+<scr` + `ipt>
+  // ページ読み込み完了後に自動で印刷ダイアログを開く（少し遅延）
+  window.addEventListener('load', function(){
+    setTimeout(function(){ try { window.print(); } catch(e) {} }, 500);
+  });
+<\/scr` + `ipt>
+</body>
+</html>`;
+
+  // 新しいウィンドウ/タブで開く
+  const w = window.open('', '_blank');
+  if(!w){
+    showErrorBanner('印刷ウィンドウが開けません', 'ポップアップブロックが有効になっている可能性があります。ブラウザの設定でこのサイトのポップアップを許可してください。', {kind:'error'});
+    return;
+  }
+  w.document.open();
+  w.document.write(printHtml);
+  w.document.close();
+  showToast(`✓ 印刷ウィンドウを開きました（${customerList.length}件）`, '#27AE60');
 }
 
 // ② PDFをローカルダウンロード
