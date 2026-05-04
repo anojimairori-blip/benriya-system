@@ -3866,8 +3866,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.0';
-const APP_BUILD_TIME='2026/05/04 20:53';
+const APP_VERSION='v3.32.1';
+const APP_BUILD_TIME='2026/05/04 21:10';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6842,34 +6842,12 @@ async function renderAndExportAddressLabels(customerList){
   .lbl-addr { font-size:10pt; line-height:1.35; flex:1; word-wrap:break-word; overflow-wrap:break-word; }
   .lbl-name { font-size:11pt; font-weight:bold; text-align:right; margin-top:auto; }
   .lbl-honor { margin-left:4mm; font-weight:normal; }
-  /* 操作ガイド（印刷時は非表示） */
-  .print-guide {
-    background:#f0f9ff; border:1px solid #3b82f6; padding:14px 18px;
-    margin:14px; border-radius:8px; font-size:13px; line-height:1.7;
-  }
-  .print-guide h3 { margin:0 0 8px; font-size:15px; color:#1e40af; }
-  .print-guide button {
-    background:#3b82f6; color:white; border:none; border-radius:6px;
-    padding:8px 16px; font-size:14px; cursor:pointer; font-family:inherit;
-    margin-right:8px;
-  }
-  .print-guide button:hover { background:#2563eb; }
   @media print {
-    .print-guide { display:none !important; }
     .lbl-cell { border-color:#ccc; }
   }
 </style>
 </head>
 <body>
-<div class="print-guide">
-  <h3>📮 ${escAttrLocal(docTitle)}</h3>
-  <p style="margin:0 0 10px">
-    下のボタンを押すと印刷ダイアログが開きます。<br>
-    <strong>「PDFに保存」</strong>を選ぶとPDF化、<strong>プリンタ名</strong>を選ぶと紙に印刷されます。
-  </p>
-  <button onclick="window.print()">🖨️ 印刷 / PDFに保存</button>
-  <button onclick="window.close()" style="background:#9ca3af">閉じる</button>
-</div>
 ${sheetsHtml}
 <scr` + `ipt>
   // ページ読み込み完了後に自動で印刷ダイアログを開く（少し遅延）
@@ -6889,7 +6867,7 @@ ${sheetsHtml}
   w.document.open();
   w.document.write(printHtml);
   w.document.close();
-  showToast(`✓ 印刷ウィンドウを開きました（${customerList.length}件）`, '#27AE60');
+  showToast(`✓ 印刷ダイアログを開いています（${customerList.length}件）`, '#27AE60');
 }
 
 // ② PDFをローカルダウンロード
