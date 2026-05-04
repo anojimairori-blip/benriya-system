@@ -3866,8 +3866,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.31.2';
-const APP_BUILD_TIME='2026/05/03 11:39';
+const APP_VERSION='v3.31.3';
+const APP_BUILD_TIME='2026/05/04 20:36';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6436,9 +6436,17 @@ async function _generatePdfBlob(){
   };
 
   try{
-    const worker = html2pdf().set(opt).from(previewDoc);
-    const blob = await worker.output('blob');
-    return { blob, filename: fname };
+    // v3.31.3: bodyのoverflow:hidden + height:100% が原因で、html2canvasのクローン内で
+    // 大きな書類が高さ0扱いになる潜在バグの予防修正
+    const _prevBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'visible';
+    try{
+      const worker = html2pdf().set(opt).from(previewDoc);
+      const blob = await worker.output('blob');
+      return { blob, filename: fname };
+    } finally {
+      document.body.style.overflow = _prevBodyOverflow;
+    }
   } finally {
     // 元に戻す
     hideEls.forEach((el,i)=>{el.style.display=oldDisplay[i]||'';});
@@ -6573,6 +6581,11 @@ async function bulkExportPdf(docIds, filename, type){
     +'opacity:0;pointer-events:none;z-index:-1;overflow:hidden';
   document.body.appendChild(container);
 
+  // v3.31.3: bodyのoverflow:hidden + height:100% が原因で、html2canvasのクローン内で
+  // コンテンツがbody高さを超えると高さ0扱いになるバグ対策。一時的にoverflow解除
+  const _prevBodyOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'visible';
+
   try{
     const htmlParts=[];
     for(let i=0; i<docIds.length; i++){
@@ -6614,6 +6627,8 @@ async function bulkExportPdf(docIds, filename, type){
   }finally{
     // 一時コンテナを削除
     container.remove();
+    // v3.31.3: bodyのoverflowを元に戻す
+    document.body.style.overflow = _prevBodyOverflow;
     // 元の状態を復元
     if(previewBody) previewBody.innerHTML = originalPreviewBodyHtml;
     currentPreviewDocId = originalPreviewDocId;
@@ -6764,6 +6779,12 @@ async function renderAndExportAddressLabels(customerList){
     +'opacity:0;pointer-events:none;z-index:-1;overflow:hidden';
   document.body.appendChild(container);
 
+  // v3.31.3: bodyのoverflow:hidden + height:100% が原因で、html2canvasのクローン内で
+  // ラベルシート(1127px)がbody(742px)を超えると高さ0扱いになるバグ対策。
+  // PDF生成中だけ一時的にbodyのoverflowを解除する。
+  const _prevBodyOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'visible';
+
   try{
     // 21枚ごとにシート分割
     const PER_SHEET=21;
@@ -6827,6 +6848,8 @@ async function renderAndExportAddressLabels(customerList){
     showErrorBanner('住所ラベルPDF生成エラー', String(e?.message||e), {kind:'error'});
   }finally{
     container.remove();
+    // v3.31.3: bodyのoverflowを元に戻す
+    document.body.style.overflow = _prevBodyOverflow;
   }
 }
 
@@ -11057,15 +11080,26 @@ window._downloadPortalImage = async function(){
     source.style.opacity = '0';
     source.style.pointerEvents = 'none';
 
-    // レンダリング
-    const canvas = await html2canvas(source, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: '#ffffff',
-      logging: false,
-      windowWidth: 794
-    });
+    // v3.31.3: bodyのoverflow:hidden + height:100% が原因で、html2canvasのクローン内で
+    // sourceの高さがbody高さを超えると0扱いになる潜在バグ対策
+    const _prevBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'visible';
+
+    let canvas;
+    try{
+      // レンダリング
+      canvas = await html2canvas(source, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        logging: false,
+        windowWidth: 794
+      });
+    } finally {
+      // bodyのoverflowを元に戻す
+      document.body.style.overflow = _prevBodyOverflow;
+    }
 
     // オフスクリーンに戻す
     source.style.left = '-99999px';
