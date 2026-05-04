@@ -3866,8 +3866,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.1';
-const APP_BUILD_TIME='2026/05/04 21:10';
+const APP_VERSION='v3.32.2';
+const APP_BUILD_TIME='2026/05/04 21:14';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6667,6 +6667,17 @@ function openAddressLabelModal(){
             <span style="float:right">21枚で1シート（超過分は次のシートへ）</span>
           </div>
           <div id="addr-label-list" style="max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;background:var(--surface)"></div>
+          <!-- v3.32.2: 罫線ON/OFF + 対応ラベル品番表記 -->
+          <div style="margin-top:12px;padding:10px 12px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;margin-bottom:8px">
+              <input type="checkbox" id="addr-label-border" style="width:16px;height:16px;cursor:pointer">
+              <span>罫線を印刷する <span style="color:var(--text3);font-size:11px">（市販ラベルシール紙の場合は通常OFF）</span></span>
+            </label>
+            <div style="font-size:11px;color:var(--text2);line-height:1.6;border-top:1px dashed var(--border);padding-top:8px;margin-top:4px">
+              <strong>📝 対応ラベル：</strong> A4・21面（3列×7行）・63.5×38.1mm<br>
+              <span style="color:var(--text3)">例: A-ONE 28729 / コクヨ KPC-E1211 / エーワン 72221 など</span>
+            </div>
+          </div>
         </div>
         <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:8px">
           <button class="btn btn-secondary" onclick="closeAddressLabelModal()">キャンセル</button>
@@ -6760,15 +6771,18 @@ async function executeAddressLabelPdf(){
     showToast('対象顧客が見つかりません','#C0392B');
     return;
   }
+  // v3.32.2: 罫線ON/OFFを取得（デフォルトOFF）
+  const withBorder = !!document.getElementById('addr-label-border')?.checked;
   closeAddressLabelModal();
-  await renderAndExportAddressLabels(selectedCustomers);
+  await renderAndExportAddressLabels(selectedCustomers, withBorder);
 }
 
 // 21面ラベルシートを生成して印刷（v3.32.0）
 // html2canvas経由のPDF生成は body{overflow:hidden;height:100%} と相性が悪く
 // canvas高さ0になる問題が解決困難だったため、ブラウザ標準の印刷ダイアログ経由方式に変更。
 // ユーザーは「PDFに保存」を選べばPDF化、プリンタを選べば紙に印刷できる。
-async function renderAndExportAddressLabels(customerList){
+// v3.32.2: 第2引数 withBorder で罫線表示制御（デフォルトfalse=罫線なし、市販ラベル紙対応）
+async function renderAndExportAddressLabels(customerList, withBorder){
   if(!customerList || customerList.length === 0){
     showToast('対象顧客が選択されていません','#C0392B');
     return;
@@ -6801,7 +6815,7 @@ async function renderAndExportAddressLabels(customerList){
         cells.push('<div class="lbl-cell lbl-empty"></div>');
       }
     }
-    sheetsHtml+=`<div class="lbl-sheet${sheetIdx<sheets.length-1?' lbl-pagebreak':''}"><div class="lbl-grid">${cells.join('')}</div></div>`;
+    sheetsHtml+=`<div class="lbl-sheet"><div class="lbl-grid">${cells.join('')}</div></div>`;
   });
 
   const today_str=today();
@@ -6817,9 +6831,19 @@ async function renderAndExportAddressLabels(customerList){
   @page { size: A4; margin: 0; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body { margin:0; padding:0; background:white; font-family:'Noto Sans JP','Hiragino Sans','Yu Gothic','Meiryo',sans-serif; color:#000; }
-  /* A4 21面シート: 上下8.5mm余白、左右7mm余白、3列×7行、列間隔2.5mm */
-  .lbl-sheet { width:210mm; height:297mm; padding:8.5mm 7mm; box-sizing:border-box; }
-  .lbl-pagebreak { page-break-after: always; }
+  /* v3.32.2: A4 21面シート - 297mmぴったりだと改ページ計算で2枚目に空白が出るため296mmに微減 */
+  .lbl-sheet {
+    width:210mm;
+    height:296mm;
+    padding:8.5mm 7mm;
+    box-sizing:border-box;
+    overflow:hidden;
+    display:block;
+    page-break-inside:avoid;
+  }
+  /* v3.32.2: 最終シートには絶対に改ページを入れない（:last-child で完全制御） */
+  .lbl-sheet:not(:last-child) { page-break-after: always; }
+  .lbl-sheet:last-child { page-break-after: avoid !important; }
   .lbl-grid {
     display:grid;
     grid-template-columns:63.5mm 63.5mm 63.5mm;
@@ -6830,20 +6854,20 @@ async function renderAndExportAddressLabels(customerList){
     height:100%;
   }
   .lbl-cell {
-    border:0.2mm solid #ddd;
+    border: ${withBorder ? '0.2mm solid #ccc' : 'none'};
     padding:3mm;
     display:flex;
     flex-direction:column;
     overflow:hidden;
     box-sizing:border-box;
   }
-  .lbl-empty { border-color:#eee; }
+  .lbl-empty { ${withBorder ? 'border-color:#eee;' : 'border:none;'} }
   .lbl-zip { font-size:9pt; color:#444; margin-bottom:1mm; }
   .lbl-addr { font-size:10pt; line-height:1.35; flex:1; word-wrap:break-word; overflow-wrap:break-word; }
   .lbl-name { font-size:11pt; font-weight:bold; text-align:right; margin-top:auto; }
   .lbl-honor { margin-left:4mm; font-weight:normal; }
   @media print {
-    .lbl-cell { border-color:#ccc; }
+    ${withBorder ? '.lbl-cell { border-color:#ccc; }' : '.lbl-cell { border:none; } .lbl-empty { border:none; }'}
   }
 </style>
 </head>
