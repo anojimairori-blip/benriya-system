@@ -1018,7 +1018,11 @@ select{appearance:auto}
     overflow:visible !important;
     box-shadow:none !important;
     background:white !important;
-    page-break-inside:avoid;
+    /* v3.32.6: 備考が長い見積書で2ページ目以降が出ない不具合を修正。
+       preview-doc 自体を改ページ可能にし、内部の table/total/notes 単位で
+       改ページを制御する（611行付近の .preview-table tr / .preview-total に
+       page-break-inside:avoid を指定済み）。 */
+    page-break-inside:auto !important;
     /* v3.31.1: モバイル時のtransform:scaleを印刷時に確実にリセット */
     transform:none !important;
     transform-origin:initial !important;
@@ -3874,8 +3878,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.5';
-const APP_BUILD_TIME='2026/05/19 06:24';
+const APP_VERSION='v3.32.6';
+const APP_BUILD_TIME='2026/05/19 06:31';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
