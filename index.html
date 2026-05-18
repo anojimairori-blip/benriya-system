@@ -836,6 +836,8 @@ select{appearance:auto}
 .preview-from strong{display:inline-block}
 .preview-logo{max-width:100px;max-height:50px;object-fit:contain;display:block;margin-left:auto;margin-bottom:5px}
 .preview-table{width:100%;max-width:100%;border-collapse:collapse;margin-bottom:15px;font-size:12px;table-layout:fixed;word-break:break-word;box-sizing:border-box}
+/* v3.32.4: 金額・単価セルのはみ出し防止（白囲い） */
+.preview-table td.num,.preview-table th.num{white-space:nowrap;font-variant-numeric:tabular-nums}
 
 /* 件名（品目テーブル直上） */
 .preview-subject{display:flex;align-items:flex-end;gap:10px;margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #888}
@@ -865,7 +867,7 @@ select{appearance:auto}
 .preview-total table{margin-left:auto;font-size:13px}
 .preview-total td{padding:4px 7px}
 .preview-total .grand{font-size:18px;font-weight:700;border-top:2px solid #111}
-.preview-notes{margin-top:14px;font-size:12px;border-top:1px solid #DDD;padding-top:11px;line-height:2}
+.preview-notes{margin-top:14px;font-size:12px;border-top:1px solid #DDD;padding-top:11px;line-height:2;white-space:pre-wrap;word-break:break-word}
 .doc-number{font-size:12px;color:#888;margin-bottom:3px}
 .stamp{width:56px;height:56px;border:2px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--red);margin-left:auto;margin-top:10px}
 
@@ -3866,8 +3868,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.3';
-const APP_BUILD_TIME='2026/05/04 21:23';
+const APP_VERSION='v3.32.4';
+const APP_BUILD_TIME='2026/05/19 05:58';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6277,13 +6279,13 @@ function previewDoc(id){
     </div>
 
     <table class="preview-table">
-      <thead><tr><th style="width:38%">品目・作業内容</th><th style="width:9%;text-align:right">数量</th><th style="width:18%;text-align:right">単価</th><th style="width:12%;text-align:center">税率</th><th style="text-align:right">金額</th></tr></thead>
+      <thead><tr><th style="width:32%">品目・作業内容</th><th class="num" style="width:9%;text-align:right">数量</th><th class="num" style="width:17%;text-align:right">単価</th><th style="width:10%;text-align:center">税率</th><th class="num" style="width:22%;text-align:right">金額</th></tr></thead>
       <tbody>${(d.lines||[]).map(l=>{
         const taxDisplay = (l.tax==='0'||l.tax===0) ? '非課税'
           : isTaxIncluded ? '税込' // 税込モード（消費税未計算）の場合
           : /^new-/.test(String(l.tax)) ? '10%' // レガシーの壊れたID → デフォルト10%表示
           : (l.tax||'10')+'%';
-        return `<tr><td>${escAttr(l.name||'—')}</td><td style="text-align:right">${l.qty}</td><td style="text-align:right">${fmt(l.price)}</td><td style="text-align:center">${taxDisplay}</td><td style="text-align:right">${fmt(l.qty*l.price)}</td></tr>`;
+        return `<tr><td>${escAttr(l.name||'—')}</td><td class="num" style="text-align:right">${l.qty}</td><td class="num" style="text-align:right">${fmt(l.price)}</td><td style="text-align:center">${taxDisplay}</td><td class="num" style="text-align:right">${fmt(l.qty*l.price)}</td></tr>`;
       }).join('')}</tbody>
     </table>
     <div class="preview-total"><table>
