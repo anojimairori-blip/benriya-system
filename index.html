@@ -870,9 +870,9 @@ select{appearance:auto}
 .preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #BBB;overflow:hidden;box-sizing:border-box}
 .preview-table td{padding:6px 9px;border:1px solid #BBB;overflow:hidden;box-sizing:border-box}
 .preview-table tbody tr:last-child td{border-bottom:1px solid #BBB}
-.preview-total table{margin-left:auto;font-size:13px}
+.preview-total table{margin-left:auto;font-size:16px}
 .preview-total td{padding:4px 7px}
-.preview-total .grand{font-size:18px;font-weight:700;border-top:2px solid #111}
+.preview-total .grand{font-size:24px;font-weight:700;border-top:2px solid #111}
 .preview-notes{margin-top:14px;font-size:12px;border-top:1px solid #DDD;padding-top:11px;line-height:2;white-space:pre-wrap;word-break:break-word}
 .doc-number{font-size:12px;color:#888;margin-bottom:3px}
 .stamp{width:56px;height:56px;border:2px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--red);margin-left:auto;margin-top:10px}
@@ -1081,7 +1081,7 @@ select{appearance:auto}
   }
   /* 合計金額を印刷時も大きく */
   .preview-doc .preview-total .grand{
-    font-size:18px !important;
+    font-size:24px !important;
     font-weight:700 !important;
   }
   /* テーブル罫線をはっきり表示 */
@@ -3878,8 +3878,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.6';
-const APP_BUILD_TIME='2026/05/19 06:31';
+const APP_VERSION='v3.32.7';
+const APP_BUILD_TIME='2026-05-21T21:33:18Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
