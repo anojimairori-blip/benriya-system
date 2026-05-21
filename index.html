@@ -605,7 +605,7 @@ tr:hover td{background:var(--bg)}
 .preview-doc.doc-quote .preview-table th{background:var(--doc-color-quote-light);color:var(--doc-color-quote);border-bottom:2px solid var(--doc-color-quote)}
 .preview-doc.doc-invoice .preview-table th{background:var(--doc-color-invoice-light);color:var(--doc-color-invoice);border-bottom:2px solid var(--doc-color-invoice)}
 .preview-doc.doc-receipt .preview-table th{background:var(--doc-color-receipt-light);color:var(--doc-color-receipt);border-bottom:2px solid var(--doc-color-receipt)}
-.preview-doc.doc-quote .grand td{color:var(--doc-color-quote);border-top:2px solid var(--doc-color-quote)}
+.preview-doc.doc-quote .grand td{color:#111;border-top:2px solid var(--doc-color-quote)}
 .preview-doc.doc-invoice .grand td{color:var(--doc-color-invoice);border-top:2px solid var(--doc-color-invoice)}
 .preview-doc.doc-receipt .grand td{color:var(--doc-color-receipt);border-top:2px solid var(--doc-color-receipt)}
 @media print{
@@ -3878,7 +3878,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.8';
+const APP_VERSION='v3.32.9';
 const APP_BUILD_TIME='2026-05-21T21:33:18Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
@@ -6301,7 +6301,7 @@ function previewDoc(id){
     <div class="preview-total"><table>
       ${isTaxIncluded?'':`<tr><td style="font-size:16px">小計（税抜）</td><td style="text-align:right;font-size:16px">${fmt(d.subtotal)}</td></tr>`}
       ${taxRows.join('')}
-      <tr class="grand"><td style="padding-top:8px;font-weight:700;font-size:24px">合計（税込）</td><td style="text-align:right;padding-top:8px;font-size:24px;font-weight:700">${fmt(d.grandTotal)}</td></tr>
+      <tr class="grand"><td style="padding-top:8px;font-weight:700;font-size:20px">合計（税込）</td><td style="text-align:right;padding-top:8px;font-size:20px;font-weight:700">${fmt(d.grandTotal)}</td></tr>
     </table></div>
     ${d.type==='請求書'&&s.bank?`<div class="preview-notes"><strong>お振込先：</strong>${escAttr(s.bank)}　${escAttr(s.account||'')}</div>`:''}
     ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr(d.notes)}</div>`:''}
