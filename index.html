@@ -1822,7 +1822,7 @@ if('serviceWorker' in navigator){
     </div>
     <div id="cust-tab-list">
       <div style="display:flex;gap:8px;margin-bottom:12px"><input id="cust-search" oninput="renderCustomerList()" type="text" placeholder="顧客名・電話・住所で検索" style="padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;flex:1;outline:none"></div>
-      <div class="card"><table><thead><tr><th>顧客名</th><th>担当者</th><th>電話</th><th>住所</th><th>取引件数</th><th></th></tr></thead><tbody id="customer-list-body"></tbody></table></div>
+      <div class="card"><table><thead><tr><th>顧客名</th><th>お客様担当者</th><th>電話</th><th>住所</th><th>取引件数</th><th></th></tr></thead><tbody id="customer-list-body"></tbody></table></div>
     </div>
     <div id="cust-tab-quotes" style="display:none"><div class="card"><table><thead><tr><th>書類番号</th><th>顧客名</th><th>件名</th><th>日付</th><th>金額</th><th>状態</th><th></th></tr></thead><tbody id="cust-quotes-body"></tbody></table></div></div>
     <div id="cust-tab-invoices" style="display:none"><div class="card"><table><thead><tr><th>書類番号</th><th>顧客名</th><th>件名</th><th>日付</th><th>金額</th><th>状態</th><th></th></tr></thead><tbody id="cust-invoices-body"></tbody></table></div></div>
@@ -3884,8 +3884,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.11';
-const APP_BUILD_TIME='2026-05-22T19:34:21Z';
+const APP_VERSION='v3.32.12';
+const APP_BUILD_TIME='2026-05-22T20:36:26Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
