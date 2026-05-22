@@ -3054,8 +3054,14 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
       <div class="form-group"><label>メモ・備考</label><textarea id="cust-memo" style="min-height:40px" placeholder=""></textarea></div>
     </div>
     <div style="margin-top:6px">
+      <div class="form-group">
+        <label>自社担当（任意）</label>
+        <select id="cust-assigned-emp"><option value="">（自社の担当者を選択）</option></select>
+      </div>
+    </div>
+    <div style="margin-top:10px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="section-title" style="margin:0">担当者（複数登録可）</div>
+        <div class="section-title" style="margin:0">お客様担当者（複数登録可）</div>
         <button class="btn btn-secondary btn-sm" onclick="addContactField()">＋ 担当者追加</button>
       </div>
       <div id="contacts-container"></div>
@@ -3878,8 +3884,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.10';
-const APP_BUILD_TIME='2026-05-22T19:09:16Z';
+const APP_VERSION='v3.32.11';
+const APP_BUILD_TIME='2026-05-22T19:34:21Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7256,10 +7262,11 @@ function openCustDetail(idOrName,byId){
             ${dirUrl?`<a href="${dirUrl}" target="_blank" class="map-btn">🚗 経路を確認</a>`:''}
           </div>`:''}
         <div class="detail-section">
-          <h4>担当者 (${(c.contacts||[]).length}名)</h4>
+          ${(()=>{const ae=c.assignedEmpId?(employees||[]).find(e=>e.id===c.assignedEmpId):null;return ae?`<div class="detail-row"><span class="dl">自社担当</span><span>${escAttr(ae.name)}${ae.role?'（'+escAttr(ae.role)+'）':''}</span></div>`:'';})()}
+          <h4>お客様担当者 (${(c.contacts||[]).length}名)</h4>
           ${(c.contacts||[]).length?c.contacts.map(ct=>`<div class="contact-card">
-            <div class="contact-avatar">${ct.name.charAt(0)}</div>
-            <div><div style="font-size:13px;font-weight:700">${ct.name} 様</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${[ct.role,ct.tel,ct.email].filter(Boolean).join('　')}</div></div>
+            <div class="contact-avatar">${escAttr((ct.name||'').charAt(0))}</div>
+            <div><div style="font-size:13px;font-weight:700">${escAttr(ct.name||'')} 様</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${escAttr([ct.role,ct.tel,ct.email].filter(Boolean).join('　'))}</div></div>
           </div>`).join(''):'<p style="font-size:13px;color:var(--text3)">担当者未登録</p>'}
         </div>
       </div>
@@ -7292,11 +7299,22 @@ function openCustomerModal(){
   document.getElementById('cust-category').value='';
   document.getElementById('cust-honorific').value='御中';
   document.getElementById('contacts-container').innerHTML='';
+  populateAssignedEmpSelect('');
   addContactField();
   // 貼り付けエリアもクリア
   const paste=document.getElementById('cust-paste-area'); if(paste) paste.value='';
   const pst=document.getElementById('cust-paste-status'); if(pst) pst.textContent='';
   document.getElementById('customer-modal').classList.add('open');
+}
+
+// 自社担当プルダウンに従業員リストを流し込み、指定IDを選択状態にする
+function populateAssignedEmpSelect(selectedId){
+  const sel=document.getElementById('cust-assigned-emp');
+  if(!sel) return;
+  const emps=(typeof employees!=='undefined'?employees:[]).filter(e=>e&&e.name);
+  sel.innerHTML='<option value="">（自社の担当者を選択）</option>'+
+    emps.map(e=>`<option value="${escAttr(e.id)}">${escAttr(e.name)}${e.role?' ('+escAttr(e.role)+')':''}</option>`).join('');
+  sel.value=selectedId||'';
 }
 
 function editCustomer(id){
@@ -7307,6 +7325,7 @@ function editCustomer(id){
   document.getElementById('cust-category').value=c.category||'';
   document.getElementById('cust-honorific').value=c.honorific!=null?c.honorific:'御中';
   document.getElementById('contacts-container').innerHTML='';
+  populateAssignedEmpSelect(c.assignedEmpId||'');
   (c.contacts||[]).forEach(ct=>addContactField(ct));
   if(!(c.contacts||[]).length)addContactField();
   document.getElementById('customer-modal').classList.add('open');
@@ -7325,27 +7344,12 @@ function addContactField(data){
   const div=document.createElement('div');div.id=uid;
   div.style.cssText='background:var(--surface2);border-radius:8px;padding:11px;margin-bottom:7px;position:relative';
 
-  // 従業員（社員）のプルダウン選択肢を作る
-  const empOptions=(typeof employees!=='undefined'?employees:[])
-    .filter(e=>e && e.name)
-    .map(e=>`<option value="${escAttr(e.id)}" data-tel="${escAttr(e.tel||'')}" data-name="${escAttr(e.name)}">${escAttr(e.name)}${e.role?' ('+escAttr(e.role)+')':''}</option>`)
-    .join('');
-
-  // 既存データがあれば fromEmpId（従業員ID）を復元
-  const selectedEmpId=data?.empId||'';
-  const matchedEmp=selectedEmpId?(employees||[]).find(e=>e.id===selectedEmpId):null;
-  const initName=data?.name||matchedEmp?.name||'';
-  const initTel=data?.tel||matchedEmp?.tel||'';
+  // お客様（先方）担当者は手入力。旧データの name/tel はそのまま引き継ぐ
+  const initName=data?.name||'';
+  const initTel=data?.tel||'';
 
   div.innerHTML=`<button onclick="document.getElementById('${uid}').remove()" style="position:absolute;top:7px;right:7px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px" title="削除">✕</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-      <div class="form-group" style="grid-column:1/-1">
-        <label>従業員から選択（任意）</label>
-        <select class="ct-emp-select" onchange="onContactEmpSelect(this,'${uid}')">
-          <option value="">（従業員を選択、または下で直接入力）</option>
-          ${empOptions}
-        </select>
-      </div>
       <div class="form-group"><label>担当者名</label><input type="text" class="ct-name" value="${escAttr(initName)}" placeholder="田中 花子"></div>
       <div class="form-group"><label>役職・部署</label><input type="text" class="ct-role" value="${escAttr(data?.role||'')}" placeholder="現場担当"></div>
       <div class="form-group"><label>携帯番号</label><input type="tel" class="ct-tel" inputmode="tel" value="${escAttr(initTel)}" placeholder="" onblur="autoTel(this)"></div>
@@ -7353,44 +7357,20 @@ function addContactField(data){
     </div>`;
 
   c.appendChild(div);
-
-  // 既存データで従業員が選択されていた場合はプルダウンを復元
-  if(selectedEmpId){
-    const sel=div.querySelector('.ct-emp-select');
-    if(sel) sel.value=selectedEmpId;
-  }
 }
 
 // 従業員プルダウン選択時に名前・携帯番号を自動補完
-function onContactEmpSelect(selectEl, containerId){
-  const container=document.getElementById(containerId);
-  if(!container) return;
-  const opt=selectEl.selectedOptions[0];
-  if(!opt || !opt.value) return;
-  const name=opt.dataset.name||'';
-  const tel=opt.dataset.tel||'';
-  const nameInput=container.querySelector('.ct-name');
-  const telInput=container.querySelector('.ct-tel');
-  if(nameInput) nameInput.value=name;
-  if(telInput){
-    telInput.value=tel;
-    // ハイフン自動整形
-    if(typeof autoTel==='function') autoTel(telInput);
-  }
-}
+function onContactEmpSelect(){ /* 廃止: お客様担当者は手入力のみ（v3.32.11） */ }
 
 function getContacts(){
   return Array.from(document.querySelectorAll('#contacts-container > div')).map(div=>{
-    const sel=div.querySelector('.ct-emp-select');
-    const empId=sel?sel.value:'';
     return{
-      empId: empId||'',
       name: (div.querySelector('.ct-name')?.value||'').trim(),
       role: (div.querySelector('.ct-role')?.value||'').trim(),
       tel:  (div.querySelector('.ct-tel')?.value||'').trim(),
       email:(div.querySelector('.ct-email')?.value||'').trim()
     };
-  }).filter(c=>c.name||c.empId);
+  }).filter(c=>c.name);
 }
 
 // ===== 貼り付け文字列から顧客情報を自動解析 =====
@@ -7731,6 +7711,7 @@ function saveCustomer(){
     memo:document.getElementById('cust-memo').value,
     dept:document.getElementById('cust-dept').value||'',
     category:document.getElementById('cust-category').value,
+    assignedEmpId:document.getElementById('cust-assigned-emp')?.value||'',
     contacts:getContacts()
   };
   // v3.28.1: N8 重複検出(新規時のみ)
