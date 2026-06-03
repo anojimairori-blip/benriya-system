@@ -1650,6 +1650,7 @@ if('serviceWorker' in navigator){
   <div class="main-header">
     <h2>📌 掲示板</h2>
     <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
+      <button onclick="hardReload()" title="アプリを最新版に更新" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;color:var(--text2)" aria-label="アプリ更新">⬆️</button>
       <button class="btn btn-primary" onclick="openBulletinModal()">＋ 新規投稿</button>
     </div>
   </div>
@@ -3884,8 +3885,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.13';
-const APP_BUILD_TIME='2026-05-22T20:43:58Z';
+const APP_VERSION='v3.32.14';
+const APP_BUILD_TIME='2026-06-03T06:10:32Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3959,7 +3960,7 @@ async function checkForUpdate(){
 
     // 厳密な比較: latest が current より新しい場合のみバナー表示
     if(_isNewerVersion(latest, APP_VERSION)){
-      showUpdateBanner(latest);
+      autoReloadOnOpen(latest);
     } else {
       // 同じか古い → 既に最新版のため記録を更新（バナー再表示防止）
       localStorage.setItem('last_updated_to_version', APP_VERSION);
@@ -3995,6 +3996,46 @@ function showUpdateBanner(latest){
   // メインコンテンツを少し下げる
   const app=document.getElementById('app-main');
   if(app) app.style.paddingTop='52px';
+}
+
+// ===== アプリ起動時 自動リロード（sessionStorageでループ防止）=====
+function autoReloadOnOpen(latest){
+  // このセッションで既に自動リロード済みか確認
+  const alreadyReloaded = sessionStorage.getItem('auto_reloaded_version');
+  if(alreadyReloaded === latest){
+    // リロード済みなのに古いまま → バナーで手動更新を促す
+    showUpdateBanner(latest);
+    return;
+  }
+  // 未リロード → フラグを立てて自動リロード
+  sessionStorage.setItem('auto_reloaded_version', latest);
+  localStorage.setItem('last_updated_to_version', latest);
+  localStorage.removeItem('update_banner_dismissed_at');
+  const clearAndReload = async () => {
+    try{
+      if('caches' in window){
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
+      }
+    }catch(e){}
+    try{
+      if('serviceWorker' in navigator){
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r=>r.unregister()));
+      }
+    }catch(e){}
+    setTimeout(()=>{
+      try{
+        const hash = location.hash || '';
+        const url = new URL(location.href);
+        url.searchParams.delete('_v');
+        url.searchParams.set('_v', Date.now().toString());
+        url.hash = hash;
+        window.location.replace(url.toString());
+      }catch(e){ window.location.reload(); }
+    }, 200);
+  };
+  clearAndReload();
 }
 
 function hardReload(){
