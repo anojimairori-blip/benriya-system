@@ -3886,8 +3886,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.15';
-const APP_BUILD_TIME='2026-06-25T21:53:00Z';
+const APP_VERSION='v3.32.16';
+const APP_BUILD_TIME='2026-06-25T22:13:41Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -11109,6 +11109,7 @@ body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto San
     <div class="company-footer">
       ${s.logo?`<img src="${_escPub(s.logo)}" alt="" class="company-logo"><br>`:''}
       <div class="company-name">${_escPub(s.company||'')}</div>
+      ${s.owner?`<div style="font-size:12px;color:var(--text2);margin-top:2px">${_escPub(s.owner)}</div>`:''}
       ${s.zip?`〒${_escPub(s.zip)} `:''}${_escPub(s.address||'')}
       ${s.tel?`<br>TEL: ${_escPub(s.tel)}`:''}${s.fax?` / FAX: ${_escPub(s.fax)}`:''}
       ${s.email?`<br>${_escPub(s.email)}`:''}
@@ -11143,6 +11144,7 @@ body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto San
     <div style="text-align:right;flex-shrink:0;max-width:38%">
       ${s.logo?`<img src="${_escPub(s.logo)}" alt="" style="max-width:120px;max-height:55px;margin-bottom:6px">`:''}
       <div style="font-weight:700;font-size:14px">${_escPub(s.company||'')}</div>
+      ${s.owner?`<div style="font-size:12px;color:var(--text2);margin-top:2px">${_escPub(s.owner)}</div>`:''}
       ${s.zip?`<div style="font-size:11px;color:#555">〒${_escPub(s.zip)}</div>`:''}
       <div style="font-size:11px;color:#555">${_escPub(s.address||'')}</div>
       ${s.tel?`<div style="font-size:11px;color:#555">TEL: ${_escPub(s.tel)}</div>`:''}
