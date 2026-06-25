@@ -1803,7 +1803,7 @@ if('serviceWorker' in navigator){
   <div class="content" id="content-quotes"></div>
 </div>
 <div id="page-invoices" class="page">
-  <div class="main-header"><h2>📋 請求書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-secondary" onclick="openBulkPdfModal('請求書')" title="請求書を複数まとめてPDF出力">📑 まとめてPDF</button><button class="btn btn-blue" onclick="openNewDoc('請求書')">＋ 新規請求書</button></div></div>
+  <div class="main-header"><h2>📋 請求書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-secondary" onclick="openBulkPdfModal('請求書')" title="請求書を複数まとめてPDF出力">📑 まとめてPDF</button><button class="btn btn-blue" onclick="openNewDoc('請求書')">＋ 新規請求書</button><button class="btn btn-sm" onclick="openMonthlyBulkModal()" style="background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9">📅 月次一括</button></div></div>
   <div class="content" id="content-invoices"></div>
 </div>
 <div id="page-receipts" class="page">
@@ -3886,9 +3886,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.19';
+const APP_VERSION='v3.32.20';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-25T22:58:09Z';
+const APP_BUILD_TIME='2026-06-25T23:10:52Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4051,6 +4051,89 @@ function updateDocBankSelect(){
   if(!sel)return;
   const banks=settings.bankAccounts||[];
   sel.innerHTML='<option value="">（口座を選択）</option>'+banks.map(b=>`<option value="${escAttr(b.id)}">${escAttr(b.label||b.bank)}</option>`).join('');
+}
+
+
+// ===== 月次請求フラグ =====
+function toggleMonthly(id){
+  var d=docs.find(function(x){return x.id===id;});
+  if(!d)return;
+  d.isMonthly=!d.isMonthly;
+  persist();
+  renderDocPageFiltered('page-invoices','請求書');
+  renderDocPageFiltered('page-quotes','見積書');
+  showToast(d.isMonthly?'📅 月次請求に設定':'月次請求を解除',d.isMonthly?'#2E7D32':'#666');
+}
+
+async function execMonthlyBulk(){
+  var checked=[].slice.call(document.querySelectorAll('.mc:checked')).map(function(x){return x.value;});
+  if(!checked.length){showToast('書類を選択してください','#C0392B');return;}
+  var todayStr=today();var created=0;
+  for(var i=0;i<checked.length;i++){
+    var did=checked[i];
+    var d=docs.find(function(x){return x.id===did;});
+    if(!d)continue;
+    var newId='doc-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+    var newDoc=JSON.parse(JSON.stringify(d));
+    newDoc.id=newId;newDoc.number=genNumber(d.type);newDoc.date=todayStr;
+    newDoc.status='下書き';newDoc.createdAt=new Date().toISOString();newDoc.updatedAt=new Date().toISOString();
+    delete newDoc.sharedToken;delete newDoc.sharedExpiry;
+    docs.push(newDoc);created++;
+    await new Promise(function(r){setTimeout(r,20);});
+  }
+  await persistNow();
+  document.getElementById('monthly-bulk-modal').style.display='none';
+  renderDocPageFiltered('page-invoices','請求書');
+  showToast('✅ '+created+'件の今月分請求書を作成しました','#2E7D32');
+}
+
+function openMonthlyBulkModal(){
+  var monthly=docs.filter(function(d){return d.isMonthly&&d.type==='請求書';});
+  var list=document.getElementById('monthly-list');
+  if(!monthly.length){
+    list.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">月次フラグ付きの請求書がありません。<br>請求書一覧の「📅」ボタンでフラグを設定してください。</div>';
+  } else {
+    var rows='<table style="width:100%;border-collapse:collapse"><thead><tr style="background:var(--surface2)"><th style="padding:8px"><input type="checkbox" id="mc-all" onchange="document.querySelectorAll(\'.mc\').forEach(function(x){x.checked=document.getElementById(\'mc-all\').checked;})"></th><th style="padding:8px;font-size:12px;text-align:left">番号</th><th style="padding:8px;font-size:12px;text-align:left">顧客</th><th style="padding:8px;font-size:12px;text-align:left">件名</th><th style="padding:8px;font-size:12px;text-align:right">金額</th></tr></thead><tbody>';
+    monthly.forEach(function(d){rows+='<tr style="border-top:1px solid var(--border)"><td style="padding:8px"><input type="checkbox" class="mc" value="'+escAttr(d.id)+'" checked></td><td style="padding:8px;font-size:12px;font-family:monospace">'+escAttr(d.number||'')+'</td><td style="padding:8px;font-size:13px">'+escAttr(d.customer||'')+'</td><td style="padding:8px;font-size:12px;color:var(--text2)">'+escAttr(d.subject||'')+'</td><td style="padding:8px;font-size:13px;text-align:right">'+fmt(d.grandTotal)+'</td></tr>';});
+    rows+='</tbody></table>';
+    list.innerHTML=rows;
+    document.getElementById('mc-all').checked=true;
+  }
+  document.getElementById('monthly-bulk-modal').style.display='block';
+}
+
+function openEnvelopePreview(id){
+  var d=docs.find(function(x){return x.id===id;});
+  if(!d){showToast('書類が見つかりません','#C0392B');return;}
+  var s=settings;
+  var cust=customers.find(function(x){return x.id===d.customerId;})||{};
+  var custName=_escPub(cust.name||d.customer||'');
+  var custHonorific=d.contact?_escPub(d.contact)+' 様':(cust.honorific?_escPub(cust.honorific):'御中');
+  var logoHtml=s.logo?'<img src="'+_escPub(s.logo)+'" style="max-height:30px;margin-bottom:4px"><br>':'';
+  var html='';
+  html+='<div style="height:99mm;box-sizing:border-box;padding:10mm 12mm 6mm;border-bottom:1px dashed #bbb;display:flex;flex-direction:column;justify-content:flex-end">';
+  html+='<div style="font-size:9px;color:#aaa;margin-bottom:4px">⬆ 上を折り込む</div>';
+  html+='<div style="text-align:right">'+logoHtml;
+  html+='<div style="font-size:13px;font-weight:700">'+_escPub(s.company||'')+'</div>';
+  html+='<div style="font-size:11px;color:#555">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
+  if(s.tel)html+='<div style="font-size:11px;color:#555">'+_escPub(s.tel)+'</div>';
+  html+='</div></div>';
+  html+='<div style="height:99mm;box-sizing:border-box;padding:14mm 10mm 6mm 14mm">';
+  html+='<div style="font-size:9px;color:#bbb;margin-bottom:10px">窓枠位置</div>';
+  if(cust.zip)html+='<div style="font-size:13px;margin-bottom:6px">〒'+_escPub(cust.zip||'')+'</div>';
+  if(cust.address)html+='<div style="font-size:13px;color:#444;margin-bottom:8px;line-height:1.7">'+_escPub(cust.address)+'</div>';
+  html+='<div style="font-size:24px;font-weight:700;margin-bottom:8px;letter-spacing:1px">'+custName+'</div>';
+  html+='<div style="font-size:16px">'+custHonorific+'</div>';
+  html+='</div>';
+  html+='<div style="height:99mm;box-sizing:border-box;padding:8mm 12mm;border-top:1px dashed #bbb;background:#f9f9f9">';
+  html+='<div style="font-size:9px;color:#aaa;margin-bottom:8px">⬇ 下を折り込む</div>';
+  html+='<div style="font-size:14px;font-weight:700;margin-bottom:4px">'+_escPub(d.type||'')+' '+_escPub(d.number||'')+'</div>';
+  if(d.subject)html+='<div style="font-size:12px;color:#555;margin-bottom:2px">件名：'+_escPub(d.subject)+'</div>';
+  html+='<div style="font-size:12px;color:#555">金額：'+fmt(d.grandTotal)+'</div>';
+  html+='<div style="font-size:11px;color:#888;margin-top:4px">発行日：'+_escPub(d.date||'')+'</div>';
+  html+='</div>';
+  document.getElementById('envelope-content').innerHTML=html;
+  document.getElementById('envelope-modal').style.display='block';
 }
 
 // ===== アプリ起動時 自動リロード（sessionStorageでループ防止）=====
@@ -5719,6 +5802,7 @@ function renderDocRows(tbodyId,list,showType){
       <button class="btn-photo-action" title="作業写真の管理・共有" onclick="openPhotoModal('${d.id}')">📷 写真${(docPhotos[d.id]||[]).length>0?`<span class="photo-count">${docPhotos[d.id].length}</span>`:''}</button>
       <button class="btn btn-secondary btn-sm" title="共有リンクを発行" onclick="shareDocFromList('${d.id}')">🔗 共有</button>
       <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteDoc('${d.id}'))">削除</button>
+      <button class="btn btn-sm" onclick="toggleMonthly('${d.id}')" style="background:${d.isMonthly?'#E8F5E9':'var(--surface2)'};color:${d.isMonthly?'#2E7D32':'var(--text3)'};border:1px solid ${d.isMonthly?'#A5D6A7':'var(--border)'}">📅${d.isMonthly?'✓':''}</button>
     </td>
   </tr>`;}).join('');
 }
@@ -7003,7 +7087,32 @@ async function renderAndExportAddressLabels(customerList, withBorder){
   });
 <\/scr` + `ipt>
 </head>
-<body>${sheetsHtml}</body>
+<body>${sheetsHtml}
+<div id="monthly-bulk-modal" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.5);overflow:auto">
+  <div style="background:var(--surface);margin:40px auto;max-width:700px;border-radius:14px;padding:24px">
+    <h3 style="margin:0 0 16px;font-size:18px">📅 月次一括請求</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">月次フラグ付きの請求書を今月分として複製します。</p>
+    <div id="monthly-list" style="border:1px solid var(--border);border-radius:8px;margin-bottom:16px;max-height:400px;overflow-y:auto"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="execMonthlyBulk()" style="background:var(--blue,#1976D2);color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer">📋 一括複製</button>
+      <button onclick="document.getElementById('monthly-bulk-modal').style.display='none'" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;cursor:pointer">閉じる</button>
+    </div>
+  </div>
+</div>
+<div id="envelope-modal" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.6);overflow:auto">
+  <div style="background:white;margin:20px auto;max-width:900px;border-radius:14px;padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin:0;font-size:18px">📬 窓枠封筒（A4三つ折り・長3封筒）</h3>
+      <div style="display:flex;gap:8px">
+        <button onclick="window.print()" style="background:#2E7D32;color:white;border:none;border-radius:8px;padding:8px 18px;cursor:pointer">🖨 印刷</button>
+        <button onclick="document.getElementById('envelope-modal').style.display='none'" style="background:#eee;border:none;border-radius:8px;padding:8px 14px;cursor:pointer">閉じる</button>
+      </div>
+    </div>
+    <p style="font-size:12px;color:#666;margin-bottom:8px">上の1/3を折り込む → 中段の宛先が窓に合います</p>
+    <div id="envelope-content" style="width:210mm;min-height:297mm;border:1px solid #ccc;margin:0 auto;background:white;font-family:sans-serif;box-sizing:border-box"></div>
+  </div>
+</div>
+</body>
 </html>`;
 
   // 新しいウィンドウ/タブで開く
@@ -11119,7 +11228,7 @@ body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto San
 
   <!-- ボタン -->
   <div class="action-bar">
-    <button class="btn-pdf" id="pdf-download-btn" onclick="_downloadPortalImage()">📸 画像で保存（スマホ推奨）</button>
+    <button class="btn-pdf" id="pdf-download-btn" onclick="_downloadPortalImage()">📸 画像で保存（スマホ推奨）</button><button onclick="openEnvelopePreview(currentPreviewDocId)" style="background:#E8F5E9;border:1px solid #A5D6A7;color:#2E7D32;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;margin-top:6px">📬 窓枠封筒</button>
     <div class="pdf-hint">画像として保存されます。印刷・メール添付・共有ができます</div>
   </div>
 
