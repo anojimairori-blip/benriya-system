@@ -3886,8 +3886,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.18';
-const APP_BUILD_TIME='2026-06-25T22:20:32Z';
+const APP_VERSION='v3.32.19';
+const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
+const APP_BUILD_TIME='2026-06-25T22:58:09Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5597,7 +5598,7 @@ async function refreshAllData(btnEl){
     const F=window._FB;
     if(F && currentUser && typeof fbLoadAll==='function'){
       try{
-        await fbLoadAll(currentUser.uid);
+        await fbLoadAll(MASTER_UID);
         fbOk=true;
       }catch(e){
         fbError=e;
@@ -9486,7 +9487,7 @@ async function _fbPersist(){
   if(!F||!currentUser) return { ok:false, error:'not logged in' };
   showSync();
   try{
-    const uid = currentUser.uid;
+    const uid = MASTER_UID; // 常にマスターUIDに書き込む
 
     // 画像データを除外したexpensesを作成（Firestoreは配列内のネストを許可しない）
     const expensesForFB = expenses.map(e=>{
@@ -9651,8 +9652,8 @@ function initFirebaseAuth(){
       if(mun) mun.textContent=user.displayName||'ユーザー';
       const mue = document.getElementById('mobile-user-email');
       if(mue) mue.textContent=user.email||'';
-      // データ読み込み
-      await fbLoadAll(user.uid);
+      // データ読み込み（常にマスターUIDのデータを参照）
+      await fbLoadAll(MASTER_UID);
       // 最終ログイン時刻を記録（全メンバー共有）
       try{ await recordMemberLogin(user); }catch(e){}
       initAppAfterAuth();
