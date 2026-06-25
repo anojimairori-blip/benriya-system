@@ -2172,11 +2172,11 @@ if('serviceWorker' in navigator){
       </div>
 
       <!-- 振込先 -->
-      <div class="section-title" style="margin-bottom:12px">振込先情報</div>
-      <div class="form-row cols2">
-        <div class="form-group"><label>振込先銀行</label><input type="text" id="set-bank" placeholder="北洋銀行 札幌支店"></div>
-        <div class="form-group"><label>口座番号</label><input type="text" id="set-account" placeholder="普通 1234567 タナカタロウ"></div>
-      </div>
+      <div class="section-title" style="margin-bottom:12px">振込先情報（複数登録可）</div>
+      <div id="bank-accounts-list"></div>
+      <button type="button" onclick="addBankAccount()" style="margin-top:6px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 14px;cursor:pointer;font-size:13px;color:var(--text2)">＋ 口座を追加</button>
+      <!-- 後方互換 hidden fields -->
+      <input type="hidden" id="set-bank"><input type="hidden" id="set-account">
 
       <!-- アラート設定 -->
       <div class="section-title" style="margin-bottom:12px">アラート設定</div>
@@ -2932,6 +2932,7 @@ if('serviceWorker' in navigator){
         <div class="form-group"><label>支払期限</label><input type="date" id="doc-due-date"></div>
         <div class="form-group"></div>
       </div>
+      <div class="form-group" id="doc-bank-area" style="display:none"><label>お振込先口座</label><select id="doc-bank-select" style="width:100%"><option value="">（口座を選択）</option></select></div>
       <div class="form-group"><label>備考・特記事項</label><textarea id="doc-notes" placeholder="お客様へのメモ、持ち物、注意事項など" style="min-height:54px"></textarea></div>
     </div>
 
@@ -3885,8 +3886,8 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.14';
-const APP_BUILD_TIME='2026-06-03T06:10:32Z';
+const APP_VERSION='v3.32.15';
+const APP_BUILD_TIME='2026-06-25T21:53:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -3996,6 +3997,59 @@ function showUpdateBanner(latest){
   // メインコンテンツを少し下げる
   const app=document.getElementById('app-main');
   if(app) app.style.paddingTop='52px';
+}
+
+
+// ===== 振込先口座 複数管理 =====
+function renderBankAccounts(){
+  const list=document.getElementById('bank-accounts-list');
+  if(!list)return;
+  if(!settings.bankAccounts||!settings.bankAccounts.length){
+    // 既存のbank/accountから移行
+    if(settings.bank){
+      settings.bankAccounts=[{id:'bank-1',label:'メイン口座',bank:settings.bank,account:settings.account||''}];
+    }else{
+      settings.bankAccounts=[];
+    }
+  }
+  list.innerHTML=settings.bankAccounts.map((b,i)=>`
+    <div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--surface)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <input type="text" value="${escAttr(b.label)}" placeholder="口座のラベル（例：PayPay銀行・メイン）"
+          style="border:none;background:transparent;font-weight:700;font-size:13px;color:var(--text1);width:60%;outline:none"
+          oninput="settings.bankAccounts[${i}].label=this.value">
+        <button onclick="removeBankAccount(${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:18px" title="削除">×</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><label style="font-size:11px;color:var(--text2)">銀行名・支店</label>
+          <input type="text" value="${escAttr(b.bank)}" placeholder="PayPay銀行 本店営業部"
+            style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:13px"
+            oninput="settings.bankAccounts[${i}].bank=this.value;updateDocBankSelect()"></div>
+        <div><label style="font-size:11px;color:var(--text2)">口座番号・名義</label>
+          <input type="text" value="${escAttr(b.account)}" placeholder="普通 2036424 ノジマアキオ"
+            style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:13px"
+            oninput="settings.bankAccounts[${i}].account=this.value"></div>
+      </div>
+    </div>`).join('');
+  updateDocBankSelect();
+}
+
+function addBankAccount(){
+  if(!settings.bankAccounts)settings.bankAccounts=[];
+  settings.bankAccounts.push({id:'bank-'+Date.now(),label:'口座'+(settings.bankAccounts.length+1),bank:'',account:''});
+  renderBankAccounts();
+}
+
+function removeBankAccount(i){
+  settings.bankAccounts.splice(i,1);
+  renderBankAccounts();
+}
+
+function updateDocBankSelect(){
+  const sel=document.getElementById('doc-bank-select');
+  if(!sel)return;
+  const banks=settings.bankAccounts||[];
+  sel.innerHTML='<option value="">（口座を選択）</option>'+banks.map(b=>`<option value="${escAttr(b.id)}">${escAttr(b.label||b.bank)}</option>`).join('');
 }
 
 // ===== アプリ起動時 自動リロード（sessionStorageでループ防止）=====
@@ -5077,6 +5131,10 @@ function setDocType(type, btn){
   if(!document.getElementById('doc-modal').dataset.editing){
     document.getElementById('doc-number').value=genNumber(type);
   }
+  // 振込先口座選択は請求書のみ表示
+  const _ba=document.getElementById('doc-bank-area');
+  if(_ba)_ba.style.display=(type==='請求書')?'block':'none';
+  if(type==='請求書')updateDocBankSelect();
 }
 
 // Inline customer dropdown
@@ -5711,6 +5769,7 @@ function openNewDoc(type,custName){
   document.getElementById('inline-new-cust').style.display='none';
   document.getElementById('selected-cust-card').style.display='none';
   document.getElementById('doc-contact-area').style.display='none';
+  const _dcr=document.getElementById('doc-contact');if(_dcr){_dcr.value='';_dcr.innerHTML='<option value="">（担当者を選択）</option>';}
   // Reset type buttons
   setTimeout(()=>{
     const btn=document.querySelector(`.doc-type-btn[data-type="${t}"]`);
@@ -5797,13 +5856,14 @@ function renderSelectedCust(c){
     document.getElementById('doc-contact-area').style.display='block';
     const sel=document.getElementById('doc-contact');
     sel.innerHTML='<option value="">（担当者を選択）</option>'+c.contacts.map(ct=>`<option value="${escAttr(ct.name)}">${escAttr(ct.name)}${ct.role?' ('+escAttr(ct.role)+')':''}</option>`).join('');
-  }else document.getElementById('doc-contact-area').style.display='none';
+  }else{document.getElementById('doc-contact-area').style.display='none';const _dc2=document.getElementById('doc-contact');if(_dc2){_dc2.value='';_dc2.innerHTML='<option value="">（担当者を選択）</option>';}}
 }
 
 function changeCust(){
   selectedCustId=null;
   document.getElementById('selected-cust-card').style.display='none';
   document.getElementById('doc-contact-area').style.display='none';
+  const _dc3=document.getElementById('doc-contact');if(_dc3){_dc3.value='';_dc3.innerHTML='<option value="">（担当者を選択）</option>';}
   toggleCustSearch();
 }
 
@@ -5985,6 +6045,7 @@ function saveDoc(){
     subject:document.getElementById('doc-subject').value,
     category:document.getElementById('doc-category').value,
     notes:document.getElementById('doc-notes').value,
+    bankSelection:document.getElementById('doc-bank-select')?.value||'',
     status:document.getElementById('doc-status').value,
     lines,subtotal:Math.round(sub),tax10:Math.round(t10),tax8:Math.round(t8),
     grandTotal:Math.round(sub+t10+t8),
@@ -6350,7 +6411,7 @@ function previewDoc(id){
       ${taxRows.join('')}
       <tr class="grand"><td style="padding-top:8px;font-weight:700;font-size:20px">合計（税込）</td><td style="text-align:right;padding-top:8px;font-size:20px;font-weight:700">${fmt(d.grandTotal)}</td></tr>
     </table></div>
-    ${d.type==='請求書'&&s.bank?`<div class="preview-notes"><strong>お振込先：</strong>${escAttr(s.bank)}　${escAttr(s.account||'')}</div>`:''}
+    ${d.type==='請求書'?(()=>{const _banks=settings.bankAccounts||[];const _sel=_banks.find(b=>b.id===d.bankSelection)||(_banks.length?_banks[0]:null);const _bank=_sel?_sel.bank:s.bank;const _acct=_sel?_sel.account:s.account||'';return _bank?`<div class="preview-notes"><strong>お振込先：</strong>${escAttr(_sel?.label?_sel.label+' ':'')}${escAttr(_bank)}　${escAttr(_acct)}</div>`:'';})():''}
     ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr(d.notes)}</div>`:''}
     ${d.type==='領収書'?`<div style="text-align:right;margin-top:12px"><div class="stamp">領収済</div></div>`:''}
   </div>`;
@@ -9217,12 +9278,15 @@ function loadSettings(){
   ['company','owner','tel','fax','email','zip','address','bank','account','notes','paydays','alertdays'].forEach(k=>{
     const el=document.getElementById('set-'+k);if(el)el.value=settings[k]||'';
   });
+  renderBankAccounts();
+  updateDocBankSelect();
   // defaultTax は税率設定画面で管理
 }
 function saveSettings(){
   ['company','owner','tel','fax','email','zip','address','bank','account','notes','paydays','alertdays'].forEach(k=>{
     settings[k]=document.getElementById('set-'+k)?.value||'';
   });
+  // bankAccounts は renderBankAccounts/addBankAccount で直接管理
   // 監査情報
   stampAudit(settings, !settings.createdAt);
   // defaultTax は税率設定画面で保存
