@@ -2933,6 +2933,12 @@ if('serviceWorker' in navigator){
         <div class="form-group"></div>
       </div>
       <div class="form-group" id="doc-bank-area" style="display:none"><label>お振込先口座</label><select id="doc-bank-select" style="width:100%"><option value="">（口座を選択）</option></select></div>
+      <div class="form-group" id="doc-monthly-area" style="display:none">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px">
+          <input type="checkbox" id="doc-monthly-check" style="width:18px;height:18px;cursor:pointer">
+          <span>📅 月次請求（毎月の一括複製対象にする）</span>
+        </label>
+      </div>
       <div class="form-group"><label>備考・特記事項</label><textarea id="doc-notes" placeholder="お客様へのメモ、持ち物、注意事項など" style="min-height:54px"></textarea></div>
     </div>
 
@@ -2956,6 +2962,7 @@ if('serviceWorker' in navigator){
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('preview-modal')">閉じる</button>
     <button class="btn btn-secondary" onclick="printPreview()">🖨️ 印刷</button>
+    <button class="btn btn-secondary" onclick="openEnvelopePreview(currentPreviewDocId)">📬 窓枠封筒</button>
     <button class="btn btn-secondary" onclick="sharePreviewLink()">🔗 共有</button>
     <button class="btn btn-primary" onclick="shareDoc()">📤 送信</button>
   </div>
@@ -3886,9 +3893,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.20';
+const APP_VERSION='v3.32.21';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-25T23:10:52Z';
+const APP_BUILD_TIME='2026-06-25T23:21:32Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5218,6 +5225,8 @@ function setDocType(type, btn){
   // 振込先口座選択は請求書のみ表示
   const _ba=document.getElementById('doc-bank-area');
   if(_ba)_ba.style.display=(type==='請求書')?'block':'none';
+  const _ma=document.getElementById('doc-monthly-area');
+  if(_ma)_ma.style.display=(type==='請求書')?'block':'none';
   if(type==='請求書')updateDocBankSelect();
 }
 
@@ -5802,7 +5811,6 @@ function renderDocRows(tbodyId,list,showType){
       <button class="btn-photo-action" title="作業写真の管理・共有" onclick="openPhotoModal('${d.id}')">📷 写真${(docPhotos[d.id]||[]).length>0?`<span class="photo-count">${docPhotos[d.id].length}</span>`:''}</button>
       <button class="btn btn-secondary btn-sm" title="共有リンクを発行" onclick="shareDocFromList('${d.id}')">🔗 共有</button>
       <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteDoc('${d.id}'))">削除</button>
-      <button class="btn btn-sm" onclick="toggleMonthly('${d.id}')" style="background:${d.isMonthly?'#E8F5E9':'var(--surface2)'};color:${d.isMonthly?'#2E7D32':'var(--text3)'};border:1px solid ${d.isMonthly?'#A5D6A7':'var(--border)'}">📅${d.isMonthly?'✓':''}</button>
     </td>
   </tr>`;}).join('');
 }
@@ -6130,6 +6138,7 @@ function saveDoc(){
     subject:document.getElementById('doc-subject').value,
     category:document.getElementById('doc-category').value,
     notes:document.getElementById('doc-notes').value,
+    isMonthly:document.getElementById('doc-monthly-check')?.checked||false,
     bankSelection:document.getElementById('doc-bank-select')?.value||'',
     status:document.getElementById('doc-status').value,
     lines,subtotal:Math.round(sub),tax10:Math.round(t10),tax8:Math.round(t8),
@@ -6175,6 +6184,8 @@ function editDoc(id){
   document.getElementById('doc-subject').value=d.subject||'';
   document.getElementById('doc-category').value=d.category||'';
   document.getElementById('doc-notes').value=d.notes||'';
+  var _mc=document.getElementById('doc-monthly-check');if(_mc)_mc.checked=!!d.isMonthly;
+  var _ma=document.getElementById('doc-monthly-area');if(_ma)_ma.style.display=(d.type==='請求書')?'block':'none';
   buildStatusSelect('doc-status', d.status||docStatuses[0]?.value||'下書き');
   setTimeout(()=>{
     const s=document.getElementById('doc-staff-select');if(s){buildStaffSelect();s.value=d.staff||'';}
@@ -11228,7 +11239,7 @@ body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto San
 
   <!-- ボタン -->
   <div class="action-bar">
-    <button class="btn-pdf" id="pdf-download-btn" onclick="_downloadPortalImage()">📸 画像で保存（スマホ推奨）</button><button onclick="openEnvelopePreview(currentPreviewDocId)" style="background:#E8F5E9;border:1px solid #A5D6A7;color:#2E7D32;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;margin-top:6px">📬 窓枠封筒</button>
+    <button class="btn-pdf" id="pdf-download-btn" onclick="_downloadPortalImage()">📸 画像で保存（スマホ推奨）</button>
     <div class="pdf-hint">画像として保存されます。印刷・メール添付・共有ができます</div>
   </div>
 
