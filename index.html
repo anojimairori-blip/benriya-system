@@ -1803,8 +1803,7 @@ if('serviceWorker' in navigator){
   <div class="content" id="content-quotes"></div>
 </div>
 <div id="page-invoices" class="page">
-  <div class="main-header"><h2>📋 請求書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-secondary" onclick="openBulkPdfModal('請求書')" title="請求書を複数まとめてPDF出力">📑 まとめてPDF</button><button class="btn btn-blue" onclick="openNewDoc('請求書')">＋ 新規請求書</button>
-        <button class="btn btn-sm" onclick="openMonthlyBulkModal()" style="background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9" title="月次フラグ付き請求書を一括複製">📅 月次一括</button></div></div>
+  <div class="main-header"><h2>📋 請求書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-secondary" onclick="openBulkPdfModal('請求書')" title="請求書を複数まとめてPDF出力">📑 まとめてPDF</button><button class="btn btn-blue" onclick="openNewDoc('請求書')">＋ 新規請求書</button></div></div>
   <div class="content" id="content-invoices"></div>
 </div>
 <div id="page-receipts" class="page">
@@ -3887,9 +3886,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.20';
+const APP_VERSION='v3.32.19';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-25T23:07:01Z';
+const APP_BUILD_TIME='2026-06-25T22:58:09Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4052,120 +4051,6 @@ function updateDocBankSelect(){
   if(!sel)return;
   const banks=settings.bankAccounts||[];
   sel.innerHTML='<option value="">（口座を選択）</option>'+banks.map(b=>`<option value="${escAttr(b.id)}">${escAttr(b.label||b.bank)}</option>`).join('');
-}
-
-
-// ===== 月次請求フラグ トグル =====
-function toggleMonthly(id){
-  const d = docs.find(x=>x.id===id);
-  if(!d) return;
-  d.isMonthly = !d.isMonthly;
-  persist();
-  renderDocPageFiltered('page-invoices','請求書');
-  renderDocPageFiltered('page-quotes','見積書');
-  showToast(d.isMonthly ? '📅 月次請求に設定しました' : '月次請求を解除しました', d.isMonthly ? '#2E7D32' : '#666');
-}
-
-// ===== 月次一括複製モーダルを開く =====
-function openMonthlyBulkModal(){
-  const monthly = docs.filter(d=>d.isMonthly && d.type==='請求書');
-  const list = document.getElementById('monthly-list');
-  if(!monthly.length){
-    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">月次フラグ付きの請求書がありません。<br>請求書一覧の「📅 月次」ボタンでフラグを設定してください。</div>';
-  } else {
-    list.innerHTML = '<table style="width:100%;border-collapse:collapse">' +
-      '<thead><tr style="background:var(--surface2)">' +
-      '<th style="padding:8px 12px;font-size:12px;text-align:left;width:36px"><input type="checkbox" id="monthly-check-all" onchange="document.querySelectorAll('.monthly-check').forEach(c=>c.checked=this.checked)"></th>' +
-      '<th style="padding:8px;font-size:12px;text-align:left">番号</th>' +
-      '<th style="padding:8px;font-size:12px;text-align:left">顧客</th>' +
-      '<th style="padding:8px;font-size:12px;text-align:left">件名</th>' +
-      '<th style="padding:8px;font-size:12px;text-align:right">金額</th>' +
-      '</tr></thead><tbody>' +
-      monthly.map(d=>`<tr style="border-top:1px solid var(--border)">
-        <td style="padding:8px 12px"><input type="checkbox" class="monthly-check" value="${escAttr(d.id)}" checked></td>
-        <td style="padding:8px;font-size:13px;font-family:monospace">${escAttr(d.number||'')}</td>
-        <td style="padding:8px;font-size:13px">${escAttr(d.customer||'')}</td>
-        <td style="padding:8px;font-size:13px;color:var(--text2)">${escAttr(d.subject||'')}</td>
-        <td style="padding:8px;font-size:13px;text-align:right">${fmt(d.grandTotal)}</td>
-      </tr>`).join('') + '</tbody></table>';
-    document.getElementById('monthly-check-all').checked = true;
-  }
-  document.getElementById('monthly-bulk-modal').style.display = 'block';
-}
-
-// ===== 月次一括複製を実行 =====
-async function execMonthlyBulk(){
-  const checked = [...document.querySelectorAll('.monthly-check:checked')].map(c=>c.value);
-  if(!checked.length){ showToast('書類を選択してください','#C0392B'); return; }
-  const todayStr = today();
-  let created = 0;
-  for(const id of checked){
-    const d = docs.find(x=>x.id===id);
-    if(!d) continue;
-    const newId = 'doc-' + Date.now() + '-' + Math.random().toString(36).slice(2,6);
-    const newNum = genNumber(d.type);
-    const newDoc = {...JSON.parse(JSON.stringify(d)), id:newId, number:newNum, date:todayStr, status:'下書き', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
-    delete newDoc.sharedToken; delete newDoc.sharedExpiry;
-    docs.push(newDoc);
-    created++;
-    await new Promise(r=>setTimeout(r,20));
-  }
-  await persistNow();
-  document.getElementById('monthly-bulk-modal').style.display = 'none';
-  renderDocPageFiltered('page-invoices','請求書');
-  showToast(`✅ ${created}件の今月分請求書を作成しました`, '#2E7D32');
-}
-
-// ===== 窓枠封筒プレビュー =====
-let _currentPreviewDocId = null;
-
-function openEnvelopePreview(id){
-  const d = docs.find(x=>x.id===id);
-  if(!d){ showToast('書類が見つかりません','#C0392B'); return; }
-  const s = settings;
-  const cust = customers.find(x=>x.id===d.customerId) || {name:d.customer||'', address:'', zip:''};
-  
-  const content = document.getElementById('envelope-preview-content');
-  content.innerHTML = `
-    <style>
-      @media print {
-        body > *:not(#envelope-modal){ display:none !important; }
-        #envelope-modal{ position:static !important; background:white !important; }
-        #envelope-modal > div{ border:none !important; padding:0 !important; }
-        #envelope-preview-content{ border:none !important; }
-        .no-print{ display:none !important; }
-      }
-    </style>
-    <!-- 上段(1/3)：差出人情報 -->
-    <div style="height:99mm;box-sizing:border-box;padding:14mm 14mm 8mm;border-bottom:1px dashed #ccc;display:flex;flex-direction:column;justify-content:flex-end">
-      <div style="text-align:right;font-size:10px;color:#999">（この部分を折り込む）</div>
-      <div style="text-align:right;margin-top:auto">
-        ${s.logo?`<img src="${s.logo}" style="max-height:28px;margin-bottom:4px"><br>`:''}
-        <div style="font-size:13px;font-weight:700">${s.company||''}</div>
-        <div style="font-size:11px;color:#555">〒${s.zip||''} ${s.address||''}</div>
-        <div style="font-size:11px;color:#555">${s.tel||''}</div>
-      </div>
-    </div>
-    <!-- 中段(1/3)：宛先（窓枠に合う位置） -->
-    <div style="height:99mm;box-sizing:border-box;padding:14mm 14mm 8mm;position:relative">
-      <div style="position:absolute;top:8px;right:12px;font-size:9px;color:#ccc">（窓枠位置）</div>
-      <div style="padding:8mm 0 0 8mm">
-        ${cust.zip?`<div style="font-size:14px;margin-bottom:6px">〒${cust.zip}</div>`:''}
-        <div style="font-size:12px;color:#555;margin-bottom:8px;line-height:1.8">${cust.address||''}</div>
-        <div style="font-size:22px;font-weight:700;margin-bottom:6px;letter-spacing:1px">${cust.name||d.customer||''}</div>
-        ${cust.honorific||d.contact?`<div style="font-size:15px;margin-bottom:4px">${d.contact?d.contact+' 様':cust.honorific||'御中'}</div>`:'<div style="font-size:15px">御中</div>'}
-      </div>
-    </div>
-    <!-- 下段(1/3)：書類情報 -->
-    <div style="height:99mm;box-sizing:border-box;padding:8mm 14mm;border-top:1px dashed #ccc;background:#FAFAFA">
-      <div style="font-size:10px;color:#999;margin-bottom:8px">（この部分を折り込む）</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:4px">${d.type}　${d.number||''}</div>
-      <div style="font-size:12px;color:#666">件名：${d.subject||''}</div>
-      <div style="font-size:12px;color:#666;margin-top:4px">金額：${fmt(d.grandTotal)}</div>
-      <div style="font-size:11px;color:#999;margin-top:4px">発行日：${d.date||''}</div>
-    </div>`;
-  
-  document.getElementById('envelope-modal').style.display = 'block';
 }
 
 // ===== アプリ起動時 自動リロード（sessionStorageでループ防止）=====
@@ -5834,7 +5719,6 @@ function renderDocRows(tbodyId,list,showType){
       <button class="btn-photo-action" title="作業写真の管理・共有" onclick="openPhotoModal('${d.id}')">📷 写真${(docPhotos[d.id]||[]).length>0?`<span class="photo-count">${docPhotos[d.id].length}</span>`:''}</button>
       <button class="btn btn-secondary btn-sm" title="共有リンクを発行" onclick="shareDocFromList('${d.id}')">🔗 共有</button>
       <button class="btn btn-danger btn-sm" onclick="armDelete(this,()=>deleteDoc('${d.id}'))">削除</button>
-      <button class="btn btn-sm" title="月次請求フラグ（毎月複製対象にする）" onclick="toggleMonthly('${d.id}')" style="background:${d.isMonthly?'#E8F5E9':'var(--surface2)'};color:${d.isMonthly?'#2E7D32':'var(--text3)'};border:1px solid ${d.isMonthly?'#A5D6A7':'var(--border)'}">📅${d.isMonthly?'✓ 月次':'月次'}</button>
     </td>
   </tr>`;}).join('');
 }
@@ -6471,7 +6355,7 @@ function duplicateDoc(id){
 }
 
 // ===== PREVIEW =====
-function previewDoc(id){ _currentPreviewDocId = id;
+function previewDoc(id){
   const d=docs.find(x=>x.id===id);if(!d)return;
   currentPreviewDocId=id;const s=settings;
   // 税込モード判定（v3.25.12〜）: 消費税額が計算されていない見積もり=
@@ -7119,37 +7003,7 @@ async function renderAndExportAddressLabels(customerList, withBorder){
   });
 <\/scr` + `ipt>
 </head>
-<body>${sheetsHtml}
-<!-- ===== 月次一括複製モーダル ===== -->
-<div id="monthly-bulk-modal" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.5);overflow:auto">
-  <div style="background:var(--surface);margin:40px auto;max-width:700px;border-radius:14px;padding:24px;position:relative">
-    <h3 style="margin:0 0 16px;font-size:18px">📅 月次一括請求 — 複製・印刷</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">「月次」フラグが付いた請求書を今月分として複製します。<br>日付は本日、番号は自動採番されます。</p>
-    <div id="monthly-list" style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px"></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button onclick="execMonthlyBulk()" style="background:var(--blue);color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer">📋 チェックした書類を今月分として複製</button>
-      <button onclick="document.getElementById('monthly-bulk-modal').style.display='none'" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;cursor:pointer">閉じる</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== 窓枠封筒プレビューモーダル ===== -->
-<div id="envelope-modal" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.6);overflow:auto">
-  <div style="background:white;margin:20px auto;max-width:860px;border-radius:14px;padding:20px;position:relative">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h3 style="margin:0;font-size:18px">📬 窓枠封筒レイアウト</h3>
-      <div style="display:flex;gap:8px">
-        <button onclick="window.print()" style="background:#2E7D32;color:white;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:14px">🖨 印刷</button>
-        <button onclick="document.getElementById('envelope-modal').style.display='none'" style="background:#eee;border:none;border-radius:8px;padding:8px 14px;cursor:pointer">閉じる</button>
-      </div>
-    </div>
-    <p style="font-size:12px;color:#666;margin-bottom:12px">A4三つ折り・長3封筒用（上1/3を折り込む → 中央の宛先が窓に合います）</p>
-    <!-- A4プレビュー -->
-    <div id="envelope-preview-content" style="width:210mm;min-height:297mm;border:1px solid #ccc;margin:0 auto;position:relative;background:white;font-family:'游ゴシック',sans-serif;box-sizing:border-box;padding:0"></div>
-  </div>
-</div>
-
-</body>
+<body>${sheetsHtml}</body>
 </html>`;
 
   // 新しいウィンドウ/タブで開く
@@ -11266,7 +11120,6 @@ body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto San
   <!-- ボタン -->
   <div class="action-bar">
     <button class="btn-pdf" id="pdf-download-btn" onclick="_downloadPortalImage()">📸 画像で保存（スマホ推奨）</button>
-    <button onclick="openEnvelopePreview(_currentPreviewDocId)" style="background:#E8F5E9;border:1px solid #A5D6A7;color:#2E7D32;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;margin-top:6px">📬 窓枠封筒で印刷</button>
     <div class="pdf-hint">画像として保存されます。印刷・メール添付・共有ができます</div>
   </div>
 
