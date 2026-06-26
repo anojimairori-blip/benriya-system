@@ -3724,7 +3724,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
         <select id="exp-status"><option value="精算済">精算済</option><option value="未精算">未精算</option></select>
       </div>
       <div class="form-group"><label>関連書類番号</label>
-        <input type="text" id="exp-doc-ref" placeholder="INV-2604-001">
+        <input type="text" id="exp-doc-ref" placeholder="INV-2606-001">
       </div>
     </div>
     <div class="form-row"><div class="form-group"><label>メモ・備考</label><textarea id="exp-memo" placeholder="領収書番号など"></textarea></div></div>
@@ -3909,9 +3909,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.42';
+const APP_VERSION='v3.32.43';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:31:43Z';
+const APP_BUILD_TIME='2026-06-26T20:34:35Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4885,7 +4885,7 @@ const HELP_CONTENT = {
       <p>請求書一覧で対象書類の <strong>→ 領収書化</strong> をクリック。但し書き(例:「○○工事代として」)を入力して保存します。</p>
       <h4>領収書特有の項目</h4>
       <ul>
-        <li>プレフィックスは <code>REC</code> (例: REC-2604-003)</li>
+        <li>プレフィックスは <code>REC</code> (例: REC-2606-001)</li>
         <li><strong>但し書き</strong> 欄(法的要件に注意)</li>
         <li>入金日の記録</li>
       </ul>
