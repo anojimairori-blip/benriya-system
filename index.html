@@ -2186,8 +2186,13 @@ if('serviceWorker' in navigator){
         </div>
       </div>
 
+      <!-- 拠点管理 -->
+      <div class="section-title" style="margin-bottom:12px">🏢 拠点管理（書類の発行元住所）</div>
+      <div id="offices-list" style="margin-bottom:6px"></div>
+      <button type="button" onclick="addOffice()" style="margin-top:6px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 14px;cursor:pointer;font-size:13px;color:var(--text2)">＋ 拠点を追加</button>
+
       <!-- 振込先 -->
-      <div class="section-title" style="margin-bottom:12px">振込先情報（複数登録可）</div>
+      <div class="section-title" style="margin-bottom:12px;margin-top:20px">振込先情報（複数登録可）</div>
       <div id="bank-accounts-list"></div>
       <button type="button" onclick="addBankAccount()" style="margin-top:6px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 14px;cursor:pointer;font-size:13px;color:var(--text2)">＋ 口座を追加</button>
       <!-- 後方互換 hidden fields -->
@@ -2898,7 +2903,7 @@ if('serviceWorker' in navigator){
     <!-- ③ 件名・カテゴリ -->
     <div class="form-section">
       <div class="form-section-title">書類情報</div>
-      <div class="form-row cols2" style="margin-bottom:0">
+      <div class="form-row cols2" style="margin-bottom:8px">
         <div class="form-group"><label class="required">件名・作業内容</label>
           <input type="text" id="doc-subject" placeholder="エアコン取り付け作業" list="subject-history">
           <datalist id="subject-history"></datalist>
@@ -2911,6 +2916,13 @@ if('serviceWorker' in navigator){
             <option>介護・生活支援</option><option>その他</option>
           </select>
         </div>
+      </div>
+      <div class="form-group" id="doc-office-area">
+        <label>発行元拠点</label>
+        <select id="doc-office-select" style="width:100%" onchange="showSelectedOfficeInfo()">
+          <option value="">（デフォルト：会社設定の住所）</option>
+        </select>
+        <div id="doc-office-info" style="display:none;margin-top:6px;padding:8px 12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.7"></div>
       </div>
     </div>
 
@@ -3911,9 +3923,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.51';
+const APP_VERSION='v3.32.52';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T21:26:40Z';
+const APP_BUILD_TIME='2026-06-26T21:59:03Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5954,6 +5966,7 @@ function openNewDoc(type,custName){
   document.getElementById('doc-type').value=t;
   document.getElementById('doc-number').value=genNumber(t);
   document.getElementById('doc-date').value=today();
+  updateDocOfficeSelect();
   document.getElementById('doc-subject').value='';
   document.getElementById('doc-category').value='';
   document.getElementById('doc-notes').value=settings.notes||'';
@@ -6236,6 +6249,7 @@ function saveDoc(){
     type:document.getElementById('doc-type').value,
     number:document.getElementById('doc-number').value,
     date:document.getElementById('doc-date').value,
+    officeId:document.getElementById('doc-office-select')?.value||'',
     dueDate:document.getElementById('doc-due-date').value,
     customerId:selectedCustId||'',
     customer:sc?sc.name:(document.getElementById('selected-cust-card').querySelector('.cust-name-text')?.textContent||''),
@@ -6288,6 +6302,7 @@ function editDoc(id){
   document.getElementById('doc-date').value=d.date;
   document.getElementById('doc-due-date').value=d.dueDate||'';
   document.getElementById('doc-subject').value=d.subject||'';
+  if(document.getElementById('doc-office-select')){document.getElementById('doc-office-select').value=d.officeId||'';showSelectedOfficeInfo();}
   document.getElementById('doc-category').value=d.category||'';
   document.getElementById('doc-notes').value=d.notes||'';
   var _mc=document.getElementById('doc-monthly-check');if(_mc)_mc.checked=!!d.isMonthly;
@@ -6585,7 +6600,7 @@ function previewDoc(id){
       </div>
       <div class="preview-from">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:3px">${logoHtml?logoHtml.replace('<img ','<img style="max-height:40px" '):''}  <strong style="font-size:13px">${escAttr(d.staff||s.owner||s.company||'（会社名未設定）')}</strong></div>
-        <p>${escAttr(s.address||'')}</p><p>${escAttr(s.tel||'')}${s.fax?' / FAX:'+escAttr(s.fax):''}</p><p>${escAttr(s.email||'')}</p>
+        <p>${escAttr(_getOfficeField(d,'address',s))}</p><p>${escAttr(_getOfficeField(d,'tel',s))}${_getOfficeField(d,'fax',s)?' / FAX:'+escAttr(_getOfficeField(d,'fax',s)):''}</p><p>${escAttr(s.email||'')}</p>
         ${d.staff?`<p style="margin-top:4px">担当：${escAttr(d.staff)}</p>`:''}
         ${d.dueDate&&d.type==='請求書'?`<p>支払期限：${escAttr(d.dueDate)}</p>`:''}
       </div>
@@ -7578,6 +7593,86 @@ function saveCustAiAll(){
   if(btn)btn.style.display='none';
   closeModal('cust-ai-modal');
   openCustDetail(_aiResearchCustId,true);
+}
+
+
+// ===== 拠点管理 =====
+function _getOffice(d){
+  if(!d||!d.officeId)return null;
+  return (settings.offices||[]).find(function(o){return o.id===d.officeId;})||null;
+}
+function _getOfficeField(d,field,s){
+  var o=_getOffice(d);
+  if(o&&o[field])return o[field];
+  return s[field]||'';
+}
+function _getOfficeZip(d,s){
+  var o=_getOffice(d);
+  if(o&&o.zip)return o.zip;
+  return s.zip||'';
+}
+function renderOffices(){
+  var list=document.getElementById('offices-list');
+  if(!list)return;
+  if(!settings.offices||!settings.offices.length){
+    settings.offices=[{id:'office-'+Date.now(),name:'本社（デフォルト）',zip:settings.zip||'',address:settings.address||'',tel:settings.tel||'',fax:settings.fax||''}];
+  }
+  list.innerHTML=settings.offices.map(function(o,i){
+    return '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;background:var(--surface)">'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+      +'<div><label style="font-size:11px;color:var(--text3)">拠点名</label><input type="text" value="'+escAttr(o.name||'')+'" oninput="settings.offices['+i+'].name=this.value;updateDocOfficeSelect()" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'<div><label style="font-size:11px;color:var(--text3)">郵便番号</label><input type="text" value="'+escAttr(o.zip||'')+'" oninput="settings.offices['+i+'].zip=this.value" placeholder="000-0000" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'</div>'
+      +'<div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text3)">住所</label><input type="text" value="'+escAttr(o.address||'')+'" oninput="settings.offices['+i+'].address=this.value" placeholder="北海道札幌市..." style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+      +'<div><label style="font-size:11px;color:var(--text3)">電話番号</label><input type="text" value="'+escAttr(o.tel||'')+'" oninput="settings.offices['+i+'].tel=this.value" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'<div><label style="font-size:11px;color:var(--text3)">FAX</label><input type="text" value="'+escAttr(o.fax||'')+'" oninput="settings.offices['+i+'].fax=this.value" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'</div>'
+      +'<div style="text-align:right"><button onclick="removeOffice(\''+o.id+'\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--red);cursor:pointer">🗑️ 削除</button></div>'
+      +'</div>';
+  }).join('');
+  updateDocOfficeSelect();
+}
+function addOffice(){
+  if(!settings.offices)settings.offices=[];
+  settings.offices.push({id:'office-'+Date.now(),name:'新しい拠点',zip:'',address:'',tel:'',fax:''});
+  renderOffices();
+}
+function removeOffice(id){
+  if(!settings.offices||settings.offices.length<=1){showToast('拠点は最低1件必要です','#C0392B');return;}
+  showConfirm('この拠点を削除しますか？',function(){
+    settings.offices=settings.offices.filter(function(o){return o.id!==id;});
+    renderOffices();persist();showToast('拠点を削除しました');
+  });
+}
+function updateDocOfficeSelect(){
+  var sel=document.getElementById('doc-office-select');
+  if(!sel)return;
+  var current=sel.value;
+  sel.innerHTML='<option value="">（デフォルト：会社設定の住所）</option>';
+  (settings.offices||[]).forEach(function(o){
+    var opt=document.createElement('option');
+    opt.value=o.id;
+    opt.textContent=o.name+(o.address?' — '+o.address.slice(0,15):'');
+    sel.appendChild(opt);
+  });
+  if(current)sel.value=current;
+  showSelectedOfficeInfo();
+}
+function showSelectedOfficeInfo(){
+  var sel=document.getElementById('doc-office-select');
+  var info=document.getElementById('doc-office-info');
+  if(!sel||!info)return;
+  var id=sel.value;
+  if(!id){info.style.display='none';return;}
+  var o=(settings.offices||[]).find(function(x){return x.id===id;});
+  if(!o){info.style.display='none';return;}
+  var lines=[];
+  if(o.zip||o.address)lines.push('📍 〒'+(o.zip||'')+' '+(o.address||''));
+  if(o.tel)lines.push('📞 '+o.tel);
+  if(o.fax)lines.push('📠 FAX: '+o.fax);
+  info.innerHTML=lines.map(function(l){return escAttr(l);}).join('<br>');
+  info.style.display=lines.length?'block':'none';
 }
 
 function openCustDetail(idOrName,byId){
@@ -9574,6 +9669,7 @@ function loadSettings(){
   });
   renderBankAccounts();
   updateDocBankSelect();
+  renderOffices();
   // defaultTax は税率設定画面で管理
 }
 function saveSettings(){
@@ -9582,6 +9678,7 @@ function saveSettings(){
   });
   // bankAccounts は renderBankAccounts/addBankAccount で直接管理
   // 監査情報
+  // officesは renderOffices/addOffice で直接管理
   stampAudit(settings, !settings.createdAt);
   // defaultTax は税率設定画面で保存
   // 郵便番号・電話番号を共通フォーマッタで正規化（autoZip/autoTel と完全同一ロジック）
@@ -11439,8 +11536,8 @@ body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto San
     <div style="text-align:right;flex-shrink:0;max-width:38%">
       ${s.logo?`<img src="${_escPub(s.logo)}" alt="" style="max-width:120px;max-height:55px;margin-bottom:6px">`:''}
       <div style="font-weight:700;font-size:14px">${_escPub(d.staff||s.owner||s.company||'')}</div>
-      ${s.zip?`<div style="font-size:11px;color:#555">〒${_escPub(s.zip)}</div>`:''}
-      <div style="font-size:11px;color:#555">${_escPub(s.address||'')}</div>
+      ${_getOfficeZip(d,s)?`<div style="font-size:11px;color:#555">〒${_escPub(_getOfficeZip(d,s))}</div>`:''}
+      <div style="font-size:11px;color:#555">${_escPub(_getOfficeField(d,'address',s))}</div>
       ${s.tel?`<div style="font-size:11px;color:#555">TEL: ${_escPub(s.tel)}</div>`:''}
       ${s.fax?`<div style="font-size:11px;color:#555">FAX: ${_escPub(s.fax)}</div>`:''}
       ${s.email?`<div style="font-size:11px;color:#555">${_escPub(s.email)}</div>`:''}
