@@ -3919,9 +3919,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.38';
+const APP_VERSION='v3.32.39';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:10:10Z';
+const APP_BUILD_TIME='2026-06-26T20:14:17Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -8407,11 +8407,14 @@ function renderCalendar(){
     var lastSync=localStorage.getItem('gcal_last_sync');
     var label=document.getElementById('gcal-last-sync-label');
     var timeEl=document.getElementById('gcal-last-sync-time');
-    if(lastSync&&label&&timeEl){
-      var d=new Date(lastSync);
-      var fmt=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')
-        +' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-      timeEl.textContent=fmt;
+    if(label&&timeEl){
+      if(lastSync){
+        var d=new Date(lastSync);
+        timeEl.textContent=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')
+          +' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      } else {
+        timeEl.textContent='未同期';
+      }
       label.style.display='inline-flex';
       label.style.alignItems='center';
     }
@@ -12963,6 +12966,7 @@ async function syncJobToGcal(job){
     if(job.gcalEventId){
       // 既存イベント更新
       await callGcalApi(`/calendars/${calId}/events/${encodeURIComponent(job.gcalEventId)}`,'PUT',event);
+      localStorage.setItem('gcal_last_sync',new Date().toISOString());var _l=document.getElementById('gcal-last-sync-label');var _t=document.getElementById('gcal-last-sync-time');if(_l&&_t){var _d=new Date();_t.textContent=_d.getFullYear()+'/'+String(_d.getMonth()+1).padStart(2,'0')+'/'+String(_d.getDate()).padStart(2,'0')+' '+String(_d.getHours()).padStart(2,'0')+':'+String(_d.getMinutes()).padStart(2,'0');_l.style.display='inline-flex';}
     } else {
       // 新規作成
       const created=await callGcalApi(`/calendars/${calId}/events`,'POST',event);
