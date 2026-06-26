@@ -609,10 +609,37 @@ tr:hover td{background:var(--bg)}
 .preview-doc.doc-invoice .grand td{color:var(--doc-color-invoice);border-top:2px solid var(--doc-color-invoice)}
 .preview-doc.doc-receipt .grand td{color:var(--doc-color-receipt);border-top:2px solid var(--doc-color-receipt)}
 @media print{
+  /* 印刷時はプレビューモーダル以外を全て非表示 */
+  #app-main,#login-screen,#pc-sidebar,#mobile-drawer,#drawer-overlay,
+  #sync-indicator,.modal-overlay:not(#preview-modal),
+  .main-header,.help-btn,.help-overlay,.help-panel,
+  #update-banner,#error-banner-container{
+    display:none !important;
+  }
+  #preview-modal{
+    position:static !important;
+    background:none !important;
+    padding:0 !important;
+    overflow:visible !important;
+  }
+  #preview-modal .modal{
+    max-width:none !important;
+    width:100% !important;
+    box-shadow:none !important;
+    border:none !important;
+    border-radius:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  #preview-modal .modal-body{
+    max-height:none !important;
+    overflow:visible !important;
+    padding:0 !important;
+  }
+  #preview-modal .modal-footer,
+  #preview-modal .modal-header{display:none !important}
   .preview-doc.doc-quote,.preview-doc.doc-invoice,.preview-doc.doc-receipt{border-top-width:6px;border-top-style:solid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .preview-doc h2,.preview-doc .preview-table th,.preview-doc .grand td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  /* v3.32.5: 備考が長い場合に2ページ目以降に渡れるよう、印刷時のみ overflow を解除。
-     また、行ごとの改ページ制御を入れて読みやすい印刷出力にする。 */
   .preview-doc{overflow:visible !important;max-width:none !important;border:none !important;page-break-inside:auto !important}
   .preview-table tr{page-break-inside:avoid}
   .preview-total{page-break-inside:avoid}
@@ -3924,9 +3951,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.54';
+const APP_VERSION='v3.32.55';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T22:09:59Z';
+const APP_BUILD_TIME='2026-06-26T22:22:05Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
