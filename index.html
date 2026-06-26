@@ -1881,6 +1881,7 @@ if('serviceWorker' in navigator){
             <span style="font-size:11px;color:#C0392B">❌</span>
           </span>
           <span style="font-size:11px;color:#888">※ Google側で入力した予定はこちらに反映されません</span>
+          <span id="gcal-last-sync-label" style="display:none;margin-left:4px;font-size:11px;color:#4285F4;background:#E8F0FE;border:1px solid #C5D8F8;border-radius:99px;padding:2px 8px">🔄 最終同期: <span id="gcal-last-sync-time">—</span></span>
         </div>
       </div>
       <!-- FullCalendar コンテナ -->
@@ -3918,9 +3919,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.36';
+const APP_VERSION='v3.32.37';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:01:48Z';
+const APP_BUILD_TIME='2026-06-26T20:04:42Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -8398,8 +8399,7 @@ function openGoogleCalendarMobile(){
 
 function renderCalendar(){
   // Google連携バッジの表示制御
-  const syncNotice = document.getElementById('gcal-sync-notice');
-  if(syncNotice) syncNotice.style.display = isGcalEnabled() ? 'block' : 'none';
+  updateGcalSyncBadge();
   // v3.31.0: モバイル(<=768px)ではFullCalendar初期化をスキップ
   // モバイルではGoogleカレンダー連携リンク方式UI(#mobile-cal-view)を使う
   // モバイルでもFullCalendarを初期化しないことで、リソース節約と描画バグ完全回避
@@ -12955,6 +12955,8 @@ async function syncJobToGcal(job){
       const idx=jobs.findIndex(x=>x.id===job.id);
       if(idx>=0) jobs[idx].gcalEventId=created.id;
       persist();
+      localStorage.setItem("gcal_last_sync", new Date().toISOString());
+      updateGcalSyncBadge();
     }
   }catch(e){
     // v3.25.3: 永続エラーバナーで表示(消えない・コピー可)
