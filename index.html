@@ -3893,9 +3893,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.24';
+const APP_VERSION='v3.32.25';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T18:38:23Z';
+const APP_BUILD_TIME='2026-06-26T18:50:14Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4130,34 +4130,102 @@ function openEnvelopePreview(id){
   var cust=customers.find(function(x){return x.id===d.customerId;})||{};
   var custName=_escPub(cust.name||d.customer||'');
   var custHonorific=d.contact?_escPub(d.contact)+' 様':(cust.honorific?_escPub(cust.honorific):'御中');
-  var logoHtml=s.logo?'<img src="'+_escPub(s.logo)+'" style="max-height:30px;margin-bottom:4px"><br>':'';
-  var html='';
-  html+='<div style="height:99mm;box-sizing:border-box;padding:10mm 12mm 6mm;border-bottom:1px dashed #bbb;display:flex;flex-direction:column;justify-content:flex-end">';
-  html+='<div style="font-size:9px;color:#aaa;margin-bottom:4px">⬆ 上を折り込む</div>';
-  html+='<div style="text-align:right">'+logoHtml;
+  var logoHtml=s.logo?'<img src="'+_escPub(s.logo)+'" style="max-height:30px;display:block;margin-left:auto;margin-bottom:3px">':'';
+
+  // 明細行を生成
+  var lines=d.lines||[];
+  var lineRows='';
+  lines.forEach(function(l){
+    var amt=(l.qty||1)*(l.price||0);
+    lineRows+='<tr>';
+    lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px">'+_escPub(l.name||'')+'</td>';
+    lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:center">'+_escPub(String(l.qty||1))+'</td>';
+    lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:right">'+fmt(l.price||0)+'</td>';
+    lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:center">'+(l.tax==='non'?'税込':'10%')+'</td>';
+    lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:right">'+fmt(amt)+'</td>';
+    lineRows+='</tr>';
+  });
+  // 空行を追加（最低5行）
+  for(var i=lines.length;i<5;i++){
+    lineRows+='<tr><td style="padding:4px 6px;border:1px solid #ccc;height:20px">&nbsp;</td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td></tr>';
+  }
+
+  // 振込先
+  var banks=settings.bankAccounts||[];
+  var bankHtml='';
+  if(banks.length){
+    bankHtml='<div style="margin-top:8px;font-size:11px">';
+    bankHtml+='<strong>【お振込先】</strong><br>';
+    banks.forEach(function(b){
+      bankHtml+=_escPub(b.label||'')+' '+_escPub(b.bank||'')+' '+_escPub(b.account||'')+'<br>';
+    });
+    bankHtml+='</div>';
+  }
+
+  var html='<div style="width:100%;font-family:\'游ゴシック\',\'Yu Gothic\',sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:10mm 10mm 8mm">';
+
+  // ===== 上部2列レイアウト =====
+  html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6mm">';
+
+  // 左：宛先（封筒の窓位置）
+  html+='<div style="width:55%">';
+  if(cust.zip)html+='<div style="font-size:12px;margin-bottom:3px">〒'+_escPub(cust.zip)+'</div>';
+  if(cust.address)html+='<div style="font-size:12px;line-height:1.7;margin-bottom:5px">'+_escPub(cust.address)+'</div>';
+  html+='<div style="font-size:22px;font-weight:700;letter-spacing:1px;margin-bottom:4px">'+custName+'</div>';
+  html+='<div style="font-size:14px">'+custHonorific+'</div>';
+  html+='</div>';
+
+  // 右：書類番号・日付・差出人
+  html+='<div style="width:42%;text-align:right">';
+  html+='<div style="font-size:11px;color:#555;margin-bottom:2px">NO. '+_escPub(d.number||'')+'</div>';
+  html+='<div style="font-size:11px;color:#555;margin-bottom:8px">'+_escPub(d.date||'')+'</div>';
+  html+=logoHtml;
   html+='<div style="font-size:13px;font-weight:700">'+_escPub(s.company||'')+'</div>';
-  html+='<div style="font-size:11px;color:#555">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
-  if(s.tel)html+='<div style="font-size:11px;color:#555">'+_escPub(s.tel)+'</div>';
-  html+='</div></div>';
-  html+='<div style="height:99mm;box-sizing:border-box;padding:14mm 10mm 6mm 14mm">';
-  html+='<div style="font-size:9px;color:#bbb;margin-bottom:10px">窓枠位置</div>';
-  if(cust.zip)html+='<div style="font-size:13px;margin-bottom:6px">〒'+_escPub(cust.zip||'')+'</div>';
-  if(cust.address)html+='<div style="font-size:13px;color:#444;margin-bottom:8px;line-height:1.7">'+_escPub(cust.address)+'</div>';
-  html+='<div style="font-size:24px;font-weight:700;margin-bottom:8px;letter-spacing:1px">'+custName+'</div>';
-  html+='<div style="font-size:16px">'+custHonorific+'</div>';
+  if(s.zip||s.address)html+='<div style="font-size:10px;color:#555;margin-top:2px">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
+  if(s.tel)html+='<div style="font-size:10px;color:#555">TEL: '+_escPub(s.tel)+'</div>';
+  if(s.email)html+='<div style="font-size:10px;color:#555">'+_escPub(s.email)+'</div>';
   html+='</div>';
-  html+='<div style="height:99mm;box-sizing:border-box;padding:8mm 12mm;border-top:1px dashed #bbb;background:#f9f9f9">';
-  html+='<div style="font-size:9px;color:#aaa;margin-bottom:8px">⬇ 下を折り込む</div>';
-  html+='<div style="font-size:14px;font-weight:700;margin-bottom:4px">'+_escPub(d.type||'')+' '+_escPub(d.number||'')+'</div>';
-  if(d.subject)html+='<div style="font-size:12px;color:#555;margin-bottom:2px">件名：'+_escPub(d.subject)+'</div>';
-  html+='<div style="font-size:12px;color:#555">金額：'+fmt(d.grandTotal)+'</div>';
-  html+='<div style="font-size:11px;color:#888;margin-top:4px">発行日：'+_escPub(d.date||'')+'</div>';
   html+='</div>';
+
+  // ===== タイトル =====
+  html+='<div style="text-align:center;font-size:22px;font-weight:700;letter-spacing:6px;border-bottom:2px solid #1a56a0;padding-bottom:4px;margin-bottom:6px;color:#1a56a0">'+_escPub(d.type||'')+'</div>';
+
+  // ===== 件名 =====
+  if(d.subject)html+='<div style="font-size:12px;margin-bottom:6px">件名：<strong>'+_escPub(d.subject)+'</strong></div>';
+
+  // ===== 明細テーブル =====
+  html+='<table style="width:100%;border-collapse:collapse;margin-bottom:4mm">';
+  html+='<thead><tr style="background:#1a56a0;color:white">';
+  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;text-align:left">品目・作業内容</th>';
+  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:8%">数量</th>';
+  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:15%">単価</th>';
+  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:8%">税</th>';
+  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:18%">金額</th>';
+  html+='</tr></thead><tbody>'+lineRows+'</tbody></table>';
+
+  // ===== 合計エリア =====
+  html+='<div style="display:flex;justify-content:flex-end;margin-bottom:4mm">';
+  html+='<table style="border-collapse:collapse;min-width:200px">';
+  if(d.tax10||d.tax8){
+    html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">小計</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.subtotal||0)+'</td></tr>';
+    if(d.tax10)html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">消費税 10%</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.tax10)+'</td></tr>';
+    if(d.tax8)html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">消費税 8%</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.tax8)+'</td></tr>';
+  }
+  html+='<tr style="background:#1a56a0;color:white"><td style="padding:6px 10px;border:1px solid #1a56a0;font-size:13px;font-weight:700">合計（税込）</td><td style="padding:6px 10px;border:1px solid #1a56a0;font-size:16px;font-weight:700;text-align:right">'+fmt(d.grandTotal||0)+'</td></tr>';
+  html+='</table></div>';
+
+  // ===== 備考・振込先 =====
+  if(d.notes||bankHtml){
+    html+='<div style="border-top:1px solid #ccc;padding-top:6px;font-size:11px;color:#555">';
+    if(d.notes)html+='<div style="white-space:pre-wrap;margin-bottom:4px">'+_escPub(d.notes)+'</div>';
+    html+=bankHtml;
+    html+='</div>';
+  }
+  html+='</div>';
+
   document.getElementById('envelope-content').innerHTML=html;
   document.getElementById('envelope-modal').style.display='block';
 }
-
-// ===== アプリ起動時 自動リロード（sessionStorageでループ防止）=====
 function autoReloadOnOpen(latest){
   // このセッションで既に自動リロード済みか確認
   const alreadyReloaded = sessionStorage.getItem('auto_reloaded_version');
