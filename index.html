@@ -3911,9 +3911,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.46';
+const APP_VERSION='v3.32.47';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:49:54Z';
+const APP_BUILD_TIME='2026-06-26T20:54:50Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7529,12 +7529,11 @@ async function openCustAiResearch(custId){
   if(cust.tel)parts.push('電話: '+cust.tel);
   var prompt='以下の会社・顧客についてWebで調査し、JSONのみで回答してください。\n'+parts.join(' / ')+'\n\n以下のJSON形式で返してください（不明な場合はnull）:\n{"url":"公式URL","ceo":"代表者名","employees":"従業員数・規模","description":"事業内容100文字以内","rating":"評価","reputation":"評判要約150文字以内","note":"特記事項"}';
   try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,tools:[{"type":"web_search_20250305","name":"web_search"}],messages:[{role:'user',content:prompt}]})});
+    var res=await fetch('/api/ai-research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:cust.name,address:cust.address||'',tel:cust.tel||''})});
     var data=await res.json();
-    var textContent=(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('\n');
-    var jsonMatch=textContent.match(/\{[\s\S]*?\}/);
-    if(jsonMatch){
-      _aiResearchResult=JSON.parse(jsonMatch[0]);
+    if(data.error){if(body)body.innerHTML='<div style="padding:20px;color:#C0392B">エラー: '+escAttr(data.error)+'</div>';return;}
+    if(data.ok&&data.result){
+      _aiResearchResult=data.result;
       _showCustAiResult(_aiResearchResult,cust.name);
       if(_aiResearchResult.url&&saveBtn)saveBtn.style.display='';
     }else{
