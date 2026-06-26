@@ -643,9 +643,9 @@ tr:hover td{background:var(--bg)}
 .fc-holiday-event{font-weight:700;font-size:10px}
 .fc-holiday-event .fc-event-title{color:#D93025}
 .fc .fc-daygrid-day-number{padding:6px 8px;color:var(--text);text-decoration:none;font-weight:500}
-.fc .fc-day-today{background:rgba(168,213,184,0.15) !important}
+.fc .fc-day-today{background:rgba(45,130,80,0.18) !important;border-top:2px solid var(--accent) !important}
 .fc .fc-daygrid-day-top{justify-content:flex-start}
-.fc .fc-day-today .fc-daygrid-day-number{background:var(--accent);color:white;border-radius:50%;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;padding:0;margin:4px;font-weight:700;line-height:1;box-sizing:border-box;font-size:13px;text-decoration:none !important}
+.fc .fc-day-today .fc-daygrid-day-number{background:none;color:var(--accent);border-radius:0;width:auto;height:auto;display:inline;padding:6px 8px;margin:0;font-weight:900;font-size:15px;text-decoration:none !important}
 .fc-event{border-radius:4px;font-size:11px;padding:2px 4px;cursor:pointer;border:none}
 .fc-event:hover{filter:brightness(1.1)}
 .fc-daygrid-event{margin:1px 2px}
@@ -662,7 +662,7 @@ tr:hover td{background:var(--bg)}
   .fc-daygrid-event{margin:0 1px}
   .fc .fc-daygrid-day-events{margin-bottom:0}
   .fc .fc-col-header-cell-cushion{font-size:10px;padding:2px}
-  .fc .fc-day-today .fc-daygrid-day-number{min-width:22px;height:22px;font-size:11px;margin:2px;padding:0 4px}
+  .fc .fc-day-today .fc-daygrid-day-number{font-size:13px;font-weight:900;padding:2px 4px}
 }
 @media(max-width:480px){
   .fc .fc-toolbar-title{font-size:13px}
@@ -3909,9 +3909,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.40';
+const APP_VERSION='v3.32.41';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:18:46Z';
+const APP_BUILD_TIME='2026-06-26T20:23:01Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
