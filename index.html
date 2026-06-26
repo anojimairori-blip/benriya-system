@@ -3930,9 +3930,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.47';
+const APP_VERSION='v3.32.48';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T23:25:27Z';
+const APP_BUILD_TIME='2026-06-26T23:29:03Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6677,10 +6677,7 @@ function previewDoc(id){
       <div class="preview-from">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:3px">${logoHtml?logoHtml.replace('<img ','<img style="max-height:40px" '):''}  <strong style="font-size:13px">${escAttr(d.staff||s.owner||s.company||'（会社名未設定）')}</strong></div>
         <p>${escAttr(_getOfficeField(d,'address',s))}</p><p>${escAttr(_getOfficeField(d,'tel',s))}${_getOfficeField(d,'fax',s)?' / FAX:'+escAttr(_getOfficeField(d,'fax',s)):''}</p><p>${escAttr(s.email||'')}</p>
-        ${d.staff?`<p style="margin-top:4px">担当：${escAttr(d.staff)}</p>`:''}
-        ${d.dueDate&&d.type==='請求書'?`<p>支払期限：${escAttr(d.dueDate)}</p>`:''}
-      </div>
-    </div>
+        ${d.staff?`<p style="margin-top:4px">担当：${escAttr(d.staff)}</p>`:''}\n        <div style="margin-top:8px;padding-top:6px;border-top:1px solid #E0E0E0;font-size:11px;color:#555;line-height:1.8">\n          <div><span style="display:inline-block;width:58px;color:#888">発行日</span>${escAttr(d.date||'')}</div>\n          ${d.type==='請求書'?`<div><span style="display:inline-block;width:58px;color:#888">支払期限</span>${escAttr(d.dueDate||'未設定')}</div>`:''}\n          ${d.type==='領収書'?`<div><span style="display:inline-block;width:58px;color:#888">入金日</span>${escAttr(d.dueDate||d.date||'')}</div>`:''}\n        </div>\n      </div>\n    </div>
 
     <!-- 件名（品目テーブルの直上に下線付き） -->
     <div class="preview-subject">
