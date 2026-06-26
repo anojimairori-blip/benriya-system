@@ -3911,9 +3911,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.50';
+const APP_VERSION='v3.32.51';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T21:22:16Z';
+const APP_BUILD_TIME='2026-06-26T21:26:40Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6131,13 +6131,13 @@ function openMapModal(custId){
     <div style="background:var(--surface2);border-radius:var(--radius);padding:14px;margin-bottom:14px">
       <div style="font-size:13px;font-weight:700;margin-bottom:10px">顧客の住所</div>
       <div style="font-size:14px;color:var(--text);margin-bottom:12px">📍 ${c.address||'（住所未登録）'}</div>
-      ${c.address?`<a href="${custUrl}" target="_blank" class="map-btn" style="margin-bottom:8px">🗺️ Googleマップで開く（顧客住所）</a>`:''}
+      ${c.address?`<a href="${custUrl}" target="_blank" class="map-btn" rel="noopener noreferrer" style="margin-bottom:8px">🗺️ Googleマップで開く（顧客住所）</a>`:''}
     </div>
     ${myAddr&&c.address?`
     <div style="background:var(--blue-light);border:1px solid #B0D0F0;border-radius:var(--radius);padding:14px;margin-bottom:14px">
       <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--blue)">🏢 自社からの経路</div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:10px">出発地：${myAddr}</div>
-      <a href="${dirUrl}" target="_blank" class="map-btn">🚗 Googleマップで経路を確認</a>
+      <a href="${dirUrl}" target="_blank" class="map-btn" rel="noopener noreferrer">🚗 Googleマップで経路を確認</a>
       <p style="font-size:11px;color:var(--text3);margin-top:8px">※ 実際の距離・所要時間はGoogleマップにてご確認ください</p>
     </div>`:`<div style="background:var(--surface2);border-radius:var(--radius);padding:14px;font-size:13px;color:var(--text3)">
       ⚠️ 自社住所が設定されていません。「会社設定」から住所を登録すると経路が表示されます。
@@ -7630,8 +7630,8 @@ function openCustDetail(idOrName,byId){
           </div>
         </div>
         ${mapUrl?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-            <a href="${mapUrl}" target="_blank" class="map-btn">📍 Googleマップで見る</a>
-            ${dirUrl?`<a href="${dirUrl}" target="_blank" class="map-btn">🚗 経路を確認</a>`:''}
+            <a href="${mapUrl}" target="_blank" class="map-btn" rel="noopener noreferrer">📍 Googleマップで見る</a>
+            ${dirUrl?`<a href="${dirUrl}" target="_blank" class="map-btn" rel="noopener noreferrer">🚗 経路を確認</a>`:''}
           </div>`:''}
         <div class="detail-section">
           ${(()=>{const ae=c.assignedEmpId?(employees||[]).find(e=>e.id===c.assignedEmpId):null;return ae?`<div class="detail-row"><span class="dl">自社担当</span><span>${escAttr(ae.name)}${ae.role?'（'+escAttr(ae.role)+'）':''}</span></div>`:'';})()}
@@ -14676,8 +14676,8 @@ function executeBulkTaxUpdate(){
           </div>
         </div>
         ${mapUrl?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-            <a href="${mapUrl}" target="_blank" class="map-btn">📍 Googleマップで見る</a>
-            ${dirUrl?`<a href="${dirUrl}" target="_blank" class="map-btn">🚗 経路を確認</a>`:''}
+            <a href="${mapUrl}" target="_blank" class="map-btn" rel="noopener noreferrer">📍 Googleマップで見る</a>
+            ${dirUrl?`<a href="${dirUrl}" target="_blank" class="map-btn" rel="noopener noreferrer">🚗 経路を確認</a>`:''}
           </div>`:''}
         <div class="detail-section">
           ${(()=>{const ae=c.assignedEmpId?(employees||[]).find(e=>e.id===c.assignedEmpId):null;return ae?`<div class="detail-row"><span class="dl">自社担当</span><span>${escAttr(ae.name)}${ae.role?'（'+escAttr(ae.role)+'）':''}</span></div>`:'';})()}
