@@ -3938,9 +3938,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.53';
+const APP_VERSION='v3.32.54';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T23:45:47Z';
+const APP_BUILD_TIME='2026-06-26T23:48:20Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4311,8 +4311,8 @@ function openEnvelopePreview(id){
     html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">小計</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.subtotal||0)+'</td></tr>';
     if(d.tax10)html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">消費税 10%</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.tax10)+'</td></tr>';
   }
-  html+='<tr style="background:#1a56a0;color:white"><td style="padding:6px 10px;border:1px solid #1a56a0;font-size:13px;font-weight:700">合計（税込）</td>';
-  html+='<td style="padding:6px 10px;border:1px solid #1a56a0;font-size:16px;font-weight:700;text-align:right">'+fmt(d.grandTotal||0)+'</td></tr>';
+  html+='<tr style="background:#1a56a0;color:white"><td style="padding:10px 12px;border:1px solid #1a56a0;font-size:16px;font-weight:700">合計（税込）</td>';
+  html+='<td style="padding:10px 12px;border:1px solid #1a56a0;font-size:22px;font-weight:700;text-align:right;letter-spacing:0.5px">'+fmt(d.grandTotal||0)+'</td></tr>';
   html+='</table></div>';
   if(d.notes||bankHtml){
     html+='<div style="border-top:1px solid #ccc;padding-top:6px;font-size:11px;color:#555">';
