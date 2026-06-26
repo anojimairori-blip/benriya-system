@@ -614,7 +614,7 @@ tr:hover td{background:var(--bg)}
   body.printing-preview #preview-modal { display:flex !important; visibility:visible !important; position:static !important; background:none !important; padding:0 !important; overflow:visible !important; }
   body.printing-preview #preview-modal .modal { max-width:none !important; width:100% !important; box-shadow:none !important; border:none !important; border-radius:0 !important; max-height:none !important; overflow:visible !important; }
   body.printing-preview #preview-modal .modal-body { max-height:none !important; overflow:visible !important; padding:0 !important; }
-  body.printing-preview .preview-doc { padding:24px 28px !important; }
+  body.printing-preview .preview-doc { padding:20px 36px !important; }
   body.printing-preview #preview-modal .modal-footer,
   body.printing-preview #preview-modal .modal-header { display:none !important; }
   body.printing-preview #preview-modal,
@@ -976,7 +976,7 @@ select{appearance:auto}
      （日付・URL・ページ番号・サイトタイトル）を描画する余白を奪い、
      結果として非表示にする。印刷の実余白は #preview-modal .modal-body の
      padding 12mm で確保する。 */
-  @page{margin:15mm 20mm}
+  @page{margin:15mm 28mm}
   /* body直下の要素を全部消す（#preview-modal だけ残す） */
   body > *:not(#preview-modal):not(#envelope-modal){display:none !important}
   /* プレビューモーダル系統は visibility:visible を強制（line 760 の body *{visibility:hidden} を上書き） */
@@ -3930,9 +3930,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.46';
+const APP_VERSION='v3.32.47';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T23:22:50Z';
+const APP_BUILD_TIME='2026-06-26T23:25:27Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
