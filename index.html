@@ -1860,29 +1860,19 @@ if('serviceWorker' in navigator){
     <!-- デスクトップ用 FullCalendar -->
     <div class="card desktop-only-cal" style="padding:16px">
       <!-- Googleカレンダー同期方向の説明 -->
-      <div id="gcal-sync-notice" style="display:none;margin-bottom:12px;padding:10px 14px;background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED;font-size:12px;color:#555">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span style="font-weight:700;color:#333">📅 Google連携中</span>
-          <span style="color:#999;font-size:11px">|</span>
-          <span style="display:inline-flex;align-items:center;gap:4px;background:#E6F4EA;border:1px solid #A8D5B5;border-radius:99px;padding:3px 10px">
-            <span style="font-size:13px">📋</span>
-            <span style="font-size:11px;font-weight:700;color:#1E7E34">Flexsys</span>
-            <span style="font-size:14px;color:#1E7E34">→</span>
-            <span style="font-size:13px">🗓</span>
-            <span style="font-size:11px;font-weight:700;color:#1E7E34">Google</span>
-            <span style="font-size:11px;color:#1E7E34">✅</span>
+      <div id="gcal-sync-notice" style="display:none;margin-bottom:12px;padding:8px 14px;background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED;font-size:11px;color:#555;white-space:nowrap;overflow-x:auto">
+        <span style="display:inline-flex;align-items:center;gap:8px;flex-wrap:nowrap">
+          <span style="font-weight:700;color:#333;font-size:12px">📅 Google連携中</span>
+          <span style="color:#ccc">|</span>
+          <span style="display:inline-flex;align-items:center;gap:3px;background:#E6F4EA;border:1px solid #A8D5B5;border-radius:99px;padding:2px 8px">
+            <span>📋Flexsys</span><span style="color:#1E7E34;font-weight:700">→</span><span>🗓Google</span><span style="color:#1E7E34">✅</span>
           </span>
-          <span style="display:inline-flex;align-items:center;gap:4px;background:#FEE8E8;border:1px solid #F5C2C2;border-radius:99px;padding:3px 10px">
-            <span style="font-size:13px">🗓</span>
-            <span style="font-size:11px;font-weight:700;color:#C0392B">Google</span>
-            <span style="font-size:14px;color:#C0392B">→</span>
-            <span style="font-size:13px">📋</span>
-            <span style="font-size:11px;font-weight:700;color:#C0392B">Flexsys</span>
-            <span style="font-size:11px;color:#C0392B">❌</span>
+          <span style="display:inline-flex;align-items:center;gap:3px;background:#FEE8E8;border:1px solid #F5C2C2;border-radius:99px;padding:2px 8px">
+            <span>🗓Google</span><span style="color:#C0392B;font-weight:700">→</span><span>📋Flexsys</span><span style="color:#C0392B">❌</span>
           </span>
-          <span style="font-size:11px;color:#888">※ Google側で入力した予定はこちらに反映されません</span>
-          <span id="gcal-last-sync-label" style="display:none;margin-left:4px;font-size:11px;color:#4285F4;background:#E8F0FE;border:1px solid #C5D8F8;border-radius:99px;padding:2px 8px">🔄 最終同期: <span id="gcal-last-sync-time">—</span></span>
-        </div>
+          <span style="color:#999">※Google側の予定はFlexsysに反映されません</span>
+          <span id="gcal-last-sync-label" style="display:none;color:#4285F4;background:#E8F0FE;border:1px solid #C5D8F8;border-radius:99px;padding:2px 8px">🔄 最終同期: <span id="gcal-last-sync-time">—</span></span>
+        </span>
       </div>
       <!-- FullCalendar コンテナ -->
       <div id="fullcalendar-el"></div>
@@ -3919,9 +3909,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.39';
+const APP_VERSION='v3.32.40';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:14:17Z';
+const APP_BUILD_TIME='2026-06-26T20:18:46Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -8408,8 +8398,9 @@ function renderCalendar(){
     var label=document.getElementById('gcal-last-sync-label');
     var timeEl=document.getElementById('gcal-last-sync-time');
     if(label&&timeEl){
-      if(lastSync){
-        var d=new Date(lastSync);
+      var fresh=localStorage.getItem('gcal_last_sync');
+      if(fresh){
+        var d=new Date(fresh);
         timeEl.textContent=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')
           +' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
       } else {
