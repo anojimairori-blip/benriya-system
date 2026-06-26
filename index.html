@@ -3893,9 +3893,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.25';
+const APP_VERSION='v3.32.26';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T18:50:14Z';
+const APP_BUILD_TIME='2026-06-26T18:55:37Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4129,10 +4129,17 @@ function openEnvelopePreview(id){
   var s=settings;
   var cust=customers.find(function(x){return x.id===d.customerId;})||{};
   var custName=_escPub(cust.name||d.customer||'');
-  var custHonorific=d.contact?_escPub(d.contact)+' 様':(cust.honorific?_escPub(cust.honorific):'御中');
+  // 「様」の重複を防ぐ：担当者名が会社名と同じ場合は敬称のみ表示
+  var contactName=d.contact||'';
+  var custHonorific='';
+  if(contactName && contactName!==( cust.name||d.customer||'')){
+    custHonorific=_escPub(contactName)+' 様';
+  } else {
+    custHonorific=cust.honorific||'様';
+  }
   var logoHtml=s.logo?'<img src="'+_escPub(s.logo)+'" style="max-height:30px;display:block;margin-left:auto;margin-bottom:3px">':'';
 
-  // 明細行を生成
+  // 明細行
   var lines=d.lines||[];
   var lineRows='';
   lines.forEach(function(l){
@@ -4145,7 +4152,6 @@ function openEnvelopePreview(id){
     lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:right">'+fmt(amt)+'</td>';
     lineRows+='</tr>';
   });
-  // 空行を追加（最低5行）
   for(var i=lines.length;i<5;i++){
     lineRows+='<tr><td style="padding:4px 6px;border:1px solid #ccc;height:20px">&nbsp;</td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td></tr>';
   }
@@ -4154,28 +4160,47 @@ function openEnvelopePreview(id){
   var banks=settings.bankAccounts||[];
   var bankHtml='';
   if(banks.length){
-    bankHtml='<div style="margin-top:8px;font-size:11px">';
-    bankHtml+='<strong>【お振込先】</strong><br>';
-    banks.forEach(function(b){
-      bankHtml+=_escPub(b.label||'')+' '+_escPub(b.bank||'')+' '+_escPub(b.account||'')+'<br>';
-    });
+    bankHtml='<div style="margin-top:8px;font-size:11px"><strong>【お振込先】</strong><br>';
+    banks.forEach(function(b){ bankHtml+=_escPub(b.label||'')+' '+_escPub(b.bank||'')+' '+_escPub(b.account||'')+'<br>'; });
     bankHtml+='</div>';
   }
 
-  var html='<div style="width:100%;font-family:\'游ゴシック\',\'Yu Gothic\',sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:10mm 10mm 8mm">';
+  // ===== 三つ折りビジュアルイメージ =====
+  var foldImg='<div style="text-align:center;margin-bottom:10px;padding:8px;background:#f5f5f5;border-radius:8px;font-size:11px;color:#555">';
+  foldImg+='<div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:4px">';
+  // A4三つ折り図
+  foldImg+='<div style="display:flex;gap:1px;height:70px;align-items:stretch">';
+  foldImg+='<div style="width:46px;border:1px solid #aaa;background:#f9f9f9;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:8px;color:#888;border-radius:2px 0 0 2px">';
+  foldImg+='<span>⬆</span><span style="writing-mode:vertical-rl;transform:rotate(180deg)">差出人</span><span>折込</span></div>';
+  foldImg+='<div style="width:46px;border:2px solid #1a56a0;background:#e8f4fd;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:8px;color:#1a56a0">';
+  foldImg+='<span style="font-size:10px">🏠</span><span style="font-weight:700">宛先</span><span>（窓）</span></div>';
+  foldImg+='<div style="width:46px;border:1px solid #aaa;background:#f9f9f9;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:8px;color:#888;border-radius:0 2px 2px 0">';
+  foldImg+='<span>⬇</span><span style="writing-mode:vertical-rl;transform:rotate(180deg)">請求内容</span><span>折込</span></div>';
+  foldImg+='</div>';
+  // 矢印
+  foldImg+='<div style="font-size:20px;color:#888">→</div>';
+  // 封筒イメージ
+  foldImg+='<div style="width:90px;height:70px;border:2px solid #888;border-radius:2px;position:relative;background:#fffef5">';
+  foldImg+='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-left:45px solid transparent;border-right:45px solid transparent;border-top:30px solid #ddd;opacity:0.5"></div>';
+  foldImg+='<div style="position:absolute;width:38px;height:18px;border:1px solid #1a56a0;left:8px;top:8px;background:#e8f4fd;border-radius:2px;font-size:7px;color:#1a56a0;display:flex;align-items:center;justify-content:center;font-weight:700">宛先↗窓</div>';
+  foldImg+='</div>';
+  foldImg+='</div>';
+  foldImg+='三つ折り（上を手前）にして封入 → 宛先が窓から見えます';
+  foldImg+='</div>';
 
-  // ===== 上部2列レイアウト =====
-  html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6mm">';
+  var html='<div style="width:100%;font-family:\'游ゴシック\',\'Yu Gothic\',sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:8mm 10mm">';
+  html+=foldImg;
 
-  // 左：宛先（封筒の窓位置）
+  // 上部2列
+  html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm">';
+  // 左：宛先
   html+='<div style="width:55%">';
   if(cust.zip)html+='<div style="font-size:12px;margin-bottom:3px">〒'+_escPub(cust.zip)+'</div>';
   if(cust.address)html+='<div style="font-size:12px;line-height:1.7;margin-bottom:5px">'+_escPub(cust.address)+'</div>';
   html+='<div style="font-size:22px;font-weight:700;letter-spacing:1px;margin-bottom:4px">'+custName+'</div>';
   html+='<div style="font-size:14px">'+custHonorific+'</div>';
   html+='</div>';
-
-  // 右：書類番号・日付・差出人
+  // 右：差出人
   html+='<div style="width:42%;text-align:right">';
   html+='<div style="font-size:11px;color:#555;margin-bottom:2px">NO. '+_escPub(d.number||'')+'</div>';
   html+='<div style="font-size:11px;color:#555;margin-bottom:8px">'+_escPub(d.date||'')+'</div>';
@@ -4187,13 +4212,11 @@ function openEnvelopePreview(id){
   html+='</div>';
   html+='</div>';
 
-  // ===== タイトル =====
+  // タイトル
   html+='<div style="text-align:center;font-size:22px;font-weight:700;letter-spacing:6px;border-bottom:2px solid #1a56a0;padding-bottom:4px;margin-bottom:6px;color:#1a56a0">'+_escPub(d.type||'')+'</div>';
-
-  // ===== 件名 =====
   if(d.subject)html+='<div style="font-size:12px;margin-bottom:6px">件名：<strong>'+_escPub(d.subject)+'</strong></div>';
 
-  // ===== 明細テーブル =====
+  // 明細テーブル
   html+='<table style="width:100%;border-collapse:collapse;margin-bottom:4mm">';
   html+='<thead><tr style="background:#1a56a0;color:white">';
   html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;text-align:left">品目・作業内容</th>';
@@ -4203,18 +4226,17 @@ function openEnvelopePreview(id){
   html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:18%">金額</th>';
   html+='</tr></thead><tbody>'+lineRows+'</tbody></table>';
 
-  // ===== 合計エリア =====
+  // 合計
   html+='<div style="display:flex;justify-content:flex-end;margin-bottom:4mm">';
   html+='<table style="border-collapse:collapse;min-width:200px">';
   if(d.tax10||d.tax8){
     html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">小計</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.subtotal||0)+'</td></tr>';
     if(d.tax10)html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">消費税 10%</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.tax10)+'</td></tr>';
-    if(d.tax8)html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">消費税 8%</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.tax8)+'</td></tr>';
   }
   html+='<tr style="background:#1a56a0;color:white"><td style="padding:6px 10px;border:1px solid #1a56a0;font-size:13px;font-weight:700">合計（税込）</td><td style="padding:6px 10px;border:1px solid #1a56a0;font-size:16px;font-weight:700;text-align:right">'+fmt(d.grandTotal||0)+'</td></tr>';
   html+='</table></div>';
 
-  // ===== 備考・振込先 =====
+  // 備考・振込先
   if(d.notes||bankHtml){
     html+='<div style="border-top:1px solid #ccc;padding-top:6px;font-size:11px;color:#555">';
     if(d.notes)html+='<div style="white-space:pre-wrap;margin-bottom:4px">'+_escPub(d.notes)+'</div>';
