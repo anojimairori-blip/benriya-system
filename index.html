@@ -613,7 +613,7 @@ tr:hover td{background:var(--bg)}
   body.printing-preview > * { display:none !important; visibility:hidden !important; }
   body.printing-preview #preview-modal { display:flex !important; visibility:visible !important; position:static !important; background:none !important; padding:0 !important; overflow:visible !important; }
   body.printing-preview #preview-modal .modal { max-width:none !important; width:100% !important; box-shadow:none !important; border:none !important; border-radius:0 !important; max-height:none !important; overflow:visible !important; }
-  body.printing-preview #preview-modal .modal-body { max-height:none !important; overflow:visible !important; padding:0 !important; }
+  body.printing-preview #preview-modal .modal-body { max-height:none !important; overflow:visible !important; }
   body.printing-preview #preview-modal .modal-footer,
   body.printing-preview #preview-modal .modal-header { display:none !important; }
   body.printing-preview #preview-modal,
@@ -975,7 +975,7 @@ select{appearance:auto}
      （日付・URL・ページ番号・サイトタイトル）を描画する余白を奪い、
      結果として非表示にする。印刷の実余白は #preview-modal .modal-body の
      padding 12mm で確保する。 */
-  @page{margin:0}
+  @page{margin:15mm 12mm}
   /* body直下の要素を全部消す（#preview-modal だけ残す） */
   body > *:not(#preview-modal):not(#envelope-modal){display:none !important}
   /* プレビューモーダル系統は visibility:visible を強制（line 760 の body *{visibility:hidden} を上書き） */
@@ -2193,8 +2193,13 @@ if('serviceWorker' in navigator){
         </div>
       </div>
 
+      <!-- 拠点管理 -->
+      <div class="section-title" style="margin-bottom:12px">🏢 拠点管理（書類の発行元住所）</div>
+      <div id="offices-list" style="margin-bottom:6px"></div>
+      <button type="button" onclick="addOffice()" style="margin-top:6px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 14px;cursor:pointer;font-size:13px;color:var(--text2)">＋ 拠点を追加</button>
+
       <!-- 振込先 -->
-      <div class="section-title" style="margin-bottom:12px">振込先情報（複数登録可）</div>
+      <div class="section-title" style="margin-bottom:12px;margin-top:20px">振込先情報（複数登録可）</div>
       <div id="bank-accounts-list"></div>
       <button type="button" onclick="addBankAccount()" style="margin-top:6px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 14px;cursor:pointer;font-size:13px;color:var(--text2)">＋ 口座を追加</button>
       <!-- 後方互換 hidden fields -->
@@ -2904,19 +2909,27 @@ if('serviceWorker' in navigator){
     <!-- ③ 件名・カテゴリ -->
     <div class="form-section">
       <div class="form-section-title">書類情報</div>
-      <div class="form-row cols2" style="margin-bottom:0">
+      <div class="form-row cols2" style="margin-bottom:8px">
         <div class="form-group"><label class="required">件名・作業内容</label>
           <input type="text" id="doc-subject" placeholder="エアコン取り付け作業" list="subject-history">
           <datalist id="subject-history"></datalist>
         </div>
-        <div class="form-group"><label>カテゴリ</label>
-          <select id="doc-category">
+        <div class="form-group">
+          <label style="display:flex;justify-content:space-between;align-items:center">
+            <span>カテゴリ</span>
+            <button type="button" onclick="openCategoryEditor()" style="background:none;border:1px solid var(--border);border-radius:5px;padding:1px 7px;font-size:11px;color:var(--text2);cursor:pointer">✏️ 編集</button>
+          </label>
+          <select id="doc-category" style="width:100%">
             <option value="">（カテゴリを選択）</option>
-            <option>引越し・運搬</option><option>清掃・片付け</option><option>修理・修繕</option>
-            <option>電気・設備</option><option>庭・外構</option><option>買い物・代行</option>
-            <option>介護・生活支援</option><option>その他</option>
           </select>
         </div>
+      </div>
+      <div class="form-group" id="doc-office-area">
+        <label>発行元拠点</label>
+        <select id="doc-office-select" style="width:100%" onchange="showSelectedOfficeInfo()">
+          <option value="">（デフォルト：会社設定の住所）</option>
+        </select>
+        <div id="doc-office-info" style="display:none;margin-top:6px;padding:8px 12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.7"></div>
       </div>
     </div>
 
@@ -3916,9 +3929,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.44';
+const APP_VERSION='v3.32.45';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T23:11:25Z';
+const APP_BUILD_TIME='2026-06-26T23:17:41Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4032,6 +4045,75 @@ function showUpdateBanner(latest){
 
 
 // ===== 振込先口座 複数管理 =====
+// ===== 拠点管理 =====
+function _getOffice(d){var o=d&&d.officeId?(settings.offices||[]).find(function(x){return x.id===d.officeId;}):null;return o||null;}
+function _getOfficeField(d,field,s){var o=_getOffice(d);return(o&&o[field])?o[field]:(s[field]||'');}
+function renderOffices(){
+  var list=document.getElementById('offices-list');if(!list)return;
+  if(!settings.offices||!settings.offices.length){settings.offices=[{id:'office-'+Date.now(),name:'本社（デフォルト）',zip:settings.zip||'',address:settings.address||'',tel:settings.tel||'',fax:settings.fax||''}];}
+  list.innerHTML=settings.offices.map(function(o,i){
+    return '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;background:var(--surface)">'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+      +'<div><label style="font-size:11px;color:var(--text3)">拠点名</label><input type="text" value="'+escAttr(o.name||'')+'" oninput="settings.offices['+i+'].name=this.value;updateDocOfficeSelect()" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'<div><label style="font-size:11px;color:var(--text3)">郵便番号</label><input type="text" value="'+escAttr(o.zip||'')+'" oninput="settings.offices['+i+'].zip=this.value" placeholder="000-0000" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'</div><div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text3)">住所</label><input type="text" value="'+escAttr(o.address||'')+'" oninput="settings.offices['+i+'].address=this.value" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+      +'<div><label style="font-size:11px;color:var(--text3)">電話番号</label><input type="text" value="'+escAttr(o.tel||'')+'" oninput="settings.offices['+i+'].tel=this.value" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'<div><label style="font-size:11px;color:var(--text3)">FAX</label><input type="text" value="'+escAttr(o.fax||'')+'" oninput="settings.offices['+i+'].fax=this.value" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit"></div>'
+      +'</div><div style="text-align:right"><button onclick="removeOffice(this.dataset.oid)" data-oid="'+escAttr(o.id)+'"" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--red);cursor:pointer">🗑️ 削除</button></div></div>';
+  }).join('');updateDocOfficeSelect();
+}
+function addOffice(){if(!settings.offices)settings.offices=[];settings.offices.push({id:'office-'+Date.now(),name:'新しい拠点',zip:'',address:'',tel:'',fax:''});renderOffices();}
+function removeOffice(id){
+  if(!settings.offices||settings.offices.length<=1){showToast('拠点は最低1件必要です','#C0392B');return;}
+  showConfirm('この拠点を削除しますか？',function(){settings.offices=settings.offices.filter(function(o){return o.id!==id;});renderOffices();persist();showToast('拠点を削除しました');});
+}
+function updateDocOfficeSelect(){
+  var sel=document.getElementById('doc-office-select');if(!sel)return;
+  var cur=sel.value;sel.innerHTML='<option value="">（デフォルト：会社設定の住所）</option>';
+  (settings.offices||[]).forEach(function(o){var opt=document.createElement('option');opt.value=o.id;opt.textContent=o.name+(o.address?' — '+o.address.slice(0,15):'');sel.appendChild(opt);});
+  if(cur)sel.value=cur;showSelectedOfficeInfo();
+}
+function showSelectedOfficeInfo(){
+  var sel=document.getElementById('doc-office-select');var info=document.getElementById('doc-office-info');if(!sel||!info)return;
+  var id=sel.value;if(!id){info.style.display='none';return;}
+  var o=(settings.offices||[]).find(function(x){return x.id===id;});if(!o){info.style.display='none';return;}
+  var lines=[];if(o.zip||o.address)lines.push('📍 〒'+(o.zip||'')+' '+(o.address||''));if(o.tel)lines.push('📞 '+o.tel);if(o.fax)lines.push('📠 FAX: '+o.fax);
+  info.innerHTML=lines.map(function(l){return escAttr(l);}).join('<br>');info.style.display=lines.length?'block':'none';
+}
+// ===== 拠点管理 END =====
+
+// ===== カテゴリ管理 =====
+var _DEFAULT_DOC_CATS=['引越し・運搬','清掃・片付け','修理・修繕','電気・設備','庭・外構','買い物・代行','介護・生活支援','井戸工事','その他'];
+function _getDocCategories(){if(!settings.docCategories||!settings.docCategories.length){settings.docCategories=_DEFAULT_DOC_CATS.slice();}return settings.docCategories;}
+function renderDocCategorySelect(){
+  var sel=document.getElementById('doc-category');if(!sel)return;
+  var cur=sel.value;sel.innerHTML='<option value="">（カテゴリを選択）</option>';
+  _getDocCategories().forEach(function(cat){var opt=document.createElement('option');opt.value=cat;opt.textContent=cat;sel.appendChild(opt);});
+  if(cur)sel.value=cur;
+}
+function openCategoryEditor(){renderCatEditorList();openModal('category-editor-modal');}
+function renderCatEditorList(){
+  var list=document.getElementById('cat-editor-list');if(!list)return;
+  var cats=_getDocCategories();
+  if(!cats.length){list.innerHTML='<p style="font-size:13px;color:var(--text3)">カテゴリなし</p>';return;}
+  list.innerHTML=cats.map(function(cat,i){
+    return '<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--border)">'
+      +'<span style="flex:1;font-size:13px">'+escAttr(cat)+'</span>'
+      +'<button onclick="moveCat('+i+',-1)" '+(i===0?'disabled':'')+' style="background:none;border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:11px">↑</button>'
+      +'<button onclick="moveCat('+i+',1)" '+(i===cats.length-1?'disabled':'')+' style="background:none;border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:11px">↓</button>'
+      +'<button onclick="renameCat('+i+')" style="background:none;border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;color:var(--blue)">✏️</button>'
+      +'<button onclick="deleteCat('+i+')" style="background:none;border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;color:var(--red)">🗑️</button>'
+      +'</div>';
+  }).join('');
+}
+function addDocCategory(){var inp=document.getElementById('cat-new-input');var val=(inp?inp.value:'').trim();if(!val){showToast('カテゴリ名を入力してください','#C0392B');return;}var cats=_getDocCategories();if(cats.indexOf(val)>=0){showToast('同じカテゴリが既にあります','#C0392B');return;}cats.push(val);if(inp)inp.value='';renderCatEditorList();}
+function deleteCat(i){var cats=_getDocCategories();cats.splice(i,1);renderCatEditorList();}
+function moveCat(i,dir){var cats=_getDocCategories();var j=i+dir;if(j<0||j>=cats.length)return;var tmp=cats[i];cats[i]=cats[j];cats[j]=tmp;renderCatEditorList();}
+function renameCat(i){var cats=_getDocCategories();showInputDialog('カテゴリ名を変更','新しいカテゴリ名',cats[i],function(val){if(!val||!val.trim())return;cats[i]=val.trim();renderCatEditorList();});}
+function saveDocCategories(){persist();renderDocCategorySelect();closeModal('category-editor-modal');showToast('✅ カテゴリを保存しました','#2E7D32');}
+// ===== カテゴリ管理 END =====
+
 function renderBankAccounts(){
   const list=document.getElementById('bank-accounts-list');
   if(!list)return;
@@ -5959,6 +6041,8 @@ function openNewDoc(type,custName){
   document.getElementById('doc-type').value=t;
   document.getElementById('doc-number').value=genNumber(t);
   document.getElementById('doc-date').value=today();
+  updateDocOfficeSelect();
+  renderDocCategorySelect();
   document.getElementById('doc-subject').value='';
   document.getElementById('doc-category').value='';
   document.getElementById('doc-notes').value=settings.notes||'';
@@ -6240,6 +6324,7 @@ function saveDoc(){
     type:document.getElementById('doc-type').value,
     number:document.getElementById('doc-number').value,
     date:document.getElementById('doc-date').value,
+    officeId:document.getElementById('doc-office-select')?.value||'',
     dueDate:document.getElementById('doc-due-date').value,
     customerId:selectedCustId||'',
     customer:sc?sc.name:(document.getElementById('selected-cust-card').querySelector('.cust-name-text')?.textContent||''),
@@ -6292,6 +6377,7 @@ function editDoc(id){
   document.getElementById('doc-date').value=d.date;
   document.getElementById('doc-due-date').value=d.dueDate||'';
   document.getElementById('doc-subject').value=d.subject||'';
+  if(document.getElementById('doc-office-select')){document.getElementById('doc-office-select').value=d.officeId||'';showSelectedOfficeInfo();}
   document.getElementById('doc-category').value=d.category||'';
   document.getElementById('doc-notes').value=d.notes||'';
   var _mc=document.getElementById('doc-monthly-check');if(_mc)_mc.checked=!!d.isMonthly;
@@ -6589,7 +6675,7 @@ function previewDoc(id){
       </div>
       <div class="preview-from">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:3px">${logoHtml?logoHtml.replace('<img ','<img style="max-height:40px" '):''}  <strong style="font-size:13px">${escAttr(d.staff||s.owner||s.company||'（会社名未設定）')}</strong></div>
-        <p>${escAttr(s.address||'')}</p><p>${escAttr(s.tel||'')}${s.fax?' / FAX:'+escAttr(s.fax):''}</p><p>${escAttr(s.email||'')}</p>
+        <p>${escAttr(_getOfficeField(d,'address',s))}</p><p>${escAttr(_getOfficeField(d,'tel',s))}${_getOfficeField(d,'fax',s)?' / FAX:'+escAttr(_getOfficeField(d,'fax',s)):''}</p><p>${escAttr(s.email||'')}</p>
         ${d.staff?`<p style="margin-top:4px">担当：${escAttr(d.staff)}</p>`:''}
         ${d.dueDate&&d.type==='請求書'?`<p>支払期限：${escAttr(d.dueDate)}</p>`:''}
       </div>
@@ -9512,6 +9598,8 @@ function loadSettings(){
   });
   renderBankAccounts();
   updateDocBankSelect();
+  renderOffices();
+  renderDocCategorySelect();
   // defaultTax は税率設定画面で管理
 }
 function saveSettings(){
@@ -14589,6 +14677,25 @@ function executeBulkTaxUpdate(){
     <p style="font-size:12px;color:#666;margin-bottom:8px">上の1/3を折り込む → 中段の宛先が窓に合います</p>
     <div id="envelope-content" style="width:210mm;min-height:297mm;border:1px solid #ccc;margin:0 auto;background:white;font-family:sans-serif;box-sizing:border-box"></div>
   </div>
+</div>
+
+<!-- カテゴリ編集モーダル -->
+<div class="modal-overlay" id="category-editor-modal">
+<div class="modal" style="max-width:420px">
+  <div class="modal-header"><h3>✏️ カテゴリ編集</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('category-editor-modal')">✕</button></div>
+  <div class="modal-body">
+    <p style="font-size:12px;color:var(--text3);margin-bottom:12px">書類のカテゴリ一覧を管理します。</p>
+    <div id="cat-editor-list" style="margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="cat-new-input" placeholder="新しいカテゴリ名" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit" onkeydown="if(event.key==='Enter')addDocCategory()">
+      <button class="btn btn-primary btn-sm" onclick="addDocCategory()">＋ 追加</button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="closeModal('category-editor-modal')">閉じる</button>
+    <button class="btn btn-primary" onclick="saveDocCategories()">💾 保存</button>
+  </div>
+</div>
 </div>
 </body>
 </html>
