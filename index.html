@@ -2980,6 +2980,7 @@ if('serviceWorker' in navigator){
     <button class="btn btn-secondary" onclick="printPreview()">🖨️ 印刷</button>
     <button class="btn btn-secondary" id="btn-envelope" onclick="openEnvelopePreview(currentPreviewDocId)">📬 窓枠封筒</button>
     <button class="btn btn-secondary" id="btn-normal-layout" onclick="switchToNormalLayout()" style="display:none">📄 通常レイアウト</button>
+    <button class="btn btn-secondary" onclick="openDocToTemplate(currentPreviewDocId)">📦 テンプレ作成</button>
     <button class="btn btn-secondary" onclick="sharePreviewLink()">🔗 共有</button>
     <button class="btn btn-primary" onclick="shareDoc()">📤 送信</button>
   </div>
@@ -3911,9 +3912,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.51';
+const APP_VERSION='v3.32.52';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T21:26:40Z';
+const APP_BUILD_TIME='2026-06-26T21:40:51Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7514,7 +7515,81 @@ function switchCustTab(tab,el){
 
 // ===== AI企業調査 =====
 var _aiResearchCustId=null,_aiResearchResult=null;
-async function openCustAiResearch(custId){
+async 
+// ===== 書類からテンプレート作成 =====
+function openDocToTemplate(id){
+  var d=docs.find(function(x){return x.id===id;});
+  if(!d){showToast('書類が見つかりません','#C0392B');return;}
+  var lines=(d.lines||[]).filter(function(l){return l.name;});
+  if(!lines.length){showToast('明細行がありません','#C0392B');return;}
+
+  // カテゴリdatalistを更新
+  var cats=[...new Set(templates.map(function(t){return t.category||'';}).filter(Boolean))].sort();
+  var dl=document.getElementById('dtmpl-cat-list');
+  if(dl)dl.innerHTML=cats.map(function(c){return '<option value="'+escAttr(c)+'">';}).join('');
+
+  // カテゴリに書類の件名ヒントを入れる
+  var catEl=document.getElementById('dtmpl-category');
+  if(catEl)catEl.value='井戸工事';
+
+  // 明細行リストを生成
+  var linesEl=document.getElementById('dtmpl-lines');
+  if(linesEl){
+    var html='<table style="width:100%;border-collapse:collapse">';
+    html+='<thead><tr style="background:var(--surface2)"><th style="padding:8px;width:36px"></th><th style="padding:8px;font-size:12px;text-align:left">品目名</th><th style="padding:8px;font-size:12px;text-align:right;width:100px">単価</th></tr></thead><tbody>';
+    lines.forEach(function(l,i){
+      var price=l.price||0;
+      html+='<tr style="border-top:1px solid var(--border)">';
+      html+='<td style="padding:8px;text-align:center"><input type="checkbox" class="dtmpl-line" value="'+i+'" checked></td>';
+      html+='<td style="padding:8px;font-size:13px">'+escAttr(l.name||'')+'</td>';
+      html+='<td style="padding:8px;font-size:13px;text-align:right">'+fmt(price)+'</td>';
+      html+='</tr>';
+    });
+    html+='</tbody></table>';
+    linesEl.innerHTML=html;
+    document.getElementById('dtmpl-check-all').checked=true;
+  }
+
+  // 現在の書類を保持
+  document.getElementById('doc-to-tmpl-modal').dataset.docId=id;
+  document.getElementById('doc-to-tmpl-modal').classList.add('open');
+}
+
+function saveDocAsTemplates(){
+  var id=document.getElementById('doc-to-tmpl-modal').dataset.docId;
+  var d=docs.find(function(x){return x.id===id;});
+  if(!d)return;
+  var cat=document.getElementById('dtmpl-category').value.trim();
+  if(!cat){showToast('カテゴリを入力してください','#C0392B');return;}
+
+  var checked=[].slice.call(document.querySelectorAll('.dtmpl-line:checked')).map(function(c){return parseInt(c.value);});
+  if(!checked.length){showToast('明細行を選択してください','#C0392B');return;}
+
+  var lines=(d.lines||[]).filter(function(l){return l.name;});
+  var saved=0;
+  checked.forEach(function(i){
+    var l=lines[i];
+    if(!l)return;
+    var t={
+      id:'tmpl-'+Date.now()+'-'+Math.random().toString(36).slice(2,5),
+      category:cat,
+      name:l.name||'',
+      price:l.price||0,
+      unit:'式',
+      tax:l.tax==='non'?'non':(l.tax||'10'),
+      note:''
+    };
+    templates.push(t);
+    saved++;
+  });
+
+  persist();
+  closeModal('doc-to-tmpl-modal');
+  if(typeof renderTemplates==='function')renderTemplates();
+  showToast('✅ '+saved+'件のテンプレートを保存しました','#2E7D32');
+}
+
+function openCustAiResearch(custId){
   var cust=customers.find(function(x){return x.id===custId;});
   if(!cust){showToast('顧客が見つかりません','#C0392B');return;}
   _aiResearchCustId=custId;_aiResearchResult=null;
@@ -21706,6 +21781,32 @@ function executeBulkTaxUpdate(){
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('cust-ai-modal')">閉じる</button>
     <button class="btn btn-primary btn-sm" id="cust-ai-save-url" style="display:none" onclick="saveCustAiAll()">📥 顧客情報に保存</button>
+  </div>
+</div>
+</div>
+
+<!-- テンプレート作成モーダル（書類から） -->
+<div class="modal-overlay" id="doc-to-tmpl-modal">
+<div class="modal" style="max-width:540px">
+  <div class="modal-header"><h3>📦 テンプレートとして保存</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('doc-to-tmpl-modal')">✕</button></div>
+  <div class="modal-body">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">選択した明細行を個別テンプレートとして保存します。</p>
+    <div class="form-group">
+      <label>カテゴリ ＊</label>
+      <input type="text" id="dtmpl-category" list="dtmpl-cat-list" placeholder="例: 井戸工事・便利屋・設備" autocomplete="off" style="width:100%">
+      <datalist id="dtmpl-cat-list"></datalist>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+        <span>保存する明細行を選択</span>
+        <label style="font-size:12px;cursor:pointer;font-weight:400"><input type="checkbox" id="dtmpl-check-all" onchange="document.querySelectorAll('.dtmpl-line').forEach(c=>c.checked=this.checked)"> 全選択</label>
+      </div>
+      <div id="dtmpl-lines" style="border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:300px;overflow-y:auto"></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="closeModal('doc-to-tmpl-modal')">キャンセル</button>
+    <button class="btn btn-primary" onclick="saveDocAsTemplates()">📦 テンプレートを保存</button>
   </div>
 </div>
 </div>
