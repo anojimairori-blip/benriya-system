@@ -2962,7 +2962,8 @@ if('serviceWorker' in navigator){
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('preview-modal')">閉じる</button>
     <button class="btn btn-secondary" onclick="printPreview()">🖨️ 印刷</button>
-    <button class="btn btn-secondary" onclick="openEnvelopePreview(currentPreviewDocId)">📬 窓枠封筒</button>
+    <button class="btn btn-secondary" id="btn-envelope" onclick="openEnvelopePreview(currentPreviewDocId)">📬 窓枠封筒</button>
+    <button class="btn btn-secondary" id="btn-normal-layout" onclick="switchToNormalLayout()" style="display:none">📄 通常レイアウト</button>
     <button class="btn btn-secondary" onclick="sharePreviewLink()">🔗 共有</button>
     <button class="btn btn-primary" onclick="shareDoc()">📤 送信</button>
   </div>
@@ -3893,9 +3894,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.27';
+const APP_VERSION='v3.32.28';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T18:58:36Z';
+const APP_BUILD_TIME='2026-06-26T19:02:39Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4129,53 +4130,42 @@ function openEnvelopePreview(id){
   var s=settings;
   var cust=customers.find(function(x){return x.id===d.customerId;})||{};
   var custName=_escPub(cust.name||d.customer||'');
-  // 「様」の重複を防ぐ：担当者名が会社名と同じ場合は敬称のみ表示
   var contactName=d.contact||'';
   var custHonorific='';
-  if(contactName && contactName!==( cust.name||d.customer||'')){
+  if(contactName&&contactName!==(cust.name||d.customer||'')){
     custHonorific=_escPub(contactName)+' 様';
-  } else {
+  }else{
     custHonorific=cust.honorific||'様';
   }
   var logoHtml=s.logo?'<img src="'+_escPub(s.logo)+'" style="max-height:30px;display:block;margin-left:auto;margin-bottom:3px">':'';
-
-  // 明細行
   var lines=d.lines||[];
   var lineRows='';
   lines.forEach(function(l){
     var amt=(l.qty||1)*(l.price||0);
-    lineRows+='<tr>';
-    lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px">'+_escPub(l.name||'')+'</td>';
+    lineRows+='<tr><td style="padding:4px 6px;border:1px solid #ccc;font-size:11px">'+_escPub(l.name||'')+'</td>';
     lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:center">'+_escPub(String(l.qty||1))+'</td>';
     lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:right">'+fmt(l.price||0)+'</td>';
     lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:center">'+(l.tax==='non'?'税込':'10%')+'</td>';
-    lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:right">'+fmt(amt)+'</td>';
-    lineRows+='</tr>';
+    lineRows+='<td style="padding:4px 6px;border:1px solid #ccc;font-size:11px;text-align:right">'+fmt(amt)+'</td></tr>';
   });
   for(var i=lines.length;i<5;i++){
     lineRows+='<tr><td style="padding:4px 6px;border:1px solid #ccc;height:20px">&nbsp;</td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td></tr>';
   }
-
-  // 振込先
   var banks=settings.bankAccounts||[];
   var bankHtml='';
   if(banks.length){
     bankHtml='<div style="margin-top:8px;font-size:11px"><strong>【お振込先】</strong><br>';
-    banks.forEach(function(b){ bankHtml+=_escPub(b.label||'')+' '+_escPub(b.bank||'')+' '+_escPub(b.account||'')+'<br>'; });
+    banks.forEach(function(b){bankHtml+=_escPub(b.label||'')+' '+_escPub(b.bank||'')+' '+_escPub(b.account||'')+'<br>';});
     bankHtml+='</div>';
   }
-
-
-  // 上部2列
+  var html='<div style="width:100%;font-family:sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:8mm 10mm">';
   html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm">';
-  // 左：宛先
   html+='<div style="width:55%">';
   if(cust.zip)html+='<div style="font-size:12px;margin-bottom:3px">〒'+_escPub(cust.zip)+'</div>';
   if(cust.address)html+='<div style="font-size:12px;line-height:1.7;margin-bottom:5px">'+_escPub(cust.address)+'</div>';
   html+='<div style="font-size:22px;font-weight:700;letter-spacing:1px;margin-bottom:4px">'+custName+'</div>';
   html+='<div style="font-size:14px">'+custHonorific+'</div>';
   html+='</div>';
-  // 右：差出人
   html+='<div style="width:42%;text-align:right">';
   html+='<div style="font-size:11px;color:#555;margin-bottom:2px">NO. '+_escPub(d.number||'')+'</div>';
   html+='<div style="font-size:11px;color:#555;margin-bottom:8px">'+_escPub(d.date||'')+'</div>';
@@ -4184,14 +4174,9 @@ function openEnvelopePreview(id){
   if(s.zip||s.address)html+='<div style="font-size:10px;color:#555;margin-top:2px">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
   if(s.tel)html+='<div style="font-size:10px;color:#555">TEL: '+_escPub(s.tel)+'</div>';
   if(s.email)html+='<div style="font-size:10px;color:#555">'+_escPub(s.email)+'</div>';
-  html+='</div>';
-  html+='</div>';
-
-  // タイトル
-  html+='<div style="text-align:center;font-size:22px;font-weight:700;letter-spacing:6px;border-bottom:2px solid #1a56a0;padding-bottom:4px;margin-bottom:6px;color:#1a56a0">'+_escPub(d.type||'')+'</div>';
+  html+='</div></div>';
+  html+='<div style="text-align:center;font-size:20px;font-weight:700;letter-spacing:6px;border-bottom:2px solid #1a56a0;padding-bottom:4px;margin-bottom:6px;color:#1a56a0">'+_escPub(d.type||'')+'</div>';
   if(d.subject)html+='<div style="font-size:12px;margin-bottom:6px">件名：<strong>'+_escPub(d.subject)+'</strong></div>';
-
-  // 明細テーブル
   html+='<table style="width:100%;border-collapse:collapse;margin-bottom:4mm">';
   html+='<thead><tr style="background:#1a56a0;color:white">';
   html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;text-align:left">品目・作業内容</th>';
@@ -4200,18 +4185,15 @@ function openEnvelopePreview(id){
   html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:8%">税</th>';
   html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:18%">金額</th>';
   html+='</tr></thead><tbody>'+lineRows+'</tbody></table>';
-
-  // 合計
   html+='<div style="display:flex;justify-content:flex-end;margin-bottom:4mm">';
   html+='<table style="border-collapse:collapse;min-width:200px">';
   if(d.tax10||d.tax8){
     html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">小計</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.subtotal||0)+'</td></tr>';
     if(d.tax10)html+='<tr><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px">消費税 10%</td><td style="padding:4px 10px;border:1px solid #ccc;font-size:12px;text-align:right">'+fmt(d.tax10)+'</td></tr>';
   }
-  html+='<tr style="background:#1a56a0;color:white"><td style="padding:6px 10px;border:1px solid #1a56a0;font-size:13px;font-weight:700">合計（税込）</td><td style="padding:6px 10px;border:1px solid #1a56a0;font-size:16px;font-weight:700;text-align:right">'+fmt(d.grandTotal||0)+'</td></tr>';
+  html+='<tr style="background:#1a56a0;color:white"><td style="padding:6px 10px;border:1px solid #1a56a0;font-size:13px;font-weight:700">合計（税込）</td>';
+  html+='<td style="padding:6px 10px;border:1px solid #1a56a0;font-size:16px;font-weight:700;text-align:right">'+fmt(d.grandTotal||0)+'</td></tr>';
   html+='</table></div>';
-
-  // 備考・振込先
   if(d.notes||bankHtml){
     html+='<div style="border-top:1px solid #ccc;padding-top:6px;font-size:11px;color:#555">';
     if(d.notes)html+='<div style="white-space:pre-wrap;margin-bottom:4px">'+_escPub(d.notes)+'</div>';
@@ -4219,9 +4201,20 @@ function openEnvelopePreview(id){
     html+='</div>';
   }
   html+='</div>';
+  // preview-bodyに直接書き込む（別モーダルを使わない）
+  document.getElementById('preview-body').innerHTML=html;
+  var be=document.getElementById('btn-envelope');
+  var bn=document.getElementById('btn-normal-layout');
+  if(be)be.style.display='none';
+  if(bn)bn.style.display='';
+}
 
-  document.getElementById('envelope-content').innerHTML=html;
-  document.getElementById('envelope-modal').style.display='block';
+function switchToNormalLayout(){
+  previewDoc(currentPreviewDocId);
+  var be=document.getElementById('btn-envelope');
+  var bn=document.getElementById('btn-normal-layout');
+  if(be)be.style.display='';
+  if(bn)bn.style.display='none';
 }
 function autoReloadOnOpen(latest){
   // このセッションで既に自動リロード済みか確認
