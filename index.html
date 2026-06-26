@@ -3959,9 +3959,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.56';
+const APP_VERSION='v3.32.57';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T22:37:26Z';
+const APP_BUILD_TIME='2026-06-26T22:55:54Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6688,10 +6688,50 @@ function shareDoc(){
 // → @media print のCSSルールが .preview-doc を見つけられるように、
 //   プレビューモーダルを開いたまま window.print() を呼ぶ
 function printPreview(){
-  // プレビューモーダルが開いていることを保証（念のため）
-  document.getElementById('preview-modal').classList.add('open');
-  // 次フレームで印刷ダイアログを開く（DOM反映を待つ）
-  requestAnimationFrame(()=>{ try{ window.print(); }catch(e){ console.error('[printPreview]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); } });
+  // 書類HTMLのみを別ウィンドウに書き込んで印刷（アプリのコードが混入しない）
+  var body = document.getElementById('preview-body');
+  if(!body){ showToast('プレビューを先に開いてください','#C0392B'); return; }
+  var docHtml = body.innerHTML;
+  var d = docs.find(function(x){return x.id===currentPreviewDocId;});
+  var title = d ? (d.type||'書類')+(d.number?' '+d.number:'') : '書類印刷';
+  var printHtml = '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>'+title+'</title><style>\n'
+    +'*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}\n'
+    +'@page{size:A4;margin:15mm 12mm}\n'
+    +'body{margin:0;padding:0;background:white;font-family:\'Noto Serif JP\',\'Hiragino Mincho Pro\',serif;color:#111}\n'
+    +'.preview-doc{max-width:640px;margin:0 auto;padding:32px 32px;font-family:\'Noto Serif JP\',serif;color:#111}\n'
+    +'.preview-doc.doc-quote{border-top:6px solid #2E7D32}\n'
+    +'.preview-doc.doc-invoice{border-top:6px solid #1565C0}\n'
+    +'.preview-doc.doc-receipt{border-top:6px solid #B71C1C}\n'
+    +'.preview-doc.doc-quote h2{color:#2E7D32;border-bottom:2px solid #2E7D32}\n'
+    +'.preview-doc.doc-invoice h2{color:#1565C0;border-bottom:2px solid #1565C0}\n'
+    +'.preview-doc.doc-receipt h2{color:#B71C1C;border-bottom:2px solid #B71C1C}\n'
+    +'.preview-doc h2{font-size:28px;font-weight:700;text-align:center;padding-bottom:8px;margin:16px 0}\n'
+    +'.doc-number{font-size:12px;color:#888;margin-bottom:3px}\n'
+    +'.preview-header{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start}\n'
+    +'.preview-table{width:100%;border-collapse:collapse;border-bottom:1px solid #BBB;margin:12px 0}\n'
+    +'.preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #BBB}\n'
+    +'.preview-table td{padding:6px 9px;border:1px solid #BBB}\n'
+    +'.preview-total table{margin-left:auto;font-size:16px;border-collapse:collapse}\n'
+    +'.preview-total td{padding:4px 7px}\n'
+    +'.grand td{font-size:24px;font-weight:700;border-top:2px solid #111}\n'
+    +'.preview-doc.doc-invoice .grand td{color:#1565C0;border-top-color:#1565C0}\n'
+    +'.preview-doc.doc-quote .grand td{border-top-color:#2E7D32}\n'
+    +'.preview-doc.doc-receipt .grand td{color:#B71C1C;border-top-color:#B71C1C}\n'
+    +'.preview-notes{margin-top:14px;font-size:13.5px;border-top:1px solid #DDD;padding-top:11px;line-height:1.6;white-space:pre-wrap;word-break:break-word}\n'
+    +'.stamp{display:none}\n'
+    +'.audit-line{display:none}\n'
+    +'.sample-badge{display:none}\n'
+    +'</style></scr'+'ipt>\n'
+    +'window.addEventListener(\'load\',function(){setTimeout(function(){try{window.print();}catch(e){}},400);});\n'
+    +'<\/scr'+'ipt></head><body>'+docHtml+'</body></html>';
+  var w = window.open('','_blank','width=900,height=700');
+  if(!w){
+    showErrorBanner('印刷ウィンドウが開けません','ポップアップブロックを許可してください',{kind:'error'});
+    return;
+  }
+  w.document.open();
+  w.document.write(printHtml);
+  w.document.close();
 }
 
 // 🔗 プレビューから直接共有リンクを発行（送信メニューを開かずに）
