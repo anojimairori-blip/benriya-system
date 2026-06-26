@@ -609,45 +609,10 @@ tr:hover td{background:var(--bg)}
 .preview-doc.doc-invoice .grand td{color:var(--doc-color-invoice);border-top:2px solid var(--doc-color-invoice)}
 .preview-doc.doc-receipt .grand td{color:var(--doc-color-receipt);border-top:2px solid var(--doc-color-receipt)}
 @media print{
-  /* 印刷時はbody全体を非表示にしてpreview-docのみ表示 */
-  body > * { display:none !important; }
-  #preview-modal,
-  #preview-modal .modal,
-  #preview-modal .modal-body,
-  #preview-modal .modal-body > *,
-  .preview-doc,
-  .preview-doc * { display:revert !important; }
-  /* 印刷時はプレビューモーダル以外を全て非表示 */
-  #app-main,#login-screen,#pc-sidebar,#mobile-drawer,#drawer-overlay,
-  #sync-indicator,.modal-overlay:not(#preview-modal),
-  .main-header,.help-btn,.help-overlay,.help-panel,
-  #update-banner,#error-banner-container{
-    display:none !important;
-  }
-  #preview-modal{
-    position:static !important;
-    background:none !important;
-    padding:0 !important;
-    overflow:visible !important;
-  }
-  #preview-modal .modal{
-    max-width:none !important;
-    width:100% !important;
-    box-shadow:none !important;
-    border:none !important;
-    border-radius:0 !important;
-    max-height:none !important;
-    overflow:visible !important;
-  }
-  #preview-modal .modal-body{
-    max-height:none !important;
-    overflow:visible !important;
-    padding:0 !important;
-  }
-  #preview-modal .modal-footer,
-  #preview-modal .modal-header{display:none !important}
   .preview-doc.doc-quote,.preview-doc.doc-invoice,.preview-doc.doc-receipt{border-top-width:6px;border-top-style:solid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .preview-doc h2,.preview-doc .preview-table th,.preview-doc .grand td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* v3.32.5: 備考が長い場合に2ページ目以降に渡れるよう、印刷時のみ overflow を解除。
+     また、行ごとの改ページ制御を入れて読みやすい印刷出力にする。 */
   .preview-doc{overflow:visible !important;max-width:none !important;border:none !important;page-break-inside:auto !important}
   .preview-table tr{page-break-inside:avoid}
   .preview-total{page-break-inside:avoid}
@@ -2943,13 +2908,12 @@ if('serviceWorker' in navigator){
           <input type="text" id="doc-subject" placeholder="エアコン取り付け作業" list="subject-history">
           <datalist id="subject-history"></datalist>
         </div>
-        <div class="form-group">
-          <label style="display:flex;justify-content:space-between;align-items:center">
-            <span>カテゴリ</span>
-            <button type="button" onclick="openCategoryEditor()" style="background:none;border:1px solid var(--border);border-radius:5px;padding:1px 7px;font-size:11px;color:var(--text2);cursor:pointer">✏️ 編集</button>
-          </label>
-          <select id="doc-category" style="width:100%">
+        <div class="form-group"><label>カテゴリ</label>
+          <select id="doc-category">
             <option value="">（カテゴリを選択）</option>
+            <option>引越し・運搬</option><option>清掃・片付け</option><option>修理・修繕</option>
+            <option>電気・設備</option><option>庭・外構</option><option>買い物・代行</option>
+            <option>介護・生活支援</option><option>その他</option>
           </select>
         </div>
       </div>
@@ -3959,9 +3923,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.57';
+const APP_VERSION='v3.32.53';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T22:55:54Z';
+const APP_BUILD_TIME='2026-06-26T22:05:43Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6004,7 +5968,6 @@ function openNewDoc(type,custName){
   document.getElementById('doc-date').value=today();
   updateDocOfficeSelect();
   document.getElementById('doc-subject').value='';
-  renderDocCategorySelect();
   document.getElementById('doc-category').value='';
   document.getElementById('doc-notes').value=settings.notes||'';
   // ステータス選択を動的に構築（デフォルト：最初の項目）
@@ -6688,50 +6651,10 @@ function shareDoc(){
 // → @media print のCSSルールが .preview-doc を見つけられるように、
 //   プレビューモーダルを開いたまま window.print() を呼ぶ
 function printPreview(){
-  // 書類HTMLのみを別ウィンドウに書き込んで印刷（アプリのコードが混入しない）
-  var body = document.getElementById('preview-body');
-  if(!body){ showToast('プレビューを先に開いてください','#C0392B'); return; }
-  var docHtml = body.innerHTML;
-  var d = docs.find(function(x){return x.id===currentPreviewDocId;});
-  var title = d ? (d.type||'書類')+(d.number?' '+d.number:'') : '書類印刷';
-  var printHtml = '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>'+title+'</title><style>\n'
-    +'*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}\n'
-    +'@page{size:A4;margin:15mm 12mm}\n'
-    +'body{margin:0;padding:0;background:white;font-family:\'Noto Serif JP\',\'Hiragino Mincho Pro\',serif;color:#111}\n'
-    +'.preview-doc{max-width:640px;margin:0 auto;padding:32px 32px;font-family:\'Noto Serif JP\',serif;color:#111}\n'
-    +'.preview-doc.doc-quote{border-top:6px solid #2E7D32}\n'
-    +'.preview-doc.doc-invoice{border-top:6px solid #1565C0}\n'
-    +'.preview-doc.doc-receipt{border-top:6px solid #B71C1C}\n'
-    +'.preview-doc.doc-quote h2{color:#2E7D32;border-bottom:2px solid #2E7D32}\n'
-    +'.preview-doc.doc-invoice h2{color:#1565C0;border-bottom:2px solid #1565C0}\n'
-    +'.preview-doc.doc-receipt h2{color:#B71C1C;border-bottom:2px solid #B71C1C}\n'
-    +'.preview-doc h2{font-size:28px;font-weight:700;text-align:center;padding-bottom:8px;margin:16px 0}\n'
-    +'.doc-number{font-size:12px;color:#888;margin-bottom:3px}\n'
-    +'.preview-header{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;align-items:start}\n'
-    +'.preview-table{width:100%;border-collapse:collapse;border-bottom:1px solid #BBB;margin:12px 0}\n'
-    +'.preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #BBB}\n'
-    +'.preview-table td{padding:6px 9px;border:1px solid #BBB}\n'
-    +'.preview-total table{margin-left:auto;font-size:16px;border-collapse:collapse}\n'
-    +'.preview-total td{padding:4px 7px}\n'
-    +'.grand td{font-size:24px;font-weight:700;border-top:2px solid #111}\n'
-    +'.preview-doc.doc-invoice .grand td{color:#1565C0;border-top-color:#1565C0}\n'
-    +'.preview-doc.doc-quote .grand td{border-top-color:#2E7D32}\n'
-    +'.preview-doc.doc-receipt .grand td{color:#B71C1C;border-top-color:#B71C1C}\n'
-    +'.preview-notes{margin-top:14px;font-size:13.5px;border-top:1px solid #DDD;padding-top:11px;line-height:1.6;white-space:pre-wrap;word-break:break-word}\n'
-    +'.stamp{display:none}\n'
-    +'.audit-line{display:none}\n'
-    +'.sample-badge{display:none}\n'
-    +'</style></scr'+'ipt>\n'
-    +'window.addEventListener(\'load\',function(){setTimeout(function(){try{window.print();}catch(e){}},400);});\n'
-    +'<\/scr'+'ipt></head><body>'+docHtml+'</body></html>';
-  var w = window.open('','_blank','width=900,height=700');
-  if(!w){
-    showErrorBanner('印刷ウィンドウが開けません','ポップアップブロックを許可してください',{kind:'error'});
-    return;
-  }
-  w.document.open();
-  w.document.write(printHtml);
-  w.document.close();
+  // プレビューモーダルが開いていることを保証（念のため）
+  document.getElementById('preview-modal').classList.add('open');
+  // 次フレームで印刷ダイアログを開く（DOM反映を待つ）
+  requestAnimationFrame(()=>{ try{ window.print(); }catch(e){ console.error('[printPreview]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); } });
 }
 
 // 🔗 プレビューから直接共有リンクを発行（送信メニューを開かずに）
@@ -7750,92 +7673,6 @@ function showSelectedOfficeInfo(){
   if(o.fax)lines.push('📠 FAX: '+o.fax);
   info.innerHTML=lines.map(function(l){return escAttr(l);}).join('<br>');
   info.style.display=lines.length?'block':'none';
-}
-
-
-// ===== カテゴリ管理 =====
-var _DEFAULT_DOC_CATS=['引越し・運搬','清掃・片付け','修理・修繕','電気・設備','庭・外構','買い物・代行','介護・生活支援','井戸工事','その他'];
-
-function _getDocCategories(){
-  if(!settings.docCategories||!settings.docCategories.length){
-    settings.docCategories=_DEFAULT_DOC_CATS.slice();
-  }
-  return settings.docCategories;
-}
-
-function renderDocCategorySelect(){
-  var sel=document.getElementById('doc-category');
-  if(!sel)return;
-  var current=sel.value;
-  sel.innerHTML='<option value="">（カテゴリを選択）</option>';
-  _getDocCategories().forEach(function(cat){
-    var opt=document.createElement('option');
-    opt.value=cat; opt.textContent=cat;
-    sel.appendChild(opt);
-  });
-  if(current)sel.value=current;
-}
-
-function openCategoryEditor(){
-  renderCatEditorList();
-  openModal('category-editor-modal');
-}
-
-function renderCatEditorList(){
-  var list=document.getElementById('cat-editor-list');
-  if(!list)return;
-  var cats=_getDocCategories();
-  if(!cats.length){list.innerHTML='<p style="font-size:13px;color:var(--text3)">カテゴリなし</p>';return;}
-  list.innerHTML=cats.map(function(cat,i){
-    return '<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--border)">'
-      +'<span style="flex:1;font-size:13px">'+escAttr(cat)+'</span>'
-      +'<button onclick="moveCat('+i+',-1)" '+(i===0?'disabled':'')+' style="background:none;border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:11px">↑</button>'
-      +'<button onclick="moveCat('+i+',1)" '+(i===cats.length-1?'disabled':'')+' style="background:none;border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:11px">↓</button>'
-      +'<button onclick="renameCat('+i+')" style="background:none;border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;color:var(--blue)">✏️</button>'
-      +'<button onclick="deleteCat('+i+')" style="background:none;border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;color:var(--red)">🗑️</button>'
-      +'</div>';
-  }).join('');
-}
-
-function addDocCategory(){
-  var inp=document.getElementById('cat-new-input');
-  var val=(inp?inp.value:'').trim();
-  if(!val){showToast('カテゴリ名を入力してください','#C0392B');return;}
-  var cats=_getDocCategories();
-  if(cats.indexOf(val)>=0){showToast('同じカテゴリが既にあります','#C0392B');return;}
-  cats.push(val);
-  if(inp)inp.value='';
-  renderCatEditorList();
-}
-
-function deleteCat(i){
-  var cats=_getDocCategories();
-  cats.splice(i,1);
-  renderCatEditorList();
-}
-
-function moveCat(i,dir){
-  var cats=_getDocCategories();
-  var j=i+dir;
-  if(j<0||j>=cats.length)return;
-  var tmp=cats[i]; cats[i]=cats[j]; cats[j]=tmp;
-  renderCatEditorList();
-}
-
-function renameCat(i){
-  var cats=_getDocCategories();
-  showInputDialog('カテゴリ名を変更','新しいカテゴリ名',cats[i],function(val){
-    if(!val||!val.trim())return;
-    cats[i]=val.trim();
-    renderCatEditorList();
-  });
-}
-
-function saveDocCategories(){
-  persist();
-  renderDocCategorySelect();
-  closeModal('category-editor-modal');
-  showToast('✅ カテゴリを保存しました','#2E7D32');
 }
 
 function openCustDetail(idOrName,byId){
@@ -9833,7 +9670,6 @@ function loadSettings(){
   renderBankAccounts();
   updateDocBankSelect();
   renderOffices();
-  renderDocCategorySelect();
   // defaultTax は税率設定画面で管理
 }
 function saveSettings(){
@@ -21967,25 +21803,6 @@ function executeBulkTaxUpdate(){
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('cust-ai-modal')">閉じる</button>
     <button class="btn btn-primary btn-sm" id="cust-ai-save-url" style="display:none" onclick="saveCustAiAll()">📥 顧客情報に保存</button>
-  </div>
-</div>
-</div>
-
-<!-- カテゴリ編集モーダル -->
-<div class="modal-overlay" id="category-editor-modal">
-<div class="modal" style="max-width:420px">
-  <div class="modal-header"><h3>✏️ カテゴリ編集</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('category-editor-modal')">✕</button></div>
-  <div class="modal-body">
-    <p style="font-size:12px;color:var(--text3);margin-bottom:12px">書類のカテゴリ一覧を管理します。</p>
-    <div id="cat-editor-list" style="margin-bottom:12px"></div>
-    <div style="display:flex;gap:8px">
-      <input type="text" id="cat-new-input" placeholder="新しいカテゴリ名" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit" onkeydown="if(event.key==='Enter')addDocCategory()">
-      <button class="btn btn-primary btn-sm" onclick="addDocCategory()">＋ 追加</button>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-secondary" onclick="closeModal('category-editor-modal')">閉じる</button>
-    <button class="btn btn-primary" onclick="saveDocCategories()">💾 保存</button>
   </div>
 </div>
 </div>
