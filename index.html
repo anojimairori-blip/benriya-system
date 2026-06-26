@@ -3893,9 +3893,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.23';
+const APP_VERSION='v3.32.24';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T18:35:30Z';
+const APP_BUILD_TIME='2026-06-26T18:38:23Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7113,30 +7113,6 @@ async function renderAndExportAddressLabels(customerList, withBorder){
 <\/scr` + `ipt>
 </head>
 <body>${sheetsHtml}
-<div id="monthly-bulk-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.5);overflow:auto">
-  <div style="background:var(--surface);margin:40px auto;max-width:700px;border-radius:14px;padding:24px">
-    <h3 style="margin:0 0 16px;font-size:18px">📅 月次一括請求</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">月次フラグ付きの請求書を今月分として複製します。</p>
-    <div id="monthly-list" style="border:1px solid var(--border);border-radius:8px;margin-bottom:16px;max-height:400px;overflow-y:auto"></div>
-    <div style="display:flex;gap:10px">
-      <button onclick="execMonthlyBulk()" style="background:var(--blue,#1976D2);color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer">📋 一括複製</button>
-      <button onclick="document.getElementById('monthly-bulk-modal').style.display='none'" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;cursor:pointer">閉じる</button>
-    </div>
-  </div>
-</div>
-<div id="envelope-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.6);overflow:auto">
-  <div style="background:white;margin:20px auto;max-width:900px;border-radius:14px;padding:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h3 style="margin:0;font-size:18px">📬 窓枠封筒（A4三つ折り・長3封筒）</h3>
-      <div style="display:flex;gap:8px">
-        <button onclick="window.print()" style="background:#2E7D32;color:white;border:none;border-radius:8px;padding:8px 18px;cursor:pointer">🖨 印刷</button>
-        <button onclick="document.getElementById('envelope-modal').style.display='none'" style="background:#eee;border:none;border-radius:8px;padding:8px 14px;cursor:pointer">閉じる</button>
-      </div>
-    </div>
-    <p style="font-size:12px;color:#666;margin-bottom:8px">上の1/3を折り込む → 中段の宛先が窓に合います</p>
-    <div id="envelope-content" style="width:210mm;min-height:297mm;border:1px solid #ccc;margin:0 auto;background:white;font-family:sans-serif;box-sizing:border-box"></div>
-  </div>
-</div>
 </body>
 </html>`;
 
@@ -14462,5 +14438,32 @@ function executeBulkTaxUpdate(){
   </div>
 </aside>
 
+
+<!-- ===== 月次一括複製モーダル ===== -->
+<div id="monthly-bulk-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.5);overflow:auto">
+  <div style="background:var(--surface);margin:40px auto;max-width:700px;border-radius:14px;padding:24px">
+    <h3 style="margin:0 0 16px;font-size:18px">📅 月次一括請求</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">月次フラグ付きの請求書を今月分として複製します。</p>
+    <div id="monthly-list" style="border:1px solid var(--border);border-radius:8px;margin-bottom:16px;max-height:400px;overflow-y:auto"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="execMonthlyBulk()" style="background:#1976D2;color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer">📋 一括複製</button>
+      <button onclick="document.getElementById('monthly-bulk-modal').style.display='none'" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;cursor:pointer">閉じる</button>
+    </div>
+  </div>
+</div>
+<!-- ===== 窓枠封筒プレビューモーダル ===== -->
+<div id="envelope-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.6);overflow:auto">
+  <div style="background:white;margin:20px auto;max-width:900px;border-radius:14px;padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin:0;font-size:18px">📬 窓枠封筒（A4三つ折り・長3封筒）</h3>
+      <div style="display:flex;gap:8px">
+        <button onclick="window.print()" style="background:#2E7D32;color:white;border:none;border-radius:8px;padding:8px 18px;cursor:pointer">🖨 印刷</button>
+        <button onclick="document.getElementById('envelope-modal').style.display='none'" style="background:#eee;border:none;border-radius:8px;padding:8px 14px;cursor:pointer">閉じる</button>
+      </div>
+    </div>
+    <p style="font-size:12px;color:#666;margin-bottom:8px">上の1/3を折り込む → 中段の宛先が窓に合います</p>
+    <div id="envelope-content" style="width:210mm;min-height:297mm;border:1px solid #ccc;margin:0 auto;background:white;font-family:sans-serif;box-sizing:border-box"></div>
+  </div>
+</div>
 </body>
 </html>
