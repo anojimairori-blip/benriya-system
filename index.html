@@ -873,7 +873,7 @@ select{appearance:auto}
 .preview-total table{margin-left:auto;font-size:16px}
 .preview-total td{padding:4px 7px}
 .preview-total .grand{font-size:24px;font-weight:700;border-top:2px solid #111}
-.preview-notes{margin-top:14px;font-size:13.5px;border-top:1px solid #DDD;padding-top:11px;line-height:2;white-space:pre-wrap;word-break:break-word}
+.preview-notes{margin-top:14px;font-size:13.5px;border-top:1px solid #DDD;padding-top:11px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .doc-number{font-size:12px;color:#888;margin-bottom:3px}
 .stamp{width:56px;height:56px;border:2px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--red);margin-left:auto;margin-top:10px}
 
@@ -3894,9 +3894,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.28';
+const APP_VERSION='v3.32.29';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T19:02:39Z';
+const APP_BUILD_TIME='2026-06-26T19:08:18Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6544,7 +6544,7 @@ function previewDoc(id){
       <div class="preview-to">
         <p class="company">${escAttr(d.customer||'（顧客名未入力）')}　${escAttr(c?.honorific!=null?c.honorific:'御中')}</p>
         ${c?.dept?`<p style="font-size:12px;color:#666;margin-top:2px">${escAttr(c.dept)}</p>`:''}
-        ${d.contact?`<p style="font-size:12px;color:#555;margin-top:2px">担当：${escAttr(d.contact)} 様</p>`:''}
+        ${d.contact&&d.contact!==d.customer?`<p style="font-size:12px;color:#555;margin-top:2px">担当：${escAttr(d.contact)} 様</p>`:''}
         ${c?.address?`<p style="font-size:11px;color:#888;margin-top:4px">〒${escAttr(c.zip||'')} ${escAttr(c.address)}</p>`:''}
         ${c?.tel?`<p style="font-size:11px;color:#888">Tel: ${escAttr(c.tel)}</p>`:''}
         ${c?.fax?`<p style="font-size:11px;color:#888">Fax: ${escAttr(c.fax)}</p>`:''}
@@ -6580,7 +6580,11 @@ function previewDoc(id){
       <tr class="grand"><td style="padding-top:8px;font-weight:700;font-size:20px">合計（税込）</td><td style="text-align:right;padding-top:8px;font-size:20px;font-weight:700">${fmt(d.grandTotal)}</td></tr>
     </table></div>
     ${d.type==='請求書'?(()=>{const _banks=settings.bankAccounts||[];const _sel=_banks.find(b=>b.id===d.bankSelection)||(_banks.length?_banks[0]:null);const _bank=_sel?_sel.bank:s.bank;const _acct=_sel?_sel.account:s.account||'';return _bank?`<div class="preview-notes"><strong>お振込先：</strong>${escAttr(_sel?.label?_sel.label+' ':'')}${escAttr(_bank)}　${escAttr(_acct)}</div>`:'';})():''}
-    ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr(d.notes)}</div>`:''}
+    ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr(d.notes.replace(/
+{2,}/g,"
+").replace(/【お振込先】
+/g,"【お振込先】").replace(/
+(普通|当座)/g," $1"))}</div>`:''}
     ${d.type==='領収書'?`<div style="text-align:right;margin-top:12px"><div class="stamp">領収済</div></div>`:''}
   </div>`;
   document.getElementById('preview-modal').classList.add('open');
