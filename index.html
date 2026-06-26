@@ -3911,9 +3911,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.44';
+const APP_VERSION='v3.32.45';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:41:29Z';
+const APP_BUILD_TIME='2026-06-26T20:46:14Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7512,6 +7512,61 @@ function switchCustTab(tab,el){
   if(tab!=='list'){const map={quotes:'見積書',invoices:'請求書',receipts:'領収書'};renderDocRows('cust-'+tab+'-body',[...docs].filter(d=>d.type===map[tab]).reverse());}
 }
 
+// ===== AI企業調査 =====
+var _aiResearchCustId=null,_aiResearchResult=null;
+async function openCustAiResearch(custId){
+  var cust=customers.find(function(x){return x.id===custId;});
+  if(!cust){showToast('顧客が見つかりません','#C0392B');return;}
+  _aiResearchCustId=custId;_aiResearchResult=null;
+  var body=document.getElementById('cust-ai-body');
+  var saveBtn=document.getElementById('cust-ai-save-url');
+  if(body)body.innerHTML='<div style="text-align:center;padding:40px;color:var(--text2)"><div style="font-size:28px;margin-bottom:8px">⏳</div><div>調査中...</div><div style="font-size:11px;margin-top:4px;color:var(--text3)">10〜20秒程度かかります</div></div>';
+  if(saveBtn)saveBtn.style.display='none';
+  document.getElementById('cust-ai-modal').classList.add('open');
+  var parts=[];
+  if(cust.name)parts.push('会社名: '+cust.name);
+  if(cust.address)parts.push('住所: '+cust.address);
+  if(cust.tel)parts.push('電話: '+cust.tel);
+  var prompt='以下の会社・顧客についてWebで調査し、JSONのみで回答してください。\n'+parts.join(' / ')+'\n\n以下のJSON形式で返してください（不明な場合はnull）:\n{"url":"公式URL","ceo":"代表者名","employees":"従業員数・規模","description":"事業内容100文字以内","rating":"評価","reputation":"評判要約150文字以内","note":"特記事項"}';
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,tools:[{"type":"web_search_20250305","name":"web_search"}],messages:[{role:'user',content:prompt}]})});
+    var data=await res.json();
+    var textContent=(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('\n');
+    var jsonMatch=textContent.match(/\{[\s\S]*?\}/);
+    if(jsonMatch){
+      _aiResearchResult=JSON.parse(jsonMatch[0]);
+      _showCustAiResult(_aiResearchResult,cust.name);
+      if(_aiResearchResult.url&&saveBtn)saveBtn.style.display='';
+    }else{
+      if(body)body.innerHTML='<div style="padding:20px;color:var(--text2);text-align:center">情報を取得できませんでした。<br>法人名や住所を確認してください。</div>';
+    }
+  }catch(e){
+    if(body)body.innerHTML='<div style="padding:20px;color:#C0392B">エラー: '+escAttr(String(e.message||e))+'</div>';
+  }
+}
+function _showCustAiResult(r,name){
+  var body=document.getElementById('cust-ai-body');
+  if(!body)return;
+  var html='<div style="padding:4px"><h4 style="margin:0 0 12px;font-size:15px">🔍 '+escAttr(name)+'</h4>';
+  [{label:'🌐 公式URL',val:r.url,isUrl:true},{label:'👤 代表者名',val:r.ceo},{label:'👥 従業員・規模',val:r.employees},{label:'📋 事業内容',val:r.description},{label:'⭐ 評価',val:r.rating},{label:'💬 評判・口コミ',val:r.reputation},{label:'📝 備考',val:r.note}].forEach(function(row){
+    if(!row.val)return;
+    html+='<div style="padding:8px 0;border-bottom:1px solid var(--border)"><div style="font-size:11px;color:var(--text3);margin-bottom:3px">'+row.label+'</div>';
+    html+=row.isUrl?'<a href="'+escAttr(row.val)+'" target="_blank" rel="noopener" style="color:var(--blue);font-size:13px;word-break:break-all">'+escAttr(row.val)+'</a>':'<div style="font-size:13px;line-height:1.6">'+escAttr(row.val)+'</div>';
+    html+='</div>';
+  });
+  body.innerHTML=html+'</div>';
+}
+function saveCustAiUrl(){
+  if(!_aiResearchCustId||!(_aiResearchResult&&_aiResearchResult.url))return;
+  var idx=customers.findIndex(function(x){return x.id===_aiResearchCustId;});
+  if(idx<0)return;
+  customers[idx].url=_aiResearchResult.url;
+  persist();
+  showToast('✅ URLを顧客情報に保存しました','#2E7D32');
+  var btn=document.getElementById('cust-ai-save-url');
+  if(btn)btn.style.display='none';
+}
+
 function openCustDetail(idOrName,byId){
   const c=byId?customers.find(x=>x.id===idOrName):customers.find(x=>x.name===idOrName);
   if(!c)return;
@@ -7593,7 +7648,7 @@ function openCustDetail(idOrName,byId){
   document.getElementById('cust-q-btn').onclick=()=>{closeModal('cust-detail-modal');openNewDoc('見積書',c.name);};
   document.getElementById('cust-i-btn').onclick=()=>{closeModal('cust-detail-modal');openNewDoc('請求書',c.name);};
   document.getElementById('cust-r-btn').onclick=()=>{closeModal('cust-detail-modal');openNewDoc('領収書',c.name);};
-  document.getElementById('cust-ai-btn').onclick=()=>openCustAiResearch(c.id);
+  document.getElementById('cust-ai-btn').onclick=()=>{if(typeof openCustAiResearch==='function')openCustAiResearch(c.id);else showToast('AI調査機能を準備中','#888');}; 
   document.getElementById('cust-detail-modal').classList.add('open');
 }
 
