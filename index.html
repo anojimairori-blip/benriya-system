@@ -3911,9 +3911,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.48';
+const APP_VERSION='v3.32.49';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T21:12:27Z';
+const APP_BUILD_TIME='2026-06-26T21:16:38Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7656,7 +7656,7 @@ function openCustDetail(idOrName,byId){
               <button class="btn btn-secondary btn-sm" style="padding:2px 6px;font-size:11px;flex-shrink:0" onclick="previewDoc('${d.id}')">表示</button>
             </div>`;}).join(''):'<p style="font-size:13px;color:var(--text3)">取引履歴なし</p>'}
         </div>
-        \${(()=>{const ai=c.aiResearch;if(!ai)return '';let h='<div style="margin-top:10px;background:var(--surface2);border-radius:8px;padding:10px;font-size:12px"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between"><span>🔍 AI調査情報</span><span>'+escAttr(ai.updatedAt||'')+'</span></div>';if(ai.ceo)h+='<div class="detail-row"><span class="dl">代表者</span><span>'+escAttr(ai.ceo)+'</span></div>';if(ai.employees)h+='<div class="detail-row"><span class="dl">規模</span><span>'+escAttr(ai.employees)+'</span></div>';if(ai.description)h+='<div class="detail-row"><span class="dl">事業内容</span><span style="color:var(--text2)">'+escAttr(ai.description)+'</span></div>';if(ai.rating)h+='<div class="detail-row"><span class="dl">評価</span><span>'+escAttr(ai.rating)+'</span></div>';if(ai.reputation)h+='<div class="detail-row"><span class="dl">評判</span><span style="color:var(--text2)">'+escAttr(ai.reputation)+'</span></div>';h+='</div>';return h;})()}
+        ${(()=>{const ai=c.aiResearch;if(!ai)return '';let h='<div style="margin-top:10px;background:var(--surface2);border-radius:8px;padding:10px;font-size:12px"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between"><span>🔍 AI調査情報</span><span>'+escAttr(ai.updatedAt||'')+'</span></div>';if(ai.ceo)h+='<div class="detail-row"><span class="dl">代表者</span><span>'+escAttr(ai.ceo)+'</span></div>';if(ai.employees)h+='<div class="detail-row"><span class="dl">規模</span><span>'+escAttr(ai.employees)+'</span></div>';if(ai.description)h+='<div class="detail-row"><span class="dl">事業内容</span><span style="color:var(--text2)">'+escAttr(ai.description)+'</span></div>';if(ai.rating)h+='<div class="detail-row"><span class="dl">評価</span><span>'+escAttr(ai.rating)+'</span></div>';if(ai.reputation)h+='<div class="detail-row"><span class="dl">評判</span><span style="color:var(--text2)">'+escAttr(ai.reputation)+'</span></div>';h+='</div>';return h;})()}
       </div>
     </div>`;
   document.getElementById('cust-q-btn').onclick=()=>{closeModal('cust-detail-modal');openNewDoc('見積書',c.name);};
