@@ -2879,6 +2879,7 @@ if('serviceWorker' in navigator){
           </div>
           <div class="form-row cols2" style="margin-bottom:8px">
             <div class="form-group" style="grid-column:span 2"><label>メールアドレス</label><input type="email" id="nc-email"></div>
+            <div class="form-group" style="grid-column:span 2"><label>公式URL</label><input type="url" id="nc-url" placeholder="https://"></div>
           </div>
           <div class="form-row" style="margin-bottom:0">
             <div class="form-group"><label>メモ</label><textarea id="nc-memo" rows="2" style="font-family:inherit;resize:vertical"></textarea></div>
@@ -3106,6 +3107,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
   <div class="modal-body" id="cust-detail-body"></div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('cust-detail-modal')">閉じる</button>
+    <button class="btn btn-secondary btn-sm" id="cust-ai-btn">🔍 AI調査</button>
     <button class="btn btn-gold btn-sm" id="cust-q-btn">＋ 見積書</button>
     <button class="btn btn-blue btn-sm" id="cust-i-btn">＋ 請求書</button>
     <button class="btn btn-primary btn-sm" id="cust-r-btn">＋ 領収書</button>
@@ -3909,9 +3911,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.43';
+const APP_VERSION='v3.32.44';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:34:35Z';
+const APP_BUILD_TIME='2026-06-26T20:41:29Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6069,7 +6071,7 @@ function openInlineNewCust(){
   const csp=document.getElementById('cust-search-panel');
   if(csp) csp.style.display='none';
   // v3.26.0: クリア対象に新フィールドとペーストエリアを追加
-  ['nc-name','nc-tel','nc-fax','nc-zip','nc-address','nc-email','nc-memo','nc-paste-area'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['nc-name','nc-tel','nc-fax','nc-zip','nc-address','nc-email','nc-url','nc-memo','nc-paste-area'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   // 敬称はデフォルト「御中」
   const h=document.getElementById('nc-honorific'); if(h) h.value='御中';
   const st=document.getElementById('nc-paste-status'); if(st) st.textContent='';
@@ -6089,6 +6091,7 @@ function saveInlineNewCust(){
     address:document.getElementById('nc-address')?.value||'',
     dept:'',
     category:'',
+    url:document.getElementById('nc-url')?.value||'',
     memo:document.getElementById('nc-memo')?.value||'',
     contacts:[]
   };
@@ -7590,6 +7593,7 @@ function openCustDetail(idOrName,byId){
   document.getElementById('cust-q-btn').onclick=()=>{closeModal('cust-detail-modal');openNewDoc('見積書',c.name);};
   document.getElementById('cust-i-btn').onclick=()=>{closeModal('cust-detail-modal');openNewDoc('請求書',c.name);};
   document.getElementById('cust-r-btn').onclick=()=>{closeModal('cust-detail-modal');openNewDoc('領収書',c.name);};
+  document.getElementById('cust-ai-btn').onclick=()=>openCustAiResearch(c.id);
   document.getElementById('cust-detail-modal').classList.add('open');
 }
 
@@ -14578,6 +14582,18 @@ function executeBulkTaxUpdate(){
     <p style="font-size:12px;color:#666;margin-bottom:8px">上の1/3を折り込む → 中段の宛先が窓に合います</p>
     <div id="envelope-content" style="width:210mm;min-height:297mm;border:1px solid #ccc;margin:0 auto;background:white;font-family:sans-serif;box-sizing:border-box"></div>
   </div>
+</div>
+
+<!-- AI企業調査モーダル -->
+<div class="modal-overlay" id="cust-ai-modal">
+<div class="modal" style="max-width:560px">
+  <div class="modal-header"><h3>🔍 AI企業調査</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('cust-ai-modal')">✕</button></div>
+  <div class="modal-body" id="cust-ai-body" style="max-height:60vh;overflow-y:auto"></div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="closeModal('cust-ai-modal')">閉じる</button>
+    <button class="btn btn-primary btn-sm" id="cust-ai-save-url" style="display:none" onclick="saveCustAiUrl()">🔗 URLを顧客情報に保存</button>
+  </div>
+</div>
 </div>
 </body>
 </html>
