@@ -3894,9 +3894,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.29';
+const APP_VERSION='v3.32.30';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T19:11:59Z';
+const APP_BUILD_TIME='2026-06-26T19:13:59Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4163,14 +4163,13 @@ function openEnvelopePreview(id){
   html+='<div style="width:55%">';
   if(cust.zip)html+='<div style="font-size:12px;margin-bottom:3px">〒'+_escPub(cust.zip)+'</div>';
   if(cust.address)html+='<div style="font-size:12px;line-height:1.7;margin-bottom:5px">'+_escPub(cust.address)+'</div>';
-  html+='<div style="font-size:22px;font-weight:700;letter-spacing:1px;margin-bottom:4px">'+custName+'</div>';
-  html+='<div style="font-size:14px">'+custHonorific+'</div>';
+  html+='<div style="font-size:22px;font-weight:700;letter-spacing:1px;margin-bottom:4px">'+custName+' <span style="font-size:15px;font-weight:400">'+custHonorific+'</span></div>';
   html+='</div>';
   html+='<div style="width:42%;text-align:right">';
   html+='<div style="font-size:11px;color:#555;margin-bottom:2px">NO. '+_escPub(d.number||'')+'</div>';
   html+='<div style="font-size:11px;color:#555;margin-bottom:8px">'+_escPub(d.date||'')+'</div>';
   html+=logoHtml;
-  html+='<div style="font-size:13px;font-weight:700">'+_escPub(s.company||'')+'</div>';
+  html+='<div style="font-size:13px;font-weight:700">'+_escPub(s.owner||s.company||'')+'</div>';
   if(s.zip||s.address)html+='<div style="font-size:10px;color:#555;margin-top:2px">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
   if(s.tel)html+='<div style="font-size:10px;color:#555">TEL: '+_escPub(s.tel)+'</div>';
   if(s.email)html+='<div style="font-size:10px;color:#555">'+_escPub(s.email)+'</div>';
