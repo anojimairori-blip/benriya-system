@@ -3909,9 +3909,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.41';
+const APP_VERSION='v3.32.42';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:23:01Z';
+const APP_BUILD_TIME='2026-06-26T20:31:43Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4845,6 +4845,8 @@ const HELP_CONTENT = {
       <div class="hp-step"><div class="hp-step-num">6</div><div class="hp-step-txt">税率を確認(デフォルト10%)して保存</div></div>
       <h4>プレビュー・共有</h4>
       <p><strong>👁️ プレビュー</strong>で印刷イメージ確認 → <strong>📤 共有</strong>からPDFダウンロード/共有リンク/LINE送信/メール送信が可能。</p>
+      <h4>📬 窓枠封筒印刷</h4>
+      <p>プレビュー画面の <strong>📬 窓枠封筒</strong> ボタンで封筒レイアウトに切り替え。A4三つ折りで宛先が封筒の窓に合います。</p>
       <div class="hp-tip">💡 見積書一覧で <strong>→ 請求書化</strong> ボタンを押すと、内容を引き継いで請求書を作れます。</div>
       <div class="hp-warn">⚠️ 書類番号は自動採番です。基本的に手動で変更しないでください。</div>
     `
@@ -4857,9 +4859,19 @@ const HELP_CONTENT = {
       <p>見積書からの引き継ぎが便利です: 見積書一覧で対象書類の <strong>→ 請求書化</strong> をクリックすると、顧客情報・明細・金額がそのままコピーされた状態でフォームが開きます。</p>
       <h4>見積書との違い</h4>
       <ul>
-        <li>プレフィックスは <code>INV</code> (例: INV-2604-012)</li>
+        <li>プレフィックスは <code>INV</code> (例: INV-2606-002)</li>
         <li><strong>支払期限</strong> の入力欄がある(通常 月末/翌月末)</li>
+        <li><strong>お振込先口座</strong> のプルダウンがある(会社情報で複数登録可)</li>
       </ul>
+      <h4>📅 月次一括複製</h4>
+      <p>サーバー管理費など毎月定期的に発行する請求書を効率化できます。</p>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt">請求書を編集 → <strong>📅 月次請求</strong> にチェックを入れて保存</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">翌月になったら請求書一覧ヘッダーの <strong>📅 月次一括</strong> をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">対象書類を確認してチェック → <strong>📋 一括複製</strong></div></div>
+      <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">今日の日付・新番号で下書きが自動生成される</div></div>
+      <h4>📬 窓枠封筒印刷</h4>
+      <p>プレビュー画面の <strong>📬 窓枠封筒</strong> ボタンで、A4三つ折り・長3封筒に対応したレイアウトに切り替わります。</p>
+      <p>そのまま <strong>🖨️ 印刷</strong> すれば宛名書きなしで封入できます。<strong>📄 通常レイアウト</strong> で元に戻せます。</p>
       <h4>ステータス管理</h4>
       <p>作成 → 送付済 → 入金済、と段階的に変えていきます。支払期限が近い/過ぎている請求書は、左メニューの <strong>🔔 支払いアラート</strong> で一覧チェックできます。</p>
       <div class="hp-tip">💡 入金があったら「入金管理」ページで入金額・日付・方法を記録すると、経理がきれいに追えます。</div>
@@ -4907,9 +4919,15 @@ const HELP_CONTENT = {
       <div class="hp-step"><div class="hp-step-num">4</div><div class="hp-step-txt">保存</div></div>
       <h4>表示切り替え</h4>
       <p>上部のボタンで「月」「週」「日」表示を切り替え可能。作業の詳細を見たい時は「日」がおすすめ。</p>
-      <h4>Googleカレンダー連携</h4>
+      <h4>📅 Googleカレンダー連携</h4>
       <p><strong>📅 Google連携</strong> ボタンから設定。ONにすると追加した予定が自動的にGoogleカレンダーに同期され、スマホの標準カレンダーでも確認できます。</p>
-      <div class="hp-warn">⚠️ 権限エラーが出た場合、「🔐 Google権限を確認」から一度権限を削除 → 再ログインしてください。</div>
+      <p>カレンダー上部に同期方向のバッジが表示されます:</p>
+      <ul>
+        <li><strong>📋Flexsys → 🗓Google ✅</strong> - Flexsysの予定はGoogleに反映されます</li>
+        <li><strong>🗓Google → 📋Flexsys ❌</strong> - Google側で入力した予定はFlexsysには反映されません</li>
+        <li><strong>🔄 最終同期</strong> - 直近の同期日時が表示されます</li>
+      </ul>
+      <div class="hp-warn">⚠️ 権限エラーが出た場合、一度ログアウト → 再ログインで解決します。Googleトークンの有効期限は1時間です。</div>
     `
   },
   'alerts': {
@@ -4999,12 +5017,13 @@ const HELP_CONTENT = {
       <p>書類に印字される自社情報を登録・編集するページです。</p>
       <h4>登録する情報</h4>
       <ul>
-        <li>会社名・代表者名</li>
+        <li>会社名・代表者名（プレビューのロゴ右に表示）</li>
         <li>住所・電話・FAX・メール</li>
-        <li>振込先銀行口座</li>
-        <li>会社ロゴ(画像アップロード)</li>
+        <li><strong>振込先銀行口座（複数登録可）</strong> - ＋口座を追加で複数登録。請求書作成時にプルダウンで選択できます</li>
+        <li>会社ロゴ(画像アップロード) - プレビューの右上に表示</li>
         <li>支払いアラートの日数</li>
       </ul>
+      <div class="hp-tip">💡 振込先を複数登録しておくと、請求書ごとに振込先を使い分けられます。</div>
       <div class="hp-warn">⚠️ ここで設定した情報は書類に印字されるので、誤字脱字がないよう十分確認してください。</div>
     `
   },
