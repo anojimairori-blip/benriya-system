@@ -1536,7 +1536,7 @@ if('serviceWorker' in navigator){
   integrity="sha384-gUPFb+preAP7G8z2MPaXHkJsLqrQFY8fIMTOMo4skGOxG/PcHI324sHK/ZdM8okF"
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
-<body>
+<body style="opacity:0;transition:opacity 0.2s ease">
 
 <!-- ===== LOGIN SCREEN ===== -->
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
@@ -3911,9 +3911,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.49';
+const APP_VERSION='v3.32.50';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T21:16:38Z';
+const APP_BUILD_TIME='2026-06-26T21:22:16Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -9906,6 +9906,7 @@ function initFirebaseAuth(){
     const lt=document.getElementById('login-title');
     if(lt) lt.textContent='Flexsys2026 '+APP_VERSION;
     ls.style.display='flex';
+    document.body.style.opacity='1'; // FOUC対策: ログイン画面表示後に表示
     document.getElementById('app') && (document.querySelector('.app').style.display='none');
   }
 
@@ -9947,6 +9948,7 @@ function initFirebaseAuth(){
       if(mue) mue.textContent=user.email||'';
       // データ読み込み（常にマスターUIDのデータを参照）
       await fbLoadAll(MASTER_UID);
+      document.body.style.opacity='1'; // FOUC対策: データ読み込み後に表示
       // 最終ログイン時刻を記録（全メンバー共有）
       try{ await recordMemberLogin(user); }catch(e){}
       initAppAfterAuth();
