@@ -3911,9 +3911,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.45';
+const APP_VERSION='v3.32.46';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:46:14Z';
+const APP_BUILD_TIME='2026-06-26T20:49:54Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -7556,15 +7556,29 @@ function _showCustAiResult(r,name){
   });
   body.innerHTML=html+'</div>';
 }
-function saveCustAiUrl(){
-  if(!_aiResearchCustId||!(_aiResearchResult&&_aiResearchResult.url))return;
+function saveCustAiUrl(){saveCustAiAll();}
+function saveCustAiAll(){
+  if(!_aiResearchCustId||!_aiResearchResult)return;
   var idx=customers.findIndex(function(x){return x.id===_aiResearchCustId;});
   if(idx<0)return;
-  customers[idx].url=_aiResearchResult.url;
+  if(_aiResearchResult.url)customers[idx].url=_aiResearchResult.url;
+  var now=new Date();
+  var dateStr=now.getFullYear()+'/'+(now.getMonth()+1).toString().padStart(2,'0')+'/'+now.getDate().toString().padStart(2,'0');
+  customers[idx].aiResearch={
+    ceo:_aiResearchResult.ceo||null,
+    employees:_aiResearchResult.employees||null,
+    description:_aiResearchResult.description||null,
+    rating:_aiResearchResult.rating||null,
+    reputation:_aiResearchResult.reputation||null,
+    note:_aiResearchResult.note||null,
+    updatedAt:dateStr
+  };
   persist();
-  showToast('✅ URLを顧客情報に保存しました','#2E7D32');
+  showToast('✅ AI調査情報を顧客情報に保存しました','#2E7D32');
   var btn=document.getElementById('cust-ai-save-url');
   if(btn)btn.style.display='none';
+  closeModal('cust-ai-modal');
+  openCustDetail(_aiResearchCustId,true);
 }
 
 function openCustDetail(idOrName,byId){
@@ -7601,6 +7615,8 @@ function openCustDetail(idOrName,byId){
           ${c.email?`<div class="detail-row"><span class="dl">メール</span><span>${c.email}</span></div>`:''}
           ${c.dept?`<div class="detail-row"><span class="dl">部署</span><span>${c.dept}</span></div>`:''}
           ${c.memo?`<div class="detail-row"><span class="dl">メモ</span><span style="color:var(--text2)">${escAttr(c.memo)}</span></div>`:''}
+          ${c.url?`<div class="detail-row"><span class="dl">公式URL</span><span><a href="${escAttr(c.url)}" target="_blank" rel="noopener" style="color:var(--blue);word-break:break-all">${escAttr(c.url)}</a></span></div>`:''}
+          ${(()=>{const ai=c.aiResearch;if(!ai)return '';let h='<div style="margin-top:8px;background:var(--surface2);border-radius:8px;padding:10px;font-size:12px">';h+='<div style="font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between"><span>🔍 AI調査情報</span><span>'+escAttr(ai.updatedAt||'')+'</span></div>';if(ai.ceo)h+='<div class="detail-row"><span class="dl">代表者</span><span>'+escAttr(ai.ceo)+'</span></div>';if(ai.employees)h+='<div class="detail-row"><span class="dl">規模</span><span>'+escAttr(ai.employees)+'</span></div>';if(ai.description)h+='<div class="detail-row"><span class="dl">事業内容</span><span style="color:var(--text2)">'+escAttr(ai.description)+'</span></div>';if(ai.rating)h+='<div class="detail-row"><span class="dl">評価</span><span>'+escAttr(ai.rating)+'</span></div>';if(ai.reputation)h+='<div class="detail-row"><span class="dl">評判</span><span style="color:var(--text2)">'+escAttr(ai.reputation)+'</span></div>';h+='</div>';return h;})()}
         </div>
         <!-- 表記サンプル -->
         <div class="detail-section" style="margin-bottom:10px">
@@ -14646,7 +14662,7 @@ function executeBulkTaxUpdate(){
   <div class="modal-body" id="cust-ai-body" style="max-height:60vh;overflow-y:auto"></div>
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('cust-ai-modal')">閉じる</button>
-    <button class="btn btn-primary btn-sm" id="cust-ai-save-url" style="display:none" onclick="saveCustAiUrl()">🔗 URLを顧客情報に保存</button>
+    <button class="btn btn-primary btn-sm" id="cust-ai-save-url" style="display:none" onclick="saveCustAiAll()">📥 顧客情報に保存</button>
   </div>
 </div>
 </div>
