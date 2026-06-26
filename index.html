@@ -609,6 +609,14 @@ tr:hover td{background:var(--bg)}
 .preview-doc.doc-invoice .grand td{color:var(--doc-color-invoice);border-top:2px solid var(--doc-color-invoice)}
 .preview-doc.doc-receipt .grand td{color:var(--doc-color-receipt);border-top:2px solid var(--doc-color-receipt)}
 @media print{
+  /* 印刷時はbody全体を非表示にしてpreview-docのみ表示 */
+  body > * { display:none !important; }
+  #preview-modal,
+  #preview-modal .modal,
+  #preview-modal .modal-body,
+  #preview-modal .modal-body > *,
+  .preview-doc,
+  .preview-doc * { display:revert !important; }
   /* 印刷時はプレビューモーダル以外を全て非表示 */
   #app-main,#login-screen,#pc-sidebar,#mobile-drawer,#drawer-overlay,
   #sync-indicator,.modal-overlay:not(#preview-modal),
@@ -3951,9 +3959,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.55';
+const APP_VERSION='v3.32.56';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T22:22:05Z';
+const APP_BUILD_TIME='2026-06-26T22:37:26Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
