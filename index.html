@@ -3894,9 +3894,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.31';
+const APP_VERSION='v3.32.32';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T19:17:36Z';
+const APP_BUILD_TIME='2026-06-26T19:20:41Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6579,7 +6579,7 @@ function previewDoc(id){
       <tr class="grand"><td style="padding-top:8px;font-weight:700;font-size:20px">合計（税込）</td><td style="text-align:right;padding-top:8px;font-size:20px;font-weight:700">${fmt(d.grandTotal)}</td></tr>
     </table></div>
     ${d.type==='請求書'?(()=>{const _banks=settings.bankAccounts||[];const _sel=_banks.find(b=>b.id===d.bankSelection)||(_banks.length?_banks[0]:null);const _bank=_sel?_sel.bank:s.bank;const _acct=_sel?_sel.account:s.account||'';return _bank?`<div class="preview-notes"><strong>お振込先：</strong>${escAttr(_sel?.label?_sel.label+' ':'')}${escAttr(_bank)}　${escAttr(_acct)}</div>`:'';})():''}
-    ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr(formatNotes(d.notes))}</div>`:''}
+    ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr((d.notes||'').replace(/\n\n+/g,'\n'))}</div>`:''}
     ${d.type==='領収書'?`<div style="text-align:right;margin-top:12px"><div class="stamp">領収済</div></div>`:''}
   </div>`;
   document.getElementById('preview-modal').classList.add('open');
