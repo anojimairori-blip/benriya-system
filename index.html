@@ -611,10 +611,18 @@ tr:hover td{background:var(--bg)}
 @media print{
   /* 書類プレビュー印刷: body.printing-preview クラスで制御 */
   body.printing-preview > * { display:none !important; visibility:hidden !important; }
+  /* 窓枠封筒印刷: body.printing-envelope クラスで制御 */
+  @page { margin:15mm 20mm }
+  body.printing-envelope > * { display:none !important; }
+  body.printing-envelope #envelope-modal { display:block !important; position:static !important; background:none !important; overflow:visible !important; }
+  body.printing-envelope #envelope-modal > div { box-shadow:none !important; border-radius:0 !important; padding:0 !important; margin:0 !important; max-width:none !important; }
+  body.printing-envelope #envelope-modal h3,
+  body.printing-envelope #envelope-modal button,
+  body.printing-envelope #envelope-modal > div > div:first-child { display:none !important; }
   body.printing-preview #preview-modal { display:flex !important; visibility:visible !important; position:static !important; background:none !important; padding:0 !important; overflow:visible !important; }
   body.printing-preview #preview-modal .modal { max-width:none !important; width:100% !important; box-shadow:none !important; border:none !important; border-radius:0 !important; max-height:none !important; overflow:visible !important; }
   body.printing-preview #preview-modal .modal-body { max-height:none !important; overflow:visible !important; padding:0 !important; }
-  body.printing-preview .preview-doc { padding:20px 36px !important; }
+  body.printing-preview .preview-doc { padding:20px 24px !important; }
   body.printing-preview #preview-modal .modal-footer,
   body.printing-preview #preview-modal .modal-header { display:none !important; }
   body.printing-preview #preview-modal,
@@ -976,7 +984,7 @@ select{appearance:auto}
      （日付・URL・ページ番号・サイトタイトル）を描画する余白を奪い、
      結果として非表示にする。印刷の実余白は #preview-modal .modal-body の
      padding 12mm で確保する。 */
-  @page{margin:15mm 28mm}
+  @page{margin:15mm 20mm}
   /* body直下の要素を全部消す（#preview-modal だけ残す） */
   body > *:not(#preview-modal):not(#envelope-modal){display:none !important}
   /* プレビューモーダル系統は visibility:visible を強制（line 760 の body *{visibility:hidden} を上書き） */
@@ -3930,9 +3938,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.50';
+const APP_VERSION='v3.32.51';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T23:36:13Z';
+const APP_BUILD_TIME='2026-06-26T23:38:50Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6743,6 +6751,14 @@ function printPreview(){
 }
 
 // 🔗 プレビューから直接共有リンクを発行（送信メニューを開かずに）
+function printEnvelope(){
+  document.body.classList.add('printing-envelope');
+  requestAnimationFrame(function(){
+    try{ window.print(); }catch(e){ console.error(e); }
+    setTimeout(function(){ document.body.classList.remove('printing-envelope'); }, 1000);
+  });
+}
+
 function sharePreviewLink(){
   // shareLink() は preview/share いずれのモーダルが開いていても currentPreviewDocId を使うので
   // プレビューモーダルを閉じてから呼んでOK
@@ -14678,7 +14694,7 @@ function executeBulkTaxUpdate(){
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <h3 style="margin:0;font-size:18px">📬 窓枠封筒（A4三つ折り・長3封筒）</h3>
       <div style="display:flex;gap:8px">
-        <button onclick="window.print()" style="background:#2E7D32;color:white;border:none;border-radius:8px;padding:8px 18px;cursor:pointer">🖨 印刷</button>
+        <button onclick="printEnvelope()" style="background:#2E7D32;color:white;border:none;border-radius:8px;padding:8px 18px;cursor:pointer">🖨 印刷</button>
         <button onclick="document.getElementById('envelope-modal').style.display='none'" style="background:#eee;border:none;border-radius:8px;padding:8px 14px;cursor:pointer">閉じる</button>
       </div>
     </div>
