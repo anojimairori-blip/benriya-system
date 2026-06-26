@@ -3919,9 +3919,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.37';
+const APP_VERSION='v3.32.38';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T20:04:42Z';
+const APP_BUILD_TIME='2026-06-26T20:10:10Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -8398,8 +8398,24 @@ function openGoogleCalendarMobile(){
 }
 
 function renderCalendar(){
-  // Google連携バッジの表示制御
-  updateGcalSyncBadge();
+  // Google連携バッジの表示制御（インライン）
+  (function(){
+    var notice=document.getElementById('gcal-sync-notice');
+    if(!notice) return;
+    if(!isGcalEnabled()){ notice.style.display='none'; return; }
+    notice.style.display='block';
+    var lastSync=localStorage.getItem('gcal_last_sync');
+    var label=document.getElementById('gcal-last-sync-label');
+    var timeEl=document.getElementById('gcal-last-sync-time');
+    if(lastSync&&label&&timeEl){
+      var d=new Date(lastSync);
+      var fmt=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')
+        +' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      timeEl.textContent=fmt;
+      label.style.display='inline-flex';
+      label.style.alignItems='center';
+    }
+  })();
   // v3.31.0: モバイル(<=768px)ではFullCalendar初期化をスキップ
   // モバイルではGoogleカレンダー連携リンク方式UI(#mobile-cal-view)を使う
   // モバイルでもFullCalendarを初期化しないことで、リソース節約と描画バグ完全回避
@@ -12956,7 +12972,8 @@ async function syncJobToGcal(job){
       if(idx>=0) jobs[idx].gcalEventId=created.id;
       persist();
       localStorage.setItem("gcal_last_sync", new Date().toISOString());
-      updateGcalSyncBadge();
+      var notice=document.getElementById("gcal-sync-notice");if(notice)notice.style.display=isGcalEnabled()?"block":"none";
+      var lbl=document.getElementById("gcal-last-sync-label");var te=document.getElementById("gcal-last-sync-time");if(lbl&&te){var d=new Date();te.textContent=d.getFullYear()+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+String(d.getDate()).padStart(2,"0")+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");lbl.style.display="inline-flex";}
     }
   }catch(e){
     // v3.25.3: 永続エラーバナーで表示(消えない・コピー可)
