@@ -840,7 +840,7 @@ select{appearance:auto}
 .preview-from{flex:1 1 0;font-size:12px;text-align:right;line-height:1.9;min-width:0;box-sizing:border-box;padding:0;margin:0;overflow-wrap:break-word;word-break:break-word}
 .preview-from p{text-align:right;margin:0;padding:0}
 .preview-from strong{display:inline-block}
-.preview-logo{max-width:100px;max-height:50px;object-fit:contain;display:block;margin-left:auto;margin-bottom:5px}
+.preview-logo{max-width:120px;max-height:50px;object-fit:contain;display:block;margin-left:auto;margin-bottom:5px}
 .preview-table{width:100%;max-width:100%;border-collapse:collapse;margin-bottom:15px;font-size:13px;table-layout:fixed;word-break:break-word;box-sizing:border-box}
 /* v3.32.4: 金額・単価セルのはみ出し防止（白囲い） */
 .preview-table td.num,.preview-table th.num{white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -3894,9 +3894,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.33';
+const APP_VERSION='v3.32.34';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T19:27:29Z';
+const APP_BUILD_TIME='2026-06-26T19:31:32Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6549,7 +6549,7 @@ function previewDoc(id){
         ${c?.fax?`<p style="font-size:11px;color:#888">Fax: ${escAttr(c.fax)}</p>`:''}
       </div>
       <div class="preview-from">
-        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:3px">${logoHtml?logoHtml.replace('<img ','<img style="max-height:24px" '):''}  <strong style="font-size:13px">${escAttr(d.staff||s.owner||s.company||'（会社名未設定）')}</strong></div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:3px">${logoHtml?logoHtml.replace('<img ','<img style="max-height:40px" '):''}  <strong style="font-size:13px">${escAttr(d.staff||s.owner||s.company||'（会社名未設定）')}</strong></div>
         <p>${escAttr(s.address||'')}</p><p>${escAttr(s.tel||'')}${s.fax?' / FAX:'+escAttr(s.fax):''}</p><p>${escAttr(s.email||'')}</p>
         ${d.staff?`<p style="margin-top:4px">担当：${escAttr(d.staff)}</p>`:''}
         ${d.dueDate&&d.type==='請求書'?`<p>支払期限：${escAttr(d.dueDate)}</p>`:''}
