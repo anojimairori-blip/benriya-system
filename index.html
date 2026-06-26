@@ -3938,9 +3938,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.52';
+const APP_VERSION='v3.32.53';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T23:43:30Z';
+const APP_BUILD_TIME='2026-06-26T23:45:47Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4276,7 +4276,10 @@ function openEnvelopePreview(id){
   html+='<div style="width:55%">';
   if(cust.zip)html+='<div style="font-size:12px;margin-bottom:3px">〒'+_escPub(cust.zip)+'</div>';
   if(cust.address)html+='<div style="font-size:12px;line-height:1.7;margin-bottom:5px">'+_escPub(cust.address)+'</div>';
-  html+='<div style="font-size:22px;font-weight:700;letter-spacing:1px;margin-bottom:4px">'+custName+' <span style="font-size:15px;font-weight:400">'+custHonorific+'</span></div>';
+  var _nameLen=(cust.name||d.customer||'').length;
+  var _nameFontSize=_nameLen>=14?'14px':_nameLen>=11?'16px':'20px';
+  var _honorFontSize=_nameLen>=14?'12px':_nameLen>=11?'13px':'14px';
+  html+='<div style="font-size:'+_nameFontSize+';font-weight:700;letter-spacing:0.5px;margin-bottom:4px;white-space:nowrap">'+custName+'<span style="font-size:'+_honorFontSize+';font-weight:400;margin-left:6px">'+custHonorific+'</span></div>';
   html+='</div>';
   html+='<div style="width:42%;text-align:right">';
   html+='<div style="font-size:11px;color:#555;margin-bottom:8px">NO. '+_escPub(d.number||'')+' / '+_escPub(d.date||'')+'</div>';
