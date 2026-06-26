@@ -2908,12 +2908,13 @@ if('serviceWorker' in navigator){
           <input type="text" id="doc-subject" placeholder="エアコン取り付け作業" list="subject-history">
           <datalist id="subject-history"></datalist>
         </div>
-        <div class="form-group"><label>カテゴリ</label>
-          <select id="doc-category">
+        <div class="form-group">
+          <label style="display:flex;justify-content:space-between;align-items:center">
+            <span>カテゴリ</span>
+            <button type="button" onclick="openCategoryEditor()" style="background:none;border:1px solid var(--border);border-radius:5px;padding:1px 7px;font-size:11px;color:var(--text2);cursor:pointer">✏️ 編集</button>
+          </label>
+          <select id="doc-category" style="width:100%">
             <option value="">（カテゴリを選択）</option>
-            <option>引越し・運搬</option><option>清掃・片付け</option><option>修理・修繕</option>
-            <option>電気・設備</option><option>庭・外構</option><option>買い物・代行</option>
-            <option>介護・生活支援</option><option>その他</option>
           </select>
         </div>
       </div>
@@ -3923,9 +3924,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.53';
+const APP_VERSION='v3.32.54';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T22:05:43Z';
+const APP_BUILD_TIME='2026-06-26T22:09:59Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5968,6 +5969,7 @@ function openNewDoc(type,custName){
   document.getElementById('doc-date').value=today();
   updateDocOfficeSelect();
   document.getElementById('doc-subject').value='';
+  renderDocCategorySelect();
   document.getElementById('doc-category').value='';
   document.getElementById('doc-notes').value=settings.notes||'';
   // ステータス選択を動的に構築（デフォルト：最初の項目）
@@ -7673,6 +7675,92 @@ function showSelectedOfficeInfo(){
   if(o.fax)lines.push('📠 FAX: '+o.fax);
   info.innerHTML=lines.map(function(l){return escAttr(l);}).join('<br>');
   info.style.display=lines.length?'block':'none';
+}
+
+
+// ===== カテゴリ管理 =====
+var _DEFAULT_DOC_CATS=['引越し・運搬','清掃・片付け','修理・修繕','電気・設備','庭・外構','買い物・代行','介護・生活支援','井戸工事','その他'];
+
+function _getDocCategories(){
+  if(!settings.docCategories||!settings.docCategories.length){
+    settings.docCategories=_DEFAULT_DOC_CATS.slice();
+  }
+  return settings.docCategories;
+}
+
+function renderDocCategorySelect(){
+  var sel=document.getElementById('doc-category');
+  if(!sel)return;
+  var current=sel.value;
+  sel.innerHTML='<option value="">（カテゴリを選択）</option>';
+  _getDocCategories().forEach(function(cat){
+    var opt=document.createElement('option');
+    opt.value=cat; opt.textContent=cat;
+    sel.appendChild(opt);
+  });
+  if(current)sel.value=current;
+}
+
+function openCategoryEditor(){
+  renderCatEditorList();
+  openModal('category-editor-modal');
+}
+
+function renderCatEditorList(){
+  var list=document.getElementById('cat-editor-list');
+  if(!list)return;
+  var cats=_getDocCategories();
+  if(!cats.length){list.innerHTML='<p style="font-size:13px;color:var(--text3)">カテゴリなし</p>';return;}
+  list.innerHTML=cats.map(function(cat,i){
+    return '<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--border)">'
+      +'<span style="flex:1;font-size:13px">'+escAttr(cat)+'</span>'
+      +'<button onclick="moveCat('+i+',-1)" '+(i===0?'disabled':'')+' style="background:none;border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:11px">↑</button>'
+      +'<button onclick="moveCat('+i+',1)" '+(i===cats.length-1?'disabled':'')+' style="background:none;border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:11px">↓</button>'
+      +'<button onclick="renameCat('+i+')" style="background:none;border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;color:var(--blue)">✏️</button>'
+      +'<button onclick="deleteCat('+i+')" style="background:none;border:1px solid var(--border);border-radius:4px;padding:2px 6px;cursor:pointer;font-size:11px;color:var(--red)">🗑️</button>'
+      +'</div>';
+  }).join('');
+}
+
+function addDocCategory(){
+  var inp=document.getElementById('cat-new-input');
+  var val=(inp?inp.value:'').trim();
+  if(!val){showToast('カテゴリ名を入力してください','#C0392B');return;}
+  var cats=_getDocCategories();
+  if(cats.indexOf(val)>=0){showToast('同じカテゴリが既にあります','#C0392B');return;}
+  cats.push(val);
+  if(inp)inp.value='';
+  renderCatEditorList();
+}
+
+function deleteCat(i){
+  var cats=_getDocCategories();
+  cats.splice(i,1);
+  renderCatEditorList();
+}
+
+function moveCat(i,dir){
+  var cats=_getDocCategories();
+  var j=i+dir;
+  if(j<0||j>=cats.length)return;
+  var tmp=cats[i]; cats[i]=cats[j]; cats[j]=tmp;
+  renderCatEditorList();
+}
+
+function renameCat(i){
+  var cats=_getDocCategories();
+  showInputDialog('カテゴリ名を変更','新しいカテゴリ名',cats[i],function(val){
+    if(!val||!val.trim())return;
+    cats[i]=val.trim();
+    renderCatEditorList();
+  });
+}
+
+function saveDocCategories(){
+  persist();
+  renderDocCategorySelect();
+  closeModal('category-editor-modal');
+  showToast('✅ カテゴリを保存しました','#2E7D32');
 }
 
 function openCustDetail(idOrName,byId){
@@ -9670,6 +9758,7 @@ function loadSettings(){
   renderBankAccounts();
   updateDocBankSelect();
   renderOffices();
+  renderDocCategorySelect();
   // defaultTax は税率設定画面で管理
 }
 function saveSettings(){
@@ -21803,6 +21892,25 @@ function executeBulkTaxUpdate(){
   <div class="modal-footer">
     <button class="btn btn-secondary" onclick="closeModal('cust-ai-modal')">閉じる</button>
     <button class="btn btn-primary btn-sm" id="cust-ai-save-url" style="display:none" onclick="saveCustAiAll()">📥 顧客情報に保存</button>
+  </div>
+</div>
+</div>
+
+<!-- カテゴリ編集モーダル -->
+<div class="modal-overlay" id="category-editor-modal">
+<div class="modal" style="max-width:420px">
+  <div class="modal-header"><h3>✏️ カテゴリ編集</h3><button class="close-btn" aria-label="閉じる" onclick="closeModal('category-editor-modal')">✕</button></div>
+  <div class="modal-body">
+    <p style="font-size:12px;color:var(--text3);margin-bottom:12px">書類のカテゴリ一覧を管理します。</p>
+    <div id="cat-editor-list" style="margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="cat-new-input" placeholder="新しいカテゴリ名" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit" onkeydown="if(event.key==='Enter')addDocCategory()">
+      <button class="btn btn-primary btn-sm" onclick="addDocCategory()">＋ 追加</button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="closeModal('category-editor-modal')">閉じる</button>
+    <button class="btn btn-primary" onclick="saveDocCategories()">💾 保存</button>
   </div>
 </div>
 </div>
