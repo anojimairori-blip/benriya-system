@@ -3922,9 +3922,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.59';
+const APP_VERSION='v3.32.60';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-27T22:51:38Z';
+const APP_BUILD_TIME='2026-06-27T23:05:23Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -12300,6 +12300,9 @@ function printReport(){
 <head>
 <meta charset="UTF-8">
 <title>${escAttr(docTitle)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 <style>
   @page { size: A4 portrait; margin: 15mm 18mm; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -12321,19 +12324,31 @@ function printReport(){
   iframe.setAttribute('aria-hidden','true');
   iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
   iframe.onload=function(){
-    try{
-      const w=iframe.contentWindow;
-      w.focus();
-      w.print();
-    }catch(e){
-      console.error('[printReport]',e);
-      showToast('印刷に失敗しました: '+e.message,'#C0392B');
-    }
+    const w=iframe.contentWindow;
     // 印刷ダイアログを閉じた後にiframeを後始末（afterprint優先、保険でタイマー）
     let _cleaned=false;
     const _cleanup=function(){ if(_cleaned)return; _cleaned=true; setTimeout(function(){ iframe.remove(); },300); };
-    try{ iframe.contentWindow.addEventListener('afterprint',_cleanup); }catch(e){}
+    try{ w.addEventListener('afterprint',_cleanup); }catch(e){}
     setTimeout(_cleanup, 60000);
+
+    // v3.32.60: 1回目の印刷プレビューが真っ白になる不具合を修正。
+    // iframe内のWebフォント描画完了(document.fonts.ready)を待ってからprintを呼ぶ。
+    // フォントAPI非対応やタイムアウト時は保険として一定時間後にフォールバック印刷。
+    let _printed=false;
+    const _doPrint=function(){
+      if(_printed)return; _printed=true;
+      try{ w.focus(); w.print(); }
+      catch(e){ console.error('[printReport]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); }
+    };
+    try{
+      if(w.document.fonts && w.document.fonts.ready){
+        w.document.fonts.ready.then(function(){ _doPrint(); });
+      }
+      // 保険：fonts.readyが解決しない/遅い環境でも最大700msで必ず印刷
+      setTimeout(_doPrint, 700);
+    }catch(e){
+      setTimeout(_doPrint, 700);
+    }
   };
   document.body.appendChild(iframe);
   const idoc=iframe.contentWindow.document;
