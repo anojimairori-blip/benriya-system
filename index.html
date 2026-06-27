@@ -609,30 +609,18 @@ tr:hover td{background:var(--bg)}
 .preview-doc.doc-invoice .grand td{color:var(--doc-color-invoice);border-top:2px solid var(--doc-color-invoice)}
 .preview-doc.doc-receipt .grand td{color:var(--doc-color-receipt);border-top:2px solid var(--doc-color-receipt)}
 @media print{
-  /* 書類プレビュー印刷: body.printing-preview クラスで制御 */
-  body.printing-preview > * { display:none !important; visibility:hidden !important; }
-  /* 窓枠封筒印刷: body.printing-envelope クラスで制御 */
+  /* v3.32.57: 請求書/見積書プレビュー印刷の制御は下方の本命ブロックに一本化。
+     ここでは @page 余白と窓枠封筒印刷(printing-envelope)のみ定義する。
+     旧 printing-preview / .preview-doc 系の重複定義は本命ブロックと競合し
+     プレビューと印刷のズレを生んでいたため削除した。 */
   @page { margin:15mm 20mm }
+  /* 窓枠封筒印刷: body.printing-envelope クラスで制御 */
   body.printing-envelope > * { display:none !important; }
   body.printing-envelope #envelope-modal { display:block !important; position:static !important; background:none !important; overflow:visible !important; }
   body.printing-envelope #envelope-modal > div { box-shadow:none !important; border-radius:0 !important; padding:0 !important; margin:0 !important; max-width:none !important; }
   body.printing-envelope #envelope-modal h3,
   body.printing-envelope #envelope-modal button,
   body.printing-envelope #envelope-modal > div > div:first-child { display:none !important; }
-  body.printing-preview #preview-modal { display:flex !important; visibility:visible !important; position:static !important; background:none !important; padding:0 !important; overflow:visible !important; }
-  body.printing-preview #preview-modal .modal { max-width:none !important; width:100% !important; box-shadow:none !important; border:none !important; border-radius:0 !important; max-height:none !important; overflow:visible !important; }
-  body.printing-preview #preview-modal .modal-body { max-height:none !important; overflow:visible !important; padding:0 !important; }
-  body.printing-preview .preview-doc { padding:16px 20px 12px !important; }
-  body.printing-preview #preview-modal .modal-footer,
-  body.printing-preview #preview-modal .modal-header { display:none !important; }
-  body.printing-preview #preview-modal,
-  body.printing-preview #preview-modal * { visibility:visible !important; }
-  .preview-doc.doc-quote,.preview-doc.doc-invoice,.preview-doc.doc-receipt{border-top-width:6px;border-top-style:solid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .preview-doc h2,.preview-doc .preview-table th,.preview-doc .grand td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .preview-doc{overflow:visible !important;max-width:none !important;border:none !important;page-break-inside:auto !important}
-  .preview-table tr{page-break-inside:avoid}
-  .preview-total{page-break-inside:avoid}
-  .preview-notes{page-break-inside:auto;page-break-before:auto}
 }
 .btn-refresh:hover:not(:disabled){background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
 .btn-refresh:disabled{opacity:.5;cursor:not-allowed}
@@ -804,10 +792,14 @@ select{appearance:auto}
 
 /* PRINT REPORT */
 @media print{
-  .no-print{display:none!important}
-  body *{visibility:hidden}
-  .print-area,.print-area *{visibility:visible}
-  .print-area{position:fixed;inset:0;padding:20px;background:white}
+  /* v3.32.57: 売上集計帳票の印刷専用。body.printing-report クラスで限定する。
+     旧実装は body *{visibility:hidden} が全印刷で発火し、請求書プレビュー印刷の
+     visibility 制御と綱引きしてズレの一因になっていた。printing-report スコープに
+     閉じ込めることで請求書/封筒印刷を巻き込まないようにした。 */
+  body.printing-report .no-print{display:none!important}
+  body.printing-report *{visibility:hidden}
+  body.printing-report .print-area,body.printing-report .print-area *{visibility:visible}
+  body.printing-report .print-area{position:fixed;inset:0;padding:20px;background:white}
 }
 
 /* BACKUP */
@@ -980,13 +972,14 @@ select{appearance:auto}
 .pin-error{color:var(--red);font-size:13px;min-height:20px}
 
 @media print{
-  /* @page margin を 0 にすることで Chrome 等のブラウザがヘッダー/フッター
-     （日付・URL・ページ番号・サイトタイトル）を描画する余白を奪い、
-     結果として非表示にする。印刷の実余白は #preview-modal .modal-body の
-     padding 12mm で確保する。 */
-  @page{margin:25mm 22mm 20mm 22mm}
-  /* body直下の要素を全部消す（#preview-modal だけ残す） */
-  body > *:not(#preview-modal):not(#envelope-modal){display:none !important}
+  /* v3.32.57: 請求書/見積書プレビュー印刷の本命ブロック。
+     @page 余白は上方ブロック(@page{margin:15mm 20mm})に一本化したため
+     ここでは再定義しない（重複defの後勝ちで余白が変わる事故を防ぐ）。
+     実余白は #preview-modal .modal-body の padding で微調整する。 */
+  /* body直下の要素を全部消す（#preview-modal だけ残す）。
+     v3.32.57: 帳票印刷(printing-report)時はこのブロック自体を無効化し、
+     report-print-modal を消さないようガードする。 */
+  body:not(.printing-report) > *:not(#preview-modal):not(#envelope-modal){display:none !important}
   /* プレビューモーダル系統は visibility:visible を強制（line 760 の body *{visibility:hidden} を上書き） */
   #preview-modal,#preview-modal *{visibility:visible !important}
   /* プレビューモーダルを通常のブロック要素として表示し直す */
@@ -3899,7 +3892,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
   <div class="modal-footer no-print">
     <button class="btn btn-secondary" onclick="closeModal('report-print-modal')">閉じる</button>
     <button class="btn btn-secondary" onclick="exportReportCSV()">📊 CSVで出力</button>
-    <button class="btn btn-primary" onclick="window.print()">🖨️ 印刷・PDF保存</button>
+    <button class="btn btn-primary" onclick="printReport()">🖨️ 印刷・PDF保存</button>
   </div>
 </div>
 </div>
@@ -3938,9 +3931,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.56';
+const APP_VERSION='v3.32.57';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-26T23:56:59Z';
+const APP_BUILD_TIME='2026-06-27T22:30:13Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -12290,7 +12283,16 @@ function openReportPrint(){
   document.getElementById('report-print-modal').classList.add('open');
 }
 
-function exportReportCSV(){
+// 🖨️ 売上集計帳票の印刷（printing-report クラスで帳票専用の印刷CSSを発火）
+// v3.32.57: 旧 onclick="window.print()" 直呼びから変更。帳票印刷CSSを
+// body.printing-report スコープに限定したため、印刷時にクラスを付与する。
+function printReport(){
+  document.body.classList.add('printing-report');
+  requestAnimationFrame(function(){
+    try{ window.print(); }catch(e){ console.error('[printReport]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); }
+    setTimeout(function(){ document.body.classList.remove('printing-report'); }, 1000);
+  });
+}
   const sel=document.getElementById('report-year');
   const y=parseInt(sel?.value)||new Date().getFullYear();
   const months=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
