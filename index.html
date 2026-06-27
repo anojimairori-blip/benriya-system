@@ -3816,9 +3816,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.62';
+const APP_VERSION='v3.32.63';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-27T23:29:24Z';
+const APP_BUILD_TIME='2026-06-27T23:56:05Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6642,8 +6642,7 @@ function _buildPreviewDocHtml(d){
         ${c?.dept?`<p style="font-size:12px;color:#666;margin-top:2px">${escAttr(c.dept)}</p>`:''}
         ${d.contact&&d.contact!==d.customer?`<p style="font-size:12px;color:#555;margin-top:2px">担当：${escAttr(d.contact)} 様</p>`:''}
         ${c?.address?`<p style="font-size:11px;color:#888;margin-top:4px">〒${escAttr(c.zip||'')} ${escAttr(c.address)}</p>`:''}
-        ${c?.tel?`<p style="font-size:11px;color:#888">Tel: ${escAttr(c.tel)}</p>`:''}
-        ${c?.fax?`<p style="font-size:11px;color:#888">Fax: ${escAttr(c.fax)}</p>`:''}
+        ${(c?.tel||c?.fax)?`<p style="font-size:11px;color:#888">${c?.tel?'Tel: '+escAttr(c.tel):''}${c?.tel&&c?.fax?' / ':''}${c?.fax?'Fax: '+escAttr(c.fax):''}</p>`:''}
       </div>
       <div class="preview-from">
         ${logoHtml?logoHtml.replace('<img ','<img style="max-height:40px" '):''}
