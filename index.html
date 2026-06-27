@@ -798,7 +798,10 @@ select{appearance:auto}
 .backup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
 .backup-icon{font-size:28px;width:40px;text-align:center}
 
-.preview-doc{background:white;max-width:640px;margin:0 auto;padding:32px 32px;border-radius:var(--radius);border:1px solid var(--border);font-family:'Noto Serif JP',serif;color:#111;overflow:hidden;box-sizing:border-box}
+/* v3.32.62: 画面プレビューを印刷レイアウト(_DOC_PRINT_CSS)に一致させる。
+   .preview-doc を「白いA4紙」に見立て、印刷の @page margin:12mm 15mm を
+   内側 padding(約45px 57px ≒ 12mm 15mm)で再現。中身のスタイルも印刷と揃える。 */
+.preview-doc{background:white;max-width:720px;margin:0 auto;padding:45px 57px;border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.08);font-family:'Noto Serif JP',serif;color:#111;font-size:14px;line-height:1.6;overflow:hidden;box-sizing:border-box}
 
 /* v3.31.1: モバイル時のプレビュー崩れ対策。
    .preview-doc は A4幅 (max-width:640px) を想定したレイアウトのため、
@@ -816,40 +819,40 @@ select{appearance:auto}
     padding:8px !important;
   }
   #preview-modal .preview-doc{
-    /* A4幅相当を維持（640px → 約53%スケール） */
-    width:640px;
-    max-width:640px;
-    transform:scale(0.53);
+    /* A4紙コンテナ(720px)を画面幅に収める（720px → 約48%スケール） */
+    width:720px;
+    max-width:720px;
+    transform:scale(0.48);
     transform-origin:top left;
     margin:0 !important;
-    /* 縮小後の実高さに合わせて見かけ上の高さを調整（53% = 47%余白を相殺） */
-    margin-bottom:-47% !important;
+    /* 縮小後の実高さに合わせて見かけ上の高さを調整 */
+    margin-bottom:-52% !important;
   }
 }
 @media screen and (max-width:400px){
   #preview-modal .preview-doc{
     /* iPhone SE等の狭い画面ではさらに縮小 */
-    transform:scale(0.45);
-    margin-bottom:-55% !important;
+    transform:scale(0.40);
+    margin-bottom:-60% !important;
   }
 }
-.preview-doc h2{font-size:22px;font-weight:600;text-align:center;margin-bottom:18px;border-bottom:2px solid #111;padding-bottom:11px}
-.preview-meta{display:flex;gap:18px;margin-bottom:18px;width:100%;box-sizing:border-box;align-items:flex-start}
+.preview-doc h2{font-size:24px;font-weight:600;text-align:center;margin:6px 0 16px;border-bottom:2px solid #111;padding-bottom:9px}
+.preview-meta{display:flex;gap:18px;margin-bottom:16px;width:100%;box-sizing:border-box;align-items:flex-start}
 .preview-to{flex:1 1 0;min-width:0;box-sizing:border-box;overflow-wrap:break-word;word-break:break-word}
-.preview-to .company{font-size:16px;font-weight:600}
-.preview-from{flex:1 1 0;font-size:12px;text-align:right;line-height:1.9;min-width:0;box-sizing:border-box;padding:0;margin:0;overflow-wrap:break-word;word-break:break-word}
+.preview-to .company{font-size:17px;font-weight:600}
+.preview-from{flex:1 1 0;font-size:12px;text-align:right;line-height:1.8;min-width:0;box-sizing:border-box;padding:0;margin:0;overflow-wrap:break-word;word-break:break-word}
 .preview-from p{text-align:right;margin:0;padding:0}
 .preview-from strong{display:inline-block}
 /* v3.32.61: ロゴ→会社名→担当者名を縦並びで右寄せ */
 .preview-from .from-company{font-size:14px;font-weight:600;display:block}
 .preview-from .from-staff{font-size:12px;color:#333;margin-top:2px}
-.preview-logo{max-width:120px;max-height:50px;object-fit:contain;display:block;margin-left:auto;margin-bottom:5px}
-.preview-table{width:100%;max-width:100%;border-collapse:collapse;margin-bottom:15px;font-size:13px;table-layout:fixed;word-break:break-word;box-sizing:border-box}
+.preview-logo{max-width:120px;max-height:40px;object-fit:contain;display:block;margin:0 0 5px auto}
+.preview-table{width:100%;max-width:100%;border-collapse:collapse;margin-bottom:14px;font-size:13.5px;table-layout:fixed;word-break:break-word;box-sizing:border-box}
 /* v3.32.4: 金額・単価セルのはみ出し防止（白囲い） */
 .preview-table td.num,.preview-table th.num{white-space:nowrap;font-variant-numeric:tabular-nums}
 
 /* 件名（品目テーブル直上） */
-.preview-subject{display:flex;align-items:flex-end;gap:10px;margin:18px 0 12px;padding-bottom:6px;border-bottom:2px solid #888}
+.preview-subject{display:flex;align-items:flex-end;gap:10px;margin:16px 0 10px;padding-bottom:6px;border-bottom:2px solid #888}
 .preview-subject .ps-label{font-size:11px;color:#666;font-weight:600;letter-spacing:.1em;flex-shrink:0;padding-bottom:2px}
 .preview-subject .ps-text{font-size:16px;font-weight:700;color:#222;flex:1;word-break:break-word}
 /* 書類タイプ別カラー対応 */
@@ -869,14 +872,13 @@ select{appearance:auto}
   .stamp{display:none !important}
   .sample-badge{display:none !important}
 }
-.preview-table{border-bottom:1px solid #BBB}
-.preview-table th{background:#F0EDE7;padding:6px 9px;text-align:left;font-weight:600;border:1px solid #BBB;overflow:hidden;box-sizing:border-box}
-.preview-table td{padding:6px 9px;border:1px solid #BBB;overflow:hidden;box-sizing:border-box}
-.preview-table tbody tr:last-child td{border-bottom:1px solid #BBB}
-.preview-total table{margin-left:auto;font-size:16px}
+.preview-table th{background:#F0EDE7;padding:7px 9px;text-align:left;font-weight:600;border:1px solid #999;overflow:hidden;box-sizing:border-box}
+.preview-table td{padding:7px 9px;border:1px solid #999;overflow:hidden;box-sizing:border-box}
+.preview-total{width:100%}
+.preview-total table{margin-left:auto;font-size:16px;min-width:46%}
 .preview-total td{padding:4px 7px}
-.preview-total .grand{font-size:24px;font-weight:700;border-top:2px solid #111}
-.preview-notes{margin-top:14px;font-size:13.5px;border-top:1px solid #DDD;padding-top:11px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.preview-total .grand{font-size:22px;font-weight:700;border-top:2px solid #111}
+.preview-notes{margin-top:12px;font-size:13px;border-top:1px solid #DDD;padding-top:9px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .doc-number{font-size:12px;color:#888;margin-bottom:3px}
 .stamp{width:56px;height:56px;border:2px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--red);margin-left:auto;margin-top:10px}
 
@@ -3814,9 +3816,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.61';
+const APP_VERSION='v3.32.62';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-27T23:14:46Z';
+const APP_BUILD_TIME='2026-06-27T23:29:24Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
