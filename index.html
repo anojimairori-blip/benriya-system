@@ -840,6 +840,9 @@ select{appearance:auto}
 .preview-from{flex:1 1 0;font-size:12px;text-align:right;line-height:1.9;min-width:0;box-sizing:border-box;padding:0;margin:0;overflow-wrap:break-word;word-break:break-word}
 .preview-from p{text-align:right;margin:0;padding:0}
 .preview-from strong{display:inline-block}
+/* v3.32.61: ロゴ→会社名→担当者名を縦並びで右寄せ */
+.preview-from .from-company{font-size:14px;font-weight:600;display:block}
+.preview-from .from-staff{font-size:12px;color:#333;margin-top:2px}
 .preview-logo{max-width:120px;max-height:50px;object-fit:contain;display:block;margin-left:auto;margin-bottom:5px}
 .preview-table{width:100%;max-width:100%;border-collapse:collapse;margin-bottom:15px;font-size:13px;table-layout:fixed;word-break:break-word;box-sizing:border-box}
 /* v3.32.4: 金額・単価セルのはみ出し防止（白囲い） */
@@ -963,132 +966,21 @@ select{appearance:auto}
 .pin-key.del{color:var(--red);font-size:13px}
 .pin-error{color:var(--red);font-size:13px;min-height:20px}
 
+/* v3.32.61: 請求書/見積書/領収書の印刷は隠しiframe+専用HTML方式(printDoc)に
+   一本化したため、旧・請求書印刷の本命 @media print ブロックは廃止。
+   印刷ボタン以外の直接Ctrl+P時のフォールバックとして、画面UIを出さず
+   プレビュー書類のみ印刷する最小ルールだけ残す。 */
 @media print{
-  /* v3.32.57: 請求書/見積書プレビュー印刷の本命ブロック。
-     @page 余白は上方ブロック(@page{margin:15mm 20mm})に一本化したため
-     ここでは再定義しない（重複defの後勝ちで余白が変わる事故を防ぐ）。
-     実余白は #preview-modal .modal-body の padding で微調整する。 */
-  /* body直下の要素を全部消す（#preview-modal だけ残す）。
-     v3.32.59: 帳票印刷を iframe 方式に移行したため printing-report ガードは不要になり撤去。 */
   body > *:not(#preview-modal):not(#envelope-modal){display:none !important}
-  /* プレビューモーダル系統は visibility:visible を強制（line 760 の body *{visibility:hidden} を上書き） */
-  #preview-modal,#preview-modal *{visibility:visible !important}
-  /* プレビューモーダルを通常のブロック要素として表示し直す */
-  #preview-modal{
-    display:block !important;
-    position:static !important;
-    background:none !important;
-    padding:0 !important;
-    margin:0 !important;
-    overflow:visible !important;
-    inset:auto !important;
-    width:auto !important;
-    height:auto !important;
-  }
-  #preview-modal .modal{
-    display:block !important;
-    position:static !important;
-    background:none !important;
-    box-shadow:none !important;
-    max-width:100% !important;
-    width:100% !important;
-    margin:0 !important;
-    padding:0 !important;
-    border:none !important;
-    border-radius:0 !important;
-  }
-  #preview-modal .modal-header,
-  #preview-modal .modal-footer{display:none !important}
-  #preview-modal .modal-body{
-    display:block !important;
-    padding:12mm !important;
-    background:none !important;
-    overflow:visible !important;
-  }
-  /* プレビュー本体: position:fixed を使わない（複数ページに繰り返されるバグ回避） */
-  .preview-doc{
-    display:block !important;
-    position:static !important;
-    margin:0 auto !important;
-    border:none !important;
-    border-radius:0 !important;
-    padding:0 !important;
-    max-width:100% !important;
-    width:auto !important;
-    overflow:visible !important;
-    box-shadow:none !important;
-    background:white !important;
-    /* v3.32.6: 備考が長い見積書で2ページ目以降が出ない不具合を修正。
-       preview-doc 自体を改ページ可能にし、内部の table/total/notes 単位で
-       改ページを制御する（611行付近の .preview-table tr / .preview-total に
-       page-break-inside:avoid を指定済み）。 */
-    page-break-inside:auto !important;
-    /* v3.31.1: モバイル時のtransform:scaleを印刷時に確実にリセット */
-    transform:none !important;
-    transform-origin:initial !important;
-    margin-bottom:0 !important;
-  }
-  /* 書類タイプ別カラー（罫線色）を印刷でも保持 */
+  #preview-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;overflow:visible !important;inset:auto !important;width:auto !important;height:auto !important}
+  #preview-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important}
+  #preview-modal .modal-header,#preview-modal .modal-footer{display:none !important}
+  #preview-modal .modal-body{display:block !important;padding:12mm !important;background:none !important;overflow:visible !important}
+  .preview-doc{display:block !important;position:static !important;margin:0 auto !important;border:none !important;border-radius:0 !important;padding:0 !important;max-width:100% !important;width:auto !important;overflow:visible !important;box-shadow:none !important;background:white !important;page-break-inside:auto !important;transform:none !important;transform-origin:initial !important;margin-bottom:0 !important}
   .preview-doc.doc-quote{border-top:6px solid var(--doc-color-quote) !important}
   .preview-doc.doc-invoice{border-top:6px solid var(--doc-color-invoice) !important}
   .preview-doc.doc-receipt{border-top:6px solid var(--doc-color-receipt) !important}
-  /* 背景色・色を印刷時に保持 */
-  .preview-doc h2,
-  .preview-doc .preview-table th,
-  .preview-doc .grand td,
-  .preview-doc .preview-subject{
-    -webkit-print-color-adjust:exact !important;
-    print-color-adjust:exact !important;
-  }
-  /* === 印刷時は必ず2列レイアウト＆会社情報を右寄せに維持 ===
-     重要：A4縦印刷の使用可能幅(~702px)が @media(max-width:768px) にもマッチするため、
-     モバイル用の .preview-from{text-align:left !important} が同じ詳細度で後勝ちしてしまう。
-     セレクタに .preview-doc を前置して詳細度を 0,2,0 に上げ、ファイル順序に関係なく勝たせる。 */
-  .preview-doc .preview-meta{
-    display:flex !important;
-    flex-direction:row !important;
-    gap:18px !important;
-    width:100% !important;
-    align-items:flex-start !important;
-    box-sizing:border-box !important;
-  }
-  .preview-doc .preview-to,
-  .preview-doc .preview-from{
-    flex:1 1 0 !important;
-    min-width:0 !important;
-    box-sizing:border-box !important;
-  }
-  .preview-doc .preview-to{ text-align:left !important }
-  .preview-doc .preview-to p{ text-align:left !important }
-  .preview-doc .preview-from{
-    text-align:right !important;
-    font-size:11px !important;
-    line-height:1.7 !important;
-  }
-  .preview-doc .preview-from p{
-    text-align:right !important;
-    margin:0 !important;
-  }
-  .preview-doc .preview-from strong{ font-size:13px !important }
-  .preview-doc .preview-from .preview-logo,
-  .preview-doc .preview-from img{
-    max-width:100px !important;
-    max-height:50px !important;
-    margin-left:auto !important;
-    margin-right:0 !important;
-    margin-bottom:5px !important;
-    display:block !important;
-  }
-  /* 合計金額を印刷時も大きく */
-  .preview-doc .preview-total .grand{
-    font-size:24px !important;
-    font-weight:700 !important;
-  }
-  /* テーブル罫線をはっきり表示 */
-  .preview-doc .preview-table th,
-  .preview-doc .preview-table td{
-    border-color:#999 !important;
-  }
+  .preview-doc h2,.preview-doc .preview-table th,.preview-doc .grand td,.preview-doc .preview-subject{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
 }
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 /* ===== MOBILE DRAWER ===== */
@@ -3922,9 +3814,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.60';
+const APP_VERSION='v3.32.61';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-27T23:05:23Z';
+const APP_BUILD_TIME='2026-06-27T23:14:46Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6659,12 +6551,78 @@ function duplicateDoc(id){
 }
 
 // ===== PREVIEW =====
-function previewDoc(id){
-  const d=docs.find(x=>x.id===id);if(!d)return;
-  currentPreviewDocId=id;const s=settings;
-  // 税込モード判定（v3.25.12〜）: 消費税額が計算されていない見積もり=
-  // 単価を税込価格として入力したものとして扱い、税率列を「税込」表記、
-  // 合計表示を「合計（税込）」一行のみに簡素化する
+// v3.32.61: 書類印刷専用のCSS（隠しiframe内で使用）。
+// 要望反映: 余白少なめ(@page 12mm 15mm)、左右の罫線を本文幅に統一、
+// 見やすいフォントサイズ(本文14px)、ロゴの下に会社名・担当者名を改行配置。
+const _DOC_PRINT_CSS=`
+  @page { size: A4 portrait; margin: 12mm 15mm; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin:0; padding:0; background:white; color:#111; font-family:'Noto Serif JP',serif; }
+  :root{
+    --doc-color-quote:#C49A2D; --doc-color-quote-light:#FAF5E5;
+    --doc-color-invoice:#1A73E8; --doc-color-invoice-light:#E8F0FE;
+    --doc-color-receipt:#2D5A3D; --doc-color-receipt-light:#E6F2EA;
+  }
+  /* 書類本体: 余白を詰め、左右は @page マージンに任せる（width:100%） */
+  .preview-doc{ width:100%; max-width:100%; margin:0; padding:0; border:none; background:white; color:#111; font-size:14px; line-height:1.6; }
+  .preview-doc.doc-quote{ border-top:5px solid var(--doc-color-quote); padding-top:10px; }
+  .preview-doc.doc-invoice{ border-top:5px solid var(--doc-color-invoice); padding-top:10px; }
+  .preview-doc.doc-receipt{ border-top:5px solid var(--doc-color-receipt); padding-top:10px; }
+  .doc-number{ font-size:12px; color:#888; margin:0 0 3px; }
+  .preview-doc h2{ font-size:24px; font-weight:600; text-align:center; margin:6px 0 16px; padding-bottom:9px; border-bottom:2px solid #111; }
+  .preview-doc.doc-quote h2{ color:var(--doc-color-quote); border-bottom-color:var(--doc-color-quote); }
+  .preview-doc.doc-invoice h2{ color:var(--doc-color-invoice); border-bottom-color:var(--doc-color-invoice); }
+  .preview-doc.doc-receipt h2{ color:var(--doc-color-receipt); border-bottom-color:var(--doc-color-receipt); }
+  /* 宛先・差出人: 2列 */
+  .preview-meta{ display:flex; gap:18px; margin-bottom:16px; width:100%; align-items:flex-start; }
+  .preview-to{ flex:1 1 0; min-width:0; overflow-wrap:break-word; word-break:break-word; }
+  .preview-to .company{ font-size:17px; font-weight:600; margin:0; }
+  .preview-to p{ margin:0; }
+  /* 差出人: ロゴ→会社名→担当者名を縦並びで右寄せ */
+  .preview-from{ flex:1 1 0; min-width:0; font-size:12px; line-height:1.8; text-align:right; }
+  .preview-from p{ text-align:right; margin:0; }
+  .preview-from .preview-logo{ max-width:120px; max-height:40px; object-fit:contain; display:block; margin:0 0 5px auto; }
+  .preview-from .from-company{ font-size:14px; font-weight:600; display:block; }
+  .preview-from .from-staff{ font-size:12px; color:#333; margin-top:2px; }
+  /* 件名: 左右を本文幅に揃える */
+  .preview-subject{ display:flex; align-items:flex-end; gap:10px; margin:16px 0 10px; padding-bottom:6px; border-bottom:2px solid #888; }
+  .preview-subject .ps-label{ font-size:11px; color:#666; font-weight:600; letter-spacing:.1em; flex-shrink:0; padding-bottom:2px; }
+  .preview-subject .ps-text{ font-size:16px; font-weight:700; color:#222; flex:1; word-break:break-word; }
+  .preview-doc.doc-quote .preview-subject{ border-bottom-color:var(--doc-color-quote); }
+  .preview-doc.doc-invoice .preview-subject{ border-bottom-color:var(--doc-color-invoice); }
+  .preview-doc.doc-receipt .preview-subject{ border-bottom-color:var(--doc-color-receipt); }
+  .preview-doc.doc-quote .preview-subject .ps-label{ color:var(--doc-color-quote); }
+  .preview-doc.doc-invoice .preview-subject .ps-label{ color:var(--doc-color-invoice); }
+  .preview-doc.doc-receipt .preview-subject .ps-label{ color:var(--doc-color-receipt); }
+  /* 明細テーブル: 左右の罫線を本文幅(width:100%)にぴったり揃える */
+  .preview-table{ width:100%; max-width:100%; border-collapse:collapse; margin-bottom:14px; font-size:13.5px; table-layout:fixed; word-break:break-word; }
+  .preview-table th{ background:#F0EDE7; padding:7px 9px; text-align:left; font-weight:600; border:1px solid #999; overflow:hidden; }
+  .preview-table td{ padding:7px 9px; border:1px solid #999; overflow:hidden; }
+  .preview-table td.num,.preview-table th.num{ white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .preview-doc.doc-quote .preview-table th{ background:var(--doc-color-quote-light); color:var(--doc-color-quote); border-bottom:2px solid var(--doc-color-quote); }
+  .preview-doc.doc-invoice .preview-table th{ background:var(--doc-color-invoice-light); color:var(--doc-color-invoice); border-bottom:2px solid var(--doc-color-invoice); }
+  .preview-doc.doc-receipt .preview-table th{ background:var(--doc-color-receipt-light); color:var(--doc-color-receipt); border-bottom:2px solid var(--doc-color-receipt); }
+  .preview-table tr{ page-break-inside:avoid; }
+  thead{ display:table-header-group; }
+  /* 合計欄: 右端をテーブル右罫線に揃える */
+  .preview-total{ width:100%; }
+  .preview-total table{ margin-left:auto; font-size:16px; min-width:46%; }
+  .preview-total td{ padding:4px 7px; }
+  .preview-total .grand{ font-size:22px; font-weight:700; border-top:2px solid #111; }
+  .preview-doc.doc-quote .grand td{ color:#111; border-top:2px solid var(--doc-color-quote); }
+  .preview-doc.doc-invoice .grand td{ color:var(--doc-color-invoice); border-top:2px solid var(--doc-color-invoice); }
+  .preview-doc.doc-receipt .grand td{ color:var(--doc-color-receipt); border-top:2px solid var(--doc-color-receipt); }
+  .preview-notes{ margin-top:12px; font-size:13px; border-top:1px solid #DDD; padding-top:9px; line-height:1.6; white-space:pre-wrap; word-break:break-word; page-break-inside:avoid; }
+  .preview-total{ page-break-inside:avoid; }
+  /* 印刷では監査情報・サンプルバッジは出さない。領収印は表示 */
+  .audit-line,.sample-badge{ display:none !important; }
+  .stamp{ width:56px; height:56px; border:2px solid #C0392B; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#C0392B; margin-left:auto; margin-top:10px; }
+`;
+
+// v3.32.61: 書類プレビューの内側HTMLを生成（画面プレビュー/印刷で共通利用）
+// ロゴ→会社名→担当者名を縦並びに配置（従来はロゴと会社名が横並びだった）。
+function _buildPreviewDocHtml(d){
+  const s=settings;
   const isTaxIncluded = (d.tax10||0)===0 && (d.tax8||0)===0;
   const taxRows=[];
   if(d.tax10>0)taxRows.push(`<tr><td>消費税（10%）</td><td style="text-align:right">${fmt(d.tax10)}</td></tr>`);
@@ -6672,8 +6630,7 @@ function previewDoc(id){
   const logoHtml=s.logo?`<img src="${s.logo}" class="preview-logo" alt="logo">`:'';
   const c=d.customerId?customers.find(x=>x.id===d.customerId):customers.find(x=>x.name===d.customer);
   const docColorClass={'見積書':'doc-quote','請求書':'doc-invoice','領収書':'doc-receipt'}[d.type]||'';
-
-  document.getElementById('preview-body').innerHTML=`
+  return `
   <div class="preview-doc ${docColorClass}">
     <p class="doc-number">${escAttr(d.number||'')}${d.date?' &nbsp;／&nbsp; 発行日：'+escAttr(d.date):''}</p>
     <h2>${escAttr(d.type||'')}</h2>
@@ -6687,9 +6644,19 @@ function previewDoc(id){
         ${c?.fax?`<p style="font-size:11px;color:#888">Fax: ${escAttr(c.fax)}</p>`:''}
       </div>
       <div class="preview-from">
-        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:3px">${logoHtml?logoHtml.replace('<img ','<img style="max-height:40px" '):''}  <strong style="font-size:13px">${escAttr(d.staff||s.owner||s.company||'（会社名未設定）')}</strong></div>
+        ${logoHtml?logoHtml.replace('<img ','<img style="max-height:40px" '):''}
+        <strong class="from-company" style="font-size:13px;display:block">${escAttr(d.staff||s.owner||s.company||'（会社名未設定）')}</strong>
+        ${d.staff?`<p class="from-staff" style="margin-top:2px">担当：${escAttr(d.staff)}</p>`:''}
         <p>${escAttr(_getOfficeField(d,'address',s))}</p><p>${escAttr(_getOfficeField(d,'tel',s))}${_getOfficeField(d,'fax',s)?' / FAX:'+escAttr(_getOfficeField(d,'fax',s)):''}</p><p>${escAttr(s.email||'')}</p>
-        ${d.staff?`<p style="margin-top:4px">担当：${escAttr(d.staff)}</p>`:''}\n        <div style="margin-top:8px;padding-top:6px;border-top:1px solid #E0E0E0;font-size:11px;color:#555;line-height:1.8">\n          ${d.type!=='見積書'?`<div><span style="display:inline-block;width:58px;color:#888">発行日</span>${escAttr(d.date||'')}</div>`:''}\n          ${d.deliveryDate?`<div><span style="display:inline-block;width:58px;color:#888">納品日</span>${escAttr(d.deliveryDate)}</div>`:''}\n          ${d.type==='見積書'?`<div><span style="display:inline-block;width:58px;color:#888">有効期限</span>${escAttr(d.dueDate||'')}</div>`:''}\n          ${d.type==='請求書'?`<div><span style="display:inline-block;width:58px;color:#888">支払期限</span>${escAttr(d.dueDate||'未設定')}</div>`:''}\n          ${d.type==='領収書'?`<div><span style="display:inline-block;width:58px;color:#888">入金日</span>${escAttr(d.dueDate||d.date||'')}</div>`:''}\n        </div>\n      </div>\n    </div>
+        <div style="margin-top:8px;padding-top:6px;border-top:1px solid #E0E0E0;font-size:11px;color:#555;line-height:1.8">
+          ${d.type!=='見積書'?`<div><span style="display:inline-block;width:58px;color:#888">発行日</span>${escAttr(d.date||'')}</div>`:''}
+          ${d.deliveryDate?`<div><span style="display:inline-block;width:58px;color:#888">納品日</span>${escAttr(d.deliveryDate)}</div>`:''}
+          ${d.type==='見積書'?`<div><span style="display:inline-block;width:58px;color:#888">有効期限</span>${escAttr(d.dueDate||'')}</div>`:''}
+          ${d.type==='請求書'?`<div><span style="display:inline-block;width:58px;color:#888">支払期限</span>${escAttr(d.dueDate||'未設定')}</div>`:''}
+          ${d.type==='領収書'?`<div><span style="display:inline-block;width:58px;color:#888">入金日</span>${escAttr(d.dueDate||d.date||'')}</div>`:''}
+        </div>
+      </div>
+    </div>
 
     <!-- 件名（品目テーブルの直上に下線付き） -->
     <div class="preview-subject">
@@ -6716,6 +6683,12 @@ function previewDoc(id){
     ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr((d.notes||'').replace(/\n\n+/g,'\n'))}</div>`:''}
     ${d.type==='領収書'?`<div style="text-align:right;margin-top:12px"><div class="stamp">領収済</div></div>`:''}
   </div>`;
+}
+
+function previewDoc(id){
+  const d=docs.find(x=>x.id===id);if(!d)return;
+  currentPreviewDocId=id;
+  document.getElementById('preview-body').innerHTML=_buildPreviewDocHtml(d);
   document.getElementById('preview-modal').classList.add('open');
 }
 
@@ -6732,16 +6705,66 @@ function shareDoc(){
   document.getElementById('share-modal').classList.add('open');
 }
 
-// 🖨️ プレビューから直接印刷（プレビューモーダルを閉じずに印刷）
-// → @media print のCSSルールが .preview-doc を見つけられるように、
-//   プレビューモーダルを開いたまま window.print() を呼ぶ
+// 🖨️ 書類印刷（v3.32.61: 隠しiframe + 印刷専用HTML 方式）
+// 画面DOMや @media print 競合に依存せず、独立した完結HTMLを iframe に注入して印刷する。
+// 帳票印刷と同じ実証済みパターン。フォント読み込み完了を待ってから印刷（1回目真っ白の防止）。
+function printDoc(){
+  const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
+  if(!d){ showToast('印刷対象の書類が見つかりません','#C0392B'); return; }
+  const innerHtml=_buildPreviewDocHtml(d);
+  const docTitle=(d.type||'書類')+'_'+(d.number||'')+'_'+today();
+  const printHtml=`<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>${escAttr(docTitle)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+<style>${_DOC_PRINT_CSS}</style>
+</head>
+<body>${innerHtml}</body>
+</html>`;
+
+  const _old=document.getElementById('doc-print-iframe');
+  if(_old) _old.remove();
+
+  const iframe=document.createElement('iframe');
+  iframe.id='doc-print-iframe';
+  iframe.setAttribute('aria-hidden','true');
+  iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  iframe.onload=function(){
+    const w=iframe.contentWindow;
+    let _cleaned=false;
+    const _cleanup=function(){ if(_cleaned)return; _cleaned=true; setTimeout(function(){ iframe.remove(); },300); };
+    try{ w.addEventListener('afterprint',_cleanup); }catch(e){}
+    setTimeout(_cleanup, 60000);
+
+    let _printed=false;
+    const _doPrint=function(){
+      if(_printed)return; _printed=true;
+      try{ w.focus(); w.print(); }
+      catch(e){ console.error('[printDoc]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); }
+    };
+    try{
+      if(w.document.fonts && w.document.fonts.ready){
+        w.document.fonts.ready.then(function(){ _doPrint(); });
+      }
+      setTimeout(_doPrint, 700);
+    }catch(e){
+      setTimeout(_doPrint, 700);
+    }
+  };
+  document.body.appendChild(iframe);
+  const idoc=iframe.contentWindow.document;
+  idoc.open();
+  idoc.write(printHtml);
+  idoc.close();
+}
+
+// 🖨️ プレビューから直接印刷
 function printPreview(){
-  document.getElementById('preview-modal').classList.add('open');
-  document.body.classList.add('printing-preview');
-  requestAnimationFrame(()=>{
-    try{ window.print(); }catch(e){ console.error('[printPreview]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); }
-    setTimeout(()=>document.body.classList.remove('printing-preview'), 1000);
-  });
+  printDoc();
 }
 
 // 🔗 プレビューから直接共有リンクを発行（送信メニューを開かずに）
@@ -6760,16 +6783,10 @@ function sharePreviewLink(){
   shareLink();
 }
 
-// 🖨️ 共有モーダルからの印刷（プレビューを再表示してから印刷）
-// → モーダルが両方閉じている状態で window.print() を呼ぶと真っ白になるバグを修正
+// 🖨️ 共有モーダルからの印刷（iframe方式なのでモーダル状態に依存しない）
 function sharePrint(){
   closeModal('share-modal');
-  document.getElementById('preview-modal').classList.add('open');
-  document.body.classList.add('printing-preview');
-  setTimeout(()=>{
-    try{ window.print(); }catch(e){ console.error('[sharePrint]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); }
-    setTimeout(()=>document.body.classList.remove('printing-preview'), 1000);
-  }, 80);
+  printDoc();
 }
 
 // 📲 スマホの「他のアプリで共有」: Web Share API で OS ネイティブ共有シートを起動
