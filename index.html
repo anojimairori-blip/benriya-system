@@ -790,17 +790,9 @@ select{appearance:auto}
 .tax-0{background:#EEE;color:#666}
 .tax-custom{background:var(--purple-light);color:var(--purple)}
 
-/* PRINT REPORT */
-@media print{
-  /* v3.32.57: 売上集計帳票の印刷専用。body.printing-report クラスで限定する。
-     旧実装は body *{visibility:hidden} が全印刷で発火し、請求書プレビュー印刷の
-     visibility 制御と綱引きしてズレの一因になっていた。printing-report スコープに
-     閉じ込めることで請求書/封筒印刷を巻き込まないようにした。 */
-  body.printing-report .no-print{display:none!important}
-  body.printing-report *{visibility:hidden}
-  body.printing-report .print-area,body.printing-report .print-area *{visibility:visible}
-  body.printing-report .print-area{position:fixed;inset:0;padding:20px;background:white}
-}
+/* PRINT REPORT: v3.32.59 で帳票印刷を隠しiframe+専用HTML方式に移行したため、
+   旧 body.printing-report 用の @media print ブロックは廃止。請求書プレビュー印刷との
+   CSS競合源が1つ減った。 */
 
 /* BACKUP */
 .backup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
@@ -977,9 +969,8 @@ select{appearance:auto}
      ここでは再定義しない（重複defの後勝ちで余白が変わる事故を防ぐ）。
      実余白は #preview-modal .modal-body の padding で微調整する。 */
   /* body直下の要素を全部消す（#preview-modal だけ残す）。
-     v3.32.57: 帳票印刷(printing-report)時はこのブロック自体を無効化し、
-     report-print-modal を消さないようガードする。 */
-  body:not(.printing-report) > *:not(#preview-modal):not(#envelope-modal){display:none !important}
+     v3.32.59: 帳票印刷を iframe 方式に移行したため printing-report ガードは不要になり撤去。 */
+  body > *:not(#preview-modal):not(#envelope-modal){display:none !important}
   /* プレビューモーダル系統は visibility:visible を強制（line 760 の body *{visibility:hidden} を上書き） */
   #preview-modal,#preview-modal *{visibility:visible !important}
   /* プレビューモーダルを通常のブロック要素として表示し直す */
@@ -3931,9 +3922,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.58';
+const APP_VERSION='v3.32.59';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-27T22:37:58Z';
+const APP_BUILD_TIME='2026-06-27T22:51:38Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -12234,10 +12225,8 @@ function updateResetPinDots(){
 }
 
 // ===== REPORT PRINT & CSV =====
-function openReportPrint(){
-  const sel=document.getElementById('report-year');
-  const y=parseInt(sel?.value)||new Date().getFullYear();
-  const months=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+// v3.32.59: 売上集計の月次データを算出（プレビュー/印刷で共通利用）
+function _computeReportData(y){
   const mData=Array(12).fill(null).map(()=>({q:0,i:0,r:0,total:0}));
   docs.forEach(d=>{
     const dt=new Date(d.date);if(dt.getFullYear()!==y)return;
@@ -12246,13 +12235,21 @@ function openReportPrint(){
     else if(d.type==='請求書'){mData[m].i++;mData[m].total+=d.grandTotal||0;}
     else if(d.type==='領収書'){mData[m].r++;mData[m].total+=d.grandTotal||0;}
   });
+  return mData;
+}
+
+// v3.32.59: 売上集計帳票の本文HTMLを生成（プレビュー/印刷で共通利用）
+// 会社名は escAttr でエスケープ。数値・件数は内部計算値のみ。
+function _buildReportInnerHtml(y){
+  const months=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const mData=_computeReportData(y);
   const yt=mData.reduce((s,m)=>s+m.total,0);
   const s=settings;
-  document.getElementById('report-print-area').innerHTML=`
+  return `
     <div style="font-family:'Noto Serif JP',serif;padding:10px">
       <div style="text-align:center;margin-bottom:20px">
         <h2 style="font-size:20px;font-weight:700">${y}年度 売上集計表</h2>
-        <p style="font-size:13px;color:#666;margin-top:4px">${s.company||''} / 出力日：${today()}</p>
+        <p style="font-size:13px;color:#666;margin-top:4px">${escAttr(s.company||'')} / 出力日：${today()}</p>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px">
         <thead><tr style="background:#F0EDE7">
@@ -12280,18 +12277,69 @@ function openReportPrint(){
         </tbody>
       </table>
     </div>`;
+}
+
+function openReportPrint(){
+  const sel=document.getElementById('report-year');
+  const y=parseInt(sel?.value)||new Date().getFullYear();
+  document.getElementById('report-print-area').innerHTML=_buildReportInnerHtml(y);
   document.getElementById('report-print-modal').classList.add('open');
 }
 
-// 🖨️ 売上集計帳票の印刷（printing-report クラスで帳票専用の印刷CSSを発火）
-// v3.32.57: 旧 onclick="window.print()" 直呼びから変更。帳票印刷CSSを
-// body.printing-report スコープに限定したため、印刷時にクラスを付与する。
+// 🖨️ 売上集計帳票の印刷（v3.32.59: 隠しiframe + 印刷専用HTML 方式）
+// 画面DOMや @media print 競合に依存せず、独立した完結HTMLを iframe に注入して印刷する。
+// 住所ラベル印刷と同じ「印刷専用HTML」パターン。SPA再描画やモーダル状態に影響されない。
+// setTimeout での print 起動は避け、iframe.onload で確実に待ってから呼ぶ。
 function printReport(){
-  document.body.classList.add('printing-report');
-  requestAnimationFrame(function(){
-    try{ window.print(); }catch(e){ console.error('[printReport]',e); showToast('印刷に失敗しました: '+e.message,'#C0392B'); }
-    setTimeout(function(){ document.body.classList.remove('printing-report'); }, 1000);
-  });
+  const sel=document.getElementById('report-year');
+  const y=parseInt(sel?.value)||new Date().getFullYear();
+  const innerHtml=_buildReportInnerHtml(y);
+  const docTitle='売上集計表_'+y+'年度_'+today();
+  const printHtml=`<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>${escAttr(docTitle)}</title>
+<style>
+  @page { size: A4 portrait; margin: 15mm 18mm; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin:0; padding:0; background:white; color:#111; font-family:'Noto Serif JP',serif; }
+  table { page-break-inside:auto; }
+  tr { page-break-inside:avoid; }
+  thead { display:table-header-group; }
+</style>
+</head>
+<body>${innerHtml}</body>
+</html>`;
+
+  // 既存の印刷用iframeがあれば除去
+  const _old=document.getElementById('report-print-iframe');
+  if(_old) _old.remove();
+
+  const iframe=document.createElement('iframe');
+  iframe.id='report-print-iframe';
+  iframe.setAttribute('aria-hidden','true');
+  iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  iframe.onload=function(){
+    try{
+      const w=iframe.contentWindow;
+      w.focus();
+      w.print();
+    }catch(e){
+      console.error('[printReport]',e);
+      showToast('印刷に失敗しました: '+e.message,'#C0392B');
+    }
+    // 印刷ダイアログを閉じた後にiframeを後始末（afterprint優先、保険でタイマー）
+    let _cleaned=false;
+    const _cleanup=function(){ if(_cleaned)return; _cleaned=true; setTimeout(function(){ iframe.remove(); },300); };
+    try{ iframe.contentWindow.addEventListener('afterprint',_cleanup); }catch(e){}
+    setTimeout(_cleanup, 60000);
+  };
+  document.body.appendChild(iframe);
+  const idoc=iframe.contentWindow.document;
+  idoc.open();
+  idoc.write(printHtml);
+  idoc.close();
 }
 
 function exportReportCSV(){
