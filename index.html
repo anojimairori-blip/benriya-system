@@ -3931,9 +3931,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.57';
+const APP_VERSION='v3.32.58';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-27T22:30:13Z';
+const APP_BUILD_TIME='2026-06-27T22:37:58Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -12293,6 +12293,8 @@ function printReport(){
     setTimeout(function(){ document.body.classList.remove('printing-report'); }, 1000);
   });
 }
+
+function exportReportCSV(){
   const sel=document.getElementById('report-year');
   const y=parseInt(sel?.value)||new Date().getFullYear();
   const months=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
