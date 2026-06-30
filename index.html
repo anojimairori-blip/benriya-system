@@ -1046,7 +1046,9 @@ select{appearance:auto}
   .preview-doc{padding:14px!important;font-size:11px!important}
   .preview-doc table{font-size:10px!important}
   .preview-doc th,.preview-doc td{padding:4px 5px!important}
-  .preview-meta{flex-direction:column!important;gap:10px !important}
+  /* v3.32.78: v3.31.1のtransform:scale方式導入後、ここでflex-directionをcolumnに
+     強制する指定は不要かつ有害（自社情報が顧客名の下に左寄せで積み上がる原因だった）。
+     scale方式は元のレイアウト(横並び・右寄せ)をそのまま縮小表示する設計のため削除。 */
 
   /* スマホ プレビュー: タイトルと件名のサイズを適正化 */
   .preview-doc h2{font-size:20px !important;letter-spacing:3px !important;margin:6px 0 14px !important}
@@ -1060,8 +1062,9 @@ select{appearance:auto}
   /* 顧客名ブロック */
   .preview-to .company{font-size:15px !important;padding-bottom:3px !important;margin-bottom:5px !important}
 
-  /* 会社情報ブロック: 要素を小さくまとめる */
-  .preview-from{font-size:10px !important;line-height:1.4 !important;text-align:left !important}
+  /* v3.32.78: text-align:left指定を削除（自社情報が右寄せにならない原因だった。
+     基本CSSのtext-align:rightをそのまま使う） */
+  .preview-from{font-size:10px !important;line-height:1.4 !important}
   .preview-from p{margin:1px 0 !important}
   .preview-from strong{font-size:12px}
   .preview-from img{max-width:70px !important;max-height:40px !important}
@@ -3865,9 +3868,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.77';
+const APP_VERSION='v3.32.78';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T04:19:00Z';
+const APP_BUILD_TIME='2026-06-30T04:28:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6697,8 +6700,8 @@ function _buildPreviewDocHtml(d){
         <p class="company">${escAttr(d.customer||'（顧客名未入力）')}　${escAttr(c?.honorific!=null?c.honorific:'御中')}</p>
         ${c?.dept?`<p style="font-size:12px;color:#666;margin-top:2px">${escAttr(c.dept)}</p>`:''}
         ${d.contact&&d.contact!==d.customer?`<p style="font-size:12px;color:#555;margin-top:2px">担当：${escAttr(d.contact)} 様</p>`:''}
-        ${c?.address?`<p style="font-size:11px;color:#888;margin-top:4px">〒${escAttr(c.zip||'')} ${escAttr(c.address)}</p>`:''}
-        ${(c?.tel||c?.fax)?`<p style="font-size:11px;color:#888">${c?.tel?'Tel: '+escAttr(c.tel):''}${c?.tel&&c?.fax?' / ':''}${c?.fax?'Fax: '+escAttr(c.fax):''}</p>`:''}
+        ${c?.address?`<p style="font-size:12.5px;color:#222;margin-top:4px">〒${escAttr(c.zip||'')} ${escAttr(c.address)}</p>`:''}
+        ${(c?.tel||c?.fax)?`<p style="font-size:12.5px;color:#222">${c?.tel?'Tel: '+escAttr(c.tel):''}${c?.tel&&c?.fax?' / ':''}${c?.fax?'Fax: '+escAttr(c.fax):''}</p>`:''}
       </div>
       <div class="preview-from">
         ${logoHtml?logoHtml.replace('<img ','<img style="max-height:40px" '):''}
