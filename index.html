@@ -11,6 +11,7 @@
 <meta http-equiv="Permissions-Policy" content="geolocation=(self), camera=(self), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()">
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="format-detection" content="telephone=no, address=no, email=no, date=no">
 <title id="page-title">便利屋 書類発行システム</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -830,10 +831,27 @@ select{appearance:auto}
     margin:0 !important;
     margin-bottom:-52% !important;
   }
+  /* v3.32.76: 封筒モード(.envelope-doc)はこれまでこのスケール対象外で、
+     幅100%のまま狭い画面に押し込まれ二列レイアウトが不格好に折り返していた。
+     .preview-doc と同じ「固定幅720pxを縮小」方式に統一して通常レイアウトと
+     同じ見た目になるようにする。 */
+  #preview-modal .envelope-doc{
+    width:720px !important;
+    max-width:720px !important;
+    transform:scale(0.48);
+    transform-origin:top left;
+    margin:0 !important;
+    margin-bottom:-52% !important;
+  }
 }
 @media screen and (max-width:400px){
   #preview-modal .preview-doc{
     transform:scale(0.40);
+    transform-origin:top left;
+    margin-bottom:-60% !important;
+  }
+  #preview-modal .envelope-doc{
+    transform:scale(0.40) !important;
     transform-origin:top left;
     margin-bottom:-60% !important;
   }
@@ -3847,9 +3865,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.76';
+const APP_VERSION='v3.32.77';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T03:21:00Z';
+const APP_BUILD_TIME='2026-06-30T04:19:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
