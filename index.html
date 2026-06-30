@@ -861,6 +861,15 @@ select{appearance:auto}
 .preview-to{flex:1 1 0;min-width:0;box-sizing:border-box;overflow-wrap:break-word;word-break:break-word}
 .preview-to .company{font-size:17px;font-weight:600}
 .preview-from{flex:1 1 0;font-size:12px;text-align:right;line-height:1.8;min-width:0;box-sizing:border-box;padding:0;margin:0;overflow-wrap:break-word;word-break:break-word}
+/* v3.32.81: メディアクエリ(screen/print)の判定ゆれに左右されない、常時有効な決定版ルール。
+   #preview-modal というID付きセレクタにすることで、どんな状況でも確実に勝つ。 */
+#preview-modal .preview-meta{display:flex !important;flex-direction:row !important}
+#preview-modal .preview-to{text-align:left !important}
+#preview-modal .preview-from{text-align:right !important}
+#preview-modal .preview-from p{text-align:right !important}
+/* v3.32.81: iOS Safariが電話番号・住所・メールを自動でリンク化し、独自の薄い色・下線を
+   付けてしまう対策。リンク化されても元のテキスト色を引き継ぐよう強制する。 */
+.preview-doc a,.envelope-doc a{color:inherit !important;text-decoration:inherit !important}
 .preview-from p{text-align:right;margin:0;padding:0}
 .preview-from strong{display:inline-block}
 /* v3.32.61: ロゴ→会社名→担当者名を縦並びで右寄せ */
@@ -3871,9 +3880,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.80';
+const APP_VERSION='v3.32.81';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T04:55:00Z';
+const APP_BUILD_TIME='2026-06-30T05:01:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
