@@ -616,7 +616,7 @@ tr:hover td{background:var(--bg)}
      ここでは @page 余白と窓枠封筒印刷(printing-envelope)のみ定義する。
      旧 printing-preview / .preview-doc 系の重複定義は本命ブロックと競合し
      プレビューと印刷のズレを生んでいたため削除した。 */
-  @page { margin:15mm 20mm }
+  @page { margin:20mm }
   /* 窓枠封筒印刷: body.printing-envelope クラスで制御 */
   body.printing-envelope > * { display:none !important; }
   body.printing-envelope #envelope-modal { display:block !important; position:static !important; background:none !important; overflow:visible !important; }
@@ -804,7 +804,7 @@ select{appearance:auto}
 /* v3.32.62: 画面プレビューを印刷レイアウト(_DOC_PRINT_CSS)に一致させる。
    .preview-doc を「白いA4紙」に見立て、印刷の @page margin:12mm 15mm を
    内側 padding(約45px 57px ≒ 12mm 15mm)で再現。中身のスタイルも印刷と揃える。 */
-.preview-doc{background:white;max-width:720px;margin:0 auto;padding:45px 57px;border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.08);font-family:'Noto Serif JP',serif;color:#111;font-size:14px;line-height:1.6;overflow:hidden;box-sizing:border-box}
+.preview-doc{background:white;max-width:720px;margin:0 auto;padding:76px;border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.08);font-family:'Noto Serif JP',serif;color:#111;font-size:14px;line-height:1.6;overflow:hidden;box-sizing:border-box}
 
 /* v3.31.1: モバイル時のプレビュー崩れ対策。
    .preview-doc は A4幅 (max-width:640px) を想定したレイアウトのため、
@@ -996,7 +996,7 @@ select{appearance:auto}
   #preview-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;overflow:visible !important;inset:auto !important;width:auto !important;height:auto !important}
   #preview-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important}
   #preview-modal .modal-header,#preview-modal .modal-footer{display:none !important}
-  #preview-modal .modal-body{display:block !important;padding:12mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
+  #preview-modal .modal-body{display:block !important;padding:20mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
   .preview-doc{display:block !important;position:static !important;margin:0 !important;border:none !important;border-radius:0 !important;padding:0 !important;max-width:100% !important;width:100% !important;overflow:hidden !important;box-shadow:none !important;background:white !important;page-break-inside:auto !important;transform:none !important;transform-origin:initial !important;font-size:14px !important}
   .preview-doc.doc-quote{border-top:5px solid var(--doc-color-quote) !important}
   .preview-doc.doc-invoice{border-top:5px solid var(--doc-color-invoice) !important}
@@ -1020,7 +1020,10 @@ select{appearance:auto}
   .preview-doc h2,.preview-doc .preview-subject,.preview-doc .grand td{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
   .preview-doc .preview-total table{margin-left:auto !important;min-width:46% !important}
   .preview-doc .audit-line,.preview-doc .sample-badge{display:none !important}
-  @page{margin:12mm 15mm}
+  /* v3.32.79: @page marginとmodal-body paddingの二重適用で余白が24mm相当になっていた
+     不具合を修正。@pageは0にし、余白はmodal-body paddingの20mmのみで作る
+     （iframe印刷ルートの確立済みパターンに合わせた）。 */
+  @page{margin:0}
 }
 /* v3.32.76: 売上集計帳票(printReport)のiOSフォールバック用。printDocと同じ考え方で
    #report-print-modal だけを表示し、それ以外を隠す。中身(_buildReportInnerHtml)は
@@ -1030,7 +1033,7 @@ select{appearance:auto}
   #report-print-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;overflow:visible !important;inset:auto !important;width:auto !important;height:auto !important}
   #report-print-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important}
   #report-print-modal .modal-header,#report-print-modal .modal-footer{display:none !important}
-  #report-print-modal .modal-body{display:block !important;padding:12mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
+  #report-print-modal .modal-body{display:block !important;padding:20mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
   #report-print-modal .print-area table{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
 }
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
@@ -3868,9 +3871,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.78';
+const APP_VERSION='v3.32.79';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T04:28:00Z';
+const APP_BUILD_TIME='2026-06-30T04:38:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6616,7 +6619,7 @@ function duplicateDoc(id){
 // 要望反映: 余白少なめ(@page 12mm 15mm)、左右の罫線を本文幅に統一、
 // 見やすいフォントサイズ(本文14px)、ロゴの下に会社名・担当者名を改行配置。
 const _DOC_PRINT_CSS=`
-  @page { size: A4 portrait; margin: 12mm 15mm; }
+  @page { size: A4 portrait; margin: 20mm; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body { margin:0; padding:0; background:white; color:#111; font-family:'Noto Serif JP',serif; overflow:hidden; }
   :root{
@@ -6788,7 +6791,7 @@ function printDoc(){
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 <style>${_bodyCss}
 :root{--doc-color-quote:#C49A2D;--doc-color-invoice:#1A73E8;--doc-color-receipt:#2D5A3D}
-@page{size:A4 portrait;margin:12mm 15mm}</style>
+@page{size:A4 portrait;margin:20mm}</style>
 </head>
 <body>${innerHtml}</body>
 </html>`;
@@ -12411,7 +12414,7 @@ function printReport(){
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  @page { size: A4 portrait; margin: 15mm 18mm; }
+  @page { size: A4 portrait; margin: 20mm; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body { margin:0; padding:0; background:white; color:#111; font-family:'Noto Serif JP',serif; }
   table { page-break-inside:auto; }
