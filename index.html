@@ -3834,9 +3834,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.73';
+const APP_VERSION='v3.32.74';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T01:31:54Z';
+const APP_BUILD_TIME='2026-06-30T02:11:29Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4133,9 +4133,9 @@ function openMonthlyBulkModal(){
   document.getElementById('monthly-bulk-modal').style.display='block';
 }
 
-function openEnvelopePreview(id){
-  var d=docs.find(function(x){return x.id===id;});
-  if(!d){showToast('書類が見つかりません','#C0392B');return;}
+// v3.32.74: 封筒窓枠レイアウトのHTML生成（画面プレビュー/印刷で共通利用）。
+// 専用クラス envelope-doc で外部CSSの干渉を遮断。全スタイルはインラインで自己完結。
+function _buildEnvelopeHtml(d){
   var s=settings;
   var cust=customers.find(function(x){return x.id===d.customerId;})||{};
   var custName=_escPub(cust.name||d.customer||'');
@@ -4167,9 +4167,10 @@ function openEnvelopePreview(id){
     banks.forEach(function(b){bankHtml+=_escPub(b.label||'')+' '+_escPub(b.bank||'')+' '+_escPub(b.account||'')+'<br>';});
     bankHtml+='</div>';
   }
-  var html='<div style="width:100%;font-family:sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:8mm 10mm">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm">';
-  html+='<div style="width:55%;box-sizing:border-box;overflow-wrap:break-word">';
+  var _envColor=d.type==='見積書'?'var(--doc-color-quote)':d.type==='領収書'?'var(--doc-color-receipt)':'var(--doc-color-invoice)';
+  var html='<div class="envelope-doc" style="width:100%;max-width:100%;font-family:sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:8mm 10mm;overflow:hidden">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm;gap:12px">';
+  html+='<div style="width:55%;box-sizing:border-box;overflow-wrap:break-word;word-break:break-word">';
   if(cust.zip)html+='<div style="font-size:12px;margin-bottom:3px">〒'+_escPub(cust.zip)+'</div>';
   if(cust.address)html+='<div style="font-size:12px;line-height:1.7;margin-bottom:5px">'+_escPub(cust.address)+'</div>';
   var _nameLen=(cust.name||d.customer||'').length;
@@ -4177,13 +4178,12 @@ function openEnvelopePreview(id){
   var _honorFontSize=_nameLen>=14?'12px':_nameLen>=11?'13px':'14px';
   html+='<div style="font-size:'+_nameFontSize+';font-weight:700;letter-spacing:0.5px;margin-bottom:4px;word-break:break-word">'+custName+'<span style="font-size:'+_honorFontSize+';font-weight:400;margin-left:6px;white-space:nowrap">'+custHonorific+'</span></div>';
   html+='</div>';
-  html+='<div style="width:42%;text-align:right;box-sizing:border-box;overflow-wrap:break-word">';
+  html+='<div style="width:42%;text-align:right;box-sizing:border-box;overflow-wrap:break-word;word-break:break-word">';
   html+='<div style="font-size:11px;color:#555;margin-bottom:8px">NO. '+_escPub(d.number||'')+' / '+_escPub(d.date||'')+'</div>';
   html+='<div style="margin-bottom:3px">'+logoHtml+'<strong style="font-size:13px;display:block;word-break:break-word">'+_escPub(s.owner||s.company||'')+'</strong></div>';
   if(s.zip||s.address)html+='<div style="font-size:10px;color:#555;margin-top:2px">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
   if(s.tel)html+='<div style="font-size:10px;color:#555">TEL: '+_escPub(s.tel)+'</div>';
   if(s.email)html+='<div style="font-size:10px;color:#555">'+_escPub(s.email)+'</div>';
-  // 発行日・支払期限・入金日
   html+='<div style="margin-top:6px;padding-top:5px;border-top:1px solid #E0E0E0;font-size:10px;color:#555;line-height:1.8">';
   html+='<div><span style="display:inline-block;width:52px;color:#888">発行日</span>'+_escPub(d.date||'')+'</div>';
   if(d.deliveryDate)html+='<div><span style="display:inline-block;width:52px;color:#888">納品日</span>'+_escPub(d.deliveryDate)+'</div>';
@@ -4191,10 +4191,10 @@ function openEnvelopePreview(id){
   if(d.type==='領収書')html+='<div><span style="display:inline-block;width:52px;color:#888">入金日</span>'+_escPub(d.dueDate||d.date||'')+'</div>';
   html+='</div>';
   html+='</div></div>';
-  html+='<div style="text-align:center;font-size:20px;font-weight:700;letter-spacing:6px;border-bottom:2px solid '+(d.type==='見積書'?'var(--doc-color-quote)':d.type==='領収書'?'var(--doc-color-receipt)':'var(--doc-color-invoice)')+';padding-bottom:4px;margin-bottom:6px;color:'+(d.type==='見積書'?'var(--doc-color-quote)':d.type==='領収書'?'var(--doc-color-receipt)':'var(--doc-color-invoice)')+'">'+_escPub(d.type||'')+'</div>';
+  html+='<div style="text-align:center;font-size:20px;font-weight:700;letter-spacing:6px;border-bottom:2px solid '+_envColor+';padding-bottom:4px;margin-bottom:6px;color:'+_envColor+'">'+_escPub(d.type||'')+'</div>';
   if(d.subject)html+='<div style="font-size:12px;margin-bottom:6px">件名：<strong>'+_escPub(d.subject)+'</strong></div>';
-  html+='<table style="width:100%;border-collapse:collapse;margin-bottom:4mm">';
-  html+='<thead><tr style="background:var(--doc-color-invoice);color:white">';
+  html+='<table style="width:100%;border-collapse:collapse;margin-bottom:4mm;table-layout:fixed">';
+  html+='<thead><tr style="background:'+_envColor+';color:white">';
   html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;text-align:left">品目・作業内容</th>';
   html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:8%">数量</th>';
   html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:15%">単価</th>';
@@ -4207,7 +4207,6 @@ function openEnvelopePreview(id){
     html+='<tr><td style="padding:4px 10px;border:none;font-size:13px;color:#555">小計</td><td style="padding:4px 10px;border:none;font-size:13px;text-align:right;color:#555">'+fmt(d.subtotal||0)+'</td></tr>';
     if(d.tax10)html+='<tr><td style="padding:4px 10px;border:none;font-size:13px;color:#555">消費税 10%</td><td style="padding:4px 10px;border:none;font-size:13px;text-align:right;color:#555">'+fmt(d.tax10)+'</td></tr>';
   }
-  var _envColor=d.type==='見積書'?'var(--doc-color-quote)':d.type==='領収書'?'var(--doc-color-receipt)':'var(--doc-color-invoice)';
   html+='<tr style="background:'+_envColor+';color:white"><td style="padding:10px 12px;border:1px solid '+_envColor+';font-size:16px;font-weight:700">合計（税込）</td>';
   html+='<td style="padding:10px 12px;border:1px solid '+_envColor+';font-size:22px;font-weight:700;text-align:right;letter-spacing:0.5px">'+fmt(d.grandTotal||0)+'</td></tr>';
   html+='</table></div>';
@@ -4218,8 +4217,14 @@ function openEnvelopePreview(id){
     html+='</div>';
   }
   html+='</div>';
-  // preview-bodyに直接書き込む（別モーダルを使わない）
-  document.getElementById('preview-body').innerHTML=html;
+  return html;
+}
+
+function openEnvelopePreview(id){
+  var d=docs.find(function(x){return x.id===id;});
+  if(!d){showToast('書類が見つかりません','#C0392B');return;}
+  _isEnvelopeMode=true;
+  document.getElementById('preview-body').innerHTML=_buildEnvelopeHtml(d);
   var be=document.getElementById('btn-envelope');
   var bn=document.getElementById('btn-normal-layout');
   if(be)be.style.display='none';
@@ -4399,6 +4404,7 @@ function persistStatuses(){localStorage.setItem('docStatuses',JSON.stringify(doc
 
 let editingDocId=null,editingCustId=null,editingJobId=null,editingTmplId=null;
 let currentPreviewDocId=null,selectedCustId=null;
+let _isEnvelopeMode=false; // v3.32.74: 封筒窓枠レイアウト表示中フラグ（印刷時の分岐に使用）
 let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
 let cropData={x:20,y:20,w:200,h:100},cropOriginal='',cropDragging=false,cropStart={};
 
@@ -6706,6 +6712,7 @@ function _buildPreviewDocHtml(d){
 function previewDoc(id){
   const d=docs.find(x=>x.id===id);if(!d)return;
   currentPreviewDocId=id;
+  _isEnvelopeMode=false;
   document.getElementById('preview-body').innerHTML=_buildPreviewDocHtml(d);
   document.getElementById('preview-modal').classList.add('open');
 }
@@ -6729,7 +6736,11 @@ function shareDoc(){
 function printDoc(){
   const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
   if(!d){ showToast('印刷対象の書類が見つかりません','#C0392B'); return; }
-  const innerHtml=_buildPreviewDocHtml(d);
+  // v3.32.74: 封筒モード表示中は封筒レイアウトを印刷（画面=印刷の一致）
+  const innerHtml = _isEnvelopeMode ? _buildEnvelopeHtml(d) : _buildPreviewDocHtml(d);
+  const _bodyCss = _isEnvelopeMode
+    ? `html,body{margin:0;padding:0;background:white;color:#111;font-family:sans-serif;overflow:hidden}`
+    : _DOC_PRINT_CSS;
   const docTitle=(d.type||'書類')+'_'+(d.number||'')+'_'+today();
   const printHtml=`<!DOCTYPE html>
 <html lang="ja">
@@ -6739,7 +6750,9 @@ function printDoc(){
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
-<style>${_DOC_PRINT_CSS}</style>
+<style>${_bodyCss}
+:root{--doc-color-quote:#C49A2D;--doc-color-invoice:#1A73E8;--doc-color-receipt:#2D5A3D}
+@page{size:A4 portrait;margin:12mm 15mm}</style>
 </head>
 <body>${innerHtml}</body>
 </html>`;
