@@ -3816,9 +3816,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.65';
+const APP_VERSION='v3.32.66';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-28T00:21:35Z';
+const APP_BUILD_TIME='2026-06-30T00:30:43Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6665,7 +6665,7 @@ function _buildPreviewDocHtml(d){
     </div>
 
     <table class="preview-table">
-      <thead><tr><th style="width:32%">品目・作業内容</th><th class="num" style="width:9%;text-align:right">数量</th><th class="num" style="width:17%;text-align:right">単価</th><th style="width:10%;text-align:center">税率</th><th class="num" style="width:22%;text-align:right">金額</th></tr></thead>
+      <thead><tr><th style="width:42%">品目・作業内容</th><th class="num" style="width:9%;text-align:right">数量</th><th class="num" style="width:17%;text-align:right">単価</th><th style="width:10%;text-align:center">税率</th><th class="num" style="width:22%;text-align:right">金額</th></tr></thead>
       <tbody>${(d.lines||[]).map(l=>{
         const taxDisplay = (l.tax==='0'||l.tax===0) ? '非課税'
           : isTaxIncluded ? '税込' // 税込モード（消費税未計算）の場合
@@ -6726,6 +6726,38 @@ function printDoc(){
 <body>${innerHtml}</body>
 </html>`;
 
+  // v3.32.66: iOS Safari は width:0/height:0/visibility:hidden のiframeへの
+  // contentWindow.print() が正常動作しない（一瞬表示されて即消える既知の問題）。
+  // iOS端末では window.open で別タブに印刷専用HTMLを開き、onload → print() で対応する。
+  const _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  if(_isIOS){
+    // iOS向け: 別タブで印刷専用HTMLを開く（住所ラベル印刷と同じ実績ある方式）
+    const _win = window.open('', '_blank');
+    if(!_win){
+      showToast('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。', '#E67E22');
+      return;
+    }
+    _win.document.open();
+    _win.document.write(printHtml);
+    _win.document.close();
+    _win.onload = function(){
+      try{
+        const w = _win;
+        if(w.document.fonts && w.document.fonts.ready){
+          w.document.fonts.ready.then(function(){ w.focus(); w.print(); });
+        }
+        setTimeout(function(){ _win.focus(); _win.print(); }, 700);
+      }catch(e){
+        console.error('[printDoc iOS]', e);
+        showToast('印刷に失敗しました: '+e.message, '#C0392B');
+      }
+    };
+    return;
+  }
+
+  // 非iOS: 隠しiframe方式（Windows/Mac Chrome/Safari 共通）
   const _old=document.getElementById('doc-print-iframe');
   if(_old) _old.remove();
 
