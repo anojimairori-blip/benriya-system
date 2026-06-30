@@ -3871,9 +3871,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.79';
+const APP_VERSION='v3.32.80';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T04:38:00Z';
+const APP_BUILD_TIME='2026-06-30T04:55:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6806,6 +6806,35 @@ function printDoc(){
     // プレビューモーダルが開いていることを確認（念のため開く）
     const _pm = document.getElementById('preview-modal');
     if(_pm) _pm.classList.add('open');
+
+    // v3.32.80: スマホ画面用の transform:scale(.preview-doc/.envelope-doc) が
+    // iOSの印刷プレビュー描画時にも screen メディアとして適用されてしまい、
+    // margin-bottom:-52%等で合計欄・備考が見えなくなる不具合への対策。
+    // @media print の上書きはこの描画パスには効かないため、印刷直前に
+    // インラインstyle(important)で直接無効化し、afterprintで復元する。
+    const _pdEl = document.querySelector('#preview-modal .preview-doc, #preview-modal .envelope-doc');
+    let _restored = false;
+    const _restorePd = function(){
+      if(_restored) return; _restored = true;
+      if(_pdEl){
+        _pdEl.style.removeProperty('transform');
+        _pdEl.style.removeProperty('transform-origin');
+        _pdEl.style.removeProperty('margin-bottom');
+        _pdEl.style.removeProperty('width');
+        _pdEl.style.removeProperty('max-width');
+      }
+      try{ window.removeEventListener('afterprint', _restorePd); }catch(e){}
+    };
+    if(_pdEl){
+      _pdEl.style.setProperty('transform','none','important');
+      _pdEl.style.setProperty('transform-origin','initial','important');
+      _pdEl.style.setProperty('margin-bottom','0','important');
+      _pdEl.style.setProperty('width','100%','important');
+      _pdEl.style.setProperty('max-width','100%','important');
+    }
+    try{ window.addEventListener('afterprint', _restorePd); }catch(e){}
+    setTimeout(_restorePd, 60000); // 保険（afterprint非対応環境向け）
+
     // フォント読み込みを待ってから印刷
     try{
       if(document.fonts && document.fonts.ready){
