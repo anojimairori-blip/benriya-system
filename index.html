@@ -3880,9 +3880,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.84';
+const APP_VERSION='v3.32.85';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T23:24:00Z';
+const APP_BUILD_TIME='2026-06-30T23:40:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6847,15 +6847,26 @@ function printDoc(){
     try{ window.addEventListener('afterprint', _restorePd); }catch(e){}
     setTimeout(_restorePd, 60000); // 保険（afterprint非対応環境向け）
 
-    // フォント読み込みを待ってから印刷
+    // v3.32.85: iOS判定。iOSはiframe方式が全滅のため window.print() 直呼び方式を採用。
+    // _iosPrinted フラグで fonts.ready.then と catch内setTimeout の両方が万一発火しても1回のみ印刷する。
+    let _iosPrinted = false;
     try{
       if(document.fonts && document.fonts.ready){
-        document.fonts.ready.then(function(){ window.print(); });
+        document.fonts.ready.then(function(){
+          if(_iosPrinted) return; _iosPrinted = true;
+          window.print();
+        });
       } else {
-        setTimeout(function(){ window.print(); }, 500);
+        setTimeout(function(){
+          if(_iosPrinted) return; _iosPrinted = true;
+          window.print();
+        }, 500);
       }
     }catch(e){
-      setTimeout(function(){ window.print(); }, 500);
+      setTimeout(function(){
+        if(_iosPrinted) return; _iosPrinted = true;
+        window.print();
+      }, 500);
     }
     return;
   }
@@ -7005,6 +7016,17 @@ async function _generatePdfBlob(){
   const oldDisplay=[];
   hideEls.forEach(el=>{oldDisplay.push(el.style.display); el.style.display='none';});
 
+  // v3.32.84: .preview-doc の画面表示用padding(76px≈20mm)をhtml2pdf捕捉前に除去。
+  // html2pdfのmarginと二重にかかると余白が30mm相当になるため、html2pdf margin:15mmのみで制御する。
+  const _prevPadding = previewDoc.style.padding;
+  const _prevBorder = previewDoc.style.border;
+  const _prevBorderRadius = previewDoc.style.borderRadius;
+  const _prevBoxShadow = previewDoc.style.boxShadow;
+  previewDoc.style.padding = '0';
+  previewDoc.style.border = 'none';
+  previewDoc.style.borderRadius = '0';
+  previewDoc.style.boxShadow = 'none';
+
   if(typeof html2pdf==='undefined') throw new Error('PDFライブラリが読み込まれていません');
 
   const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
@@ -7012,7 +7034,7 @@ async function _generatePdfBlob(){
   const fname=d?buildPdfFilename(d):'document.pdf';
 
   const opt={
-    margin: [10,10,10,10],
+    margin: [15,15,15,15],
     filename: fname,
     image: { type:'jpeg', quality:0.95 },
     html2canvas: { scale:2, useCORS:true, allowTaint:false, backgroundColor:'#ffffff', logging:false },
@@ -7032,8 +7054,12 @@ async function _generatePdfBlob(){
       document.body.style.overflow = _prevBodyOverflow;
     }
   } finally {
-    // 元に戻す
+    // 元に戻す（画面用CSS含む）
     hideEls.forEach((el,i)=>{el.style.display=oldDisplay[i]||'';});
+    previewDoc.style.padding = _prevPadding;
+    previewDoc.style.border = _prevBorder;
+    previewDoc.style.borderRadius = _prevBorderRadius;
+    previewDoc.style.boxShadow = _prevBoxShadow;
   }
 }
 
