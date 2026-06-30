@@ -3816,9 +3816,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.69';
+const APP_VERSION='v3.32.70';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T01:12:09Z';
+const APP_BUILD_TIME='2026-06-30T01:19:25Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6726,62 +6726,24 @@ function printDoc(){
 <body>${innerHtml}</body>
 </html>`;
 
-  // v3.32.67: iOS Safari では window.open が別タブに飛ばされて印刷できない問題を修正。
-  // Body Swap方式: 現在のbody内容を印刷用HTMLに差し替え → window.print() → afterprintで元に戻す。
-  // iOSで唯一確実に動作する方式。ユーザーが別タブに飛ばされない。
+  // v3.32.70: Body Swap方式を廃止。SPAのDOM/状態が失われメニューが操作不能になるため。
+  // 全プラットフォーム共通で隠しiframe方式に統一。
+  // iOS Safariは width:0/height:0 だとprint()が無視されるため、1px×1px + opacity:0 で回避。
   const _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-  if(_isIOS){
-    // 現在のDOM全体をスナップショット
-    const _savedHtml = document.documentElement.innerHTML;
-    const _savedTitle = document.title;
-
-    // v3.32.69: div.innerHTMLでは<head>/<body>タグが正しくパースされない問題を修正。
-    // DOMParserで完全なHTML文書としてパースし、head/bodyを確実に取得する。
-    const _parser = new DOMParser();
-    const _parsedDoc = _parser.parseFromString(printHtml, 'text/html');
-    const _printHeadHtml = _parsedDoc.head ? _parsedDoc.head.innerHTML : '';
-    const _printBodyHtml = _parsedDoc.body ? _parsedDoc.body.innerHTML : '';
-
-    // DOMをスワップ（印刷用に差し替え）
-    document.title = docTitle;
-    document.head.innerHTML = _printHeadHtml;
-    document.body.innerHTML = _printBodyHtml;
-
-    // 元に戻す処理（afterprint + 保険タイマー3秒）
-    let _restored = false;
-    const _restore = function(){
-      if(_restored) return;
-      _restored = true;
-      document.documentElement.innerHTML = _savedHtml;
-      document.title = _savedTitle;
-      // イベントリスナーを再バインド（Flexsys2026はonclick属性なので再バインド不要）
-    };
-    try{ window.addEventListener('afterprint', _restore, {once:true}); }catch(e){}
-    setTimeout(_restore, 3000);
-
-    // フォント読み込みを待ってから印刷
-    try{
-      if(document.fonts && document.fonts.ready){
-        document.fonts.ready.then(function(){ window.print(); });
-      } else {
-        setTimeout(function(){ window.print(); }, 700);
-      }
-    }catch(e){
-      setTimeout(function(){ window.print(); }, 700);
-    }
-    return;
-  }
-
-  // 非iOS: 隠しiframe方式（Windows/Mac Chrome/Safari 共通）
   const _old=document.getElementById('doc-print-iframe');
   if(_old) _old.remove();
 
   const iframe=document.createElement('iframe');
   iframe.id='doc-print-iframe';
   iframe.setAttribute('aria-hidden','true');
-  iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  // iOSは0×0だとprint()が無視される → 1px×1px + opacity:0 で不可視化
+  if(_isIOS){
+    iframe.style.cssText='position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none';
+  } else {
+    iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  }
   iframe.onload=function(){
     const w=iframe.contentWindow;
     let _cleaned=false;
