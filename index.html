@@ -1003,7 +1003,7 @@ select{appearance:auto}
 @media print{
   body > *:not(#preview-modal):not(#envelope-modal):not(#report-print-modal){display:none !important}
   #preview-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;overflow:visible !important;inset:auto !important;width:auto !important;height:auto !important}
-  #preview-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important}
+  #preview-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important;max-height:none !important;height:auto !important;overflow:visible !important;overflow-y:visible !important}
   #preview-modal .modal-header,#preview-modal .modal-footer{display:none !important}
   #preview-modal .modal-body{display:block !important;padding:20mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
   .preview-doc{display:block !important;position:static !important;margin:0 !important;border:none !important;border-radius:0 !important;padding:0 !important;max-width:100% !important;width:100% !important;overflow:hidden !important;box-shadow:none !important;background:white !important;page-break-inside:auto !important;transform:none !important;transform-origin:initial !important;font-size:14px !important}
@@ -1040,7 +1040,7 @@ select{appearance:auto}
 @media print{
   body > *:not(#report-print-modal):not(#preview-modal):not(#envelope-modal){display:none !important}
   #report-print-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;overflow:visible !important;inset:auto !important;width:auto !important;height:auto !important}
-  #report-print-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important}
+  #report-print-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important;max-height:none !important;height:auto !important;overflow:visible !important;overflow-y:visible !important}
   #report-print-modal .modal-header,#report-print-modal .modal-footer{display:none !important}
   #report-print-modal .modal-body{display:block !important;padding:20mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
   #report-print-modal .print-area table{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;min-width:0 !important;width:100% !important}
@@ -3880,9 +3880,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.82';
+const APP_VERSION='v3.32.83';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T05:20:00Z';
+const APP_BUILD_TIME='2026-06-30T05:34:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
