@@ -3834,7 +3834,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.72';
+const APP_VERSION='v3.32.73';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
 const APP_BUILD_TIME='2026-06-30T01:31:54Z';
 
@@ -4169,17 +4169,17 @@ function openEnvelopePreview(id){
   }
   var html='<div style="width:100%;font-family:sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:8mm 10mm">';
   html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm">';
-  html+='<div style="width:55%">';
+  html+='<div style="width:55%;box-sizing:border-box;overflow-wrap:break-word">';
   if(cust.zip)html+='<div style="font-size:12px;margin-bottom:3px">〒'+_escPub(cust.zip)+'</div>';
   if(cust.address)html+='<div style="font-size:12px;line-height:1.7;margin-bottom:5px">'+_escPub(cust.address)+'</div>';
   var _nameLen=(cust.name||d.customer||'').length;
   var _nameFontSize=_nameLen>=14?'14px':_nameLen>=11?'16px':'20px';
   var _honorFontSize=_nameLen>=14?'12px':_nameLen>=11?'13px':'14px';
-  html+='<div style="font-size:'+_nameFontSize+';font-weight:700;letter-spacing:0.5px;margin-bottom:4px;white-space:nowrap">'+custName+'<span style="font-size:'+_honorFontSize+';font-weight:400;margin-left:6px">'+custHonorific+'</span></div>';
+  html+='<div style="font-size:'+_nameFontSize+';font-weight:700;letter-spacing:0.5px;margin-bottom:4px;word-break:break-word">'+custName+'<span style="font-size:'+_honorFontSize+';font-weight:400;margin-left:6px;white-space:nowrap">'+custHonorific+'</span></div>';
   html+='</div>';
-  html+='<div style="width:42%;text-align:right">';
+  html+='<div style="width:42%;text-align:right;box-sizing:border-box;overflow-wrap:break-word">';
   html+='<div style="font-size:11px;color:#555;margin-bottom:8px">NO. '+_escPub(d.number||'')+' / '+_escPub(d.date||'')+'</div>';
-  html+='<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:3px">'+logoHtml+'<strong style="font-size:13px">'+_escPub(s.owner||s.company||'')+'</strong></div>';
+  html+='<div style="margin-bottom:3px">'+logoHtml+'<strong style="font-size:13px;display:block;word-break:break-word">'+_escPub(s.owner||s.company||'')+'</strong></div>';
   if(s.zip||s.address)html+='<div style="font-size:10px;color:#555;margin-top:2px">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
   if(s.tel)html+='<div style="font-size:10px;color:#555">TEL: '+_escPub(s.tel)+'</div>';
   if(s.email)html+='<div style="font-size:10px;color:#555">'+_escPub(s.email)+'</div>';
