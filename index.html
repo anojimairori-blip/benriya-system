@@ -813,26 +813,29 @@ select{appearance:auto}
    `screen and`を付けて画面表示時のみマッチするように修正。 */
 @media screen and (max-width:768px){
   #preview-modal #preview-body{
-    /* スケール後のオーバーフロー対策 */
-    overflow-x:auto;
+    /* v3.32.68: overflow-x:hidden でA4紙の右端はみ出しをclip（横スクロール無効化）*/
+    overflow-x:hidden;
+    overflow-y:auto;
     -webkit-overflow-scrolling:touch;
     padding:8px !important;
   }
   #preview-modal .preview-doc{
-    /* A4紙コンテナ(720px)を画面幅に収める（720px → 約48%スケール） */
+    /* A4紙コンテナ(720px)を画面幅に収める。
+       transform-origin:top center で左右均等に縮小し右端はみ出しを防ぐ */
     width:720px;
     max-width:720px;
     transform:scale(0.48);
-    transform-origin:top left;
-    margin:0 !important;
+    transform-origin:top center;
+    margin:0 auto !important;
     /* 縮小後の実高さに合わせて見かけ上の高さを調整 */
     margin-bottom:-52% !important;
   }
 }
 @media screen and (max-width:400px){
   #preview-modal .preview-doc{
-    /* iPhone SE等の狭い画面ではさらに縮小 */
+    /* iPhone SE等の狭い画面ではさらに縮小。transform-originはtop centerで左右均等 */
     transform:scale(0.40);
+    transform-origin:top center;
     margin-bottom:-60% !important;
   }
 }
@@ -3816,9 +3819,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.67';
+const APP_VERSION='v3.32.68';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T00:47:19Z';
+const APP_BUILD_TIME='2026-06-30T01:04:26Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6559,14 +6562,14 @@ function duplicateDoc(id){
 const _DOC_PRINT_CSS=`
   @page { size: A4 portrait; margin: 12mm 15mm; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  html, body { margin:0; padding:0; background:white; color:#111; font-family:'Noto Serif JP',serif; }
+  html, body { margin:0; padding:0; background:white; color:#111; font-family:'Noto Serif JP',serif; overflow:hidden; }
   :root{
     --doc-color-quote:#C49A2D; --doc-color-quote-light:#FAF5E5;
     --doc-color-invoice:#1A73E8; --doc-color-invoice-light:#E8F0FE;
     --doc-color-receipt:#2D5A3D; --doc-color-receipt-light:#E6F2EA;
   }
-  /* 書類本体: 余白を詰め、左右は @page マージンに任せる（width:100%） */
-  .preview-doc{ width:100%; max-width:100%; margin:0; padding:0; border:none; background:white; color:#111; font-size:14px; line-height:1.6; }
+  /* 書類本体: 余白を詰め、左右は @page マージンに任せる（width:100%）。overflow:hiddenで右端クリップ */
+  .preview-doc{ width:100%; max-width:100%; margin:0; padding:0; border:none; background:white; color:#111; font-size:14px; line-height:1.6; overflow:hidden; }
   .preview-doc.doc-quote{ border-top:5px solid var(--doc-color-quote); padding-top:10px; }
   .preview-doc.doc-invoice{ border-top:5px solid var(--doc-color-invoice); padding-top:10px; }
   .preview-doc.doc-receipt{ border-top:5px solid var(--doc-color-receipt); padding-top:10px; }
