@@ -283,6 +283,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* テーブルカードは横スクロール可能に（電話番号や件数バッジが折り返さない） */
 .card:has(>table){overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;min-width:600px}
+/* 封筒レイアウトは自己完結のため外部の min-width:600px を無効化（モバイルはみ出し対策 v3.32.75） */
+.envelope-doc table{min-width:0 !important}
 th{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.05em;padding:9px 13px;background:var(--surface2);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
 td{padding:10px 13px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
 tr:last-child td{border-bottom:none}
@@ -3834,9 +3836,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.74';
+const APP_VERSION='v3.32.75';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T02:11:29Z';
+const APP_BUILD_TIME='2026-06-30T02:37:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
