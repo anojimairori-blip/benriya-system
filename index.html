@@ -876,7 +876,7 @@ select{appearance:auto}
 .preview-from .from-company{font-size:14px;font-weight:600;display:block}
 .preview-from .from-staff{font-size:12px;color:#333;margin-top:2px}
 .preview-logo{max-width:120px;max-height:40px;object-fit:contain;display:block;margin:0 0 5px auto}
-.preview-table{width:100%;max-width:100%;border-collapse:collapse;margin-bottom:14px;font-size:13.5px;table-layout:fixed;word-break:break-word;box-sizing:border-box}
+.preview-table{width:100%;max-width:100%;min-width:0;border-collapse:collapse;margin-bottom:14px;font-size:13.5px;table-layout:fixed;word-break:break-word;box-sizing:border-box}
 /* v3.32.4: 金額・単価セルのはみ出し防止（白囲い） */
 .preview-table td.num,.preview-table th.num{white-space:nowrap;font-variant-numeric:tabular-nums}
 
@@ -1019,7 +1019,7 @@ select{appearance:auto}
   .preview-doc .preview-from .from-staff{display:block !important;font-size:12px !important}
   .preview-doc .preview-logo{display:block !important;margin-left:auto !important;max-height:40px !important}
   /* テーブル: 列幅100%固定 */
-  .preview-doc .preview-table{width:100% !important;table-layout:fixed !important;border-collapse:collapse !important;font-size:13.5px !important}
+  .preview-doc .preview-table{width:100% !important;min-width:0 !important;table-layout:fixed !important;border-collapse:collapse !important;font-size:13.5px !important}
   .preview-doc .preview-table th,.preview-doc .preview-table td{border:1px solid #999 !important;padding:7px 9px !important;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
   .preview-doc .preview-table th{background:#F0EDE7 !important}
   .preview-doc.doc-quote .preview-table th{background:var(--doc-color-quote-light) !important;color:var(--doc-color-quote) !important}
@@ -1043,7 +1043,7 @@ select{appearance:auto}
   #report-print-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important}
   #report-print-modal .modal-header,#report-print-modal .modal-footer{display:none !important}
   #report-print-modal .modal-body{display:block !important;padding:20mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
-  #report-print-modal .print-area table{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+  #report-print-modal .print-area table{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;min-width:0 !important;width:100% !important}
 }
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 /* ===== MOBILE DRAWER ===== */
@@ -3880,9 +3880,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.81';
+const APP_VERSION='v3.32.82';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T05:01:00Z';
+const APP_BUILD_TIME='2026-06-30T05:20:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
