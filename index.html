@@ -974,7 +974,7 @@ select{appearance:auto}
    非iOS: 隠しiframe+専用HTML方式(printDoc)。
    iOS: window.print()直呼び方式のため、このフォールバックCSSでレイアウトを制御する。 */
 @media print{
-  body > *:not(#preview-modal):not(#envelope-modal){display:none !important}
+  body > *:not(#preview-modal):not(#envelope-modal):not(#report-print-modal){display:none !important}
   #preview-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;overflow:visible !important;inset:auto !important;width:auto !important;height:auto !important}
   #preview-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important}
   #preview-modal .modal-header,#preview-modal .modal-footer{display:none !important}
@@ -1003,6 +1003,17 @@ select{appearance:auto}
   .preview-doc .preview-total table{margin-left:auto !important;min-width:46% !important}
   .preview-doc .audit-line,.preview-doc .sample-badge{display:none !important}
   @page{margin:12mm 15mm}
+}
+/* v3.32.76: 売上集計帳票(printReport)のiOSフォールバック用。printDocと同じ考え方で
+   #report-print-modal だけを表示し、それ以外を隠す。中身(_buildReportInnerHtml)は
+   インラインスタイルで自己完結しているため列幅の追加指定は不要。 */
+@media print{
+  body > *:not(#report-print-modal):not(#preview-modal):not(#envelope-modal){display:none !important}
+  #report-print-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;overflow:visible !important;inset:auto !important;width:auto !important;height:auto !important}
+  #report-print-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important}
+  #report-print-modal .modal-header,#report-print-modal .modal-footer{display:none !important}
+  #report-print-modal .modal-body{display:block !important;padding:12mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
+  #report-print-modal .print-area table{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
 }
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 /* ===== MOBILE DRAWER ===== */
@@ -3836,9 +3847,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.75';
+const APP_VERSION='v3.32.76';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T02:37:00Z';
+const APP_BUILD_TIME='2026-06-30T03:21:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4196,12 +4207,13 @@ function _buildEnvelopeHtml(d){
   html+='<div style="text-align:center;font-size:20px;font-weight:700;letter-spacing:6px;border-bottom:2px solid '+_envColor+';padding-bottom:4px;margin-bottom:6px;color:'+_envColor+'">'+_escPub(d.type||'')+'</div>';
   if(d.subject)html+='<div style="font-size:12px;margin-bottom:6px">件名：<strong>'+_escPub(d.subject)+'</strong></div>';
   html+='<table style="width:100%;border-collapse:collapse;margin-bottom:4mm;table-layout:fixed">';
+  html+='<colgroup><col style="width:51%"><col style="width:8%"><col style="width:15%"><col style="width:8%"><col style="width:18%"></colgroup>';
   html+='<thead><tr style="background:'+_envColor+';color:white">';
   html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;text-align:left">品目・作業内容</th>';
-  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:8%">数量</th>';
-  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:15%">単価</th>';
-  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:8%">税</th>';
-  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px;width:18%">金額</th>';
+  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px">数量</th>';
+  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px">単価</th>';
+  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px">税</th>';
+  html+='<th style="padding:5px 6px;border:1px solid #1a56a0;font-size:11px">金額</th>';
   html+='</tr></thead><tbody>'+lineRows+'</tbody></table>';
   html+='<div style="display:flex;justify-content:flex-end;margin-bottom:4mm">';
   html+='<table style="border-collapse:collapse;min-width:200px">';
@@ -6691,7 +6703,8 @@ function _buildPreviewDocHtml(d){
     </div>
 
     <table class="preview-table">
-      <thead><tr><th style="width:42%">品目・作業内容</th><th class="num" style="width:9%;text-align:right">数量</th><th class="num" style="width:17%;text-align:right">単価</th><th style="width:10%;text-align:center">税率</th><th class="num" style="width:22%;text-align:right">金額</th></tr></thead>
+      <colgroup><col style="width:42%"><col style="width:9%"><col style="width:17%"><col style="width:10%"><col style="width:22%"></colgroup>
+      <thead><tr><th>品目・作業内容</th><th class="num" style="text-align:right">数量</th><th class="num" style="text-align:right">単価</th><th style="text-align:center">税率</th><th class="num" style="text-align:right">金額</th></tr></thead>
       <tbody>${(d.lines||[]).map(l=>{
         const taxDisplay = (l.tax==='0'||l.tax===0) ? '非課税'
           : isTaxIncluded ? '税込' // 税込モード（消費税未計算）の場合
@@ -12387,6 +12400,27 @@ function printReport(){
 </head>
 <body>${innerHtml}</body>
 </html>`;
+
+  // v3.32.76: iOS判定。iOSは0サイズ隠しiframeからの印刷が非対応のため、
+  // printDoc()と同じ方式（report-print-modalを開いたままwindow.print()）に統一。
+  // レイアウトは下記 @media print の #report-print-modal 用フォールバックCSSで制御。
+  const _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  if(_isIOS){
+    const _rpm = document.getElementById('report-print-modal');
+    if(_rpm) _rpm.classList.add('open');
+    try{
+      if(document.fonts && document.fonts.ready){
+        document.fonts.ready.then(function(){ window.print(); });
+      } else {
+        setTimeout(function(){ window.print(); }, 500);
+      }
+    }catch(e){
+      setTimeout(function(){ window.print(); }, 500);
+    }
+    return;
+  }
 
   // 既存の印刷用iframeがあれば除去
   const _old=document.getElementById('report-print-iframe');
