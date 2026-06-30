@@ -616,7 +616,7 @@ tr:hover td{background:var(--bg)}
      ここでは @page 余白と窓枠封筒印刷(printing-envelope)のみ定義する。
      旧 printing-preview / .preview-doc 系の重複定義は本命ブロックと競合し
      プレビューと印刷のズレを生んでいたため削除した。 */
-  @page { margin:20mm }
+  @page { margin:0 }
   /* 窓枠封筒印刷: body.printing-envelope クラスで制御 */
   body.printing-envelope > * { display:none !important; }
   body.printing-envelope #envelope-modal { display:block !important; position:static !important; background:none !important; overflow:visible !important; }
@@ -1005,7 +1005,7 @@ select{appearance:auto}
   #preview-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;overflow:visible !important;inset:auto !important;width:auto !important;height:auto !important}
   #preview-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important;max-height:none !important;height:auto !important;overflow:visible !important;overflow-y:visible !important}
   #preview-modal .modal-header,#preview-modal .modal-footer{display:none !important}
-  #preview-modal .modal-body{display:block !important;padding:20mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
+  #preview-modal .modal-body{display:block !important;padding:15mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
   .preview-doc{display:block !important;position:static !important;margin:0 !important;border:none !important;border-radius:0 !important;padding:0 !important;max-width:100% !important;width:100% !important;overflow:hidden !important;box-shadow:none !important;background:white !important;page-break-inside:auto !important;transform:none !important;transform-origin:initial !important;font-size:14px !important}
   .preview-doc.doc-quote{border-top:5px solid var(--doc-color-quote) !important}
   .preview-doc.doc-invoice{border-top:5px solid var(--doc-color-invoice) !important}
@@ -1042,7 +1042,7 @@ select{appearance:auto}
   #report-print-modal{display:block !important;position:static !important;background:none !important;padding:0 !important;margin:0 !important;overflow:visible !important;inset:auto !important;width:auto !important;height:auto !important}
   #report-print-modal .modal{display:block !important;position:static !important;background:none !important;box-shadow:none !important;max-width:100% !important;width:100% !important;margin:0 !important;padding:0 !important;border:none !important;border-radius:0 !important;max-height:none !important;height:auto !important;overflow:visible !important;overflow-y:visible !important}
   #report-print-modal .modal-header,#report-print-modal .modal-footer{display:none !important}
-  #report-print-modal .modal-body{display:block !important;padding:20mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
+  #report-print-modal .modal-body{display:block !important;padding:15mm !important;background:none !important;overflow:visible !important;box-sizing:border-box !important}
   #report-print-modal .print-area table{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;min-width:0 !important;width:100% !important}
 }
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
@@ -3880,9 +3880,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.83';
+const APP_VERSION='v3.32.84';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T05:34:00Z';
+const APP_BUILD_TIME='2026-06-30T23:24:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6628,9 +6628,12 @@ function duplicateDoc(id){
 // 要望反映: 余白少なめ(@page 12mm 15mm)、左右の罫線を本文幅に統一、
 // 見やすいフォントサイズ(本文14px)、ロゴの下に会社名・担当者名を改行配置。
 const _DOC_PRINT_CSS=`
-  @page { size: A4 portrait; margin: 20mm; }
+  @page { size: A4 portrait; margin: 0; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body { margin:0; padding:0; background:white; color:#111; font-family:'Noto Serif JP',serif; overflow:hidden; }
+  /* v3.32.84: @page{margin:0}でブラウザの印刷ヘッダー/フッター(URL・日付・タイトル)を除去し、
+     余白はbody側のpaddingで15mmに統一。全経路(PC iframe・iOS生DOM)で一致させる。 */
+  body { padding:15mm; box-sizing:border-box; }
   :root{
     --doc-color-quote:#C49A2D; --doc-color-quote-light:#FAF5E5;
     --doc-color-invoice:#1A73E8; --doc-color-invoice-light:#E8F0FE;
@@ -6800,7 +6803,7 @@ function printDoc(){
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 <style>${_bodyCss}
 :root{--doc-color-quote:#C49A2D;--doc-color-invoice:#1A73E8;--doc-color-receipt:#2D5A3D}
-@page{size:A4 portrait;margin:20mm}</style>
+@page{size:A4 portrait;margin:0}</style>
 </head>
 <body>${innerHtml}</body>
 </html>`;
@@ -12452,7 +12455,7 @@ function printReport(){
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  @page { size: A4 portrait; margin: 20mm; }
+  @page { size: A4 portrait; margin: 0; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body { margin:0; padding:0; background:white; color:#111; font-family:'Noto Serif JP',serif; }
   table { page-break-inside:auto; }
