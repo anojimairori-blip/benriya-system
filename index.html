@@ -3816,9 +3816,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.66';
+const APP_VERSION='v3.32.67';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T00:30:43Z';
+const APP_BUILD_TIME='2026-06-30T00:47:19Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6726,34 +6726,50 @@ function printDoc(){
 <body>${innerHtml}</body>
 </html>`;
 
-  // v3.32.66: iOS Safari は width:0/height:0/visibility:hidden のiframeへの
-  // contentWindow.print() が正常動作しない（一瞬表示されて即消える既知の問題）。
-  // iOS端末では window.open で別タブに印刷専用HTMLを開き、onload → print() で対応する。
+  // v3.32.67: iOS Safari では window.open が別タブに飛ばされて印刷できない問題を修正。
+  // Body Swap方式: 現在のbody内容を印刷用HTMLに差し替え → window.print() → afterprintで元に戻す。
+  // iOSで唯一確実に動作する方式。ユーザーが別タブに飛ばされない。
   const _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
   if(_isIOS){
-    // iOS向け: 別タブで印刷専用HTMLを開く（住所ラベル印刷と同じ実績ある方式）
-    const _win = window.open('', '_blank');
-    if(!_win){
-      showToast('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。', '#E67E22');
-      return;
-    }
-    _win.document.open();
-    _win.document.write(printHtml);
-    _win.document.close();
-    _win.onload = function(){
-      try{
-        const w = _win;
-        if(w.document.fonts && w.document.fonts.ready){
-          w.document.fonts.ready.then(function(){ w.focus(); w.print(); });
-        }
-        setTimeout(function(){ _win.focus(); _win.print(); }, 700);
-      }catch(e){
-        console.error('[printDoc iOS]', e);
-        showToast('印刷に失敗しました: '+e.message, '#C0392B');
-      }
+    // 現在のDOM全体をスナップショット
+    const _savedHtml = document.documentElement.innerHTML;
+    const _savedTitle = document.title;
+
+    // 印刷用HTMLからbody内容だけ抽出
+    const _tmpDiv = document.createElement('div');
+    _tmpDiv.innerHTML = printHtml;
+    const _printBody = _tmpDiv.querySelector('body');
+    const _printHead = _tmpDiv.querySelector('head');
+
+    // DOMをスワップ（印刷用に差し替え）
+    document.title = docTitle;
+    document.head.innerHTML = _printHead ? _printHead.innerHTML : '';
+    document.body.innerHTML = _printBody ? _printBody.innerHTML : _tmpDiv.innerHTML;
+
+    // 元に戻す処理（afterprint + 保険タイマー3秒）
+    let _restored = false;
+    const _restore = function(){
+      if(_restored) return;
+      _restored = true;
+      document.documentElement.innerHTML = _savedHtml;
+      document.title = _savedTitle;
+      // イベントリスナーを再バインド（Flexsys2026はonclick属性なので再バインド不要）
     };
+    try{ window.addEventListener('afterprint', _restore, {once:true}); }catch(e){}
+    setTimeout(_restore, 3000);
+
+    // フォント読み込みを待ってから印刷
+    try{
+      if(document.fonts && document.fonts.ready){
+        document.fonts.ready.then(function(){ window.print(); });
+      } else {
+        setTimeout(function(){ window.print(); }, 700);
+      }
+    }catch(e){
+      setTimeout(function(){ window.print(); }, 700);
+    }
     return;
   }
 
