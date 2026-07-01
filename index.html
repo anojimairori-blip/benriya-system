@@ -2928,7 +2928,7 @@ if('serviceWorker' in navigator){
           <span>📅 月次請求（毎月の一括複製対象にする）</span>
         </label>
       </div>
-      <div class="form-group"><label>備考・特記事項</label><textarea id="doc-notes" placeholder="お客様へのメモ、持ち物、注意事項など" style="min-height:54px"></textarea></div>
+      <div class="form-group"><label>備考・特記事項</label><textarea id="doc-notes" placeholder="お客様へのメモ、持ち物、注意事項など" style="min-height:160px;resize:vertical"></textarea></div>
     </div>
 
   </div>
@@ -3883,7 +3883,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.89';
+const APP_VERSION='v3.32.90';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
 const APP_BUILD_TIME='2026-07-01T00:38:00Z';
 
