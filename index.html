@@ -3880,9 +3880,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.86';
+const APP_VERSION='v3.32.87';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-07-01T00:01:00Z';
+const APP_BUILD_TIME='2026-07-01T00:19:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4206,12 +4206,18 @@ function _buildEnvelopeHtml(d){
   for(var i=lines.length;i<5;i++){
     lineRows+='<tr><td style="padding:4px 6px;border:1px solid #ccc;height:20px">&nbsp;</td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td></tr>';
   }
-  var banks=settings.bankAccounts||[];
+  // v3.32.87: 封筒モードでも d.bankSelection が明示的にセットされている場合のみ振込先を表示。
+  // 以前は settings の全銀行口座を常に表示していたため、
+  // d.notes に振込先テキストがある書類で二重表示になっていた。
   var bankHtml='';
-  if(banks.length){
-    bankHtml='<div style="margin-top:8px;font-size:11px"><strong>【お振込先】</strong><br>';
-    banks.forEach(function(b){bankHtml+=_escPub(b.label||'')+' '+_escPub(b.bank||'')+' '+_escPub(b.account||'')+'<br>';});
-    bankHtml+='</div>';
+  if(d.bankSelection){
+    var banks=settings.bankAccounts||[];
+    var _bsel=banks.find(function(b){return b.id===d.bankSelection;});
+    if(_bsel){
+      bankHtml='<div style="margin-top:8px;font-size:11px"><strong>【お振込先】</strong><br>';
+      bankHtml+=_escPub(_bsel.label||'')+' '+_escPub(_bsel.bank||'')+' '+_escPub(_bsel.account||'')+'<br>';
+      bankHtml+='</div>';
+    }
   }
   var _envColor=d.type==='見積書'?'var(--doc-color-quote)':d.type==='領収書'?'var(--doc-color-receipt)':'var(--doc-color-invoice)';
   var html='<div class="envelope-doc" style="width:100%;max-width:100%;font-family:sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:8mm 10mm;overflow:hidden">';
@@ -6754,7 +6760,15 @@ function _buildPreviewDocHtml(d){
       ${taxRows.join('')}
       <tr class="grand"><td style="padding-top:8px;font-weight:700;font-size:20px">合計（税込）</td><td style="text-align:right;padding-top:8px;font-size:20px;font-weight:700">${fmt(d.grandTotal)}</td></tr>
     </table></div>
-    ${d.type==='請求書'?(()=>{const _banks=settings.bankAccounts||[];const _sel=_banks.find(b=>b.id===d.bankSelection)||(_banks.length?_banks[0]:null);const _bank=_sel?_sel.bank:s.bank;const _acct=_sel?_sel.account:s.account||'';return _bank?`<div class="preview-notes"><strong>お振込先：</strong>${escAttr(_sel?.label?_sel.label+' ':'')}${escAttr(_bank)}　${escAttr(_acct)}</div>`:'';})():''}
+    ${d.type==='請求書'?(()=>{
+      // v3.32.87: d.bankSelectionが明示的にセットされている場合のみ表示。
+      // フォールバック(_banks[0])を廃止: 未選択時に勝手に表示するとd.notesに振込先テキストがある書類で二重表示になっていた。
+      if(!d.bankSelection) return '';
+      const _banks=settings.bankAccounts||[];
+      const _sel=_banks.find(b=>b.id===d.bankSelection);
+      if(!_sel) return '';
+      return `<div class="preview-notes"><strong>お振込先：</strong>${escAttr(_sel.label?_sel.label+' ':'')}${escAttr(_sel.bank||'')}　${escAttr(_sel.account||'')}</div>`;
+    })():''}
     ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr((d.notes||'').replace(/\n\n+/g,'\n'))}</div>`:''}
     ${d.type==='領収書'?`<div style="text-align:right;margin-top:12px"><div class="stamp">領収済</div></div>`:''}
   </div>`;
