@@ -907,7 +907,10 @@ select{appearance:auto}
 .preview-total table{margin-left:auto;font-size:16px;min-width:46%}
 .preview-total td{padding:4px 7px}
 .preview-total .grand{font-size:22px;font-weight:700;border-top:2px solid #111}
-.preview-notes{margin-top:12px;font-size:13px;border-top:1px solid #DDD;padding-top:9px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.preview-notes-area{margin-top:14px;border:1px solid #999;font-size:13px;line-height:1.6;word-break:break-word;page-break-inside:avoid}
+.preview-notes-bank{padding:8px 10px}
+.preview-notes-text{padding:8px 10px;white-space:pre-wrap;word-break:break-word}
+.preview-notes-bank+.preview-notes-text{border-top:1px solid #CCC}
 .doc-number{font-size:12px;color:#888;margin-bottom:3px}
 .stamp{width:56px;height:56px;border:2px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--red);margin-left:auto;margin-top:10px}
 
@@ -3880,9 +3883,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.87';
+const APP_VERSION='v3.32.88';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-07-01T00:19:00Z';
+const APP_BUILD_TIME='2026-07-01T00:28:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4206,19 +4209,25 @@ function _buildEnvelopeHtml(d){
   for(var i=lines.length;i<5;i++){
     lineRows+='<tr><td style="padding:4px 6px;border:1px solid #ccc;height:20px">&nbsp;</td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td><td style="border:1px solid #ccc"></td></tr>';
   }
-  // v3.32.87: 封筒モードでも d.bankSelection が明示的にセットされている場合のみ振込先を表示。
-  // 以前は settings の全銀行口座を常に表示していたため、
-  // d.notes に振込先テキストがある書類で二重表示になっていた。
-  var bankHtml='';
+  // v3.32.88: 振込先+備考を全囲い枠コンテナにまとめ、順序を「振込先→備考」に統一（通常レイアウトと同じ）
+  var _envBank='', _envNote='';
   if(d.bankSelection){
     var banks=settings.bankAccounts||[];
     var _bsel=banks.find(function(b){return b.id===d.bankSelection;});
     if(_bsel){
-      bankHtml='<div style="margin-top:8px;font-size:11px"><strong>【お振込先】</strong><br>';
-      bankHtml+=_escPub(_bsel.label||'')+' '+_escPub(_bsel.bank||'')+' '+_escPub(_bsel.account||'')+'<br>';
-      bankHtml+='</div>';
+      _envBank='<div style="padding:6px 8px;font-size:11px"><strong>お振込先：</strong>'
+        +_escPub(_bsel.label?_bsel.label+' ':'')
+        +_escPub(_bsel.bank||'')+' '+_escPub(_bsel.account||'')+'</div>';
     }
   }
+  if(d.notes){
+    _envNote='<div style="padding:6px 8px;font-size:11px;white-space:pre-wrap;word-break:break-word'
+      +(_envBank?';border-top:1px solid #CCC':'')+'"><strong>備考：</strong>'
+      +_escPub((d.notes||'').replace(/\n\n+/g,'\n'))+'</div>';
+  }
+  var bankHtml=(_envBank||_envNote)
+    ? '<div style="margin-top:8px;border:1px solid #999;line-height:1.6">'+_envBank+_envNote+'</div>'
+    : '';
   var _envColor=d.type==='見積書'?'var(--doc-color-quote)':d.type==='領収書'?'var(--doc-color-receipt)':'var(--doc-color-invoice)';
   var html='<div class="envelope-doc" style="width:100%;max-width:100%;font-family:sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:8mm 10mm;overflow:hidden">';
   html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm;gap:12px">';
@@ -4263,9 +4272,8 @@ function _buildEnvelopeHtml(d){
   html+='<tr style="background:'+_envColor+';color:white"><td style="padding:10px 12px;border:1px solid '+_envColor+';font-size:16px;font-weight:700">合計（税込）</td>';
   html+='<td style="padding:10px 12px;border:1px solid '+_envColor+';font-size:22px;font-weight:700;text-align:right;letter-spacing:0.5px">'+fmt(d.grandTotal||0)+'</td></tr>';
   html+='</table></div>';
-  if(d.notes||bankHtml){
+  if(bankHtml){
     html+='<div style="border-top:1px solid #ccc;padding-top:6px;font-size:11px;color:#555">';
-    if(d.notes)html+='<div style="white-space:pre-wrap;margin-bottom:4px">'+_escPub(d.notes)+'</div>';
     html+=bankHtml;
     html+='</div>';
   }
@@ -6694,7 +6702,10 @@ const _DOC_PRINT_CSS=`
   .preview-doc.doc-quote .grand td{ color:#111; border-top:2px solid var(--doc-color-quote); }
   .preview-doc.doc-invoice .grand td{ color:var(--doc-color-invoice); border-top:2px solid var(--doc-color-invoice); }
   .preview-doc.doc-receipt .grand td{ color:var(--doc-color-receipt); border-top:2px solid var(--doc-color-receipt); }
-  .preview-notes{ margin-top:12px; font-size:13px; border-top:1px solid #DDD; padding-top:9px; line-height:1.6; white-space:pre-wrap; word-break:break-word; page-break-inside:avoid; }
+  .preview-notes-area{ margin-top:14px; border:1px solid #999; font-size:13px; line-height:1.6; word-break:break-word; page-break-inside:avoid; }
+  .preview-notes-bank{ padding:8px 10px; }
+  .preview-notes-text{ padding:8px 10px; white-space:pre-wrap; word-break:break-word; }
+  .preview-notes-bank + .preview-notes-text{ border-top:1px solid #CCC; }
   .preview-total{ page-break-inside:avoid; }
   /* 印刷では監査情報・サンプルバッジは出さない。領収印は表示 */
   .audit-line,.sample-badge{ display:none !important; }
@@ -6760,16 +6771,18 @@ function _buildPreviewDocHtml(d){
       ${taxRows.join('')}
       <tr class="grand"><td style="padding-top:8px;font-weight:700;font-size:20px">合計（税込）</td><td style="text-align:right;padding-top:8px;font-size:20px;font-weight:700">${fmt(d.grandTotal)}</td></tr>
     </table></div>
-    ${d.type==='請求書'?(()=>{
-      // v3.32.87: d.bankSelectionが明示的にセットされている場合のみ表示。
-      // フォールバック(_banks[0])を廃止: 未選択時に勝手に表示するとd.notesに振込先テキストがある書類で二重表示になっていた。
-      if(!d.bankSelection) return '';
-      const _banks=settings.bankAccounts||[];
-      const _sel=_banks.find(b=>b.id===d.bankSelection);
-      if(!_sel) return '';
-      return `<div class="preview-notes"><strong>お振込先：</strong>${escAttr(_sel.label?_sel.label+' ':'')}${escAttr(_sel.bank||'')}　${escAttr(_sel.account||'')}</div>`;
-    })():''}
-    ${d.notes?`<div class="preview-notes"><strong>備考：</strong>${escAttr((d.notes||'').replace(/\n\n+/g,'\n'))}</div>`:''}
+    ${(()=>{
+      // v3.32.88: 振込先+備考を全囲い枠(border:1px solid #999)のコンテナにまとめる。
+      // 順序: 振込先 → 備考（封筒モードも同じ順序に統一）
+      let _bank='', _note='';
+      if(d.type==='請求書' && d.bankSelection){
+        const _banks=settings.bankAccounts||[];
+        const _sel=_banks.find(b=>b.id===d.bankSelection);
+        if(_sel) _bank=`<div class="preview-notes-bank"><strong>お振込先：</strong>${escAttr(_sel.label?_sel.label+' ':'')}${escAttr(_sel.bank||'')}　${escAttr(_sel.account||'')}</div>`;
+      }
+      if(d.notes) _note=`<div class="preview-notes-text"><strong>備考：</strong>${escAttr((d.notes||'').replace(/\n\n+/g,'\n'))}</div>`;
+      return (_bank||_note)?`<div class="preview-notes-area">${_bank}${_note}</div>`:'';
+    })()}
     ${d.type==='領収書'?`<div style="text-align:right;margin-top:12px"><div class="stamp">領収済</div></div>`:''}
   </div>`;
 }
