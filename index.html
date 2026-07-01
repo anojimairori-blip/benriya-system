@@ -3880,9 +3880,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.85';
+const APP_VERSION='v3.32.86';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-06-30T23:40:00Z';
+const APP_BUILD_TIME='2026-07-01T00:01:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6879,6 +6879,11 @@ function printDoc(){
   iframe.setAttribute('aria-hidden','true');
   iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
   iframe.onload=function(){
+    // v3.32.86: iframe.onload は about:blank 初期読み込みとコンテンツ書き込み後の2回発火する。
+    // 2つの独立クロージャ(_printed フラグ)が作られ、2つ目の fonts.ready.then が
+    // キャンセル後に発火して二重印刷ダイアログになっていた根本原因を修正。
+    // <title>タグがある場合のみ本物のコンテンツ = 1回だけ処理する。
+    if(!iframe.contentDocument?.title) return;
     const w=iframe.contentWindow;
     let _cleaned=false;
     const _cleanup=function(){ if(_cleaned)return; _cleaned=true; setTimeout(function(){ iframe.remove(); },300); };
@@ -12522,6 +12527,8 @@ function printReport(){
   iframe.setAttribute('aria-hidden','true');
   iframe.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
   iframe.onload=function(){
+    // v3.32.86: doc-print-iframe と同様の二重発火対策
+    if(!iframe.contentDocument?.title) return;
     const w=iframe.contentWindow;
     // 印刷ダイアログを閉じた後にiframeを後始末（afterprint優先、保険でタイマー）
     let _cleaned=false;
