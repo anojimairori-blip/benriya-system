@@ -907,7 +907,7 @@ select{appearance:auto}
 .preview-total table{margin-left:auto;font-size:16px;min-width:46%}
 .preview-total td{padding:4px 7px}
 .preview-total .grand{font-size:22px;font-weight:700;border-top:2px solid #111}
-.preview-notes-area{margin-top:14px;border:1px solid #999;font-size:13px;line-height:1.6;word-break:break-word;page-break-inside:avoid}
+.preview-notes-area{margin-top:14px;border:1px solid #999;font-size:13px;line-height:1.6;word-break:break-word;page-break-before:avoid;break-before:avoid}
 .preview-notes-bank{padding:8px 10px}
 .preview-notes-text{padding:8px 10px;white-space:pre-wrap;word-break:break-word}
 .preview-notes-bank+.preview-notes-text{border-top:1px solid #CCC}
@@ -3883,9 +3883,9 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.88';
+const APP_VERSION='v3.32.89';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-07-01T00:28:00Z';
+const APP_BUILD_TIME='2026-07-01T00:38:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6702,7 +6702,7 @@ const _DOC_PRINT_CSS=`
   .preview-doc.doc-quote .grand td{ color:#111; border-top:2px solid var(--doc-color-quote); }
   .preview-doc.doc-invoice .grand td{ color:var(--doc-color-invoice); border-top:2px solid var(--doc-color-invoice); }
   .preview-doc.doc-receipt .grand td{ color:var(--doc-color-receipt); border-top:2px solid var(--doc-color-receipt); }
-  .preview-notes-area{ margin-top:14px; border:1px solid #999; font-size:13px; line-height:1.6; word-break:break-word; page-break-inside:avoid; }
+  .preview-notes-area{ margin-top:14px; border:1px solid #999; font-size:13px; line-height:1.6; word-break:break-word; page-break-before:avoid; break-before:avoid; }
   .preview-notes-bank{ padding:8px 10px; }
   .preview-notes-text{ padding:8px 10px; white-space:pre-wrap; word-break:break-word; }
   .preview-notes-bank + .preview-notes-text{ border-top:1px solid #CCC; }
