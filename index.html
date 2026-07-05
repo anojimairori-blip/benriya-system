@@ -3883,11 +3883,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.33.0';
+const APP_VERSION='v3.33.1';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
-const APP_BUILD_TIME='2026-07-05T13:15:00Z';
+const APP_BUILD_TIME='2026-07-05T14:00:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -10172,9 +10172,10 @@ function initFirebaseAuth(){
       const allowed = await checkAccessAllowed(user.email);
       window.HUB_LICENSE = null;
       window.COMPANY_KEY = MASTER_UID;
+      const idToken = await user.getIdToken();
+
       if(!allowed){
         try{
-          const idToken = await user.getIdToken();
           const r = await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/userLicense', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
@@ -10199,6 +10200,17 @@ function initFirebaseAuth(){
         // ライセンス顧客: 契約テナントIDを自社データキーとして採用
         window.COMPANY_KEY = window.HUB_LICENSE.license.tenantId;
       }
+
+      // 許可リスト内・ライセンス顧客とも、ハブ側のownerKeyマップを最新化しておく
+      // （Firestoreルールが将来このマップを参照して権限判定するため）
+      try{
+        await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/flexsysEnsureOwnerMap', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+          body: JSON.stringify({})
+        });
+      }catch(e){ console.warn('flexsysEnsureOwnerMap failed:', e); }
+
       currentUser = user;
       // UIを更新
       if(loginEl) loginEl.style.display='none';
@@ -10206,6 +10218,7 @@ function initFirebaseAuth(){
       // ユーザー情報表示（PC + モバイル）
       const sbu = document.getElementById('sidebar-user');
       if(sbu) sbu.style.display='block';
+
       const av = document.getElementById('user-avatar');
       if(av && user.photoURL) av.src=user.photoURL;
       const un = document.getElementById('user-name');
