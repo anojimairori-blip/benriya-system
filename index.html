@@ -1783,7 +1783,14 @@ if('serviceWorker' in navigator){
       <div class="tab" onclick="switchCustTab('receipts',this)">領収書</div>
     </div>
     <div id="cust-tab-list">
-      <div style="display:flex;gap:8px;margin-bottom:12px"><input id="cust-search" oninput="renderCustomerList()" type="text" placeholder="顧客名・電話・住所で検索" style="padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;flex:1;outline:none"></div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input id="cust-search" oninput="renderCustomerList()" type="text" placeholder="顧客名・電話・住所で検索" style="padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;flex:1;outline:none">
+        <button type="button" class="btn btn-primary btn-sm" onclick="searchCustomersWithAI()" title="自然文で検索（例：先月の大きい工事の顧客）" style="white-space:nowrap">🤖 AIで検索</button>
+      </div>
+      <div id="ai-cust-search-banner" style="display:none;margin-bottom:10px;padding:8px 12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:7px;font-size:12px;color:var(--accent);display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span id="ai-cust-search-summary"></span>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="clearAiCustomerSearch()">✕ 解除</button>
+      </div>
       <div class="card"><table><thead><tr><th>顧客名</th><th>お客様担当者</th><th>電話</th><th>住所</th><th>取引件数</th><th></th></tr></thead><tbody id="customer-list-body"></tbody></table></div>
     </div>
     <div id="cust-tab-quotes" style="display:none"><div class="card"><table><thead><tr><th>書類番号</th><th>顧客名</th><th>件名</th><th>日付</th><th>金額</th><th>状態</th><th></th></tr></thead><tbody id="cust-quotes-body"></tbody></table></div></div>
@@ -3024,6 +3031,27 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
       </div>
     </details>
 
+    <!-- AI下書き入力（テキスト/音声） -->
+    <div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:700;color:var(--accent)">🤖 AIで自動入力</div>
+        <span id="ai-cust-status" style="font-size:11px;color:var(--text3)"></span>
+      </div>
+      <p style="font-size:11px;color:var(--text2);margin:0 0 6px;line-height:1.5">
+        話し言葉や定型に沿わない自由な文章でもOK。例：「南23条の田中さんという方、電話は011-123-4567」
+      </p>
+      <div style="display:flex;gap:6px;align-items:flex-start">
+        <textarea id="ai-cust-input" rows="2" placeholder="ここに入力、または🎤で話す"
+          style="flex:1;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
+        <button type="button" id="ai-cust-mic-btn" onclick="toggleVoiceInputForCustomer()"
+          title="音声入力"
+          style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0">🎤</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="parseCustomerWithAI()" style="margin-top:8px">
+        ✨ AIで自動入力する
+      </button>
+    </div>
+
     <div class="form-row cols3">
       <div class="form-group" style="grid-column:span 2"><label>顧客名・会社名 ＊</label><input type="text" id="cust-name"></div>
       <div class="form-group">
@@ -3904,11 +3932,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.34.0';
+const APP_VERSION='v3.35.0';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
-const APP_BUILD_TIME='2026-07-05T15:00:00Z';
+const APP_BUILD_TIME='2026-07-05T15:30:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6367,6 +6395,158 @@ function toggleVoiceInputForDoc(){
   _aiDocRecognition.start();
 }
 
+// ===== 汎用: Web Speech APIで音声入力→指定テキストエリアに追記 =====
+function _genericVoiceInput(targetTextareaId, btnId, statusId, listeningFlagName){
+  const btn = document.getElementById(btnId);
+  const statusEl = document.getElementById(statusId);
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    showToast('このブラウザは音声入力に対応していません（Chrome推奨）', 'var(--red)');
+    return;
+  }
+  if(window[listeningFlagName]){
+    if(window['_rec_' + listeningFlagName]) window['_rec_' + listeningFlagName].stop();
+    return;
+  }
+  const rec = new SpeechRecognition();
+  window['_rec_' + listeningFlagName] = rec;
+  rec.lang = 'ja-JP';
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  rec.onstart = () => {
+    window[listeningFlagName] = true;
+    if(btn){ btn.style.background = 'var(--red)'; btn.textContent = '⏹'; }
+    if(statusEl) statusEl.textContent = '🎤 聞き取り中…';
+  };
+  rec.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    const ta = document.getElementById(targetTextareaId);
+    if(ta) ta.value = (ta.value ? ta.value + ' ' : '') + text;
+  };
+  rec.onerror = (e) => {
+    if(statusEl) statusEl.textContent = '';
+    if(e.error !== 'no-speech') showToast('音声認識エラー: ' + e.error, 'var(--red)');
+  };
+  rec.onend = () => {
+    window[listeningFlagName] = false;
+    if(btn){ btn.style.background = 'var(--surface)'; btn.textContent = '🎤'; }
+    if(statusEl) statusEl.textContent = '';
+  };
+  rec.start();
+}
+
+function toggleVoiceInputForCustomer(){
+  _genericVoiceInput('ai-cust-input', 'ai-cust-mic-btn', 'ai-cust-status', '_aiCustListening');
+}
+
+// ===== 顧客登録: AIで自動入力 =====
+async function parseCustomerWithAI(){
+  const ta = document.getElementById('ai-cust-input');
+  const text = (ta?.value || '').trim();
+  const statusEl = document.getElementById('ai-cust-status');
+  if(!text){
+    showToast('内容を入力または音声で話してください', 'var(--red)');
+    return;
+  }
+  if(!currentUser){
+    showToast('ログイン状態を確認してください', 'var(--red)');
+    return;
+  }
+  if(statusEl) statusEl.textContent = '✨ AI解析中…';
+  try{
+    const idToken = await currentUser.getIdToken();
+    const res = await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/flexsysCustomerAI', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+      body: JSON.stringify({ mode: 'parse', text })
+    });
+    const data = await res.json();
+    if(!res.ok || !data.ok){
+      showToast('AI解析に失敗しました: ' + (data.error || res.status), 'var(--red)');
+      if(statusEl) statusEl.textContent = '';
+      return;
+    }
+    const c = data.customer || {};
+    const setVal = (id, v) => { const el = document.getElementById(id); if(el && v) el.value = v; };
+    setVal('cust-name', c.name);
+    if(c.honorific){ const h = document.getElementById('cust-honorific'); if(h) h.value = c.honorific; }
+    setVal('cust-zip', c.zip);
+    setVal('cust-address', c.address);
+    setVal('cust-tel', c.tel);
+    setVal('cust-fax', c.fax);
+    setVal('cust-email', c.email);
+    if(c.memo){
+      const memoEl = document.getElementById('cust-memo');
+      if(memoEl) memoEl.value = memoEl.value ? memoEl.value + '\n' + c.memo : c.memo;
+    }
+    if(statusEl) statusEl.textContent = '✅ 自動入力しました（内容をご確認ください）';
+    showToast('AIで自動入力しました。内容をご確認の上、保存してください', '#2E7D32');
+    setTimeout(() => { if(statusEl) statusEl.textContent = ''; }, 5000);
+  }catch(e){
+    showToast('AI解析エラー: ' + e.message, 'var(--red)');
+    if(statusEl) statusEl.textContent = '';
+  }
+}
+
+// ===== 顧客一覧: AI自然文検索 =====
+async function searchCustomersWithAI(){
+  const query = (document.getElementById('cust-search')?.value || '').trim();
+  if(!query){
+    showToast('検索したい内容を入力してから「AIで検索」を押してください', 'var(--red)');
+    return;
+  }
+  if(!currentUser){
+    showToast('ログイン状態を確認してください', 'var(--red)');
+    return;
+  }
+  showToast('✨ AIが検索中…', 'var(--accent)');
+  try{
+    const idToken = await currentUser.getIdToken();
+    // 顧客ごとの集計データを付与（取引件数・累計金額・直近取引日）
+    const summarized = customers.map(c => {
+      const myDocs = docs.filter(d => d.customer === c.name || d.customerId === c.id);
+      const totalAmount = myDocs.reduce((s, d) => s + (d.grandTotal || 0), 0);
+      const dates = myDocs.map(d => d.date).filter(Boolean).sort();
+      return {
+        id: c.id,
+        name: c.name,
+        address: c.address || '',
+        docCount: myDocs.length,
+        totalAmount,
+        lastDate: dates.length ? dates[dates.length - 1] : null,
+        memo: c.memo || ''
+      };
+    });
+    const res = await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/flexsysCustomerAI', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+      body: JSON.stringify({ mode: 'search', query, customers: summarized })
+    });
+    const data = await res.json();
+    if(!res.ok || !data.ok){
+      showToast('AI検索に失敗しました: ' + (data.error || res.status), 'var(--red)');
+      return;
+    }
+    window._aiCustFilterIds = data.matchedIds || [];
+    const banner = document.getElementById('ai-cust-search-banner');
+    const summaryEl = document.getElementById('ai-cust-search-summary');
+    if(banner && summaryEl){
+      summaryEl.textContent = `🤖 AI検索結果（${window._aiCustFilterIds.length}件）: ${data.summary || query}`;
+      banner.style.display = 'flex';
+    }
+    renderCustomerList();
+  }catch(e){
+    showToast('AI検索エラー: ' + e.message, 'var(--red)');
+  }
+}
+
+function clearAiCustomerSearch(){
+  window._aiCustFilterIds = null;
+  const banner = document.getElementById('ai-cust-search-banner');
+  if(banner) banner.style.display = 'none';
+  renderCustomerList();
+}
+
 async function generateDocFromAI(){
   const ta = document.getElementById('ai-doc-input');
   const text = (ta?.value || '').trim();
@@ -7942,7 +8122,11 @@ const escHtml = escAttr;
 function renderCustomerList(){
   const search=(document.getElementById('cust-search')?.value||'').toLowerCase();
   let list=[...customers];
-  if(search)list=list.filter(c=>c.name.toLowerCase().includes(search)||(c.tel||'').includes(search)||(c.address||'').toLowerCase().includes(search));
+  if(window._aiCustFilterIds){
+    list=list.filter(c=>window._aiCustFilterIds.includes(c.id));
+  } else if(search){
+    list=list.filter(c=>c.name.toLowerCase().includes(search)||(c.tel||'').includes(search)||(c.address||'').toLowerCase().includes(search));
+  }
   const tbody=document.getElementById('customer-list-body');
   if(!list.length){tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:28px">顧客がいません。</td></tr>`;return;}
   tbody.innerHTML=list.map(c=>{
