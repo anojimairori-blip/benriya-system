@@ -3883,9 +3883,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.32.90';
-const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 全ユーザーが参照するマスターUID
-const APP_BUILD_TIME='2026-07-01T00:38:00Z';
+const APP_VERSION='v3.33.0';
+const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
+window.HUB_LICENSE = null;
+window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
+const APP_BUILD_TIME='2026-07-05T13:15:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5865,7 +5867,7 @@ async function refreshAllData(btnEl){
     const F=window._FB;
     if(F && currentUser && typeof fbLoadAll==='function'){
       try{
-        await fbLoadAll(MASTER_UID);
+        await fbLoadAll(window.COMPANY_KEY || MASTER_UID);
         fbOk=true;
       }catch(e){
         fbError=e;
@@ -10033,7 +10035,7 @@ async function _fbPersist(){
   if(!F||!currentUser) return { ok:false, error:'not logged in' };
   showSync();
   try{
-    const uid = MASTER_UID; // 常にマスターUIDに書き込む
+    const uid = window.COMPANY_KEY || MASTER_UID; // 自社/契約ごとのデータキー
 
     // 画像データを除外したexpensesを作成（Firestoreは配列内のネストを許可しない）
     const expensesForFB = expenses.map(e=>{
@@ -10166,17 +10168,36 @@ function initFirebaseAuth(){
     const appEl = document.getElementById('app-main');
     const loginEl = document.getElementById('login-screen');
     if(user){
-      // ===== アクセス許可チェック =====
+      // ===== アクセス許可チェック（Phase D-3: リスト外はハブのライセンスを照会） =====
       const allowed = await checkAccessAllowed(user.email);
+      window.HUB_LICENSE = null;
+      window.COMPANY_KEY = MASTER_UID;
       if(!allowed){
-        // 許可リストにない → ログアウトしてエラー表示
-        await F.signOut(F.auth);
-        if(loginEl){
-          loginEl.style.display='flex';
-          const errEl=document.getElementById('login-error');
-          if(errEl) errEl.textContent='⛔ このアカウント（'+user.email+'）はアクセスが許可されていません。管理者にお問い合わせください。';
+        try{
+          const idToken = await user.getIdToken();
+          const r = await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/userLicense', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+            body: JSON.stringify({ productId: 'flexsys' })
+          });
+          const lic = await r.json();
+          if(r.ok && lic && lic.valid){ window.HUB_LICENSE = lic; }
+        }catch(e){ console.warn('license check failed:', e); }
+        if(!window.HUB_LICENSE){
+          // 許可リストにもハブ契約にもない → ログアウトして申込ページへ誘導
+          await F.signOut(F.auth);
+          if(loginEl){
+            loginEl.style.display='flex';
+            const errEl=document.getElementById('login-error');
+            if(errEl){
+              errEl.innerHTML = `${user.email} の有効なご契約が見つかりません。<br>ご利用にはお申し込みが必要です。<br><a href="https://nojima-business-hub.pages.dev/signup" target="_blank" rel="noopener" style="color:#b88746;font-weight:bold;">→ 申込ページを開く（14日間無料）</a>`;
+              errEl.classList.add('show');
+            }
+          }
+          return;
         }
-        return;
+        // ライセンス顧客: 契約テナントIDを自社データキーとして採用
+        window.COMPANY_KEY = window.HUB_LICENSE.license.tenantId;
       }
       currentUser = user;
       // UIを更新
@@ -10199,7 +10220,7 @@ function initFirebaseAuth(){
       const mue = document.getElementById('mobile-user-email');
       if(mue) mue.textContent=user.email||'';
       // データ読み込み（常にマスターUIDのデータを参照）
-      await fbLoadAll(MASTER_UID);
+      await fbLoadAll(window.COMPANY_KEY || MASTER_UID);
       // 最終ログイン時刻を記録（全メンバー共有）
       try{ await recordMemberLogin(user); }catch(e){}
       initAppAfterAuth();
