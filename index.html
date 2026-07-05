@@ -371,7 +371,7 @@ tr:hover td{background:var(--bg)}
 .line-item input,.line-item select{padding:7px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;background:var(--surface);outline:none;transition:border .15s;width:100%}
 .line-item input:focus,.line-item select:focus{border-color:var(--accent)}
 .line-item .line-total{font-size:13px;font-weight:500;text-align:right;padding-right:2px}
-.del-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:6px}
 .del-btn:hover{background:var(--red-light);color:var(--red)}
 
 /* TOTALS */
@@ -1292,7 +1292,7 @@ select{appearance:auto}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .help-panel-header .hp-close{
-  flex-shrink:0;width:34px;height:34px;border:none;
+  flex-shrink:0;width:38px;height:38px;border:none;
   background:rgba(255,255,255,.2);color:white;border-radius:50%;
   cursor:pointer;font-size:18px;font-family:inherit;
   display:flex;align-items:center;justify-content:center;
@@ -1384,7 +1384,7 @@ select{appearance:auto}
 
 /* モバイル: 下からスライドアップ */
 @media(max-width:768px){
-  .help-btn{width:34px;height:34px;font-size:15px}
+  .help-btn{width:38px;height:38px;font-size:15px}
   .help-panel{
     width:100%;max-width:100%;right:auto;left:0;
     top:auto;bottom:-100vh;height:88vh;
@@ -1723,6 +1723,21 @@ if('serviceWorker' in navigator){
       </div>
       <div id="home-members-list" style="display:flex;flex-wrap:wrap;gap:8px"></div>
     </div>
+    <!-- 🤖 万能AI入力 -->
+    <div style="background:linear-gradient(135deg,var(--accent-light),var(--surface));border:1.5px solid var(--accent);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:6px">🤖 AIで何でも実行</div>
+      <p style="font-size:11px;color:var(--text2);margin:0 0 8px;line-height:1.5">
+        話す/入力するだけで、見積書作成・請求書作成・顧客登録・顧客検索を自動で振り分けます。
+      </p>
+      <div style="display:flex;gap:6px;align-items:flex-start">
+        <textarea id="ai-quick-universal" rows="1" placeholder="例：田中様に見積もり作って／先月の大きい工事の顧客／南23条の田中さんを登録"
+          style="flex:1;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
+        <button type="button" onclick="toggleQuickVoiceInput('universal')" title="音声入力"
+          style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0">🎤</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="runUniversalAI()" style="margin-top:8px">✨ AIで実行</button>
+      <span id="ai-universal-status" style="font-size:11px;color:var(--text3);margin-left:8px"></span>
+    </div>
     <!-- Mini stats -->
     <div class="stats-grid" id="home-stats" style="margin-bottom:20px"></div>
     <!-- Menu grid -->
@@ -1764,7 +1779,7 @@ if('serviceWorker' in navigator){
   <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
     <textarea id="ai-quick-見積書" rows="1" placeholder="🤖 話す/入力→AIで新規見積書を作成（例：田中様に足場工事、材料費3万・施工費5万）"
       style="flex:1;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
-    <button type="button" onclick="toggleQuickVoiceInput('見積書')" title="音声入力" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
+    <button type="button" onclick="toggleQuickVoiceInput('見積書')" title="音声入力" style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
     <button class="btn btn-primary btn-sm" onclick="quickCreateDocWithAI('見積書')" style="white-space:nowrap;flex-shrink:0">✨ AIで作成</button>
   </div>
   <div class="content" id="content-quotes"></div>
@@ -1774,7 +1789,7 @@ if('serviceWorker' in navigator){
   <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
     <textarea id="ai-quick-請求書" rows="1" placeholder="🤖 話す/入力→AIで新規請求書を作成"
       style="flex:1;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
-    <button type="button" onclick="toggleQuickVoiceInput('請求書')" title="音声入力" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
+    <button type="button" onclick="toggleQuickVoiceInput('請求書')" title="音声入力" style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
     <button class="btn btn-primary btn-sm" onclick="quickCreateDocWithAI('請求書')" style="white-space:nowrap;flex-shrink:0">✨ AIで作成</button>
   </div>
   <div class="content" id="content-invoices"></div>
@@ -1784,7 +1799,7 @@ if('serviceWorker' in navigator){
   <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
     <textarea id="ai-quick-領収書" rows="1" placeholder="🤖 話す/入力→AIで新規領収書を作成"
       style="flex:1;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
-    <button type="button" onclick="toggleQuickVoiceInput('領収書')" title="音声入力" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
+    <button type="button" onclick="toggleQuickVoiceInput('領収書')" title="音声入力" style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
     <button class="btn btn-primary btn-sm" onclick="quickCreateDocWithAI('領収書')" style="white-space:nowrap;flex-shrink:0">✨ AIで作成</button>
   </div>
   <div class="content" id="content-receipts"></div>
@@ -1812,7 +1827,7 @@ if('serviceWorker' in navigator){
       <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
         <textarea id="ai-quick-cust" rows="1" placeholder="🤖 話す/入力→AIで新規顧客登録（例：南23条の田中さん、電話は011-123-4567）"
           style="flex:1;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
-        <button type="button" onclick="toggleQuickVoiceInputCustomer()" title="音声入力" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
+        <button type="button" onclick="toggleQuickVoiceInputCustomer()" title="音声入力" style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
         <button class="btn btn-primary btn-sm" onclick="quickCreateCustomerWithAI()" style="white-space:nowrap;flex-shrink:0">✨ AIで登録</button>
       </div>
       <div class="card"><table><thead><tr><th>顧客名</th><th>お客様担当者</th><th>電話</th><th>住所</th><th>取引件数</th><th></th></tr></thead><tbody id="customer-list-body"></tbody></table></div>
@@ -3956,11 +3971,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.36.0';
+const APP_VERSION='v3.37.0';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
-const APP_BUILD_TIME='2026-07-05T16:00:00Z';
+const APP_BUILD_TIME='2026-07-05T16:30:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6543,6 +6558,73 @@ async function quickCreateDocWithAI(docType){
     await generateDocFromAI();
     if(ta) ta.value = '';
   }, 150);
+}
+
+// ===== ホーム画面: 万能AI入力（意図判定→自動振り分け） v3.37.0 =====
+async function runUniversalAI(){
+  const ta = document.getElementById('ai-quick-universal');
+  const text = (ta?.value || '').trim();
+  const statusEl = document.getElementById('ai-universal-status');
+  if(!text){
+    showToast('内容を入力または音声で話してください', 'var(--red)');
+    return;
+  }
+  if(!currentUser){
+    showToast('ログイン状態を確認してください', 'var(--red)');
+    return;
+  }
+  if(statusEl) statusEl.textContent = '🤖 判定中…';
+  try{
+    const idToken = await currentUser.getIdToken();
+    const res = await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/flexsysClassifyIntent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+      body: JSON.stringify({ text })
+    });
+    const data = await res.json();
+    if(!res.ok || !data.ok){
+      showToast('判定に失敗しました: ' + (data.error || res.status), 'var(--red)');
+      if(statusEl) statusEl.textContent = '';
+      return;
+    }
+    const intent = data.intent;
+    if(statusEl) statusEl.textContent = '';
+
+    if(intent === 'estimate' || intent === 'invoice' || intent === 'receipt'){
+      const typeMap = { estimate: '見積書', invoice: '請求書', receipt: '領収書' };
+      const docType = typeMap[intent];
+      openNewDoc(docType);
+      setTimeout(async () => {
+        const modalInput = document.getElementById('ai-doc-input');
+        if(modalInput) modalInput.value = text;
+        await generateDocFromAI();
+      }, 150);
+    } else if(intent === 'register_customer'){
+      showPage('customers');
+      setTimeout(() => {
+        openCustomerModal();
+        setTimeout(async () => {
+          const modalInput = document.getElementById('ai-cust-input');
+          if(modalInput) modalInput.value = text;
+          await parseCustomerWithAI();
+        }, 150);
+      }, 50);
+    } else if(intent === 'search_customer'){
+      showPage('customers');
+      setTimeout(() => {
+        const q = document.getElementById('cust-search');
+        if(q) q.value = text;
+        searchCustomersWithAI();
+      }, 150);
+    } else {
+      showToast('内容を判定できませんでした。もう少し具体的に入力してください（例：「〇〇様に見積もり」「〇〇な顧客を探す」）', '#E67E22');
+      return;
+    }
+    ta.value = '';
+  }catch(e){
+    showToast('AI実行エラー: ' + e.message, 'var(--red)');
+    if(statusEl) statusEl.textContent = '';
+  }
 }
 
 async function quickCreateCustomerWithAI(){
