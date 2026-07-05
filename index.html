@@ -2767,6 +2767,27 @@ if('serviceWorker' in navigator){
   <div id="doc-audit-info" style="display:none;padding:6px 20px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.5"></div>
   <div class="modal-body" style="padding:16px 20px">
 
+    <!-- ⓪ AI下書き入力（テキスト/音声） -->
+    <div class="form-section" style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:700;color:var(--accent)">🤖 AIで下書き入力</div>
+        <span id="ai-doc-status" style="font-size:11px;color:var(--text3)"></span>
+      </div>
+      <p style="font-size:11px;color:var(--text2);margin:0 0 6px;line-height:1.5">
+        話し言葉でOK。例：「田中様に足場工事、材料費3万・施工費5万で見積もり」。内容はAI生成後に必ずご確認ください。
+      </p>
+      <div style="display:flex;gap:6px;align-items:flex-start">
+        <textarea id="ai-doc-input" rows="2" placeholder="ここに入力、または🎤で話す"
+          style="flex:1;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
+        <button type="button" id="ai-doc-mic-btn" onclick="toggleVoiceInputForDoc()"
+          title="音声入力"
+          style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0">🎤</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="generateDocFromAI()" style="margin-top:8px">
+        ✨ AIで自動入力する
+      </button>
+    </div>
+
     <!-- ① 種別・番号・日付 -->
     <div class="form-row cols3" style="margin-bottom:12px">
       <div class="form-group">
@@ -3883,11 +3904,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.33.2';
+const APP_VERSION='v3.34.0';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
-const APP_BUILD_TIME='2026-07-05T14:15:00Z';
+const APP_BUILD_TIME='2026-07-05T15:00:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6302,6 +6323,129 @@ function calcTotals(){
   document.getElementById('tax10').textContent=fmt(taxMap['10']||0);
   document.getElementById('tax8').textContent=fmt(taxMap['8']||0);
   document.getElementById('grand-total').textContent=fmt(sub+totalTax);
+}
+
+// ===== AI下書き入力（テキスト/音声） v3.34.0 =====
+let _aiDocRecognition = null;
+let _aiDocListening = false;
+
+function toggleVoiceInputForDoc(){
+  const btn = document.getElementById('ai-doc-mic-btn');
+  const statusEl = document.getElementById('ai-doc-status');
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    showToast('このブラウザは音声入力に対応していません（Chrome推奨）', 'var(--red)');
+    return;
+  }
+  if(_aiDocListening){
+    if(_aiDocRecognition) _aiDocRecognition.stop();
+    return;
+  }
+  _aiDocRecognition = new SpeechRecognition();
+  _aiDocRecognition.lang = 'ja-JP';
+  _aiDocRecognition.interimResults = false;
+  _aiDocRecognition.maxAlternatives = 1;
+  _aiDocRecognition.onstart = () => {
+    _aiDocListening = true;
+    if(btn){ btn.style.background = 'var(--red)'; btn.textContent = '⏹'; }
+    if(statusEl) statusEl.textContent = '🎤 聞き取り中…';
+  };
+  _aiDocRecognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    const ta = document.getElementById('ai-doc-input');
+    if(ta) ta.value = (ta.value ? ta.value + ' ' : '') + text;
+  };
+  _aiDocRecognition.onerror = (e) => {
+    if(statusEl) statusEl.textContent = '';
+    if(e.error !== 'no-speech') showToast('音声認識エラー: ' + e.error, 'var(--red)');
+  };
+  _aiDocRecognition.onend = () => {
+    _aiDocListening = false;
+    if(btn){ btn.style.background = 'var(--surface)'; btn.textContent = '🎤'; }
+    if(statusEl) statusEl.textContent = '';
+  };
+  _aiDocRecognition.start();
+}
+
+async function generateDocFromAI(){
+  const ta = document.getElementById('ai-doc-input');
+  const text = (ta?.value || '').trim();
+  const statusEl = document.getElementById('ai-doc-status');
+  if(!text){
+    showToast('内容を入力または音声で話してください', 'var(--red)');
+    return;
+  }
+  if(!currentUser){
+    showToast('ログイン状態を確認してください', 'var(--red)');
+    return;
+  }
+  if(statusEl) statusEl.textContent = '✨ AI解析中…';
+  try{
+    const idToken = await currentUser.getIdToken();
+    const res = await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/flexsysGenerateDocument', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+      body: JSON.stringify({ text })
+    });
+    const data = await res.json();
+    if(!res.ok || !data.ok){
+      showToast('AI生成に失敗しました: ' + (data.error || res.status), 'var(--red)');
+      if(statusEl) statusEl.textContent = '';
+      return;
+    }
+    const draft = data.draft || {};
+
+    // 書類種別（対応する種別ボタンがあれば切替）
+    if(draft.docType === 'invoice'){
+      const btn = document.querySelector('.doc-type-btn[data-type="請求書"]');
+      if(btn) setDocType('請求書', btn);
+    }
+
+    // 顧客の自動マッチ（部分一致・最初の候補を採用）
+    if(draft.customerName){
+      const hit = (customers||[]).find(c =>
+        c.name && (c.name.includes(draft.customerName) || draft.customerName.includes(c.name))
+      );
+      if(hit){
+        selectCust(hit.id);
+      } else {
+        // 未登録顧客: 検索欄に候補名だけ表示して手動選択を促す
+        const q = document.getElementById('cust-search-q');
+        if(q){ q.value = draft.customerName; filterCustSearchInline(); }
+      }
+    }
+
+    // 件名
+    if(draft.subject){
+      const subj = document.getElementById('doc-subject');
+      if(subj) subj.value = draft.subject;
+    }
+
+    // 明細（既存行をクリアしてAI結果で置き換え）
+    if(Array.isArray(draft.lines) && draft.lines.length > 0){
+      const container = document.getElementById('line-items-container');
+      if(container) container.innerHTML = '';
+      draft.lines.forEach(l => {
+        addLineItem({ name: l.name || '', qty: l.qty || 1, price: l.price || 0 });
+      });
+      calcTotals();
+    }
+
+    // 備考（既存の定型文がある場合は改行して追記）
+    if(draft.notes){
+      const notesEl = document.getElementById('doc-notes');
+      if(notesEl){
+        notesEl.value = notesEl.value ? notesEl.value + '\n' + draft.notes : draft.notes;
+      }
+    }
+
+    if(statusEl) statusEl.textContent = '✅ 自動入力しました（内容をご確認ください）';
+    showToast('AIで下書きを入力しました。内容をご確認の上、保存してください', '#2E7D32');
+    setTimeout(() => { if(statusEl) statusEl.textContent = ''; }, 5000);
+  }catch(e){
+    showToast('AI生成エラー: ' + e.message, 'var(--red)');
+    if(statusEl) statusEl.textContent = '';
+  }
 }
 
 // ===== SAVE DOC =====
