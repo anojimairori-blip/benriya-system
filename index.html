@@ -1729,14 +1729,14 @@ if('serviceWorker' in navigator){
       <p style="font-size:11px;color:var(--text2);margin:0 0 8px;line-height:1.5">
         話す/入力するだけで、見積書作成・請求書作成・顧客登録・顧客検索を自動で振り分けます。
       </p>
-      <div style="display:flex;gap:6px;align-items:flex-start">
+      <div style="display:flex;gap:6px;align-items:stretch">
         <textarea id="ai-quick-universal" rows="1" placeholder="例：田中様に見積もり作って／先月の大きい工事の顧客／南23条の田中さんを登録"
-          style="flex:1;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
+          style="flex:1;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical;min-height:38px;box-sizing:border-box"></textarea>
         <button type="button" onclick="toggleQuickVoiceInput('universal')" title="音声入力"
           style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0">🎤</button>
+        <button class="btn btn-primary" onclick="runUniversalAI()" style="height:38px;padding:0 14px;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center">✨ AIで実行</button>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="runUniversalAI()" style="margin-top:8px">✨ AIで実行</button>
-      <span id="ai-universal-status" style="font-size:11px;color:var(--text3);margin-left:8px"></span>
+      <span id="ai-universal-status" style="font-size:11px;color:var(--text3)"></span>
     </div>
     <!-- Mini stats -->
     <div class="stats-grid" id="home-stats" style="margin-bottom:20px"></div>
@@ -1776,31 +1776,31 @@ if('serviceWorker' in navigator){
 <!-- QUOTES / INVOICES / RECEIPTS -->
 <div id="page-quotes" class="page">
   <div class="main-header"><h2>📝 見積書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-gold" onclick="openNewDoc('見積書')">＋ 新規見積書</button></div></div>
-  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
+  <div style="display:flex;gap:6px;align-items:stretch;margin:12px 24px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
     <textarea id="ai-quick-見積書" rows="1" placeholder="🤖 話す/入力→AIで新規見積書を作成（例：田中様に足場工事、材料費3万・施工費5万）"
       style="flex:1;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
     <button type="button" onclick="toggleQuickVoiceInput('見積書')" title="音声入力" style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
-    <button class="btn btn-primary btn-sm" onclick="quickCreateDocWithAI('見積書')" style="white-space:nowrap;flex-shrink:0">✨ AIで作成</button>
+    <button class="btn btn-primary" onclick="quickCreateDocWithAI('見積書')" style="height:38px;padding:0 14px;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center">✨ AIで作成</button>
   </div>
   <div class="content" id="content-quotes"></div>
 </div>
 <div id="page-invoices" class="page">
   <div class="main-header"><h2>📋 請求書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-secondary" onclick="openBulkPdfModal('請求書')" title="請求書を複数まとめてPDF出力">📑 まとめてPDF</button><button class="btn btn-blue" onclick="openNewDoc('請求書')">＋ 新規請求書</button><button class="btn btn-sm" onclick="openMonthlyBulkModal()" style="background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9">📅 月次一括</button></div></div>
-  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
+  <div style="display:flex;gap:6px;align-items:stretch;margin:12px 24px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
     <textarea id="ai-quick-請求書" rows="1" placeholder="🤖 話す/入力→AIで新規請求書を作成"
       style="flex:1;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
     <button type="button" onclick="toggleQuickVoiceInput('請求書')" title="音声入力" style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
-    <button class="btn btn-primary btn-sm" onclick="quickCreateDocWithAI('請求書')" style="white-space:nowrap;flex-shrink:0">✨ AIで作成</button>
+    <button class="btn btn-primary" onclick="quickCreateDocWithAI('請求書')" style="height:38px;padding:0 14px;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center">✨ AIで作成</button>
   </div>
   <div class="content" id="content-invoices"></div>
 </div>
 <div id="page-receipts" class="page">
   <div class="main-header"><h2>🧾 領収書一覧</h2><div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button><button class="btn btn-primary" onclick="openNewDoc('領収書')">＋ 新規領収書</button></div></div>
-  <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
+  <div style="display:flex;gap:6px;align-items:stretch;margin:12px 24px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
     <textarea id="ai-quick-領収書" rows="1" placeholder="🤖 話す/入力→AIで新規領収書を作成"
       style="flex:1;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
     <button type="button" onclick="toggleQuickVoiceInput('領収書')" title="音声入力" style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
-    <button class="btn btn-primary btn-sm" onclick="quickCreateDocWithAI('領収書')" style="white-space:nowrap;flex-shrink:0">✨ AIで作成</button>
+    <button class="btn btn-primary" onclick="quickCreateDocWithAI('領収書')" style="height:38px;padding:0 14px;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center">✨ AIで作成</button>
   </div>
   <div class="content" id="content-receipts"></div>
 </div>
@@ -1816,19 +1816,19 @@ if('serviceWorker' in navigator){
       <div class="tab" onclick="switchCustTab('receipts',this)">領収書</div>
     </div>
     <div id="cust-tab-list">
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <input id="cust-search" oninput="renderCustomerList()" type="text" placeholder="顧客名・電話・住所で検索" style="padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;flex:1;outline:none">
-        <button type="button" class="btn btn-primary btn-sm" onclick="searchCustomersWithAI()" title="自然文で検索（例：先月の大きい工事の顧客）" style="white-space:nowrap">🤖 AIで検索</button>
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:stretch">
+        <input id="cust-search" oninput="renderCustomerList()" type="text" placeholder="顧客名・電話・住所で検索" style="height:38px;padding:0 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;flex:1;outline:none;box-sizing:border-box">
+        <button type="button" class="btn btn-primary" onclick="searchCustomersWithAI()" title="自然文で検索（例：先月の大きい工事の顧客）" style="height:38px;padding:0 14px;white-space:nowrap;display:inline-flex;align-items:center">🤖 AIで検索</button>
       </div>
       <div id="ai-cust-search-banner" style="display:none;margin-bottom:10px;padding:8px 12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:7px;font-size:12px;color:var(--accent);display:flex;align-items:center;justify-content:space-between;gap:8px">
         <span id="ai-cust-search-summary"></span>
         <button type="button" class="btn btn-secondary btn-sm" onclick="clearAiCustomerSearch()">✕ 解除</button>
       </div>
-      <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
+      <div style="display:flex;gap:6px;align-items:stretch;margin-bottom:12px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:8px 10px">
         <textarea id="ai-quick-cust" rows="1" placeholder="🤖 話す/入力→AIで新規顧客登録（例：南23条の田中さん、電話は011-123-4567）"
           style="flex:1;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical"></textarea>
         <button type="button" onclick="toggleQuickVoiceInputCustomer()" title="音声入力" style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:15px;flex-shrink:0">🎤</button>
-        <button class="btn btn-primary btn-sm" onclick="quickCreateCustomerWithAI()" style="white-space:nowrap;flex-shrink:0">✨ AIで登録</button>
+        <button class="btn btn-primary" onclick="quickCreateCustomerWithAI()" style="height:38px;padding:0 14px;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center">✨ AIで登録</button>
       </div>
       <div class="card"><table><thead><tr><th>顧客名</th><th>お客様担当者</th><th>電話</th><th>住所</th><th>取引件数</th><th></th></tr></thead><tbody id="customer-list-body"></tbody></table></div>
     </div>
@@ -3971,11 +3971,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.37.0';
+const APP_VERSION='v3.38.0';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
-const APP_BUILD_TIME='2026-07-05T16:30:00Z';
+const APP_BUILD_TIME='2026-07-06T00:00:00Z';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
