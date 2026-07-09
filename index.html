@@ -3977,11 +3977,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.1';
-const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
+const APP_VERSION='v3.38.0-cloud.2';
 window.HUB_LICENSE = null;
-window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
-const APP_BUILD_TIME='2026-07-09 13:21 JST';
+window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
+window.MY_ROLE = null;     // 'owner' | 'member'
+const APP_BUILD_TIME='2026-07-10 08:19 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5961,7 +5961,7 @@ async function refreshAllData(btnEl){
     const F=window._FB;
     if(F && currentUser && typeof fbLoadAll==='function'){
       try{
-        await fbLoadAll(window.COMPANY_KEY || MASTER_UID);
+        await fbLoadAll(window.COMPANY_KEY);
         fbOk=true;
       }catch(e){
         fbError=e;
@@ -10584,7 +10584,8 @@ async function _fbPersist(){
   if(!F||!currentUser) return { ok:false, error:'not logged in' };
   showSync();
   try{
-    const uid = window.COMPANY_KEY || MASTER_UID; // 自社/契約ごとのデータキー
+    const uid = window.COMPANY_KEY; // 会社(tenantId)ごとのデータキー
+    if(!uid){ hideSync(); return { ok:false, error:'no tenant' }; }
 
     // 画像データを除外したexpensesを作成（Firestoreは配列内のネストを許可しない）
     const expensesForFB = expenses.map(e=>{
@@ -10695,6 +10696,39 @@ async function _fbPersist(){
   }
 }
 
+// ===== 顧客用SaaS: ログインユーザーの所属会社(tenantId)を解決 =====
+// memberIndex/{uid} を読み、あれば所属会社を採用。無ければ暫定で新会社を作成し
+// そのユーザーをownerにする（検証用の自動owner化。本番前にCLOUD_AUTO_OWNER=falseに）。
+const CLOUD_AUTO_OWNER = true;
+async function resolveTenantForCloud(user){
+  const F = window._FB;
+  const uid = user.uid;
+  try{
+    const idxSnap = await F.getDoc(F.doc(F.db, 'memberIndex', uid));
+    if(idxSnap.exists()){
+      const d = idxSnap.data();
+      if(d && d.tenantId){
+        return { tenantId: d.tenantId, role: d.role || 'member', created: false };
+      }
+    }
+  }catch(e){ console.warn('memberIndex read failed:', e); }
+  if(!CLOUD_AUTO_OWNER){
+    return { tenantId: null, role: null, created: false };
+  }
+  const newTid = 'tenant_' + uid;
+  try{
+    await F.setDoc(F.doc(F.db, 'users', newTid, 'meta', 'company'), {
+      companyName: (user.email||'新しい会社'), createdAt: Date.now(), seatLimit: 1, ownerUid: uid
+    });
+    await F.setDoc(F.doc(F.db, 'users', newTid, 'members', uid), {
+      role: 'owner', email: user.email||'', name: user.displayName||'',
+      status: 'active', joinedAt: Date.now(), invitedBy: null
+    });
+    await F.setDoc(F.doc(F.db, 'memberIndex', uid), { tenantId: newTid, role: 'owner' });
+  }catch(e){ console.error('tenant init failed:', e); }
+  return { tenantId: newTid, role: 'owner', created: true };
+}
+
 // 認証状態監視 → ログイン画面制御
 function initFirebaseAuth(){
   const F = window._FB;
@@ -10717,48 +10751,24 @@ function initFirebaseAuth(){
     const appEl = document.getElementById('app-main');
     const loginEl = document.getElementById('login-screen');
     if(user){
-      // ===== アクセス許可チェック（Phase D-3: リスト外はハブのライセンスを照会） =====
-      const allowed = await checkAccessAllowed(user.email);
+      // ===== 所属会社(tenantId)の解決（memberIndex方式・MASTER_UID撤廃） =====
       window.HUB_LICENSE = null;
-      window.COMPANY_KEY = MASTER_UID;
-      const idToken = await user.getIdToken();
-
-      if(!allowed){
-        try{
-          const r = await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/userLicense', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-            body: JSON.stringify({ productId: 'flexsys' })
-          });
-          const lic = await r.json();
-          if(r.ok && lic && lic.valid){ window.HUB_LICENSE = lic; }
-        }catch(e){ console.warn('license check failed:', e); }
-        if(!window.HUB_LICENSE){
-          // 許可リストにもハブ契約にもない → ログアウトして申込ページへ誘導
-          await F.signOut(F.auth);
-          if(loginEl){
-            loginEl.style.display='flex';
-            const errEl=document.getElementById('login-error');
-            if(errEl){
-              errEl.innerHTML = `${user.email} の有効なご契約が見つかりません。<br>ご利用にはお申し込みが必要です。<br><a href="https://nojima-business-hub.pages.dev/signup" target="_blank" rel="noopener" style="color:#b88746;font-weight:bold;">→ 申込ページを開く（14日間無料）</a>`;
-              errEl.classList.add('show');
-            }
+      const tenantInfo = await resolveTenantForCloud(user);
+      if(!tenantInfo.tenantId){
+        // 所属会社なし（自動owner化オフ時）→ ログアウトして申込ページへ誘導
+        await F.signOut(F.auth);
+        if(loginEl){
+          loginEl.style.display='flex';
+          const errEl=document.getElementById('login-error');
+          if(errEl){
+            errEl.innerHTML = `${escAttr(user.email||'')} の所属する会社が見つかりません。<br>ご利用にはお申し込みが必要です。<br><a href="https://nojima-business-hub.pages.dev/signup" target="_blank" rel="noopener" style="color:#b88746;font-weight:bold;">→ 申込ページを開く（14日間無料）</a>`;
+            errEl.classList.add('show');
           }
-          return;
         }
-        // ライセンス顧客: 契約テナントIDを自社データキーとして採用
-        window.COMPANY_KEY = window.HUB_LICENSE.license.tenantId;
+        return;
       }
-
-      // 許可リスト内・ライセンス顧客とも、ハブ側のownerKeyマップを最新化しておく
-      // （Firestoreルールが将来このマップを参照して権限判定するため）
-      try{
-        await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/flexsysEnsureOwnerMap', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-          body: JSON.stringify({})
-        });
-      }catch(e){ console.warn('flexsysEnsureOwnerMap failed:', e); }
+      window.COMPANY_KEY = tenantInfo.tenantId;
+      window.MY_ROLE = tenantInfo.role;
 
       currentUser = user;
       // UIを更新
@@ -10781,8 +10791,8 @@ function initFirebaseAuth(){
       if(mun) mun.textContent=user.displayName||'ユーザー';
       const mue = document.getElementById('mobile-user-email');
       if(mue) mue.textContent=user.email||'';
-      // データ読み込み（常にマスターUIDのデータを参照）
-      await fbLoadAll(window.COMPANY_KEY || MASTER_UID);
+      // データ読み込み（所属会社 tenantId のデータを参照）
+      await fbLoadAll(window.COMPANY_KEY);
       // 最終ログイン時刻を記録（全メンバー共有）
       try{ await recordMemberLogin(user); }catch(e){}
       initAppAfterAuth();
