@@ -1435,7 +1435,8 @@ if(typeof QRCode === 'undefined'){
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
+           signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
   import { getFirestore, doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, writeBatch, query, where, orderBy, limit }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -1444,13 +1445,12 @@ if(typeof QRCode === 'undefined'){
 
   // ★★★ Firebaseの設定 ★★★
   const firebaseConfig = {
-    apiKey: "AIzaSyDkcka93Kf1mv4ToTi6i6AixzxW45xLzlc",
-    authDomain: "flexsysv2026.firebaseapp.com",
-    projectId: "flexsysv2026",
-    storageBucket: "flexsysv2026.firebasestorage.app",
-    messagingSenderId: "721432443715",
-    appId: "1:721432443715:web:d969e17c93eaf5b8300df6",
-    measurementId: "G-MRQX4NDXS1"
+    apiKey: "AIzaSyBwW6DkYtuULoGlIznyhtS1nBPFRGTlbAg",
+    authDomain: "flexsys-cloud.firebaseapp.com",
+    projectId: "flexsys-cloud",
+    storageBucket: "flexsys-cloud.firebasestorage.app",
+    messagingSenderId: "240806666601",
+    appId: "1:240806666601:web:aee715f595cb8490745df8"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -1458,15 +1458,18 @@ if(typeof QRCode === 'undefined'){
   const db = getFirestore(app);
   const storage = getStorage(app);
   const provider = new GoogleAuthProvider();
-  // カレンダー一覧取得(calendarList)とイベント操作の両方に対応するため
-  // 'calendar' スコープに拡張(v3.25.3)。以前の 'calendar.events' のみでは
-  // /users/me/calendarList が 403 Insufficient Permission で失敗していた
-  provider.addScope('https://www.googleapis.com/auth/calendar');
   provider.setCustomParameters({prompt:'consent'});
+  // 顧客用SaaS: メール+PWログインをメインとし、Googleログイン(provider)は
+  // calendarスコープを要求しない(CASA審査回避)。カレンダー連携が必要な場面では
+  // 別途 calProvider を用いて明示的に権限を要求する(将来用・現状は定義のみ)。
+  const calProvider = new GoogleAuthProvider();
+  calProvider.addScope('https://www.googleapis.com/auth/calendar');
+  calProvider.setCustomParameters({prompt:'consent'});
 
   // グローバルに公開
-  window._FB = { auth, db, storage, provider, GoogleAuthProvider,
+  window._FB = { auth, db, storage, provider, calProvider, GoogleAuthProvider,
     signInWithPopup, signOut, onAuthStateChanged,
+    signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail,
     doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, writeBatch,
     query, where, orderBy, limit,
     storageRef, uploadBytes, getDownloadURL, deleteObject, listAll };
@@ -1503,14 +1506,17 @@ if('serviceWorker' in navigator){
 <div id="login-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;align-items:center;justify-content:center;flex-direction:column">
   <div style="text-align:center;max-width:380px;width:90%;padding:40px 32px;background:var(--surface);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.15)">
     <div style="font-size:48px;margin-bottom:16px">📋</div>
-    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys2026 v3.25.12</h1>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:28px">Googleアカウントでログインしてください</p>
-    <button onclick="fbLogin()" style="width:100%;padding:13px;background:white;border:1px solid #DDD;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:#333;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 37"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.6 0 10.6-1.9 14.4-5.1l-6.7-5.5C29.7 37 27 38 24 38c-5.7 0-10.6-3.9-11.8-9.1L5.1 34C8.1 41.1 15.5 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.9-2.6 5.4-5.1 7.1l6.7 5.5C41.8 37.5 45 31.2 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
-      Googleでログイン
-    </button>
+    <h1 id="login-title" style="font-family:'Noto Serif JP',serif;font-size:24px;font-weight:700;color:var(--accent);margin-bottom:6px">Flexsys</h1>
+    <p id="login-sub" style="font-size:13px;color:var(--text2);margin-bottom:22px">メールアドレスでログイン</p>
+    <div style="display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:9px;overflow:hidden">
+      <button type="button" id="auth-tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer">ログイン</button>
+      <button type="button" id="auth-tab-signup" onclick="switchAuthTab('signup')" style="flex:1;padding:10px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer">新規登録</button>
+    </div>
+    <input id="auth-email" type="email" autocomplete="email" placeholder="メールアドレス" style="width:100%;padding:12px 14px;margin-bottom:10px;border:1px solid var(--border);border-radius:9px;font-size:14px;box-sizing:border-box;background:var(--bg);color:var(--text)">
+    <input id="auth-password" type="password" autocomplete="current-password" placeholder="パスワード（6文字以上）" onkeydown="if(event.key==='Enter')doEmailAuth()" style="width:100%;padding:12px 14px;margin-bottom:16px;border:1px solid var(--border);border-radius:9px;font-size:14px;box-sizing:border-box;background:var(--bg);color:var(--text)">
+    <button id="auth-submit" onclick="doEmailAuth()" style="width:100%;padding:13px;background:var(--accent);border:none;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.12)">ログイン</button>
     <div id="login-error" style="margin-top:14px;font-size:12px;color:var(--red);min-height:18px"></div>
-    <p style="font-size:11px;color:var(--text3);margin-top:20px">※ 許可されたGoogleアカウントのみアクセスできます</p>
+    <p id="auth-reset-line" style="font-size:12px;margin-top:8px"><a href="javascript:void(0)" onclick="doPasswordReset()" style="color:var(--accent);text-decoration:underline;cursor:pointer">パスワードを忘れた方はこちら</a></p>
   </div>
 </div>
 
@@ -3971,11 +3977,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0';
+const APP_VERSION='v3.38.0-cloud.1';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
-const APP_BUILD_TIME='2026-07-06T00:00:00Z';
+const APP_BUILD_TIME='2026-07-09 13:21 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -10331,25 +10337,93 @@ let currentUser = null;
 let fbUnsubscribe = null; // realtime listener
 
 // ログイン
-async function fbLogin(){
-  const F = window._FB;
-  if(!F){ document.getElementById('login-error').textContent='Firebase未設定。firebaseConfigを設定してください。'; return; }
-  try{
-    document.getElementById('login-error').textContent='';
-    // ログイン後にCredentialからaccess tokenを取り出して保存
-    const result=await F.signInWithPopup(F.auth, F.provider);
-    try{
-      const cred=F.GoogleAuthProvider.credentialFromResult(result);
-      if(cred?.accessToken){
-        // メモリ優先（XSS耐性）＋ sessionStorage（ページリロード復元用）
-        window._gcalToken = { token: cred.accessToken, at: Date.now() };
-        sessionStorage.setItem('google_access_token', cred.accessToken);
-        sessionStorage.setItem('google_token_at', String(Date.now()));
-      }
-    }catch(e){console.warn('Token capture failed:',e);}
-  }catch(e){
-    document.getElementById('login-error').textContent='ログイン失敗: '+e.message;
+// ===== 顧客用SaaS 認証（メール+パスワード） =====
+let _authMode = 'login';
+function switchAuthTab(mode){
+  _authMode = mode;
+  const tl=document.getElementById('auth-tab-login');
+  const ts=document.getElementById('auth-tab-signup');
+  const sub=document.getElementById('login-sub');
+  const submit=document.getElementById('auth-submit');
+  const pw=document.getElementById('auth-password');
+  const resetLine=document.getElementById('auth-reset-line');
+  const err=document.getElementById('login-error'); if(err) err.textContent='';
+  if(mode==='signup'){
+    if(tl){tl.style.background='transparent';tl.style.color='var(--text2)';}
+    if(ts){ts.style.background='var(--accent)';ts.style.color='#fff';}
+    if(sub) sub.textContent='新しいアカウントを作成';
+    if(submit) submit.textContent='新規登録';
+    if(pw){pw.setAttribute('autocomplete','new-password');}
+    if(resetLine) resetLine.style.display='none';
+  }else{
+    if(tl){tl.style.background='var(--accent)';tl.style.color='#fff';}
+    if(ts){ts.style.background='transparent';ts.style.color='var(--text2)';}
+    if(sub) sub.textContent='メールアドレスでログイン';
+    if(submit) submit.textContent='ログイン';
+    if(pw){pw.setAttribute('autocomplete','current-password');}
+    if(resetLine) resetLine.style.display='';
   }
+}
+
+async function doEmailAuth(){
+  const F = window._FB;
+  const errEl = document.getElementById('login-error');
+  if(!F){ if(errEl) errEl.textContent='Firebase未設定です。'; return; }
+  const email=(document.getElementById('auth-email')?.value||'').trim();
+  const pw=document.getElementById('auth-password')?.value||'';
+  if(errEl) errEl.textContent='';
+  if(!email){ if(errEl) errEl.textContent='メールアドレスを入力してください。'; return; }
+  if(!pw || pw.length<6){ if(errEl) errEl.textContent='パスワードは6文字以上で入力してください。'; return; }
+  const submit=document.getElementById('auth-submit');
+  if(submit){ submit.disabled=true; submit.style.opacity='.6'; }
+  try{
+    if(_authMode==='signup'){
+      await F.createUserWithEmailAndPassword(F.auth, email, pw);
+    }else{
+      await F.signInWithEmailAndPassword(F.auth, email, pw);
+    }
+    // 認証成功後は onAuthStateChanged が画面遷移を担当
+  }catch(e){
+    if(errEl) errEl.textContent = authErrorMessage(e);
+  }finally{
+    if(submit){ submit.disabled=false; submit.style.opacity='1'; }
+  }
+}
+
+async function doPasswordReset(){
+  const F = window._FB;
+  const errEl = document.getElementById('login-error');
+  if(!F){ if(errEl) errEl.textContent='Firebase未設定です。'; return; }
+  const email=(document.getElementById('auth-email')?.value||'').trim();
+  if(!email){ if(errEl){ errEl.style.color='var(--red)'; errEl.textContent='メールアドレスを入力してから再度お試しください。'; } return; }
+  try{
+    await F.sendPasswordResetEmail(F.auth, email);
+    if(errEl){ errEl.style.color='var(--green,#27AE60)'; errEl.textContent='パスワード再設定メールを送信しました。'; }
+  }catch(e){
+    if(errEl){ errEl.style.color='var(--red)'; errEl.textContent=authErrorMessage(e); }
+  }
+}
+
+function authErrorMessage(e){
+  const code = (e && e.code) || '';
+  switch(code){
+    case 'auth/invalid-email': return 'メールアドレスの形式が正しくありません。';
+    case 'auth/user-disabled': return 'このアカウントは無効化されています。';
+    case 'auth/user-not-found': return 'アカウントが見つかりません。新規登録をお試しください。';
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential': return 'メールアドレスまたはパスワードが正しくありません。';
+    case 'auth/email-already-in-use': return 'このメールアドレスは既に登録されています。ログインをお試しください。';
+    case 'auth/weak-password': return 'パスワードは6文字以上にしてください。';
+    case 'auth/too-many-requests': return '試行回数が多すぎます。しばらくしてから再度お試しください。';
+    case 'auth/network-request-failed': return 'ネットワークエラーが発生しました。接続を確認してください。';
+    default: return 'エラー: ' + ((e && e.message) || code || '不明なエラー');
+  }
+}
+
+// 旧Googleログイン関数（互換のため残置。顧客用ではメール+PWを使用）
+async function fbLogin(){
+  const errEl = document.getElementById('login-error');
+  if(errEl) errEl.textContent = 'メールアドレスとパスワードでログインしてください。';
 }
 
 // ログアウト
@@ -10850,6 +10924,10 @@ function getOnlineStatus(isoStr){
 
 // Firestoreの共有ドキュメントから許可リストを取得してチェック
 async function checkAccessAllowed(email){
+  // 顧客用SaaS: 許可Emailリスト方式は廃止。全ユーザーを通す。
+  // Step5でハブのuserLicense照会（契約状態チェック）をここに差し込む予定。
+  return true;
+  /* eslint-disable no-unreachable */
   const F = window._FB;
   if(!F || !email) return true; // ローカルモードは全員許可
   try{
