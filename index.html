@@ -2405,19 +2405,25 @@ if('serviceWorker' in navigator){
   <div class="content">
     <div class="card" style="max-width:640px;padding:24px">
       <div class="section-title" style="margin-bottom:4px">メンバー一覧</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">同じ会社データを共有するメンバーです。オーナーが招待できます。</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:6px">同じ会社データを共有するメンバーです。</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px">シート使用状況: <strong id="seat-usage">—</strong></div>
       <div id="members-list" style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px">
         <div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">読み込み中...</div>
       </div>
       <div class="section-title" style="margin-bottom:8px">メンバーを招待</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:10px">招待メールが指定のアドレスに届きます。7日以内に受諾してください。</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <input type="email" id="invite-email-input" placeholder="staff@example.com"
-          style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none"
-          onkeydown="if(event.key==='Enter')sendMemberInvite()">
-        <button class="btn btn-primary" onclick="sendMemberInvite()">📧 招待メールを送る</button>
+      <div id="seat-limit-msg" style="display:none;font-size:12px;color:var(--red);margin-bottom:8px;padding:8px 12px;background:rgba(220,38,38,.08);border-radius:6px">
+        ⚠️ シート上限に達しています。プランをアップグレードすると招待できます。
       </div>
-      <div id="invite-status" style="font-size:12px;margin-top:10px;min-height:18px"></div>
+      <div id="invite-form">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px">招待メールが指定のアドレスに届きます。7日以内に受諾してください。</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input type="email" id="invite-email-input" placeholder="staff@example.com"
+            style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none"
+            onkeydown="if(event.key==='Enter')sendMemberInvite()">
+          <button id="invite-send-btn" class="btn btn-primary" onclick="sendMemberInvite()">📧 招待メールを送る</button>
+        </div>
+        <div id="invite-status" style="font-size:12px;margin-top:10px;min-height:18px"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -4104,11 +4110,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.5';
+const APP_VERSION='v3.38.0-cloud.6';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-10 14:57 JST';
+const APP_BUILD_TIME='2026-07-11 04:56 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -15541,6 +15547,147 @@ async function submitConsent(){
   }catch(e){
     if(btn){btn.disabled=false;btn.textContent='✅ 同意して Flexsys を開始する';btn.style.opacity='1';}
     showToast('記録に失敗しました: '+(e&&e.message?e.message:e),'#C0392B');
+  }
+}
+
+
+// ===== メンバー管理・招待フロー（Step3-2 / Step3-3） =====
+const INVITE_CREATE_URL='https://asia-northeast1-nojima-business-hub.cloudfunctions.net/inviteCreate';
+const INVITE_ACCEPT_URL='https://asia-northeast1-nojima-business-hub.cloudfunctions.net/inviteAccept';
+const OWNER_TRANSFER_URL='https://asia-northeast1-nojima-business-hub.cloudfunctions.net/inviteTransferOwner';
+
+// メンバー一覧を読み込んで描画
+async function loadMembersList(){
+  const el=document.getElementById('members-list'); if(!el) return;
+  const seatEl=document.getElementById('seat-usage'); 
+  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">読み込み中...</div>';
+  try{
+    const F=window._FB;
+    if(!F||!window.COMPANY_KEY){ el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px">データなし</div>'; return; }
+    const [membersSnap, metaSnap] = await Promise.all([
+      F.getDocs(F.collection(F.db,'users',window.COMPANY_KEY,'members')),
+      F.getDoc(F.doc(F.db,'users',window.COMPANY_KEY,'meta','company')),
+    ]);
+    const seatLimit = metaSnap.exists() ? (metaSnap.data().seatLimit || 1) : 1;
+    const rows=[];
+    membersSnap.forEach(d=>{ const x=d.data(); rows.push({uid:d.id,...x}); });
+    
+    // シート使用状況表示
+    if(seatEl) seatEl.textContent=`${rows.length} / ${seatLimit} 名使用中`;
+    const canInvite = rows.length < seatLimit;
+    const invFormEl=document.getElementById('invite-form');
+    if(invFormEl) invFormEl.style.opacity = canInvite ? '1' : '.5';
+    const invBtn=document.getElementById('invite-send-btn');
+    if(invBtn) invBtn.disabled = !canInvite;
+    const limitMsg=document.getElementById('seat-limit-msg');
+    if(limitMsg) limitMsg.style.display = canInvite ? 'none' : '';
+    
+    if(rows.length===0){ el.innerHTML='<div style="padding:16px;color:var(--text3);font-size:13px;text-align:center">まだメンバーがいません</div>'; return; }
+    const myUid=F.auth.currentUser?.uid;
+    el.innerHTML='<table style="width:100%;border-collapse:collapse">'+
+      '<thead><tr style="background:var(--surface2);font-size:11px;color:var(--text2)">'+
+      '<th style="text-align:left;padding:8px 14px">メール</th><th style="padding:8px 14px;text-align:center">役割</th><th style="padding:8px 14px;text-align:center">参加日</th><th style="padding:8px 14px;text-align:center">操作</th></tr></thead><tbody>'+
+      rows.map((r,i)=>{
+        const joined=r.joinedAt?.seconds?new Date(r.joinedAt.seconds*1000).toLocaleDateString('ja-JP'):'';
+        const isMe=r.uid===myUid;
+        const isOwner=r.role==='owner';
+        return `<tr style="border-top:1px solid var(--border)${i%2===1?';background:var(--surface2)':''}">
+          <td style="padding:10px 14px;font-size:13px">${escAttr(r.email||'')}${isMe?' <span style="font-size:10px;background:var(--accent-light);color:var(--accent);padding:1px 6px;border-radius:99px">自分</span>':''}</td>
+          <td style="padding:10px 14px;text-align:center;font-size:12px">${isOwner?'👑 オーナー':'👤 メンバー'}</td>
+          <td style="padding:10px 14px;text-align:center;font-size:12px;color:var(--text3)">${joined}</td>
+          <td style="padding:10px 14px;text-align:center;font-size:12px">
+            ${window.MY_ROLE==='owner'&&!isOwner&&!isMe?
+              `<button onclick="transferOwner('${escAttr(r.uid)}','${escAttr(r.email||'')}')" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--text2)">👑 オーナーに移譲</button>`
+              :''}
+          </td>
+        </tr>`;
+      }).join('')+'</tbody></table>';
+  }catch(e){ el.innerHTML='<div style="padding:16px;color:var(--red);font-size:13px">読み込みエラー: '+escAttr(e.message)+'</div>'; }
+}
+
+// 招待メールを送信
+async function sendMemberInvite(){
+  const inp=document.getElementById('invite-email-input');
+  const st=document.getElementById('invite-status');
+  if(!inp) return;
+  const email=inp.value.trim().toLowerCase();
+  if(!email){ showToast('招待先のメールアドレスを入力してください','#E67E22'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('正しいメールアドレスを入力してください','#E67E22'); return; }
+  if(st) st.textContent='送信中...';
+  try{
+    const F=window._FB;
+    const user=F&&F.auth&&F.auth.currentUser;
+    if(!user) throw new Error('ログイン情報が確認できません');
+    const idToken=await user.getIdToken();
+    const r=await fetch(INVITE_CREATE_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({inviteeEmail:email})
+    });
+    const d=await r.json();
+    if(!r.ok||!d.ok) throw new Error(d.error||'HTTP '+r.status);
+    inp.value='';
+    if(st) st.innerHTML='<span style="color:var(--green)">✅ 招待メールを送りました（受付番号: '+escAttr(d.inviteId)+'）。7日以内に受諾してもらってください。</span>';
+    showToast('招待メールを送りました 📧','#27AE60');
+  }catch(e){
+    if(st) st.innerHTML='<span style="color:var(--red)">❌ 送信失敗: '+escAttr(e&&e.message?e.message:String(e))+'</span>';
+    showToast('招待の送信に失敗しました','#C0392B');
+  }
+}
+
+// オーナー移譲
+async function transferOwner(toUid, toEmail){
+  if(!confirm(`${toEmail} をオーナーに移譲します。あなたはメンバーになります。よろしいですか？`)) return;
+  try{
+    const F=window._FB;
+    const user=F&&F.auth&&F.auth.currentUser;
+    if(!user) throw new Error('ログイン情報が確認できません');
+    const idToken=await user.getIdToken();
+    const r=await fetch(OWNER_TRANSFER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({toUid})
+    });
+    const d=await r.json();
+    if(!r.ok||!d.ok) throw new Error(d.error||'HTTP '+r.status);
+    showToast('✅ オーナーを移譲しました','#27AE60');
+    window.MY_ROLE='member';
+    // ownerタブを非表示に
+    document.querySelectorAll('.cloud-owner-only').forEach(el=>el.style.display='none');
+    await loadMembersList();
+  }catch(e){
+    showToast('移譲に失敗しました: '+escAttr(e&&e.message?e.message:String(e)),'#C0392B');
+  }
+}
+
+// 招待トークン受諾（URLパラメータ ?invite=xxx から起動）
+async function handleInviteAccept(inviteId){
+  if(window.COMPANY_KEY && !window.COMPANY_KEY.startsWith('tenant_')) return;
+  const confirmed=confirm('招待を受諾して、このアカウントで会社データを共有しますか？\n\n受諾すると、招待した会社のデータにアクセスできるようになります。');
+  if(!confirmed) return;
+  try{
+    const F=window._FB;
+    const user=F&&F.auth&&F.auth.currentUser;
+    if(!user) throw new Error('ログイン情報が確認できません');
+    const idToken=await user.getIdToken();
+    const r=await fetch(INVITE_ACCEPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({inviteId})
+    });
+    const d=await r.json();
+    if(!r.ok||!d.ok) throw new Error(d.error||'HTTP '+r.status);
+    showToast('✅ 招待を受諾しました。「'+escAttr(d.tenantName||d.tenantId)+'」のメンバーとして参加しました。','#27AE60');
+    const url=new URL(location.href);
+    url.searchParams.delete('invite');
+    history.replaceState(null,'',url.toString());
+    setTimeout(()=>location.reload(),2000);
+  }catch(e){
+    const msg=e&&e.message?e.message:String(e);
+    if(msg.includes('already used')) showToast('この招待リンクは既に使用済みです','#E67E22');
+    else if(msg.includes('expired')) showToast('この招待リンクの有効期限が切れています','#E67E22');
+    else if(msg.includes('email mismatch')) showToast('招待先のメールアドレスと一致しません。正しいアカウントでログインしてください','#C0392B');
+    else showToast('招待の受諾に失敗しました: '+escAttr(msg),'#C0392B');
   }
 }
 
