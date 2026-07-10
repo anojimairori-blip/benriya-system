@@ -2003,6 +2003,9 @@ if('serviceWorker' in navigator){
       <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
       </button>
+      <button class="settings-tab settings-tab-extra cloud-owner-only" data-settings-nav="members" onclick="showPage('members-settings')" style="display:none">
+        <span class="stab-icon">👥</span><span class="stab-label">メンバー管理</span>
+      </button>
     </div>
   <div class="content">
 
@@ -2125,6 +2128,9 @@ if('serviceWorker' in navigator){
       <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
       </button>
+      <button class="settings-tab settings-tab-extra cloud-owner-only" data-settings-nav="members" onclick="showPage('members-settings')" style="display:none">
+        <span class="stab-icon">👥</span><span class="stab-label">メンバー管理</span>
+      </button>
     </div>
   <div class="content">
     <p style="font-size:13px;color:var(--text2);margin-bottom:14px">よく使う品目を登録しておくと、見積書作成時にワンクリックで挿入できます。</p>
@@ -2166,6 +2172,9 @@ if('serviceWorker' in navigator){
       </button>
       <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
+      <button class="settings-tab settings-tab-extra cloud-owner-only" data-settings-nav="members" onclick="showPage('members-settings')" style="display:none">
+        <span class="stab-icon">👥</span><span class="stab-label">メンバー管理</span>
       </button>
     </div>
   <div class="content">
@@ -2305,6 +2314,9 @@ if('serviceWorker' in navigator){
       <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
       </button>
+      <button class="settings-tab settings-tab-extra cloud-owner-only" data-settings-nav="members" onclick="showPage('members-settings')" style="display:none">
+        <span class="stab-icon">👥</span><span class="stab-label">メンバー管理</span>
+      </button>
     </div>
   <div class="content">
 
@@ -2341,6 +2353,35 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
+
+<!-- MEMBERS SETTINGS（クラウド版・ownerのみ） -->
+<div id="page-members-settings" class="page">
+  <div class="main-header"><h2>👥 メンバー管理</h2></div>
+  <div class="settings-tabs-nav">
+    <button class="settings-tab" data-settings-nav="settings" onclick="showPage('settings')"><span class="stab-icon">🏢</span><span class="stab-label">会社情報</span></button>
+    <button class="settings-tab settings-tab-extra" data-settings-nav="employees" onclick="requireAdmin('employees')"><span class="stab-icon">👷</span><span class="stab-label">従業員</span></button>
+    <button class="settings-tab active" data-settings-nav="members" onclick="showPage('members-settings')"><span class="stab-icon">👥</span><span class="stab-label">メンバー管理</span></button>
+  </div>
+  <div class="content">
+    <div class="card" style="max-width:640px;padding:24px">
+      <div class="section-title" style="margin-bottom:4px">メンバー一覧</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">同じ会社データを共有するメンバーです。オーナーが招待できます。</div>
+      <div id="members-list" style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px">
+        <div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">読み込み中...</div>
+      </div>
+      <div class="section-title" style="margin-bottom:8px">メンバーを招待</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px">招待メールが指定のアドレスに届きます。7日以内に受諾してください。</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input type="email" id="invite-email-input" placeholder="staff@example.com"
+          style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none"
+          onkeydown="if(event.key==='Enter')sendMemberInvite()">
+        <button class="btn btn-primary" onclick="sendMemberInvite()">📧 招待メールを送る</button>
+      </div>
+      <div id="invite-status" style="font-size:12px;margin-top:10px;min-height:18px"></div>
+    </div>
+  </div>
+</div>
+
 <!-- PAYMENTS -->
 <div id="page-payments" class="page">
   <div class="main-header">
@@ -2426,6 +2467,9 @@ if('serviceWorker' in navigator){
       </button>
       <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
+      <button class="settings-tab settings-tab-extra cloud-owner-only" data-settings-nav="members" onclick="showPage('members-settings')" style="display:none">
+        <span class="stab-icon">👥</span><span class="stab-label">メンバー管理</span>
       </button>
     </div>
   <div class="content">
@@ -2570,6 +2614,9 @@ if('serviceWorker' in navigator){
       </button>
       <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
+      <button class="settings-tab settings-tab-extra cloud-owner-only" data-settings-nav="members" onclick="showPage('members-settings')" style="display:none">
+        <span class="stab-icon">👥</span><span class="stab-label">メンバー管理</span>
       </button>
     </div>
   <div class="content">
@@ -2782,6 +2829,9 @@ if('serviceWorker' in navigator){
       </button>
       <button class="settings-tab settings-tab-extra" data-settings-nav="developer" onclick="requireDeveloper()">
         <span class="stab-icon">🛠️</span><span class="stab-label">開発者</span>
+      </button>
+      <button class="settings-tab settings-tab-extra cloud-owner-only" data-settings-nav="members" onclick="showPage('members-settings')" style="display:none">
+        <span class="stab-icon">👥</span><span class="stab-label">メンバー管理</span>
       </button>
     </div>
   <div class="content">
@@ -4014,11 +4064,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.3';
+const APP_VERSION='v3.38.0-cloud.4';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-10 09:06 JST';
+const APP_BUILD_TIME='2026-07-10 13:47 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5714,6 +5764,7 @@ const PAGE_LABELS={
 };
 
 function showPage(id, el, addToHistory=true){
+  if(id==='members-settings') setTimeout(loadMembersList, 100);
   currentPageId=id;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -10806,6 +10857,13 @@ function initFirebaseAuth(){
       }
       window.COMPANY_KEY = tenantInfo.tenantId;
       window.MY_ROLE = tenantInfo.role;
+      // クラウド版: ownerなら「メンバー管理」タブを表示
+      if(window.MY_ROLE === 'owner'){
+        document.querySelectorAll('.cloud-owner-only').forEach(el=>el.style.display='');
+      }
+      // URLに ?invite=xxx があれば受諾フローを起動
+      const _invParam = new URLSearchParams(location.search).get('invite');
+      if(_invParam) setTimeout(()=>handleInviteAccept(_invParam), 800);
 
       currentUser = user;
       // UIを更新
