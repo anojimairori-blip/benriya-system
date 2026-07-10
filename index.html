@@ -1664,6 +1664,46 @@ if('serviceWorker' in navigator){
 </div>
 </div>
 
+<!-- CONSENT MODAL（初回ログイン時・許諾未取得の場合のみ表示） -->
+<div id="consent-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--surface1);border:1px solid var(--border);border-radius:12px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;padding:28px 24px">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:32px;margin-bottom:8px">📋</div>
+      <h2 style="font-size:18px;font-weight:700;margin:0 0 6px">Flexsys へようこそ</h2>
+      <p style="font-size:13px;color:var(--text2);margin:0">ご利用開始にあたり、以下をご確認ください</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)">
+        <input type="checkbox" id="consent-terms" style="margin-top:2px;width:16px;height:16px;cursor:pointer;accent-color:var(--accent)">
+        <span style="font-size:13px;line-height:1.6">
+          <a href="https://nojima-giken.com/flexsys/terms/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">利用規約</a>に同意します
+        </span>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)">
+        <input type="checkbox" id="consent-privacy" style="margin-top:2px;width:16px;height:16px;cursor:pointer;accent-color:var(--accent)">
+        <span style="font-size:13px;line-height:1.6">
+          <a href="https://nojima-giken.com/flexsys/privacy/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">プライバシーポリシー</a>に同意します
+        </span>
+      </label>
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)">
+        <input type="checkbox" id="consent-backup" style="margin-top:2px;width:16px;height:16px;cursor:pointer;accent-color:var(--accent)">
+        <span style="font-size:13px;line-height:1.6">
+          <a href="https://nojima-giken.com/flexsys/data-policy/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">データ取扱いに関するお願い</a>を読み、定期的なバックアップが利用者の責任であることを理解しました
+        </span>
+      </label>
+    </div>
+
+    <div style="font-size:11px;color:var(--text3);line-height:1.7;margin-bottom:16px;padding:10px;background:var(--surface2);border-radius:6px">
+      ※ 同意日時はアカウントに記録されます。3項目すべてにチェックを入れると「同意して開始」ボタンが有効になります。
+    </div>
+
+    <button id="consent-submit-btn" onclick="submitConsent()" disabled
+      style="width:100%;padding:13px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;font-family:inherit;border:none;cursor:pointer;opacity:.5;transition:opacity .2s"
+    >✅ 同意して Flexsys を開始する</button>
+  </div>
+</div>
+
 <!-- BULLETIN DETAIL MODAL -->
 <div class="modal-overlay" id="bulletin-detail-modal">
 <div class="modal" style="max-width:600px">
@@ -4064,11 +4104,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.4';
+const APP_VERSION='v3.38.0-cloud.5';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-10 13:47 JST';
+const APP_BUILD_TIME='2026-07-10 14:57 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -10864,6 +10904,8 @@ function initFirebaseAuth(){
       // URLに ?invite=xxx があれば受諾フローを起動
       const _invParam = new URLSearchParams(location.search).get('invite');
       if(_invParam) setTimeout(()=>handleInviteAccept(_invParam), 800);
+      // 初回ログイン時の同意チェック（500ms遅延でアプリ初期化後に実行）
+      setTimeout(()=>checkAndShowConsentModal(user), 500);
 
       currentUser = user;
       // UIを更新
@@ -15437,6 +15479,69 @@ function submitInquiry(){
       if(btn){btn.disabled=false;btn.textContent='📮 送信する';}
     }
   })();
+}
+
+// ===== 初回ログイン時 同意モーダル（cloud.5） =====
+const CONSENT_ENDPOINT='https://asia-northeast1-nojima-business-hub.cloudfunctions.net/recordConsent';
+
+function updateConsentBtn(){
+  const all=['consent-terms','consent-privacy','consent-backup'].every(id=>{
+    const el=document.getElementById(id); return el&&el.checked;
+  });
+  const btn=document.getElementById('consent-submit-btn');
+  if(btn){btn.disabled=!all;btn.style.opacity=all?'1':'.5';btn.style.cursor=all?'pointer':'not-allowed';}
+}
+['consent-terms','consent-privacy','consent-backup'].forEach(id=>{
+  // onloadで動的にリスナーを付けるため DOMContentLoaded 後に設定
+  document.addEventListener('DOMContentLoaded',()=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('change',updateConsentBtn);
+  });
+});
+
+async function checkAndShowConsentModal(user){
+  // Firestoreの memberIndex/{uid} に consentAt があれば同意済み
+  try{
+    const F=window._FB;
+    if(!F||!user) return false;
+    const snap=await F.getDoc(F.doc(F.db,'memberIndex',user.uid));
+    if(snap.exists&&snap.exists()&&snap.data().consentAt) return false; // 同意済み→表示不要
+  }catch(e){ console.warn('consent check failed:', e); return false; }
+  // 未同意 → モーダル表示
+  const modal=document.getElementById('consent-modal');
+  if(modal) modal.style.display='flex';
+  ['consent-terms','consent-privacy','consent-backup'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('change',updateConsentBtn);
+  });
+  return true; // モーダルを表示した
+}
+
+async function submitConsent(){
+  const all=['consent-terms','consent-privacy','consent-backup'].every(id=>{
+    const el=document.getElementById(id); return el&&el.checked;
+  });
+  if(!all){showToast('3項目すべてにチェックを入れてください','#E67E22');return;}
+  const btn=document.getElementById('consent-submit-btn');
+  if(btn){btn.disabled=true;btn.textContent='記録中...';}
+  try{
+    const F=window._FB;
+    const user=F&&F.auth&&F.auth.currentUser;
+    if(!user) throw new Error('ログイン情報が確認できません');
+    // Firestoreに同意日時を記録
+    const consentAt=new Date().toISOString();
+    await F.updateDoc(F.doc(F.db,'memberIndex',user.uid),{
+      consentAt,
+      consentVersion:'2026-07-10',
+    });
+    // モーダルを閉じる
+    const modal=document.getElementById('consent-modal');
+    if(modal) modal.style.display='none';
+    showToast('ご同意ありがとうございます。Flexsys をご利用ください 🎉','#27AE60');
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='✅ 同意して Flexsys を開始する';btn.style.opacity='1';}
+    showToast('記録に失敗しました: '+(e&&e.message?e.message:e),'#C0392B');
+  }
 }
 
 function buildMobileDrawer(){
