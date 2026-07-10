@@ -1597,6 +1597,8 @@ if('serviceWorker' in navigator){
     <div id="nav-management"><!-- 動的生成: renderNavManagement() --></div>
     <div class="nav-section">設定</div>
     <div class="nav-item" onclick="requireAdminAccess('settings',this)"><span class="nav-icon">⚙️</span><span class="nav-label">各種設定</span><span class="nav-tooltip">各種設定（管理者専用）</span></div>
+    <div class="nav-section">サポート</div>
+    <div class="nav-item" id="nav-inquiry" onclick="openInquiryModal()"><span class="nav-icon">📢</span><span class="nav-label">不具合・要望を報告</span><span class="nav-tooltip">不具合・要望を報告</span></div>
   </nav>
 </div>
 
@@ -1625,6 +1627,41 @@ if('serviceWorker' in navigator){
     <!-- お知らせ一覧 -->
     <div id="bulletin-list"></div>
   </div>
+</div>
+
+<!-- INQUIRY (不具合・要望報告) MODAL -->
+<div class="modal-overlay" id="inquiry-modal">
+<div class="modal" style="max-width:520px">
+  <div class="modal-header">
+    <h3>📢 不具合・要望を報告</h3>
+    <button class="close-btn" aria-label="閉じる" onclick="closeModal('inquiry-modal')">✕</button>
+  </div>
+  <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+    <div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px">種別（複数選択可）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <label style="display:flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;cursor:pointer"><input type="checkbox" value="不具合">🐞 不具合</label>
+        <label style="display:flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;cursor:pointer"><input type="checkbox" value="要望・改善案">💡 要望・改善案</label>
+        <label style="display:flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;cursor:pointer"><input type="checkbox" value="操作の質問">❓ 操作の質問</label>
+        <label style="display:flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;cursor:pointer"><input type="checkbox" value="データの相談">🗂 データの相談</label>
+        <label style="display:flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;cursor:pointer"><input type="checkbox" value="その他">📎 その他</label>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px">内容 <span style="color:#C0392B">必須</span></div>
+      <textarea id="inquiry-body" rows="5" placeholder="困っていること・してほしいことを、操作していた画面や手順とあわせてご記入ください" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:14px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px">写真・スクリーンショット（任意・最大5枚） <span id="inquiry-photo-count" style="font-weight:400;color:var(--text3)">0/5枚</span></div>
+      <input type="file" id="inquiry-photo-input" accept="image/*" multiple style="display:none" onchange="addInquiryPhotos(this)">
+      <button onclick="document.getElementById('inquiry-photo-input').click()" style="background:var(--surface2);border:1px dashed var(--border);border-radius:8px;padding:9px 14px;cursor:pointer;font-size:13px;color:var(--text2);font-family:inherit">📷 写真を追加</button>
+      <div id="inquiry-photo-list" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"></div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);line-height:1.6">会社名・バージョン情報は自動で添付されます。回答はご登録のメールアドレスへお送りします。</div>
+    <div id="inquiry-status" style="font-size:12px;color:var(--text2)"></div>
+    <button id="inquiry-submit-btn" class="btn btn-primary" onclick="submitInquiry()" style="width:100%;padding:12px;font-size:15px">📮 送信する</button>
+  </div>
+</div>
 </div>
 
 <!-- BULLETIN DETAIL MODAL -->
@@ -3977,11 +4014,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.2';
+const APP_VERSION='v3.38.0-cloud.3';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-10 08:19 JST';
+const APP_BUILD_TIME='2026-07-10 09:06 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -15262,6 +15299,88 @@ function deleteSampleData(){
 
 // ===== 開発者ツールここまで =====
 
+// ===== 不具合・要望報告（ビジネスハブへ送信） =====
+const INQUIRY_ENDPOINT='https://asia-northeast1-nojima-business-hub.cloudfunctions.net/inquirySubmit';
+const INQUIRY_PRODUCT='flexsys_cloud';
+let inquiryPhotos=[];
+
+function openInquiryModal(){
+  inquiryPhotos=[];
+  document.querySelectorAll('#inquiry-modal input[type=checkbox]').forEach(c=>{c.checked=false;});
+  const t=document.getElementById('inquiry-body'); if(t)t.value='';
+  const st=document.getElementById('inquiry-status'); if(st)st.textContent='';
+  renderInquiryPhotos();
+  openModal('inquiry-modal');
+}
+
+function renderInquiryPhotos(){
+  const wrap=document.getElementById('inquiry-photo-list'); if(!wrap)return;
+  wrap.innerHTML=inquiryPhotos.map((p,i)=>`<div style="position:relative;display:inline-block"><img src="data:${p.mime};base64,${p.dataBase64}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"><button onclick="removeInquiryPhoto(${i})" aria-label="写真を削除" style="position:absolute;top:-7px;right:-7px;background:#C0392B;color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1">✕</button></div>`).join('');
+  const cnt=document.getElementById('inquiry-photo-count'); if(cnt)cnt.textContent=`${inquiryPhotos.length}/5枚`;
+}
+
+function removeInquiryPhoto(i){inquiryPhotos.splice(i,1);renderInquiryPhotos();}
+
+function addInquiryPhotos(input){
+  const files=Array.from(input.files||[]);
+  input.value='';
+  (function next(idx){
+    if(idx>=files.length){renderInquiryPhotos();return;}
+    if(inquiryPhotos.length>=5){showToast('写真は5枚までです','#E67E22');renderInquiryPhotos();return;}
+    const f=files[idx];
+    const r=new FileReader();
+    r.onload=()=>{
+      resizeImageForOcr(r.result,1200).then(small=>{
+        inquiryPhotos.push({name:(f.name||`photo${idx+1}.jpg`),mime:'image/jpeg',dataBase64:(small.split(',')[1]||'')});
+        next(idx+1);
+      }).catch(()=>{showToast('写真の変換に失敗しました','#C0392B');next(idx+1);});
+    };
+    r.onerror=()=>{showToast('写真の読み込みに失敗しました','#C0392B');next(idx+1);};
+    r.readAsDataURL(f);
+  })(0);
+}
+
+function submitInquiry(){
+  const types=Array.from(document.querySelectorAll('#inquiry-modal input[type=checkbox]:checked')).map(c=>c.value);
+  const bodyEl=document.getElementById('inquiry-body');
+  const bodyText=(bodyEl?bodyEl.value:'').trim();
+  if(types.length===0){showToast('種別を1つ以上選んでください','#E67E22');return;}
+  if(!bodyText){showToast('内容を入力してください','#E67E22');return;}
+  const btn=document.getElementById('inquiry-submit-btn');
+  const st=document.getElementById('inquiry-status');
+  if(btn){btn.disabled=true;btn.textContent='送信中...';}
+  if(st)st.textContent='送信しています…';
+  (async()=>{
+    try{
+      const F=window._FB;
+      const user=F&&F.auth&&F.auth.currentUser;
+      if(!user)throw new Error('ログイン情報が確認できません');
+      const idToken=await user.getIdToken();
+      const r=await fetch(INQUIRY_ENDPOINT,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+        body:JSON.stringify({
+          product:INQUIRY_PRODUCT, types, body:bodyText, photos:inquiryPhotos,
+          companyName:(typeof settings!=='undefined'&&settings&&settings.company)||'',
+          tenantId:window.COMPANY_KEY||'',
+          userName:user.displayName||'',
+          appVersion:APP_VERSION,
+          page:(typeof currentPageId!=='undefined'?currentPageId:'')
+        })
+      });
+      const d=await r.json();
+      if(!r.ok||!d.ok)throw new Error(d.error||('HTTP '+r.status));
+      closeModal('inquiry-modal');
+      showToast(`報告を送信しました（受付番号: ${d.id}）\n回答はメールでお届けします 📮`,'#27AE60');
+    }catch(e){
+      if(st)st.textContent='';
+      showToast('送信に失敗しました: '+(e&&e.message?e.message:e),'#C0392B');
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent='📮 送信する';}
+    }
+  })();
+}
+
 function buildMobileDrawer(){
   const nav=document.getElementById('mobile-drawer-nav');
   if(!nav)return;
@@ -15297,6 +15416,8 @@ function buildMobileDrawer(){
       <span class="nav-icon">${item.icon}</span><span${labelStyle}>${item.label}</span>
     </div>`;
   });
+  html+=`<div class="nav-section">サポート</div>
+    <div class="nav-item" onclick="closeDrawer();openInquiryModal()"><span class="nav-icon">📢</span><span>不具合・要望を報告</span></div>`;
   nav.innerHTML=html;
 }
 
