@@ -4110,11 +4110,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.6';
+const APP_VERSION='v3.38.0-cloud.7';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-11 04:56 JST';
+const APP_BUILD_TIME='2026-07-11 05:27 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -10835,8 +10835,12 @@ async function _fbPersist(){
 // そのユーザーをownerにする（検証用の自動owner化。本番前にCLOUD_AUTO_OWNER=falseに）。
 const CLOUD_AUTO_OWNER = true;
 async function resolveTenantForCloud(user){
+  // ===== Phase C: Stripe購入済みメールアドレス → pendingTenants から tenantId を解決 =====
   const F = window._FB;
   const uid = user.uid;
+  const email = (user.email||'').toLowerCase();
+
+  // Step1: memberIndex に既存の所属があればそれを使う
   try{
     const idxSnap = await F.getDoc(F.doc(F.db, 'memberIndex', uid));
     if(idxSnap.exists()){
@@ -10846,16 +10850,48 @@ async function resolveTenantForCloud(user){
       }
     }
   }catch(e){ console.warn('memberIndex read failed:', e); }
+
+  // Step2: pendingTenants にメールアドレスで登録があるか確認（Stripe購入済みの場合）
+  if(email){
+    try{
+      const pendingSnap = await F.getDoc(F.doc(F.db, 'pendingTenants', email));
+      if(pendingSnap.exists()){
+        const pd = pendingSnap.data();
+        const tenantId = pd.tenantId;
+        const seatLimit = pd.seatLimit || 1;
+        const planId = pd.planId || 'starter';
+        if(tenantId){
+          const now = Date.now();
+          // memberIndex・members を作成して pendingTenants を active 化
+          await F.setDoc(F.doc(F.db, 'memberIndex', uid), { tenantId, role: 'owner', joinedAt: now });
+          await F.setDoc(F.doc(F.db, 'users', tenantId, 'members', uid), {
+            role: 'owner', email, name: user.displayName||'',
+            status: 'active', joinedAt: now, invitedBy: null
+          });
+          // meta/company の ownerUid を確定
+          await F.updateDoc(F.doc(F.db, 'users', tenantId, 'meta', 'company'), {
+            ownerUid: uid, activatedAt: now, status: 'active'
+          });
+          // pending → active に更新
+          await F.updateDoc(F.doc(F.db, 'pendingTenants', email), { status: 'active', activatedAt: now, activatedByUid: uid });
+          console.log('Phase C: activated tenant from pending:', tenantId, 'plan:', planId);
+          return { tenantId, role: 'owner', created: false, fromPending: true, seatLimit, planId };
+        }
+      }
+    }catch(e){ console.warn('pendingTenants read failed:', e); }
+  }
+
+  // Step3: 開発用の自動テナント作成（CLOUD_AUTO_OWNER=true の場合のみ）
   if(!CLOUD_AUTO_OWNER){
     return { tenantId: null, role: null, created: false };
   }
   const newTid = 'tenant_' + uid;
   try{
     await F.setDoc(F.doc(F.db, 'users', newTid, 'meta', 'company'), {
-      companyName: (user.email||'新しい会社'), createdAt: Date.now(), seatLimit: 1, ownerUid: uid
+      companyName: (email||'新しい会社'), createdAt: Date.now(), seatLimit: 1, ownerUid: uid, planId: 'dev'
     });
     await F.setDoc(F.doc(F.db, 'users', newTid, 'members', uid), {
-      role: 'owner', email: user.email||'', name: user.displayName||'',
+      role: 'owner', email, name: user.displayName||'',
       status: 'active', joinedAt: Date.now(), invitedBy: null
     });
     await F.setDoc(F.doc(F.db, 'memberIndex', uid), { tenantId: newTid, role: 'owner' });
