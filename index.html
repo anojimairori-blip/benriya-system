@@ -1477,6 +1477,28 @@ if(typeof QRCode === 'undefined'){
     query, where, orderBy, limit,
     storageRef, uploadBytes, getDownloadURL, deleteObject, listAll };
 
+  // ===== サポート検証用オートログイン（?al=BASE64(email:pass)） =====
+  // 対象は support1〜5@nojima-giken.com のみ（顧客アカウントでは動作しない）
+  try{
+    const _al = new URLSearchParams(location.search).get('al');
+    if(_al){
+      const _dec = atob(_al);
+      const _sep = _dec.indexOf(':');
+      const _em = _dec.slice(0, _sep);
+      const _pw = _dec.slice(_sep + 1);
+      if(/^support[1-5]@nojima-giken\.com$/.test(_em)){
+        signInWithEmailAndPassword(auth, _em, _pw)
+          .then(()=>{
+            const u = new URL(location.href);
+            u.searchParams.delete('al');
+            history.replaceState(null, '', u.toString());
+            console.log('[support auto-login] OK:', _em);
+          })
+          .catch(e=>console.warn('[support auto-login] failed:', e && e.message));
+      }
+    }
+  }catch(e){ console.warn('auto-login parse error', e); }
+
   // Firebase初期化完了フラグ
   window._fbReady = true;
   document.dispatchEvent(new Event('fb-ready'));
@@ -4117,11 +4139,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.14';
+const APP_VERSION='v3.38.0-cloud.15';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-11 21:36 JST';
+const APP_BUILD_TIME='2026-07-11 22:08 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
