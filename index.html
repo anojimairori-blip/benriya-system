@@ -4202,11 +4202,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.21';
+const APP_VERSION='v3.38.0-cloud.22';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-12 08:18 JST';
+const APP_BUILD_TIME='2026-07-12 08:40 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -16014,7 +16014,8 @@ async function handleInviteAccept(inviteId){
     setTimeout(()=>location.reload(),2000);
   }catch(e){
     const msg=e&&e.message?e.message:String(e);
-    if(msg.includes('already used')) showToast('この招待リンクは既に使用済みです','#E67E22');
+    if(msg.includes('already belongs')) showToast('このアカウントは既にご自身の会社をお持ちのため、他社の招待は受諾できません。別のメールアドレスで登録してください。','#E67E22');
+    else if(msg.includes('already used')) showToast('この招待リンクは既に使用済みです','#E67E22');
     else if(msg.includes('expired')) showToast('この招待リンクの有効期限が切れています','#E67E22');
     else if(msg.includes('email mismatch')) showToast('招待先のメールアドレスと一致しません。正しいアカウントでログインしてください','#C0392B');
     else showToast('招待の受諾に失敗しました: '+escAttr(msg),'#C0392B');
