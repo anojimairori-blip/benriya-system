@@ -1729,6 +1729,30 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
+<!-- CANCELED BLOCK SCREEN（契約終了時の利用停止画面） -->
+<div id="canceled-block" style="display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:460px;padding:32px 28px;text-align:center">
+    <div style="font-size:40px;margin-bottom:10px">📦</div>
+    <h2 style="font-size:18px;font-weight:700;margin:0 0 10px">ご契約が終了しています</h2>
+    <p style="font-size:13px;color:var(--text2);line-height:1.8;margin:0 0 18px">
+      この会社のFlexsysのご契約は終了しました。<br>
+      データは<strong>解約日から90日間</strong>安全に保管されます。<br>
+      再開されると、そのままの状態でお使いいただけます。
+    </p>
+    <a href="https://nojima-business-hub.pages.dev/signup" 
+      style="display:block;padding:13px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;text-decoration:none;margin-bottom:10px">
+      🔄 利用を再開する（お申し込みページへ）
+    </a>
+    <button onclick="window._FB&&window._FB.signOut(window._FB.auth).then(()=>location.reload())"
+      style="width:100%;padding:11px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);font-size:13px;font-family:inherit;cursor:pointer">
+      ログアウト
+    </button>
+    <p style="font-size:11px;color:var(--text3);margin:14px 0 0">
+      お困りの際は mail@nojima-giken.com までご連絡ください。
+    </p>
+  </div>
+</div>
+
 <!-- ONBOARDING MODAL（初回ログイン時のはじめにガイド） -->
 <div id="onboarding-modal" style="display:none;position:fixed;inset:0;z-index:8900;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:16px">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;padding:28px 24px">
@@ -4188,11 +4212,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.39.0-prod.7';
+const APP_VERSION='v3.39.0-prod.8';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-12 02:12 JST';
+const APP_BUILD_TIME='2026-07-12 02:53 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -11137,6 +11161,18 @@ function initFirebaseAuth(){
       }
       window.COMPANY_KEY = tenantInfo.tenantId;
       window.MY_ROLE = tenantInfo.role;
+      // ===== 契約終了チェック（正典: canceled = アクセス停止・データは保全） =====
+      try{
+        const metaSnap = await F.getDoc(F.doc(F.db, 'users', tenantInfo.tenantId, 'meta', 'company'));
+        const meta = metaSnap && metaSnap.data && metaSnap.data();
+        if(meta && meta.status === 'canceled'){
+          const blk = document.getElementById('canceled-block');
+          if(blk) blk.style.display = 'flex';
+          if(loginEl) loginEl.style.display = 'none';
+          console.warn('[canceled] tenant access blocked:', tenantInfo.tenantId);
+          return; // データ読み込みへ進まない
+        }
+      }catch(e){ console.warn('canceled check failed (continue):', e); }
       // クラウド版: ownerなら「メンバー管理」タブを表示
       if(window.MY_ROLE === 'owner'){
         document.querySelectorAll('.cloud-owner-only').forEach(el=>el.style.display='');
