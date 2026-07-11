@@ -2423,6 +2423,11 @@ if('serviceWorker' in navigator){
         </div>
         <div id="invite-status" style="font-size:12px;margin-top:10px;min-height:18px"></div>
       </div>
+
+      <div class="section-title" style="margin-top:28px;margin-bottom:8px">💳 契約・お支払いの管理</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px">プランの変更・お支払い方法の変更・解約・領収書のダウンロードができます（Stripeの安全なページへ移動します）。</div>
+      <button class="btn btn-secondary" onclick="openBillingPortal(this)">💳 契約・お支払いの管理を開く</button>
+      <div id="portal-status" style="font-size:12px;margin-top:8px;min-height:16px;color:var(--text3)"></div>
     </div>
   </div>
 </div>
@@ -4109,11 +4114,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.11';
+const APP_VERSION='v3.38.0-cloud.12';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-11 09:12 JST';
+const APP_BUILD_TIME='2026-07-11 10:26 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -15807,6 +15812,30 @@ async function sendMemberInvite(){
 }
 
 // オーナー移譲
+// Stripe Customer Portal（解約・支払い変更のセルフサービス）
+async function openBillingPortal(btn){
+  const st=document.getElementById('portal-status');
+  if(btn){btn.disabled=true;btn.textContent='読み込み中...';}
+  if(st) st.textContent='';
+  try{
+    const F=window._FB;
+    const user=F&&F.auth&&F.auth.currentUser;
+    if(!user) throw new Error('ログイン情報が確認できません');
+    const idToken=await user.getIdToken();
+    const r=await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/createPortalSession',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({})
+    });
+    const d=await r.json();
+    if(!r.ok||!d.ok) throw new Error(d.error||('HTTP '+r.status));
+    location.href=d.url;
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='💳 契約・お支払いの管理を開く';}
+    if(st) st.innerHTML='<span style="color:var(--red)">'+escAttr(e&&e.message?e.message:String(e))+'</span>';
+  }
+}
+
 async function transferOwner(toUid, toEmail){
   if(!confirm(`${toEmail} をオーナーに移譲します。あなたはメンバーになります。よろしいですか？`)) return;
   try{
