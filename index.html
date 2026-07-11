@@ -4110,11 +4110,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.8';
+const APP_VERSION='v3.38.0-cloud.9';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-11 08:54 JST';
+const APP_BUILD_TIME='2026-07-11 09:01 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -15572,7 +15572,10 @@ async function checkAndShowConsentModal(user){
     const F=window._FB;
     if(!F||!user) return false;
     const snap=await F.getDoc(F.doc(F.db,'memberIndex',user.uid));
-    if(snap.exists&&snap.exists()&&snap.data().consentAt) return false; // 同意済み→表示不要
+    const d=snap&&snap.data&&snap.data();
+    if(d&&d.consentAt) return false; // Firestore同意済み
+    // localStorageフォールバックも確認
+    if(localStorage.getItem('consent_at_'+user.uid)) return false;
   }catch(e){ console.warn('consent check failed:', e); return false; }
   // 未同意 → モーダル表示
   const modal=document.getElementById('consent-modal');
@@ -15595,18 +15598,30 @@ async function submitConsent(){
     const F=window._FB;
     const user=F&&F.auth&&F.auth.currentUser;
     if(!user) throw new Error('ログイン情報が確認できません');
-    // Firestoreに同意日時を記録
     const consentAt=new Date().toISOString();
-    // setDoc merge: ドキュメント未存在でも失敗しない
-    await F.setDoc(F.doc(F.db,'memberIndex',user.uid),{
-      consentAt,
-      consentVersion:'2026-07-10',
-    },{merge:true});
-    // モーダルを閉じる
+    console.log('[consent] saving consentAt for uid:', user.uid);
+    try{
+      // 既存ドキュメントがあれば update、なければ set
+      const ref=F.doc(F.db,'memberIndex',user.uid);
+      const snap=await F.getDoc(ref);
+      if(snap&&snap.data&&snap.data()){
+        await F.updateDoc(ref,{consentAt,consentVersion:'2026-07-11'});
+      }else{
+        await F.setDoc(ref,{consentAt,consentVersion:'2026-07-11'},{merge:true});
+      }
+      console.log('[consent] saved OK');
+    }catch(fsErr){
+      console.warn('[consent] Firestore write failed (non-fatal):', fsErr);
+      // Firestore書き込み失敗でもモーダルは閉じる（localStorageにフォールバック）
+      localStorage.setItem('consent_at_'+user.uid, consentAt);
+    }
+    // モーダルを確実に閉じる
     const modal=document.getElementById('consent-modal');
-    if(modal) modal.style.display='none';
+    if(modal){modal.style.display='none';modal.style.visibility='hidden';}
     showToast('ご同意ありがとうございます。Flexsys をご利用ください 🎉','#27AE60');
+    if(btn){btn.disabled=false;btn.textContent='✅ 同意して Flexsys を開始する';}
   }catch(e){
+    console.error('[consent] error:', e);
     if(btn){btn.disabled=false;btn.textContent='✅ 同意して Flexsys を開始する';btn.style.opacity='1';}
     showToast('記録に失敗しました: '+(e&&e.message?e.message:e),'#C0392B');
   }
