@@ -1729,6 +1729,55 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
+<!-- ONBOARDING MODAL（初回ログイン時のはじめにガイド） -->
+<div id="onboarding-modal" style="display:none;position:fixed;inset:0;z-index:8900;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--surface1);border:1px solid var(--border);border-radius:12px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;padding:28px 24px">
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:34px;margin-bottom:6px">👋</div>
+      <h2 style="font-size:18px;font-weight:700;margin:0 0 6px">はじめに ─ Flexsysの使い方</h2>
+      <p style="font-size:13px;color:var(--text2);margin:0">3ステップで今日から使えます</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px">
+      <div style="display:flex;gap:12px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)">
+        <div style="font-size:20px;flex-shrink:0">1️⃣</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:3px">自社情報を設定する</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">左メニュー「設定」→ 会社名・住所・振込先を入力すると、見積書や請求書に自動で反映されます。</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)">
+        <div style="font-size:20px;flex-shrink:0">2️⃣</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:3px">顧客を登録する</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">左メニュー「顧客管理」から登録。AIアシスタントに「〇〇様を登録、住所は…」と話しかけてもOKです。</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)">
+        <div style="font-size:20px;flex-shrink:0">3️⃣</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:3px">書類を作る</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.6">上部の「＋見積書」ボタン、またはAIアシスタントに「田中様に電球交換3000円の見積書」と頼むだけで下書きが完成します。</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:var(--text3);line-height:1.7;margin-bottom:16px;padding:10px;background:var(--surface2);border-radius:6px">
+      💡 メンバーを増やしたいときは「設定 → メンバー管理」から招待できます。困ったときは左下の「不具合・要望を報告」からいつでもご連絡ください。
+    </div>
+
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:14px;font-size:13px">
+      <input type="checkbox" id="onboarding-dismiss-check" style="width:15px;height:15px;cursor:pointer;accent-color:var(--accent)">
+      次回から表示しない
+    </label>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="closeOnboarding(false)" style="flex:1;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);font-size:14px;font-family:inherit;cursor:pointer">閉じる</button>
+      <button onclick="closeOnboarding(true)" style="flex:1;padding:12px;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;font-family:inherit;border:none;cursor:pointer">⚙️ 設定を開く</button>
+    </div>
+  </div>
+</div>
+
 <!-- BULLETIN DETAIL MODAL -->
 <div class="modal-overlay" id="bulletin-detail-modal">
 <div class="modal" style="max-width:600px">
@@ -4139,11 +4188,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.15';
+const APP_VERSION='v3.38.0-cloud.16';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-11 22:08 JST';
+const APP_BUILD_TIME='2026-07-12 02:04 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -11096,7 +11145,10 @@ function initFirebaseAuth(){
       const _invParam = new URLSearchParams(location.search).get('invite');
       if(_invParam) setTimeout(()=>handleInviteAccept(_invParam), 800);
       // 初回ログイン時の同意チェック（500ms遅延でアプリ初期化後に実行）
-      setTimeout(()=>checkAndShowConsentModal(user), 500);
+      setTimeout(async()=>{
+        const consentShown=await checkAndShowConsentModal(user);
+        if(!consentShown) showOnboardingIfNeeded();
+      }, 500);
 
       currentUser = user;
       // UIを更新
@@ -15083,6 +15135,8 @@ function showExpenseStatDrilldown(rangeType){
 function isCurrentUserAdmin(){
   if(!currentUser) return false;
   if((currentUser.email||'').toLowerCase()===DEVELOPER_EMAIL.toLowerCase()) return true;
+  // クラウド版: オーナー（契約者）は管理者
+  if(window.MY_ROLE==='owner') return true;
   const myGoogle=(currentUser.email||'').toLowerCase();
   const emp=employees.find(e=>(e.google||'').toLowerCase()===myGoogle);
   return !!(emp&&emp.isAdmin);
@@ -15105,7 +15159,7 @@ function requireAdminAccess(pageId, el){
     requireAdmin('employees', el);
     return;
   }
-  showToast('🔒 この画面には管理者権限が必要です。従業員管理で「管理者」チェックを付けたGoogleアカウントでログインしてください。','#C0392B');
+  showToast('🔒 この画面はオーナー（契約者）のみ操作できます。オーナーからメンバー管理で権限を付与してもらってください。','#C0392B');
 }
 
 function toggleEmpPermission(empId, key, checked){
@@ -15690,6 +15744,27 @@ function updateConsentBtn(){
   });
 });
 
+// ===== はじめにガイド（初回ログイン時） =====
+function showOnboardingIfNeeded(){
+  try{
+    const uid=window._FB&&window._FB.auth&&window._FB.auth.currentUser&&window._FB.auth.currentUser.uid;
+    if(!uid) return;
+    if(localStorage.getItem('onboarding_done_'+uid)) return;
+    const m=document.getElementById('onboarding-modal');
+    if(m) m.style.display='flex';
+  }catch(e){}
+}
+function closeOnboarding(goSettings){
+  const m=document.getElementById('onboarding-modal');
+  if(m) m.style.display='none';
+  try{
+    const chk=document.getElementById('onboarding-dismiss-check');
+    const uid=window._FB&&window._FB.auth&&window._FB.auth.currentUser&&window._FB.auth.currentUser.uid;
+    if(chk&&chk.checked&&uid) localStorage.setItem('onboarding_done_'+uid,'1');
+  }catch(e){}
+  if(goSettings){ showPage('settings'); }
+}
+
 async function checkAndShowConsentModal(user){
   // Firestoreの memberIndex/{uid} に consentAt があれば同意済み
   try{
@@ -15744,6 +15819,8 @@ async function submitConsent(){
     if(modal){modal.style.display='none';modal.style.visibility='hidden';}
     showToast('ご同意ありがとうございます。Flexsys をご利用ください 🎉','#27AE60');
     if(btn){btn.disabled=false;btn.textContent='✅ 同意して Flexsys を開始する';}
+    // 同意完了後に「はじめに」ガイドを表示
+    setTimeout(showOnboardingIfNeeded, 400);
   }catch(e){
     console.error('[consent] error:', e);
     if(btn){btn.disabled=false;btn.textContent='✅ 同意して Flexsys を開始する';btn.style.opacity='1';}
