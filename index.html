@@ -4202,11 +4202,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.39.0-prod.10';
+const APP_VERSION='v3.39.0-prod.11';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-12 07:55 JST';
+const APP_BUILD_TIME='2026-07-12 08:18 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5919,7 +5919,8 @@ const PAGE_LABELS={
   customers:'顧客管理',calendar:'作業カレンダー',alerts:'支払いアラート',report:'年次レポート',
   templates:'作業テンプレート',payments:'入金管理',employees:'従業員管理',
   'staff-report':'スタッフ実績','csv-export':'CSVエクスポート',
-  expenses:'経費管理',backup:'バックアップ・復旧',settings:'会社設定',tax:'税率設定'
+  expenses:'経費管理',backup:'バックアップ・復旧',settings:'会社設定',tax:'税率設定',
+  'members-settings':'メンバー管理',bulletin:'掲示板',developer:'開発者設定'
 };
 
 function showPage(id, el, addToHistory=true){
@@ -5995,7 +5996,7 @@ function showPage(id, el, addToHistory=true){
   });
   const item=NAV_ITEMS.find(x=>x.id===id);
   const dt=document.getElementById('drawer-title');
-  if(dt) dt.textContent=item?.label||PAGE_LABELS[id]||id;
+  if(dt) dt.textContent=item?.label||PAGE_LABELS[id]||sysTitle.replace(/\\n/g,' ');
   // History
   if(addToHistory){
     if(pageHistoryIndex<pageHistory.length-1) pageHistory=pageHistory.slice(0,pageHistoryIndex+1);
@@ -15991,7 +15992,8 @@ async function transferOwner(toUid, toEmail){
 // 招待トークン受諾（URLパラメータ ?invite=xxx から起動）
 async function handleInviteAccept(inviteId){
   if(window.COMPANY_KEY && !window.COMPANY_KEY.startsWith('tenant_')) return;
-  const confirmed=confirm('招待を受諾して、このアカウントで会社データを共有しますか？\n\n受諾すると、招待した会社のデータにアクセスできるようになります。');
+  const _curEmail=(window._FB&&window._FB.auth&&window._FB.auth.currentUser&&window._FB.auth.currentUser.email)||'';
+  const confirmed=confirm('【招待の受諾】\n\n現在「'+_curEmail+'」でログイン中です。\n招待されたメールアドレスと同じアカウントの場合のみ受諾できます。\n\n※違うアカウントの場合は「キャンセル」→ログアウトしてから、招待リンクをもう一度開いて「新規登録」してください。\n\n受諾しますか？');
   if(!confirmed) return;
   try{
     const F=window._FB;
