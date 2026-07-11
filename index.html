@@ -2468,25 +2468,15 @@ if('serviceWorker' in navigator){
     <div class="section-title">従業員一覧</div>
     <div id="employee-list"></div>
 
-    <!-- アクセス許可管理 -->
-    <div class="section-title" style="margin-top:28px">🔐 アクセス許可管理
-      <span style="font-size:11px;font-weight:400;color:var(--text2);margin-left:8px">ログインを許可するGoogleアカウントを管理します</span>
-    </div>
+    <!-- アクセス許可（クラウド版はメンバー招待方式） -->
+    <div class="section-title" style="margin-top:28px">🔐 ログインできる人の管理</div>
     <div class="card" style="padding:18px;margin-top:10px">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7;background:var(--blue-light);border-radius:8px;padding:10px 14px;border-left:3px solid var(--blue)">
-        💡 リストが<strong>空の場合</strong>はGoogleアカウントを持つ全員がログイン可能です。<br>
-        メールアドレスを追加するとそのアドレス<strong>のみ</strong>アクセスできるようになります。
+      <div style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:14px">
+        Flexsysにログインできるのは、<strong>メンバー管理で招待した人だけ</strong>です。<br>
+        メールアドレス＋パスワードでログインします（Googleアカウントは不要です）。<br>
+        スタッフを追加したいときは、メンバー管理から招待メールを送ってください。
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-        <input type="email" id="access-email-input" placeholder="staff@gmail.com"
-          style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none"
-          onkeydown="if(event.key==='Enter')addAccessEmail()">
-        <button class="btn btn-primary" onclick="addAccessEmail()">＋ 追加</button>
-      </div>
-      <div id="access-list-container">
-        <div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">読み込み中...</div>
-      </div>
-      <div id="access-status" style="font-size:12px;margin-top:10px;min-height:18px"></div>
+      <button class="btn btn-primary" onclick="showPage('members-settings')">👥 メンバー管理を開く</button>
     </div>
   </div>
 </div>
@@ -4212,11 +4202,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.39.0-prod.8';
+const APP_VERSION='v3.39.0-prod.9';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-12 02:53 JST';
+const APP_BUILD_TIME='2026-07-12 07:47 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
