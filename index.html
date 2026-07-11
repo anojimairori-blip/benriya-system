@@ -4202,11 +4202,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.39.0-prod.9';
+const APP_VERSION='v3.39.0-prod.10';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-12 07:47 JST';
+const APP_BUILD_TIME='2026-07-12 07:55 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5436,9 +5436,9 @@ const HELP_CONTENT = {
       <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt"><strong>＋ 従業員追加</strong></div></div>
       <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">氏名・Email・電話・役職を入力</div></div>
       <div class="hp-step"><div class="hp-step-num">3</div><div class="hp-step-txt">「管理者」チェックを入れると全権限付与</div></div>
-      <h4>アクセス許可管理</h4>
-      <p>許可Emailリストに従業員のGmailを登録することで、そのGmailでのログインを許可します。登録していないEmailではログインできません。</p>
-      <div class="hp-tip">💡 従業員が退職した場合は、許可Emailリストから必ずそのEmailを削除してください。</div>
+      <h4>ログインできる人の管理</h4>
+      <p>Flexsysにログインできるのは、メンバー管理で招待した人だけです。メールアドレス＋パスワードでログインします（Googleアカウントは不要）。</p>
+      <div class="hp-tip">💡 スタッフの追加は「設定 → メンバー管理」から招待メールを送ってください。従業員が退職した場合はメンバー管理から削除してください。</div>
     `
   },
   'tax': {
@@ -6025,7 +6025,7 @@ function showPage(id, el, addToHistory=true){
   if(id==='dashboard') renderDashboard();
   if(id==='tax') renderTaxPage();
   if(id==='settings') initTheme();
-  if(id==='employees') loadAccessList();
+  // クラウド版: 許可リスト読込は廃止（メンバー招待方式）
 }
 
 function updateHistoryBar(id){
