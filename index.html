@@ -4109,11 +4109,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.11';
+const APP_VERSION='v3.39.0-prod.1';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-11 09:12 JST';
+const APP_BUILD_TIME='2026-07-11 09:31 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -10952,7 +10952,7 @@ async function _fbPersist(){
 // ===== 顧客用SaaS: ログインユーザーの所属会社(tenantId)を解決 =====
 // memberIndex/{uid} を読み、あれば所属会社を採用。無ければ暫定で新会社を作成し
 // そのユーザーをownerにする（検証用の自動owner化。本番前にCLOUD_AUTO_OWNER=falseに）。
-const CLOUD_AUTO_OWNER = true;
+const CLOUD_AUTO_OWNER = false; // 本番: 申込済み（pendingTenants）のみ利用可
 async function resolveTenantForCloud(user){
   // ===== Phase C: Stripe購入済みメールアドレス → pendingTenants から tenantId を解決 =====
   const F = window._FB;
