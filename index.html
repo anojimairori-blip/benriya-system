@@ -1477,6 +1477,26 @@ if(typeof QRCode === 'undefined'){
     query, where, orderBy, limit,
     storageRef, uploadBytes, getDownloadURL, deleteObject, listAll };
 
+  // ===== A-2: 招待リンクの宛先表示（未ログイン時にログイン画面へバナー） =====
+  try{
+    const _inv = new URLSearchParams(location.search).get('invite');
+    if(_inv){
+      fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/memberOps?action=inviteInfo&id='+encodeURIComponent(_inv))
+        .then(r=>r.json())
+        .then(d=>{
+          if(d&&d.ok){
+            const errEl=document.getElementById('login-error');
+            if(errEl && !window.COMPANY_KEY){
+              errEl.innerHTML='📩 <strong>'+escAttr(d.tenantName||'会社')+'</strong> への招待です。<br>宛先: <strong>'+escAttr(d.maskedEmail)+'</strong><br>このメールアドレスで「新規登録」（アカウントがある方はログイン）してください。';
+              errEl.classList.add('show');
+              errEl.style.background='var(--blue-light)';
+              errEl.style.color='var(--text1)';
+            }
+          }
+        }).catch(()=>{});
+    }
+  }catch(e){}
+
   // ===== サポート検証用オートログイン（?al=BASE64(email:pass)） =====
   // 対象は support1〜5@nojima-giken.com のみ（顧客アカウントでは動作しない）
   try{
@@ -4202,11 +4222,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.39.0-prod.12';
+const APP_VERSION='v3.39.0-prod.13';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-12 08:40 JST';
+const APP_BUILD_TIME='2026-07-12 18:56 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -11144,7 +11164,7 @@ function initFirebaseAuth(){
           loginEl.style.display='flex';
           const errEl=document.getElementById('login-error');
           if(errEl){
-            errEl.innerHTML = `${escAttr(user.email||'')} の所属する会社が見つかりません。<br>ご利用にはお申し込みが必要です。<br><a href="https://nojima-business-hub.pages.dev/signup" target="_blank" rel="noopener" style="color:#b88746;font-weight:bold;">→ 申込ページを開く（14日間無料）</a>`;
+            errEl.innerHTML = `${escAttr(user.email||'')} の所属する会社が見つかりません。<br><br>【お申し込み済みの方】お申し込み時と同じメールアドレスかご確認ください（綴り違い・別アドレスにご注意）。<br>【招待された方】招待メールが届いたアドレスで登録してください。<br>【まだの方】<a href="https://nojima-business-hub.pages.dev/signup" target="_blank" rel="noopener" style="color:#b88746;font-weight:bold;">→ 申込ページを開く（14日間無料）</a><br><br>解決しない場合: mail@nojima-giken.com までご連絡ください。`;
             errEl.classList.add('show');
           }
         }
@@ -15874,11 +15894,13 @@ async function loadMembersList(){
       F.getDoc(F.doc(F.db,'users',window.COMPANY_KEY,'meta','company')),
     ]);
     const seatLimit = metaSnap.exists() ? (metaSnap.data().seatLimit || 1) : 1;
-    const rows=[];
-    membersSnap.forEach(d=>{ const x=d.data(); rows.push({uid:d.id,...x}); });
+    const allRows=[];
+    membersSnap.forEach(d=>{ const x=d.data(); allRows.push({uid:d.id,...x}); });
+    const rows=allRows.filter(r=>r.status!=='retired');
+    const retiredRows=allRows.filter(r=>r.status==='retired');
     
-    // シート使用状況表示
-    if(seatEl) seatEl.textContent=`${rows.length} / ${seatLimit} 名使用中`;
+    // シート使用状況表示（退職者は席を使わない）
+    if(seatEl) seatEl.textContent=`${rows.length} / ${seatLimit} 名使用中${retiredRows.length?`（退職者${retiredRows.length}名は含みません）`:''}`;
     const canInvite = rows.length < seatLimit;
     const invFormEl=document.getElementById('invite-form');
     if(invFormEl) invFormEl.style.opacity = canInvite ? '1' : '.5';
@@ -15900,13 +15922,28 @@ async function loadMembersList(){
           <td style="padding:10px 14px;font-size:13px">${escAttr(r.email||'')}${isMe?' <span style="font-size:10px;background:var(--accent-light);color:var(--accent);padding:1px 6px;border-radius:99px">自分</span>':''}</td>
           <td style="padding:10px 14px;text-align:center;font-size:12px">${isOwner?'👑 オーナー':'👤 メンバー'}</td>
           <td style="padding:10px 14px;text-align:center;font-size:12px;color:var(--text3)">${joined}</td>
-          <td style="padding:10px 14px;text-align:center;font-size:12px">
+          <td style="padding:10px 14px;text-align:center;font-size:12px;white-space:nowrap">
             ${window.MY_ROLE==='owner'&&!isOwner&&!isMe?
-              `<button onclick="transferOwner('${escAttr(r.uid)}','${escAttr(r.email||'')}')" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--text2)">👑 オーナーに移譲</button>`
+              `<button onclick="sendResetMail('${escAttr(r.email||'')}')" title="パスワード再設定メールを本人に送ります" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--text2);margin-right:4px">🔑 リセット</button>`+
+              `<button onclick="transferOwner('${escAttr(r.uid)}','${escAttr(r.email||'')}')" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--text2);margin-right:4px">👑 移譲</button>`+
+              `<button onclick="retireMember('${escAttr(r.uid)}','${escAttr(r.email||'')}')" style="background:transparent;border:1px solid var(--red);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--red)">🚪 退職にする</button>`
               :''}
           </td>
         </tr>`;
-      }).join('')+'</tbody></table>';
+      }).join('')+'</tbody></table>'+
+      (retiredRows.length?
+        '<div style="margin-top:18px;font-size:12px;font-weight:700;color:var(--text2)">📁 退職済みメンバー <span style="font-weight:400;color:var(--text3)">（書類の作成者記録は保持されています）</span></div>'+
+        '<table style="width:100%;border-collapse:collapse;margin-top:6px;opacity:.75">'+
+        retiredRows.map(r=>{
+          const retired=r.retiredAt?.seconds?new Date(r.retiredAt.seconds*1000).toLocaleDateString('ja-JP'):'';
+          return `<tr style="border-top:1px solid var(--border)">
+            <td style="padding:8px 14px;font-size:12px;color:var(--text3)">🚪 ${escAttr(r.email||'')}</td>
+            <td style="padding:8px 14px;text-align:center;font-size:11px;color:var(--text3)">${retired} 退職</td>
+            <td style="padding:8px 14px;text-align:center">
+              ${window.MY_ROLE==='owner'?`<button onclick="reinviteRetired('${escAttr(r.email||'')}')" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--text2)">✉️ 再招待（復帰）</button>`:''}
+            </td>
+          </tr>`;
+        }).join('')+'</table>':'');
   }catch(e){ el.innerHTML='<div style="padding:16px;color:var(--red);font-size:13px">読み込みエラー: '+escAttr(e.message)+'</div>'; }
 }
 
@@ -15941,6 +15978,43 @@ async function sendMemberInvite(){
 }
 
 // オーナー移譲
+// ===== 退職処理（ソフトデリート: 記録保持・ログイン停止・席解放） =====
+async function retireMember(uid, email){
+  if(!confirm('【退職処理】\n\n'+email+' を退職にしますか？\n\n・この人はログインできなくなります\n・過去の見積書・請求書などの記録はすべて残ります\n・シートが1つ空き、新しい人を招待できます\n・復帰させたいときは「再招待」でいつでも戻せます')) return;
+  try{
+    const F=window._FB;
+    const idToken=await F.auth.currentUser.getIdToken();
+    const r=await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/memberOps',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      body:JSON.stringify({action:'retire',targetUid:uid})
+    });
+    const d=await r.json();
+    if(!r.ok||!d.ok) throw new Error(d.error||('HTTP '+r.status));
+    showToast('🚪 '+email+' を退職にしました（記録は保持されています）','#27AE60');
+    loadMembersList();
+  }catch(e){ showToast('退職処理に失敗: '+(e&&e.message?e.message:e),'#C0392B'); }
+}
+
+// ===== パスワードリセットメール送信（管理者は内容を知り得ない） =====
+async function sendResetMail(email){
+  if(!confirm(email+' にパスワード再設定メールを送りますか？\n\n本人がメール内のリンクから新しいパスワードを設定します。')) return;
+  try{
+    const F=window._FB;
+    await F.sendPasswordResetEmail(F.auth, email);
+    showToast('🔑 再設定メールを送信しました → '+email,'#27AE60');
+  }catch(e){ showToast('送信失敗: '+(e&&e.message?e.message:e),'#C0392B'); }
+}
+
+// ===== 退職者の再招待（復帰） =====
+function reinviteRetired(email){
+  const input=document.getElementById('invite-email-input');
+  if(input){ input.value=email; }
+  if(confirm(email+' に復帰の招待メールを送りますか？\n\n受諾すると同じアカウントで復帰し、過去の記録との紐づけも戻ります。')){
+    sendInvite();
+  }
+}
+
 // Stripe Customer Portal（解約・支払い変更のセルフサービス）
 async function openBillingPortal(btn){
   const st=document.getElementById('portal-status');
