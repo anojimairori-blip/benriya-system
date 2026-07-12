@@ -4218,11 +4218,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.25';
+const APP_VERSION='v3.38.0-cloud.26';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-13 04:28 JST';
+const APP_BUILD_TIME='2026-07-13 04:56 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6859,12 +6859,13 @@ function aiChatInit(){
   aiChatAdd('ai','こんにちは！👋 何でもお申し付けください。\n例：「田中様に電球交換3000円の見積書」「南区の顧客を探して」「新しい顧客を登録」');
 }
 
-// ===== 🤖 AIサイドパネル =====
+// ===== 🤖 AIサイドパネル（会話型アシスタント） =====
 function togglePanelVoiceInput(){
   _genericVoiceInput('ai-panel-input', null, null, '_aiPanelListening');
 }
+
 let aiPanelOpen=false;
-let aiPanelHistory=[];
+let aiPanelHistory=[];   // [{role:'user'|'assistant', content:'...'}]
 
 function toggleAIPanel(open){
   const p=document.getElementById('ai-panel');
@@ -6901,7 +6902,53 @@ function aiPanelAdd(role, html){
 }
 
 function aiPanelGreet(){
-  aiPanelAdd('ai','こんにちは。お手伝いできることの例です。<br><br>📄 <strong>書類を作る</strong><br>「田中様に電球交換3000円の見積書」<br><br>👤 <strong>顧客を登録する</strong><br>「山田工務店を登録、住所は札幌市…」<br><br>🔍 <strong>顧客を探す</strong><br>「札幌市の顧客を探して」<br><br>❓ <strong>使い方を聞く</strong><br>「経費の入力はどこ？」');
+  aiPanelAdd('ai','こんにちは。Flexsysのことなら何でも聞いてください。<br><br>例：<br>・「田中様に電球交換3000円の見積書」<br>・「自分の会社の住所を変えたい」<br>・「経費はどこで入力する？」<br>・「スタッフを追加したい」');
+}
+
+// AIの提案アクションを実行
+async function aiPanelRunAction(action, originalText){
+  if(!action || !action.type) return;
+  if(action.type==='navigate' && action.page){
+    showPage(action.page);
+    if(window.innerWidth<900) toggleAIPanel(false);
+    return;
+  }
+  if(action.type==='create_doc' && action.docType){
+    if(window.innerWidth<900) toggleAIPanel(false);
+    openNewDoc(action.docType);
+    setTimeout(async function(){
+      const modalInput=document.getElementById('ai-doc-input');
+      if(modalInput) modalInput.value=(action.text||originalText||'');
+      await generateDocFromAI();
+      aiPanelAdd('ai','✅ '+escAttr(action.docType)+'の下書きができました。内容を確認して保存してください。');
+    },150);
+    return;
+  }
+  if(action.type==='register_customer'){
+    if(window.innerWidth<900) toggleAIPanel(false);
+    showPage('customers');
+    setTimeout(function(){
+      openCustomerModal();
+      setTimeout(async function(){
+        const modalInput=document.getElementById('ai-cust-input');
+        if(modalInput) modalInput.value=(action.text||originalText||'');
+        await parseCustomerWithAI();
+        aiPanelAdd('ai','✅ 顧客情報を読み取りました。内容を確認して登録してください。');
+      },150);
+    },50);
+    return;
+  }
+  if(action.type==='search_customer'){
+    if(window.innerWidth<900) toggleAIPanel(false);
+    showPage('customers');
+    setTimeout(function(){
+      const q=document.getElementById('cust-search');
+      if(q) q.value=(action.text||originalText||'');
+      searchCustomersWithAI();
+      aiPanelAdd('ai','✅ 顧客管理ページで検索結果を表示しています。');
+    },150);
+    return;
+  }
 }
 
 async function aiPanelSend(){
@@ -6911,95 +6958,38 @@ async function aiPanelSend(){
   if(!currentUser){ showToast('ログイン状態を確認してください','var(--red)'); return; }
   ta.value='';
   aiPanelAdd('user', escAttr(text));
-  aiPanelHistory.push({role:'user', text:text});
   const thinking=aiPanelAdd('ai','🤖 考えています…');
   try{
-    const prevUser=aiPanelHistory.filter(function(m){return m.role==='user';}).slice(-3,-1).map(function(m){return m.text;}).join(' / ');
-    const contextText=prevUser?('（直前の依頼: '+prevUser+'）'+text):text;
     const idToken=await currentUser.getIdToken();
-    const res=await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/flexsysClassifyIntent',{
+    const pageLabel=(typeof PAGE_LABELS!=='undefined' && PAGE_LABELS[currentPageId]) || currentPageId || '';
+    const res=await fetch('https://asia-northeast1-nojima-business-hub.cloudfunctions.net/flexsysAssistant',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
-      body:JSON.stringify({text:contextText})
+      body:JSON.stringify({ text:text, currentPage:pageLabel, history:aiPanelHistory })
     });
     const data=await res.json();
     if(!res.ok||!data.ok) throw new Error(data.error||('HTTP '+res.status));
-    const intent=data.intent;
 
-    if(intent==='estimate'||intent==='invoice'||intent==='receipt'){
-      const typeMap={estimate:'見積書',invoice:'請求書',receipt:'領収書'};
-      const docType=typeMap[intent];
-      thinking.innerHTML='📄 '+docType+'を作成します。作成画面を開いてAIで下書きします…';
-      aiPanelHistory.push({role:'ai',text:docType+'作成'});
-      if(window.innerWidth<900) toggleAIPanel(false);
-      openNewDoc(docType);
-      setTimeout(async function(){
-        const modalInput=document.getElementById('ai-doc-input');
-        if(modalInput) modalInput.value=text;
-        await generateDocFromAI();
-        aiPanelAdd('ai','✅ '+docType+'の下書きができました。内容を確認して保存してください。');
-      },150);
-    }else if(intent==='register_customer'){
-      thinking.innerHTML='👤 顧客登録画面を開いてAIで情報を読み取ります…';
-      aiPanelHistory.push({role:'ai',text:'顧客登録'});
-      if(window.innerWidth<900) toggleAIPanel(false);
-      showPage('customers');
-      setTimeout(function(){
-        openCustomerModal();
-        setTimeout(async function(){
-          const modalInput=document.getElementById('ai-cust-input');
-          if(modalInput) modalInput.value=text;
-          await parseCustomerWithAI();
-          aiPanelAdd('ai','✅ 顧客情報を読み取りました。内容を確認して登録してください。');
-        },150);
-      },50);
-    }else if(intent==='search_customer'){
-      thinking.innerHTML='🔍 顧客を検索します…';
-      aiPanelHistory.push({role:'ai',text:'顧客検索'});
-      if(window.innerWidth<900) toggleAIPanel(false);
-      showPage('customers');
-      setTimeout(function(){
-        const q=document.getElementById('cust-search');
-        if(q) q.value=text;
-        searchCustomersWithAI();
-        aiPanelAdd('ai','✅ 顧客管理ページで検索結果を表示しています。');
-      },150);
-    }else{
-      thinking.innerHTML=aiPanelAnswerHowTo(text);
-      aiPanelHistory.push({role:'ai',text:'使い方案内'});
+    // 会話履歴（AIに渡すのは文章のみ。顧客データは送らない）
+    aiPanelHistory.push({role:'user', content:text});
+    aiPanelHistory.push({role:'assistant', content:String(data.reply||'')});
+    if(aiPanelHistory.length>12) aiPanelHistory=aiPanelHistory.slice(-12);
+
+    const replyHtml=escAttr(String(data.reply||'')).replace(/\n/g,'<br>');
+    const a=data.action;
+    let btn='';
+    if(a && a.type==='navigate' && a.page){
+      btn='<br><br><button class="btn btn-primary" style="font-size:12px;padding:5px 10px" onclick="aiPanelRunAction('+JSON.stringify(a).replace(/"/g,'&quot;')+')">'+escAttr(a.label||'開く')+'</button>';
+    }
+    thinking.innerHTML=replyHtml+btn;
+
+    // 書類作成・顧客登録・検索は即実行（利用者の明確な依頼のため）
+    if(a && (a.type==='create_doc'||a.type==='register_customer'||a.type==='search_customer')){
+      await aiPanelRunAction(a, text);
     }
   }catch(e){
-    thinking.innerHTML='❌ エラーが発生しました: '+escAttr(e&&e.message?e.message:String(e));
+    thinking.innerHTML='❌ '+escAttr(e&&e.message?e.message:String(e));
   }
-}
-
-function aiPanelAnswerHowTo(text){
-  const t=text.toLowerCase();
-  const HOWTO=[
-    {k:['経費','けいひ','支出','経費精算'],page:'expenses',label:'経費管理',tip:'左メニュー「経費管理」から、日付・金額・カテゴリを入力して登録します。'},
-    {k:['入金','未収','売掛','回収','支払われ'],page:'payments',label:'入金管理',tip:'左メニュー「入金管理」で請求書ごとの入金状況を管理できます。未入金の絞り込みも可能です。'},
-    {k:['カレンダー','予定','スケジュール','日程'],page:'calendar',label:'作業カレンダー',tip:'左メニュー「作業カレンダー」で現場の予定を登録・確認できます。'},
-    {k:['スタッフ','従業員','社員','実績'],page:'staff-report',label:'スタッフ実績',tip:'「スタッフ実績」で担当者ごとの作業実績を確認できます。従業員の登録は「設定 → 従業員」です。'},
-    {k:['メンバー','招待','ログインできる人','アカウント追加','退職'],page:'members-settings',label:'メンバー管理',tip:'「設定 → メンバー管理」から招待メールを送れます。退職者の処理もここです（記録は残り、席が空きます）。'},
-    {k:['会社名','住所','振込','ロゴ','自社情報','印鑑'],page:'settings',label:'会社設定',tip:'「設定 → 会社情報」で会社名・住所・振込先を登録すると、書類に自動で反映されます。'},
-    {k:['税率','消費税','インボイス'],page:'tax',label:'税率設定',tip:'「設定 → 税率」で消費税率を管理できます。'},
-    {k:['バックアップ','復元'],page:'backup',label:'バックアップ',tip:'「設定 → バックアップ」からデータの書き出しができます。クラウド版は毎日自動バックアップも行っています。'},
-    {k:['テンプレート','定型'],page:'templates',label:'作業テンプレート',tip:'よく使う作業を「作業テンプレート」に登録しておくと、書類作成が速くなります。'},
-    {k:['csv','エクスポート','書き出し','会計ソフト'],page:'csv-export',label:'CSVエクスポート',tip:'「CSVエクスポート」から会計ソフト向けにデータを書き出せます。'},
-    {k:['解約','退会','支払い方法','カード変更','請求書の履歴','契約'],page:'members-settings',label:'契約・お支払いの管理',tip:'「設定 → メンバー管理」ページ下部の「契約・お支払いの管理」から、解約・支払い方法の変更・領収書の取得ができます。'},
-    {k:['印刷','pdf','封筒'],page:null,label:'印刷',tip:'書類を開いて「印刷」ボタンを押すとプレビューが表示されます。封筒モードもそこから選べます。'},
-    {k:['掲示板','お知らせ','連絡'],page:'bulletin',label:'掲示板',tip:'「掲示板」で社内の連絡事項を共有できます。重要な投稿はピン留めできます。'}
-  ];
-  for(let i=0;i<HOWTO.length;i++){
-    const h=HOWTO[i];
-    let hit=false;
-    for(let j=0;j<h.k.length;j++){ if(t.indexOf(h.k[j])>=0){ hit=true; break; } }
-    if(hit){
-      const btn = h.page ? '<br><br><button class="btn btn-primary" style="font-size:12px;padding:5px 10px" onclick="showPage(\'' + h.page + '\');if(window.innerWidth<900)toggleAIPanel(false);">' + escAttr(h.label) + 'を開く</button>' : '';
-      return '💡 <strong>'+escAttr(h.label)+'</strong><br>'+escAttr(h.tip)+btn;
-    }
-  }
-  return 'うーん、内容を判定できませんでした🤔<br><br>次のような言い方だと動けます。<br>・見積書/請求書 →「〇〇様に△△の見積書」<br>・顧客登録 →「〇〇様を登録、住所は…」<br>・顧客検索 →「〇〇な顧客を探して」<br>・使い方 →「経費の入力はどこ？」<br><br>解決しない場合は左下の「不具合・要望を報告」からご連絡ください。';
 }
 
 document.addEventListener('keydown', function(e){
@@ -16629,11 +16619,11 @@ function executeBulkTaxUpdate(){
   <div id="ai-panel-log" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:14px 16px"></div>
   <div style="padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0">
     <div style="display:flex;gap:6px;align-items:stretch">
-      <textarea id="ai-panel-input" rows="1" placeholder="例：田中様に電球交換3000円の見積書" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiPanelSend();}" style="flex:1;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical;min-height:38px;box-sizing:border-box"></textarea>
+      <textarea id="ai-panel-input" rows="1" placeholder="例：自分の会社の住所を変えたい" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiPanelSend();}" style="flex:1;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:inherit;resize:vertical;min-height:38px;box-sizing:border-box"></textarea>
       <button type="button" onclick="togglePanelVoiceInput()" title="音声入力" style="width:38px;height:38px;border-radius:8px;border:1px solid var(--accent);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0">🎤</button>
       <button class="btn btn-primary" onclick="aiPanelSend()" style="height:38px;padding:0 12px;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center">送信</button>
     </div>
-    <span style="font-size:10px;color:var(--text3);display:block;margin-top:6px">書類作成・顧客登録・顧客検索の自動実行、システムの使い方の質問にお答えします。</span>
+    <span style="font-size:10px;color:var(--text3);display:block;margin-top:6px">Flexsysのことなら何でも聞いてください。書類作成・顧客登録も話し言葉でできます。<br>※顧客名簿や売上などのデータはAIに送信していません。</span>
   </div>
 </aside>
 <button type="button" id="ai-fab" onclick="toggleAIPanel(true)" title="AIアシスタント（Alt+A）" aria-label="AIアシスタントを開く" style="position:fixed;right:18px;bottom:18px;width:52px;height:52px;border-radius:50%;border:none;background:var(--accent);color:#fff;font-size:22px;cursor:pointer;z-index:8600;box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center">🤖</button>
