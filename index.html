@@ -1568,6 +1568,47 @@ if('serviceWorker' in navigator){
 <!-- ===== SYNC STATUS ===== -->
 <div id="sync-indicator" style="display:none;position:fixed;bottom:16px;right:16px;background:var(--accent);color:white;padding:8px 14px;border-radius:99px;font-size:12px;font-weight:600;z-index:500;box-shadow:0 4px 16px rgba(0,0,0,.2)">🔄 同期中...</div>
 
+<!-- EMAIL VERIFY BLOCK（メール未確認ユーザーのブロック画面・body直下） -->
+<div id="email-verify-block" style="display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:460px;padding:32px 28px;text-align:center">
+    <div style="font-size:40px;margin-bottom:10px">📧</div>
+    <h2 style="font-size:18px;font-weight:700;margin:0 0 10px">メールアドレスの確認をお願いします</h2>
+    <p style="font-size:13px;color:var(--text2);line-height:1.8;margin:0 0 6px">
+      <strong id="verify-email-addr"></strong> 宛に確認メールを送信しました。<br>
+      メール内のリンクをクリックして、確認を完了してください。
+    </p>
+    <p style="font-size:12px;color:var(--text3);line-height:1.7;margin:0 0 18px">届かない場合は迷惑メールフォルダもご確認ください。</p>
+    <button onclick="verifyBlockReload()" style="display:block;width:100%;padding:13px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;margin-bottom:10px">✅ 確認しました（再読み込み）</button>
+    <button onclick="resendVerifyEmail(this)" style="display:block;width:100%;padding:12px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:10px">📨 確認メールを再送する</button>
+    <button onclick="fbLogout()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">ログアウト</button>
+    <div id="verify-resend-status" style="font-size:12px;color:var(--text2);margin-top:8px;min-height:16px"></div>
+  </div>
+</div>
+
+<!-- CANCELED BLOCK（契約終了画面・body直下） -->
+<div id="canceled-block" style="display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:460px;padding:32px 28px;text-align:center">
+    <div style="font-size:40px;margin-bottom:10px">📦</div>
+    <h2 style="font-size:18px;font-weight:700;margin:0 0 10px">ご契約が終了しています</h2>
+    <p style="font-size:13px;color:var(--text2);line-height:1.8;margin:0 0 18px">
+      この会社のFlexsysのご契約は終了しました。<br>
+      データは<strong>解約日から90日間</strong>安全に保管されます。<br>
+      再開されると、そのままの状態でお使いいただけます。
+    </p>
+    <a href="https://nojima-business-hub.pages.dev/signup" 
+      style="display:block;padding:13px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;text-decoration:none;margin-bottom:10px">
+      🔄 利用を再開する（お申し込みページへ）
+    </a>
+    <button onclick="window._FB&&window._FB.signOut(window._FB.auth).then(()=>location.reload())"
+      style="width:100%;padding:11px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);font-size:13px;font-family:inherit;cursor:pointer">
+      ログアウト
+    </button>
+    <p style="font-size:11px;color:var(--text3);margin:14px 0 0">
+      お困りの際は mail@nojima-giken.com までご連絡ください。
+    </p>
+  </div>
+</div>
+
 <div class="app" id="app-main" style="display:none">
 
 <!-- MOBILE DRAWER OVERLAY -->
@@ -1750,45 +1791,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <!-- CANCELED BLOCK SCREEN（契約終了時の利用停止画面） -->
-<div id="canceled-block" style="display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);align-items:center;justify-content:center;padding:16px">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:460px;padding:32px 28px;text-align:center">
-    <div style="font-size:40px;margin-bottom:10px">📦</div>
-    <h2 style="font-size:18px;font-weight:700;margin:0 0 10px">ご契約が終了しています</h2>
-    <p style="font-size:13px;color:var(--text2);line-height:1.8;margin:0 0 18px">
-      この会社のFlexsysのご契約は終了しました。<br>
-      データは<strong>解約日から90日間</strong>安全に保管されます。<br>
-      再開されると、そのままの状態でお使いいただけます。
-    </p>
-    <a href="https://nojima-business-hub.pages.dev/signup" 
-      style="display:block;padding:13px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;text-decoration:none;margin-bottom:10px">
-      🔄 利用を再開する（お申し込みページへ）
-    </a>
-    <button onclick="window._FB&&window._FB.signOut(window._FB.auth).then(()=>location.reload())"
-      style="width:100%;padding:11px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);font-size:13px;font-family:inherit;cursor:pointer">
-      ログアウト
-    </button>
-    <p style="font-size:11px;color:var(--text3);margin:14px 0 0">
-      お困りの際は mail@nojima-giken.com までご連絡ください。
-    </p>
-  </div>
-</div>
 
-<!-- EMAIL VERIFY BLOCK（メール未確認ユーザーのブロック画面） -->
-<div id="email-verify-block" style="display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);align-items:center;justify-content:center;padding:16px">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:460px;padding:32px 28px;text-align:center">
-    <div style="font-size:40px;margin-bottom:10px">📧</div>
-    <h2 style="font-size:18px;font-weight:700;margin:0 0 10px">メールアドレスの確認をお願いします</h2>
-    <p style="font-size:13px;color:var(--text2);line-height:1.8;margin:0 0 6px">
-      <strong id="verify-email-addr"></strong> 宛に確認メールを送信しました。<br>
-      メール内のリンクをクリックして、確認を完了してください。
-    </p>
-    <p style="font-size:12px;color:var(--text3);line-height:1.7;margin:0 0 18px">届かない場合は迷惑メールフォルダもご確認ください。</p>
-    <button onclick="verifyBlockReload()" style="display:block;width:100%;padding:13px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;margin-bottom:10px">✅ 確認しました（再読み込み）</button>
-    <button onclick="resendVerifyEmail(this)" style="display:block;width:100%;padding:12px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:10px">📨 確認メールを再送する</button>
-    <button onclick="fbLogout()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">ログアウト</button>
-    <div id="verify-resend-status" style="font-size:12px;color:var(--text2);margin-top:8px;min-height:16px"></div>
-  </div>
-</div>
 
 <!-- ONBOARDING MODAL（初回ログイン時のはじめにガイド） -->
 <div id="onboarding-modal" style="display:none;position:fixed;inset:0;z-index:8900;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:16px">
@@ -1918,7 +1921,7 @@ if('serviceWorker' in navigator){
 <div id="page-home" class="page active">
   <div class="main-header">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-      <h2 id="home-title-h2" style="margin:0">📋 Flexsys2026</h2>
+      <h2 id="home-title-h2" style="margin:0">📋 Flexsys</h2>
       <span style="font-size:11px;color:var(--text3);white-space:nowrap" id="home-header-version"></span>
     </div>
     <div class="header-actions"><button class="btn-refresh" aria-label="更新" onclick="refreshAllData(this)" title="最新データに更新">🔄</button>
@@ -4148,7 +4151,7 @@ Email：tanaka@example.com" style="width:100%;padding:10px;border:1px solid var(
       <ol style="padding-left:20px;margin-top:4px;line-height:1.7;color:var(--text2)">
         <li>上の「🔐 Google権限を確認」を開く</li>
         <li>このアプリの権限を一度削除</li>
-        <li>Flexsys2026 からログアウト → 再ログイン</li>
+        <li>Flexsys からログアウト → 再ログイン</li>
         <li>権限ダイアログで「予定の閲覧・作成・変更・削除」を「許可」</li>
       </ol>
     </details>
@@ -4235,7 +4238,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.28';
+const APP_VERSION='v3.38.0-cloud.29';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
@@ -11334,7 +11337,7 @@ function initFirebaseAuth(){
   if(ls){
     // タイトルを動的に Flexsys + バージョンに更新
     const lt=document.getElementById('login-title');
-    if(lt) lt.textContent='Flexsys2026 '+APP_VERSION;
+    if(lt) lt.textContent='Flexsys '+APP_VERSION;
     ls.style.display='flex';
     document.getElementById('app') && (document.querySelector('.app').style.display='none');
   }
@@ -12890,7 +12893,7 @@ body{margin:0;padding:0;background:#F5F3EE;font-family:'Hiragino Sans','Noto San
     <div class="pdf-hint">画像として保存されます。印刷・メール添付・共有ができます</div>
   </div>
 
-  <div class="footer-credit">Powered by Flexsys2026</div>
+  <div class="footer-credit">Powered by Flexsys</div>
 </div>
 
 <!-- PDF生成用の隠しエリア（A4レイアウト） -->
@@ -14525,8 +14528,8 @@ function jobToGcalEvent(job){
   if(job.category) lines.push(`カテゴリ: ${job.category}`);
   if(job.memo) lines.push(`メモ: ${job.memo}`);
   lines.push(`─────────`);
-  lines.push(`Flexsys2026 ID: ${job.id}`);
-  lines.push(`Flexsys2026 から自動同期`);
+  lines.push(`Flexsys ID: ${job.id}`);
+  lines.push(`Flexsys から自動同期`);
   // タイトルを安全に組み立て
   const titleStr=String(job.title||'').trim();
   const categoryStr=String(job.category||'').trim();
@@ -14649,7 +14652,7 @@ async function syncJobToGcal(job){
       showErrorBanner(
         'Googleカレンダーの権限が不足しています',
         '同期エラー(予定「'+(job.title||job.customer||'無題')+'」): '+msg+'\n\n【解決方法】\n'
-        +'1. Google アカウント権限ページで Flexsys2026 の権限を削除\n'
+        +'1. Google アカウント権限ページで Flexsys の権限を削除\n'
         +'2. 当アプリからログアウト→再ログインで「カレンダー操作」を許可',
         {kind:'error'}
       );
@@ -14725,8 +14728,8 @@ async function fetchGcalCalendarList(){
         'Googleカレンダーの権限が不足しています',
         'カレンダー一覧取得エラー: '+msg+'\n\n【解決方法】\n'
         +'1. Google アカウント権限ページ (https://myaccount.google.com/permissions) を開く\n'
-        +'2. このアプリ(Flexsys2026)の権限を一度削除\n'
-        +'3. Flexsys2026 からログアウト\n'
+        +'2. このアプリ(Flexsys)の権限を一度削除\n'
+        +'3. Flexsys からログアウト\n'
         +'4. 再ログイン時に「予定の閲覧・作成・変更・削除」を含む権限ダイアログが出るので「許可」\n'
         +'5. 再度この画面を開く',
         {kind:'error'}
