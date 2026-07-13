@@ -1568,6 +1568,18 @@ if('serviceWorker' in navigator){
 <!-- ===== SYNC STATUS ===== -->
 <div id="sync-indicator" style="display:none;position:fixed;bottom:16px;right:16px;background:var(--accent);color:white;padding:8px 14px;border-radius:99px;font-size:12px;font-weight:600;z-index:500;box-shadow:0 4px 16px rgba(0,0,0,.2)">🔄 同期中...</div>
 
+<!-- BOOT LOADER（認証判定が終わるまでの読み込み画面・ちらつき防止） -->
+<div id="boot-loader" style="position:fixed;inset:0;z-index:9800;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px">
+  <svg width="52" height="52" viewBox="0 0 64 64" aria-hidden="true" style="border-radius:12px">
+    <rect width="64" height="64" rx="14" fill="#11223d"/>
+    <path d="M22 14h24v9H33v10h11v9H33v14H22z" fill="#b88746"/>
+  </svg>
+  <div style="width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:bootspin .7s linear infinite"></div>
+  <div style="font-size:13px;color:var(--text3);letter-spacing:.04em">読み込んでいます…</div>
+</div>
+<style>@keyframes bootspin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#boot-loader div[style*=bootspin]{animation:none}}</style>
+
 <!-- EMAIL VERIFY BLOCK（メール未確認ユーザーのブロック画面・body直下） -->
 <div id="email-verify-block" style="display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);align-items:center;justify-content:center;padding:16px">
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:460px;padding:32px 28px;text-align:center">
@@ -4238,7 +4250,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.29';
+const APP_VERSION='v3.38.0-cloud.30';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
@@ -11352,6 +11364,7 @@ function initFirebaseAuth(){
         if(loginEl) loginEl.style.display='none';
         if(appEl) appEl.style.display='none';
         showEmailVerifyBlock(user);
+        hideBootLoader();
         return;
       }
       // ===== 所属会社(tenantId)の解決（memberIndex方式・MASTER_UID撤廃） =====
@@ -11368,6 +11381,7 @@ function initFirebaseAuth(){
             errEl.classList.add('show');
           }
         }
+        hideBootLoader();
         return;
       }
       window.COMPANY_KEY = tenantInfo.tenantId;
@@ -11401,6 +11415,7 @@ function initFirebaseAuth(){
       // UIを更新
       if(loginEl) loginEl.style.display='none';
       if(appEl)   appEl.style.display='flex';
+      hideBootLoader();
       // ユーザー情報表示（PC + モバイル）
       const sbu = document.getElementById('sidebar-user');
       if(sbu) sbu.style.display='block';
@@ -11427,6 +11442,7 @@ function initFirebaseAuth(){
       currentUser = null;
       if(loginEl){ loginEl.style.display='flex'; }
       if(appEl)   { appEl.style.display='none'; }
+      hideBootLoader();
     }
   });
 }
@@ -11743,6 +11759,7 @@ function initAppAfterAuth(){
     });
   }, 100);
   initSidebar(); initTheme();
+  setTimeout(()=>{ const bl=document.getElementById('boot-loader'); if(bl && bl.style.display!=='none') hideBootLoader(); }, 8000);
   renderHome(); showPage('home',null,true);
   const ht=document.getElementById('home-title-h2');
   if(ht) ht.textContent=sysTitle.replace(/\n/,' ');
@@ -16017,6 +16034,15 @@ function showOnboardingManual(){
   try{ if(typeof closeHelpPanel==='function') closeHelpPanel(); }catch(e){}
   const m=document.getElementById('onboarding-modal');
   if(m) m.style.display='flex';
+}
+
+// ===== 起動ローダーを閉じる（表示が確定した時点で呼ぶ） =====
+function hideBootLoader(){
+  const el=document.getElementById('boot-loader');
+  if(!el) return;
+  el.style.transition='opacity .25s ease';
+  el.style.opacity='0';
+  setTimeout(()=>{ el.style.display='none'; }, 260);
 }
 
 // ===== メール確認（emailVerified）ブロック画面 =====
