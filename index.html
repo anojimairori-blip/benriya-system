@@ -4218,11 +4218,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.26';
+const APP_VERSION='v3.38.0-cloud.27';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
-const APP_BUILD_TIME='2026-07-13 04:56 JST';
+const APP_BUILD_TIME='2026-07-13 10:34 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -5207,6 +5207,32 @@ const SPEC_PDF_URL   = '/Flexsys2026_仕様書.pdf';
 // ページID → ヘルプコンテンツの対応表
 // bodyはHTML文字列(インラインスタイルは避け、CSSクラス .hp-step / .hp-tip / .hp-warn を使用)
 const HELP_CONTENT = {
+  'ai-assistant': {
+    title: '🤖 AIアシスタント',
+    body: `
+      <p>話し言葉で書類の作成・顧客の登録や検索ができます。使い方の質問にも答えます。</p>
+      <h4>呼び出し方</h4>
+      <div class="hp-step"><div class="hp-step-num">1</div><div class="hp-step-txt">どのページでも、画面<strong>右下の 🤖 ボタン</strong>をクリック</div></div>
+      <div class="hp-step"><div class="hp-step-num">2</div><div class="hp-step-txt">キーボードの <strong>Alt + A</strong> でも開けます（閉じるのは Esc）</div></div>
+      <h4>できること</h4>
+      <ul>
+        <li><strong>書類を作る</strong>：「田中様に電球交換3000円の見積書」</li>
+        <li><strong>顧客を登録する</strong>：「山田工務店を登録、住所は札幌市…」</li>
+        <li><strong>顧客を探す</strong>：「札幌市の顧客を探して」</li>
+        <li><strong>使い方を聞く</strong>：「自分の会社の住所を変えたい」「経費はどこで入力する？」</li>
+      </ul>
+      <p>言い回しは自由です。思いついたまま話しかけてください。</p>
+      <h4>🎤 音声入力</h4>
+      <p>マイクのボタンを押すと、話した内容がそのまま文字になります。現場で手が離せないときに便利です。</p>
+      <div class="hp-tip">💡 書類作成の画面や顧客登録の画面にも「🤖 AIで下書き入力」があります。そちらは、その画面の中で直接AIに下書きさせる機能です。</div>
+      <h4>データの取り扱い（大切なこと）</h4>
+      <p>AIアシスタントに送信されるのは、<strong>あなたが入力した文章・会話の履歴・今開いている画面の名前</strong>だけです。</p>
+      <div class="hp-warn">⚠️ <strong>顧客名簿・売上・請求書の中身・従業員情報は、AIに送信していません。</strong>「今月の売上は？」のような質問に対して、AIは金額を答えず「ダッシュボードで確認できます」とご案内します。</div>
+      <p>AI提供元（Anthropic社）は、送信されたデータをAIの学習に使用しません。詳しくは<a href="https://nojima-giken.com/legal/privacy/" target="_blank" rel="noopener">プライバシーポリシー</a>をご覧ください。</p>
+      <h4>注意点</h4>
+      <div class="hp-warn">⚠️ AIの回答や生成された下書きには誤りが含まれることがあります。書類の内容は必ずご自身でご確認のうえ保存・送付してください。</div>
+    `
+  },
   'bulletin': {
     title: '📌 掲示板',
     body: `
@@ -5577,7 +5603,7 @@ function _renderHelpContent(pageId){
 function _renderHelpToc(currentPageId){
   const tocEl = document.getElementById('help-panel-toc-list');
   if(!tocEl) return;
-  const order = ['home','dashboard','bulletin','quotes','invoices','receipts',
+  const order = ['home','ai-assistant','dashboard','bulletin','quotes','invoices','receipts',
                  'customers','calendar','alerts','payments','expenses',
                  'staff-report','report','templates',
                  'settings','employees','tax','backup','display-settings',
