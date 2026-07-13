@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flexsys｜見積・請求・顧客管理を、ひとつづきに。中小事業者のための業務管理ソフト</title>
-<meta name="description" content="見積書から請求書、領収書までを一本の流れで。便利屋・工務店・個人事業主のために、現場の人間がつくった業務管理ソフト。月額9,800円から・14日間無料。">
+<meta name="description" content="見積書から請求書、領収書までを一本の流れで。便利屋・工務店・個人事業主のために、現場の人間がつくった業務管理ソフト。2026年8月 販売開始予定。">
 <meta name="theme-color" content="#11223d">
 <meta property="og:title" content="Flexsys｜見積・請求・顧客管理を、ひとつづきに。">
 <meta property="og:description" content="見積書から請求書、領収書までを一本の流れで。現場の人間がつくった業務管理ソフト。月額9,800円から・14日間無料。">
@@ -372,6 +372,25 @@
   footer a:hover{color:var(--paper)}
   @media(max-width:640px){ .ft{flex-direction:column;text-align:center} footer a{margin:0 11px} }
 
+  /* ── 販売準備中 ───────────────── */
+  .soon{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--paper-2);color:var(--navy);
+    border:1px dashed var(--brass);border-radius:2px;
+    font-size:15px;font-weight:700;padding:13px 26px;
+    cursor:default;
+  }
+  .soon-note{font-size:13px;color:var(--muted);line-height:1.85}
+  .soon-banner{
+    max-width:640px;margin:0 auto 34px;padding:20px 26px;
+    background:rgba(184,135,70,.09);border:1px solid var(--brass);border-radius:2px;
+    text-align:center;
+  }
+  .soon-banner b{font-family:'Shippori Mincho',serif;font-size:17px;display:block;margin-bottom:6px}
+  .soon-banner p{font-size:13.5px;color:var(--muted);line-height:1.9}
+  .end .soon{background:rgba(245,239,226,.1);color:var(--paper-2);border-color:var(--brass)}
+  .end .soon-note{color:rgba(245,239,226,.6)}
+
   a:focus-visible, summary:focus-visible, button:focus-visible{
     outline:2px solid var(--brass);outline-offset:3px;
   }
@@ -389,9 +408,9 @@
       "url": "https://flexsys-cloud.pages.dev/lp/",
       "author": { "@type": "Organization", "name": "野島技研", "url": "https://nojima-giken.com/" },
       "offers": [
-        { "@type": "Offer", "name": "スターター", "price": "9800", "priceCurrency": "JPY", "description": "2人まで・月額（税込）" },
-        { "@type": "Offer", "name": "プロ", "price": "14800", "priceCurrency": "JPY", "description": "5人まで・月額（税込）" },
-        { "@type": "Offer", "name": "ビジネス", "price": "19800", "priceCurrency": "JPY", "description": "10人まで・月額（税込）" }
+        { "@type": "Offer", "name": "スターター", "price": "9800", "priceCurrency": "JPY", "description": "2人まで・月額（税込）", "availability": "https://schema.org/PreOrder", "availabilityStarts": "2026-08-01" },
+        { "@type": "Offer", "name": "プロ", "price": "14800", "priceCurrency": "JPY", "description": "5人まで・月額（税込）", "availability": "https://schema.org/PreOrder", "availabilityStarts": "2026-08-01" },
+        { "@type": "Offer", "name": "ビジネス", "price": "19800", "priceCurrency": "JPY", "description": "10人まで・月額（税込）", "availability": "https://schema.org/PreOrder", "availabilityStarts": "2026-08-01" }
       ]
     },
     {
@@ -425,7 +444,7 @@
       <a href="#ai">AIとデータ</a>
       <a href="#price">料金</a>
       <a href="#faq">よくある質問</a>
-      <a class="btn btn-sm" href="https://nojima-business-hub.pages.dev/signup">14日間無料で試す</a>
+      <span class="soon" style="font-size:13px;padding:9px 16px">8月 販売開始予定</span>
     </nav>
   </div>
 </header>
@@ -444,8 +463,8 @@
         同じ顧客名を三度打ち込む必要はありません。
       </p>
       <div class="cta-row">
-        <a class="btn" href="https://nojima-business-hub.pages.dev/signup">14日間、無料で試す</a>
-        <span class="cta-note">クレジットカード登録あり・期間中の解約は無料</span>
+        <span class="soon">📅 2026年8月 販売開始予定</span>
+        <span class="cta-note">より多くの人数で使えるよう、改良を進めています</span>
       </div>
     </div>
 
@@ -705,7 +724,15 @@
     <div class="sec-head">
       <span class="sec-num">— 料金 —</span>
       <h2>人数で選ぶ、3つのプラン。</h2>
-      <p class="sec-lede">機能はどのプランも同じです。違うのは使える人数だけ。まずは14日間、無料でお試しください。</p>
+      <p class="sec-lede">機能はどのプランも同じです。違うのは使える人数だけ。</p>
+    </div>
+
+    <div class="soon-banner">
+      <b>📅 2026年8月 販売開始予定</b>
+      <p>
+        より多くの人数で安心してお使いいただけるよう、システムの改良を進めています。<br>
+        準備が整い次第、こちらのページでご案内いたします。
+      </p>
     </div>
     <div class="plans">
       <div class="plan">
@@ -719,7 +746,7 @@
           <li>14日間の無料トライアル</li>
           <li>メールサポート</li>
         </ul>
-        <a class="btn btn-ghost" href="https://nojima-business-hub.pages.dev/signup">このプランで試す</a>
+        <span class="soon" style="width:100%;font-size:14px">8月 販売開始予定</span>
       </div>
       <div class="plan pick">
         <h3>プロ</h3>
@@ -732,7 +759,7 @@
           <li>14日間の無料トライアル</li>
           <li>メールサポート</li>
         </ul>
-        <a class="btn" href="https://nojima-business-hub.pages.dev/signup">このプランで試す</a>
+        <span class="soon" style="width:100%;font-size:14px">8月 販売開始予定</span>
       </div>
       <div class="plan">
         <h3>ビジネス</h3>
@@ -745,7 +772,7 @@
           <li>14日間の無料トライアル</li>
           <li>メールサポート</li>
         </ul>
-        <a class="btn btn-ghost" href="https://nojima-business-hub.pages.dev/signup">このプランで試す</a>
+        <span class="soon" style="width:100%;font-size:14px">8月 販売開始予定</span>
       </div>
     </div>
 
@@ -771,7 +798,7 @@
     </div>
 
     <details>
-      <summary>トライアル中に解約したら、料金はかかりますか。</summary>
+      <summary>トライアル中に解約したら、料金はかかりますか。（販売開始後）</summary>
       <p>かかりません。14日間の期間中に解約すれば、料金は一切発生しません。カード登録はお願いしていますが、期間内であれば請求されずに終わります。</p>
     </details>
     <details>
@@ -800,10 +827,10 @@
 <!-- ═══ 締め ═══ -->
 <section class="end">
   <div class="wrap narrow">
-    <h2>まずは、見積書を1枚<br>つくってみてください。</h2>
-    <p>説明を読むより、実際に触ってみるほうが早いはずです。<br>14日間、すべての機能を無料でお使いいただけます。</p>
-    <a class="btn" href="https://nojima-business-hub.pages.dev/signup">14日間、無料で試す</a>
-    <span class="cta-note">期間中の解約はいつでも・料金は発生しません</span>
+    <h2>2026年8月、<br>販売を開始します。</h2>
+    <p>今は、より多くの人数で安心して使えるよう、<br>システムの土台を作り直しています。<br>準備が整い次第、このページでご案内します。</p>
+    <span class="soon">📅 2026年8月 販売開始予定</span>
+    <span class="cta-note">14日間の無料トライアルからお試しいただけます</span>
   </div>
 </section>
 
