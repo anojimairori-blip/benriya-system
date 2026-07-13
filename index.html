@@ -15,7 +15,7 @@
 <title id="page-title">Flexsys｜業務管理システム</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Flexsys - 見積書・請求書・領収書、顧客管理、作業カレンダーをひとつに。小さな会社のための業務管理システム。">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%232E7D57%22/%3E%3Cpath%20d%3D%22M20%2012h17l9%209v31a2%202%200%200%201-2%202H20a2%202%200%200%201-2-2V14a2%202%200%200%201%202-2z%22%20fill%3D%22%23f5f2ea%22/%3E%3Cpath%20d%3D%22M37%2012l9%209h-9z%22%20fill%3D%22%23cfe5d8%22/%3E%3Crect%20x%3D%2224%22%20y%3D%2228%22%20width%3D%2216%22%20height%3D%223%22%20rx%3D%221.5%22%20fill%3D%22%232E7D57%22/%3E%3Crect%20x%3D%2224%22%20y%3D%2235%22%20width%3D%2216%22%20height%3D%223%22%20rx%3D%221.5%22%20fill%3D%22%232E7D57%22/%3E%3Crect%20x%3D%2224%22%20y%3D%2242%22%20width%3D%2210%22%20height%3D%223%22%20rx%3D%221.5%22%20fill%3D%22%236db392%22/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2311223d%22/%3E%3Cpath%20d%3D%22M22%2014h24v9H33v10h11v9H33v14H22z%22%20fill%3D%22%23b88746%22/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 <style>
 /* ===== THEMES ===== */
@@ -1439,7 +1439,7 @@ if(typeof QRCode === 'undefined'){
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
-           signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail }
+           signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
   import { getFirestore, doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, writeBatch, query, where, orderBy, limit }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -1472,7 +1472,7 @@ if(typeof QRCode === 'undefined'){
   // グローバルに公開
   window._FB = { auth, db, storage, provider, calProvider, GoogleAuthProvider,
     signInWithPopup, signOut, onAuthStateChanged,
-    signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail,
+    signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification,
     doc, collection, setDoc, getDoc, getDocs, onSnapshot, deleteDoc, writeBatch,
     query, where, orderBy, limit,
     storageRef, uploadBytes, getDownloadURL, deleteObject, listAll };
@@ -1770,6 +1770,23 @@ if('serviceWorker' in navigator){
     <p style="font-size:11px;color:var(--text3);margin:14px 0 0">
       お困りの際は mail@nojima-giken.com までご連絡ください。
     </p>
+  </div>
+</div>
+
+<!-- EMAIL VERIFY BLOCK（メール未確認ユーザーのブロック画面） -->
+<div id="email-verify-block" style="display:none;position:fixed;inset:0;z-index:9500;background:var(--bg);align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:460px;padding:32px 28px;text-align:center">
+    <div style="font-size:40px;margin-bottom:10px">📧</div>
+    <h2 style="font-size:18px;font-weight:700;margin:0 0 10px">メールアドレスの確認をお願いします</h2>
+    <p style="font-size:13px;color:var(--text2);line-height:1.8;margin:0 0 6px">
+      <strong id="verify-email-addr"></strong> 宛に確認メールを送信しました。<br>
+      メール内のリンクをクリックして、確認を完了してください。
+    </p>
+    <p style="font-size:12px;color:var(--text3);line-height:1.7;margin:0 0 18px">届かない場合は迷惑メールフォルダもご確認ください。</p>
+    <button onclick="verifyBlockReload()" style="display:block;width:100%;padding:13px;border-radius:8px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;margin-bottom:10px">✅ 確認しました（再読み込み）</button>
+    <button onclick="resendVerifyEmail(this)" style="display:block;width:100%;padding:12px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:10px">📨 確認メールを再送する</button>
+    <button onclick="fbLogout()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">ログアウト</button>
+    <div id="verify-resend-status" style="font-size:12px;color:var(--text2);margin-top:8px;min-height:16px"></div>
   </div>
 </div>
 
@@ -4218,7 +4235,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.0-cloud.27';
+const APP_VERSION='v3.38.0-cloud.28';
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = null; // ログイン確定時に resolveTenantForCloud() で設定（memberIndex方式・MASTER_UID撤廃）
 window.MY_ROLE = null;     // 'owner' | 'member'
@@ -10902,6 +10919,7 @@ async function doEmailAuth(){
   try{
     if(_authMode==='signup'){
       await F.createUserWithEmailAndPassword(F.auth, email, pw);
+      try{ if(F.auth.currentUser) await F.sendEmailVerification(F.auth.currentUser); }catch(e){ console.warn('verification mail send failed:', e); }
     }else{
       await F.signInWithEmailAndPassword(F.auth, email, pw);
     }
@@ -11325,6 +11343,14 @@ function initFirebaseAuth(){
     const appEl = document.getElementById('app-main');
     const loginEl = document.getElementById('login-screen');
     if(user){
+      // ===== メール確認（emailVerified）ガード：パスワード認証のみ対象 =====
+      const _isPwProvider = (user.providerData||[]).some(p=>p.providerId==='password');
+      if(_isPwProvider && !user.emailVerified){
+        if(loginEl) loginEl.style.display='none';
+        if(appEl) appEl.style.display='none';
+        showEmailVerifyBlock(user);
+        return;
+      }
       // ===== 所属会社(tenantId)の解決（memberIndex方式・MASTER_UID撤廃） =====
       window.HUB_LICENSE = null;
       const tenantInfo = await resolveTenantForCloud(user);
@@ -15983,6 +16009,42 @@ function closeOnboarding(goSettings){
   if(goSettings){ showPage('settings'); }
 }
 
+// ===== はじめにガイドの手動再表示（ヘルプパネルから） =====
+function showOnboardingManual(){
+  try{ if(typeof closeHelpPanel==='function') closeHelpPanel(); }catch(e){}
+  const m=document.getElementById('onboarding-modal');
+  if(m) m.style.display='flex';
+}
+
+// ===== メール確認（emailVerified）ブロック画面 =====
+function showEmailVerifyBlock(user){
+  const blk=document.getElementById('email-verify-block');
+  if(!blk) return;
+  const addr=document.getElementById('verify-email-addr');
+  if(addr) addr.textContent=(user&&user.email)||'';
+  blk.style.display='flex';
+}
+async function resendVerifyEmail(btn){
+  const F=window._FB;
+  const st=document.getElementById('verify-resend-status');
+  if(!F||!F.auth.currentUser){ if(st) st.textContent='再ログインしてからお試しください。'; return; }
+  if(btn){ btn.disabled=true; btn.style.opacity='.6'; }
+  try{
+    await F.sendEmailVerification(F.auth.currentUser);
+    if(st) st.textContent='✓ 確認メールを再送しました。';
+  }catch(e){
+    if(st) st.textContent='再送に失敗しました。しばらく待ってからお試しください。';
+  }
+  setTimeout(()=>{ if(btn){ btn.disabled=false; btn.style.opacity='1'; } }, 30000);
+}
+async function verifyBlockReload(){
+  try{
+    const F=window._FB;
+    if(F&&F.auth.currentUser) await F.auth.currentUser.reload();
+  }catch(e){}
+  location.reload();
+}
+
 async function checkAndShowConsentModal(user){
   // Firestoreの memberIndex/{uid} に consentAt があれば同意済み
   try{
@@ -16580,6 +16642,7 @@ function executeBulkTaxUpdate(){
   <div class="help-panel-pdfbar">
     <button type="button" onclick="openManualPdf()" title="新しいタブで操作マニュアル(PDF)を開く">📄 操作マニュアル(全文PDF)</button>
     <button type="button" onclick="openSpecPdf()" title="新しいタブで仕様書(PDF)を開く">📘 仕様書(全文PDF)</button>
+    <button type="button" onclick="showOnboardingManual()" title="はじめにガイドをもう一度表示">🚀 はじめにガイド</button>
   </div>
   <div class="help-panel-body" id="help-panel-body"></div>
   <div class="help-panel-toc">
