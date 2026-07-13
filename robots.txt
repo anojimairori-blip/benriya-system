@@ -1,0 +1,12 @@
+# Flexsys — flexsys-cloud.pages.dev
+# 公開: 製品紹介LP（/lp/）のみ。アプリ本体は顧客の業務画面のため除外。
+
+User-agent: *
+Allow: /lp/
+Allow: /lp/img/
+Allow: /Flexsys_操作マニュアル.pdf
+Allow: /google6cfd010ee4bb84af.html
+Allow: /sitemap.xml
+Disallow: /
+
+Sitemap: https://flexsys-cloud.pages.dev/sitemap.xml
