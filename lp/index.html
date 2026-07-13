@@ -13,7 +13,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2311223d%22/%3E%3Cpath%20d%3D%22M22%2014h24v9H33v10h11v9H33v14H22z%22%20fill%3D%22%23b88746%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#11223d;
@@ -60,8 +60,8 @@
   .logo svg{width:30px;height:30px;border-radius:7px;display:block}
   .logo b{font-family:'Shippori Mincho',serif;font-size:19px;letter-spacing:.06em;font-weight:700}
   .hd nav{display:flex;align-items:center;gap:28px}
-  .hd nav a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
-  .hd nav a:hover{color:var(--navy)}
+  .hd nav a:not(.btn){color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+  .hd nav a:not(.btn):hover{color:var(--navy)}
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
     background:var(--navy);color:var(--paper-2);
@@ -122,13 +122,32 @@
     .doc .draw,.doc .fade,.doc .slide{animation:none;opacity:1;stroke-dashoffset:0}
   }
 
+  /* ── 画面キャプチャ ───────────────── */
+  .shot{margin:0}
+  .shot img{
+    width:100%;height:auto;display:block;
+    border:1px solid var(--rule);border-radius:3px;
+    box-shadow:0 2px 4px rgba(17,34,61,.06), 0 24px 48px -16px rgba(17,34,61,.22);
+    background:var(--white);
+  }
+  .shot figcaption{
+    font-size:12px;color:var(--muted);margin-top:12px;text-align:center;
+    letter-spacing:.02em;
+  }
+  .shot-hero img{transform:perspective(1600px) rotateY(-3deg) rotateX(1deg)}
+  @media(max-width:900px){ .shot-hero img{transform:none} }
+  .shot-step{margin-top:0}
+  .shot-pair{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:34px}
+  @media(max-width:860px){ .shot-pair{grid-template-columns:1fr;gap:28px} }
+  .shot-step img{box-shadow:0 1px 3px rgba(17,34,61,.07), 0 12px 28px -14px rgba(17,34,61,.2)}
+
   /* ── セクション共通 ───────────────── */
   section{padding:104px 0}
   @media(max-width:860px){ section{padding:68px 0} }
   .sec-head{margin-bottom:56px}
   .sec-num{
-    font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--brass);
-    letter-spacing:.2em;display:block;margin-bottom:12px;
+    font-family:'Shippori Mincho',serif;font-size:13px;color:var(--brass);
+    letter-spacing:.18em;display:block;margin-bottom:12px;
   }
   h2{
     font-family:'Shippori Mincho',serif;font-weight:700;
@@ -216,7 +235,7 @@
   .plan .seats{font-size:13px;color:var(--muted);margin-bottom:22px}
   .price{display:flex;align-items:baseline;gap:3px;margin-bottom:6px}
   .price .yen{font-size:17px;font-weight:700}
-  .price .num{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:600;line-height:1;letter-spacing:-.01em}
+  .price .num{font-size:38px;font-weight:700;line-height:1.1;letter-spacing:.005em;font-feature-settings:'tnum'}
   .price .per{font-size:13px;color:var(--muted);margin-left:4px}
   .price-y{font-size:12.5px;color:var(--muted);margin-bottom:24px;padding-bottom:22px;border-bottom:1px solid var(--rule)}
   .plan ul{list-style:none;margin-bottom:28px;flex:1}
@@ -306,55 +325,11 @@
       </div>
     </div>
 
-    <!-- シグネチャー：組み上がっていく見積書 -->
-    <svg class="doc" viewBox="0 0 400 300" role="img" aria-label="見積書が請求書、領収書へと自動的に引き継がれていく様子">
-      <!-- 3枚目：領収書（奥） -->
-      <g class="slide" style="animation-delay:2.5s">
-        <rect x="46" y="24" width="330" height="240" rx="2" fill="#fffdf9" stroke="rgba(17,34,61,.14)"/>
-        <rect x="66" y="44" width="52" height="7" rx="1" fill="#b88746" opacity=".5"/>
-      </g>
-      <!-- 2枚目：請求書（中） -->
-      <g class="slide" style="animation-delay:1.9s">
-        <rect x="33" y="37" width="330" height="240" rx="2" fill="#fffdf9" stroke="rgba(17,34,61,.14)"/>
-        <rect x="53" y="57" width="46" height="7" rx="1" fill="#b88746" opacity=".7"/>
-      </g>
-      <!-- 1枚目：見積書（手前・組み上がる） -->
-      <rect class="fade" x="20" y="50" width="330" height="240" rx="2" fill="#fffdf9" stroke="rgba(17,34,61,.14)" style="animation-delay:.1s"/>
-      <!-- 表題 -->
-      <rect class="fade" x="40" y="70" width="58" height="9" rx="1" fill="#11223d" style="animation-delay:.35s"/>
-      <rect class="fade" x="286" y="70" width="44" height="5" rx="1" fill="rgba(17,34,61,.28)" style="animation-delay:.35s"/>
-      <!-- 宛名 -->
-      <rect class="fade" x="40" y="98" width="104" height="6" rx="1" fill="rgba(17,34,61,.5)" style="animation-delay:.6s"/>
-      <line class="draw" x1="40" y1="112" x2="180" y2="112" stroke="rgba(17,34,61,.2)" stroke-width="1" pathLength="1" style="animation-delay:.7s"/>
-      <!-- 明細ヘッダ -->
-      <line class="draw" x1="40" y1="132" x2="330" y2="132" stroke="#11223d" stroke-width="1.2" pathLength="1" style="animation-delay:.85s"/>
-      <!-- 明細行 -->
-      <g class="fade" style="animation-delay:1.05s">
-        <rect x="40" y="142" width="94" height="5" rx="1" fill="rgba(17,34,61,.42)"/>
-        <rect x="252" y="142" width="34" height="5" rx="1" fill="rgba(17,34,61,.28)"/>
-        <rect x="298" y="142" width="32" height="5" rx="1" fill="rgba(17,34,61,.42)"/>
-      </g>
-      <line class="draw" x1="40" y1="156" x2="330" y2="156" stroke="rgba(17,34,61,.12)" stroke-width="1" pathLength="1" style="animation-delay:1.15s"/>
-      <g class="fade" style="animation-delay:1.25s">
-        <rect x="40" y="166" width="118" height="5" rx="1" fill="rgba(17,34,61,.42)"/>
-        <rect x="252" y="166" width="34" height="5" rx="1" fill="rgba(17,34,61,.28)"/>
-        <rect x="298" y="166" width="32" height="5" rx="1" fill="rgba(17,34,61,.42)"/>
-      </g>
-      <line class="draw" x1="40" y1="180" x2="330" y2="180" stroke="rgba(17,34,61,.12)" stroke-width="1" pathLength="1" style="animation-delay:1.35s"/>
-      <g class="fade" style="animation-delay:1.45s">
-        <rect x="40" y="190" width="76" height="5" rx="1" fill="rgba(17,34,61,.42)"/>
-        <rect x="252" y="190" width="34" height="5" rx="1" fill="rgba(17,34,61,.28)"/>
-        <rect x="298" y="190" width="32" height="5" rx="1" fill="rgba(17,34,61,.42)"/>
-      </g>
-      <line class="draw" x1="40" y1="204" x2="330" y2="204" stroke="rgba(17,34,61,.12)" stroke-width="1" pathLength="1" style="animation-delay:1.55s"/>
-      <!-- 合計 -->
-      <rect class="fade" x="212" y="222" width="118" height="34" rx="2" fill="#11223d" style="animation-delay:1.7s"/>
-      <rect class="fade" x="226" y="234" width="26" height="5" rx="1" fill="rgba(245,239,226,.6)" style="animation-delay:1.8s"/>
-      <rect class="fade" x="264" y="232" width="52" height="9" rx="1" fill="#b88746" style="animation-delay:1.85s"/>
-      <!-- 判子 -->
-      <circle class="fade" cx="72" cy="240" r="19" fill="none" stroke="#b88746" stroke-width="1.6" opacity=".85" style="animation-delay:2.1s"/>
-      <text class="fade" x="72" y="246" text-anchor="middle" font-family="'Shippori Mincho',serif" font-size="15" fill="#b88746" style="animation-delay:2.2s">承</text>
-    </svg>
+    <!-- シグネチャー：実際の画面 -->
+    <figure class="shot shot-hero">
+      <img src="./img/flexsys-dashboard.jpg" alt="Flexsysのホーム画面。今月の売上、未回収額、見積・請求・領収の作成メニューが並ぶ" width="1524" height="973" loading="eager">
+      <figcaption>野島技研で実際に使っている画面です</figcaption>
+    </figure>
   </div>
 </div>
 
@@ -410,8 +385,20 @@
         <p>入金を記録すれば、領収書はボタンひとつ。誰にいくら請求して、いくら入ったかが常に見えます。</p>
       </div>
     </div>
+
+    <div class="shot-pair">
+      <figure class="shot shot-step">
+        <img src="./img/flexsys-estimate-list.jpg" alt="見積書の一覧画面。番号・顧客名・件名・金額・状態が一覧で並ぶ" width="1400" height="787" loading="lazy">
+        <figcaption>見積書の一覧。ここから「→請求」で請求書に変わります</figcaption>
+      </figure>
+      <figure class="shot shot-step">
+        <img src="./img/flexsys-estimate-preview.jpg" alt="見積書のPDFプレビュー。宛名・明細・小計・消費税・合計が組まれた完成形" width="1400" height="787" loading="lazy">
+        <figcaption>できあがる書類。このまま印刷、またはメールで送れます</figcaption>
+      </figure>
+    </div>
+
     <p class="flow-note">
-      書類には <b>EST-2607-001</b> のような番号が自動でつきます。あとから「あの見積、どれだっけ」と探す時間がなくなります。
+      書類には <b>EST-2604-677</b> のような番号が自動でつきます。あとから「あの見積、どれだっけ」と探す時間がなくなります。
     </p>
   </div>
 </section>
@@ -423,6 +410,10 @@
       <span class="sec-num">— 機能 —</span>
       <h2>必要なものだけ、ちゃんと入っている。</h2>
     </div>
+    <figure class="shot" style="margin-bottom:44px">
+      <img src="./img/flexsys-payment.jpg" alt="入金管理画面。請求額・入金額・未収の状況と入金率が一覧で見える" width="1400" height="787" loading="lazy">
+      <figcaption>入金管理。誰からいくら入ったか、残りいくらかが一目で分かります</figcaption>
+    </figure>
     <div class="feats">
       <div class="feat">
         <svg class="feat-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 3h11l5 5v13H4z"/><path d="M15 3v5h5"/><path d="M8 13h8M8 17h5"/></svg>
