@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flexsys｜見積・請求・顧客管理を、ひとつづきに。中小事業者のための業務管理ソフト</title>
-<meta name="description" content="見積書から請求書、領収書までを一本の流れで。便利屋・工務店・個人事業主のために、現場の人間がつくった業務管理ソフト。2026年8月 販売開始予定。">
+<meta name="description" content="見積書から請求書、領収書までを一本の流れで。便利屋・工務店・個人事業主のために、現場の人間がつくった業務管理ソフト。月額980円（税込・1名用）・14日間無料。">
 <meta name="theme-color" content="#11223d">
 <meta property="og:title" content="Flexsys｜見積・請求・顧客管理を、ひとつづきに。">
-<meta property="og:description" content="見積書から請求書、領収書までを一本の流れで。現場の人間がつくった業務管理ソフト。月額9,800円から・14日間無料。">
+<meta property="og:description" content="見積書から請求書、領収書までを一本の流れで。現場の人間がつくった業務管理ソフト。月額980円（税込・1名用）・14日間無料。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://flexsys-cloud.pages.dev/lp/">
 <meta property="og:image" content="https://flexsys-cloud.pages.dev/lp/img/og.png">
@@ -17,7 +17,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Flexsys｜見積・請求・顧客管理を、ひとつづきに。">
-<meta name="twitter:description" content="見積書から請求書、領収書までを一本の流れで。現場の人間がつくった業務管理ソフト。月額9,800円から・14日間無料。">
+<meta name="twitter:description" content="見積書から請求書、領収書までを一本の流れで。現場の人間がつくった業務管理ソフト。月額980円（税込・1名用）・14日間無料。">
 <meta name="twitter:image" content="https://flexsys-cloud.pages.dev/lp/img/og.png">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://flexsys-cloud.pages.dev/lp/">
@@ -309,6 +309,7 @@
 
   /* ── 料金 ───────────────── */
   .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:12px}
+  .plans-single{grid-template-columns:1fr;max-width:420px;margin-left:auto;margin-right:auto}
   @media(max-width:860px){ .plans{grid-template-columns:1fr} }
   .plan{
     background:var(--white);border:1px solid var(--rule);border-radius:2px;
@@ -408,9 +409,7 @@
       "url": "https://flexsys-cloud.pages.dev/lp/",
       "author": { "@type": "Organization", "name": "野島技研", "url": "https://nojima-giken.com/" },
       "offers": [
-        { "@type": "Offer", "name": "スターター", "price": "9800", "priceCurrency": "JPY", "description": "2人まで・月額（税込）", "availability": "https://schema.org/PreOrder", "availabilityStarts": "2026-08-01" },
-        { "@type": "Offer", "name": "プロ", "price": "14800", "priceCurrency": "JPY", "description": "5人まで・月額（税込）", "availability": "https://schema.org/PreOrder", "availabilityStarts": "2026-08-01" },
-        { "@type": "Offer", "name": "ビジネス", "price": "19800", "priceCurrency": "JPY", "description": "10人まで・月額（税込）", "availability": "https://schema.org/PreOrder", "availabilityStarts": "2026-08-01" }
+        { "@type": "Offer", "name": "月額プラン", "price": "980", "priceCurrency": "JPY", "description": "1名用・月額（税込）", "availability": "https://schema.org/InStock" }
       ]
     },
     {
@@ -422,8 +421,8 @@
           "acceptedAnswer": { "@type": "Answer", "text": "顧客名簿・売上・書類の中身は、外部のAIに一切送信していません。AIが知っているのはFlexsysの操作方法（取扱説明書）だけです。" } },
         { "@type": "Question", "name": "スマホでも使えますか。",
           "acceptedAnswer": { "@type": "Answer", "text": "使えます。専用アプリのインストールは不要で、スマホのブラウザから同じ画面を開けます。" } },
-        { "@type": "Question", "name": "途中でプランを変えられますか。",
-          "acceptedAnswer": { "@type": "Answer", "text": "変えられます。人が増えたらプランを上げる、減ったら下げる、どちらも管理画面から手続きできます。" } }
+        { "@type": "Question", "name": "途中で解約できますか。",
+          "acceptedAnswer": { "@type": "Answer", "text": "いつでも解約できます。管理画面から手続きでき、次回請求日で終了します。日割り返金はありません。" } }
       ]
     }
   ]
@@ -444,7 +443,7 @@
       <a href="#ai">AIとデータ</a>
       <a href="#price">料金</a>
       <a href="#faq">よくある質問</a>
-      <span class="soon" style="font-size:13px;padding:9px 16px">8月 販売開始予定</span>
+      <a href="https://nojima-business-hub.pages.dev/signup" class="btn btn-sm">無料で試す</a>
     </nav>
   </div>
 </header>
@@ -463,8 +462,8 @@
         同じ顧客名を三度打ち込む必要はありません。
       </p>
       <div class="cta-row">
-        <span class="soon">📅 2026年8月 販売開始予定</span>
-        <span class="cta-note">より多くの人数で使えるよう、改良を進めています</span>
+        <a href="https://nojima-business-hub.pages.dev/signup" class="btn">📅 14日間、無料で試す</a>
+        <span class="cta-note">月額980円（税込・1名用）／期間中の解約で費用は発生しません</span>
       </div>
     </div>
 
@@ -723,56 +722,23 @@
   <div class="wrap">
     <div class="sec-head">
       <span class="sec-num">— 料金 —</span>
-      <h2>人数で選ぶ、3つのプラン。</h2>
-      <p class="sec-lede">機能はどのプランも同じです。違うのは使える人数だけ。</p>
+      <h2>シンプルな、月額プラン。</h2>
+      <p class="sec-lede">1名でお使いいただく、フル機能プランです。年払いなし・追加課金なしのわかりやすい設計。</p>
     </div>
 
-    <div class="soon-banner">
-      <b>📅 2026年8月 販売開始予定</b>
-      <p>
-        より多くの人数で安心してお使いいただけるよう、システムの改良を進めています。<br>
-        準備が整い次第、こちらのページでご案内いたします。
-      </p>
-    </div>
-    <div class="plans">
-      <div class="plan">
-        <h3>スターター</h3>
-        <div class="seats">2人まで</div>
-        <div class="price"><span class="yen">¥</span><span class="num">9,800</span><span class="per">/月（税込）</span></div>
-        <div class="price-y">年払い ¥98,000（2ヶ月分お得）</div>
-        <ul>
-          <li>利用ユーザー 2人まで</li>
-          <li>全機能が使えます</li>
-          <li>14日間の無料トライアル</li>
-          <li>メールサポート</li>
-        </ul>
-        <span class="soon" style="width:100%;font-size:14px">8月 販売開始予定</span>
-      </div>
+    <div class="plans plans-single">
       <div class="plan pick">
-        <h3>プロ</h3>
-        <div class="seats">5人まで</div>
-        <div class="price"><span class="yen">¥</span><span class="num">14,800</span><span class="per">/月（税込）</span></div>
-        <div class="price-y">年払い ¥148,000（2ヶ月分お得）</div>
+        <h3>月額プラン</h3>
+        <div class="seats">1名でご利用</div>
+        <div class="price"><span class="yen">¥</span><span class="num">980</span><span class="per">/月（税込）</span></div>
+        <div class="price-y">14日間の無料トライアル付き</div>
         <ul>
-          <li>利用ユーザー 5人まで</li>
-          <li>全機能が使えます</li>
-          <li>14日間の無料トライアル</li>
+          <li>見積・請求・領収 全機能が使えます</li>
+          <li>顧客管理・作業カレンダー</li>
+          <li>AIアシスタント搭載</li>
           <li>メールサポート</li>
         </ul>
-        <span class="soon" style="width:100%;font-size:14px">8月 販売開始予定</span>
-      </div>
-      <div class="plan">
-        <h3>ビジネス</h3>
-        <div class="seats">10人まで</div>
-        <div class="price"><span class="yen">¥</span><span class="num">19,800</span><span class="per">/月（税込）</span></div>
-        <div class="price-y">年払い ¥198,000（2ヶ月分お得）</div>
-        <ul>
-          <li>利用ユーザー 10人まで</li>
-          <li>全機能が使えます</li>
-          <li>14日間の無料トライアル</li>
-          <li>メールサポート</li>
-        </ul>
-        <span class="soon" style="width:100%;font-size:14px">8月 販売開始予定</span>
+        <a href="https://nojima-business-hub.pages.dev/signup" class="btn" style="width:100%;font-size:14px">無料で始める</a>
       </div>
     </div>
 
@@ -827,10 +793,10 @@
 <!-- ═══ 締め ═══ -->
 <section class="end">
   <div class="wrap narrow">
-    <h2>2026年8月、<br>販売を開始します。</h2>
-    <p>今は、より多くの人数で安心して使えるよう、<br>システムの土台を作り直しています。<br>準備が整い次第、このページでご案内します。</p>
-    <span class="soon">📅 2026年8月 販売開始予定</span>
-    <span class="cta-note">14日間の無料トライアルからお試しいただけます</span>
+    <h2>まずは、14日間<br>無料で試してみてください。</h2>
+    <p>クレジットカードの登録から始まりますが、<br>14日以内に解約すれば費用は一切かかりません。<br>合わなければ、そのまま辞めても大丈夫です。</p>
+    <a href="https://nojima-business-hub.pages.dev/signup" class="btn">📅 14日間、無料で試す</a>
+    <span class="cta-note">月額980円（税込・1名用）／期間中の解約で費用は発生しません</span>
   </div>
 </section>
 
