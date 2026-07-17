@@ -10704,7 +10704,7 @@ function initFirebaseAuth(){
             loginEl.style.display='flex';
             const errEl=document.getElementById('login-error');
             if(errEl){
-              errEl.innerHTML = `${user.email} の有効なご契約が見つかりません。<br>ご利用にはお申し込みが必要です。<br><a href="https://nojima-business-hub.pages.dev/signup" target="_blank" rel="noopener" style="color:#b88746;font-weight:bold;">→ 申込ページを開く（14日間無料）</a>`;
+              errEl.innerHTML = `${user.email} の有効なご契約が見つかりません。<br>ご利用にはお申し込みが必要です。<br><a href="https://nojima-business-hub.pages.dev/signup?product=flexsys" target="_blank" rel="noopener" style="color:#b88746;font-weight:bold;">→ 申込ページを開く（14日間無料）</a>`;
               errEl.classList.add('show');
             }
           }
