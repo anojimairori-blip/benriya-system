@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flexsys｜見積・請求・顧客管理を、ひとつづきに。中小事業者のための業務管理ソフト</title>
-<meta name="description" content="見積書から請求書、領収書までを一本の流れで。便利屋・工務店・個人事業主のために、現場の人間がつくった業務管理ソフト。月額980円（税込・1名用）・14日間無料。">
+<meta name="description" content="見積書から請求書、領収書までを一本の流れで。便利屋・工務店・個人事業主のために、現場の人間がつくった業務管理ソフト。Flexsys Enterprise は 2026年8月上旬リリース予定（Solo ¥980〜Enterprise ¥9,800の4段階プラン制、税込・14日間無料トライアル付き）。">
 <meta name="theme-color" content="#11223d">
 <meta property="og:title" content="Flexsys｜見積・請求・顧客管理を、ひとつづきに。">
-<meta property="og:description" content="見積書から請求書、領収書までを一本の流れで。現場の人間がつくった業務管理ソフト。月額980円（税込・1名用）・14日間無料。">
+<meta property="og:description" content="見積書から請求書、領収書までを一本の流れで。現場の人間がつくった業務管理ソフト。Flexsys Enterprise は 2026年8月上旬リリース予定。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://flexsys-cloud.pages.dev/lp/">
 <meta property="og:image" content="https://flexsys-cloud.pages.dev/lp/img/og.png">
@@ -17,7 +17,7 @@
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Flexsys｜見積・請求・顧客管理を、ひとつづきに。">
-<meta name="twitter:description" content="見積書から請求書、領収書までを一本の流れで。現場の人間がつくった業務管理ソフト。月額980円（税込・1名用）・14日間無料。">
+<meta name="twitter:description" content="見積書から請求書、領収書までを一本の流れで。現場の人間がつくった業務管理ソフト。Flexsys Enterprise は 2026年8月上旬リリース予定。">
 <meta name="twitter:image" content="https://flexsys-cloud.pages.dev/lp/img/og.png">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://flexsys-cloud.pages.dev/lp/">
@@ -86,6 +86,37 @@
   .btn-sm{padding:9px 18px;font-size:14px}
   .btn-ghost{background:transparent;color:var(--navy);box-shadow:none;border:1px solid var(--rule)}
   .btn-ghost:hover{background:var(--white);box-shadow:none;transform:translateY(-1px)}
+  /* 2026-07-18: v3 販売停止・v4 Enterprise 準備中の disabled ボタン */
+  .btn[aria-disabled="true"]{
+    background:#d5cec2 !important;color:#8a8578 !important;
+    border-color:#c5bea8 !important;box-shadow:none !important;
+    cursor:not-allowed !important;pointer-events:none;
+    opacity:.75;filter:grayscale(.4);
+  }
+  .btn[aria-disabled="true"]:hover{transform:none !important;box-shadow:none !important}
+  /* 2026-07-18: v3 販売停止・v4 Enterprise 準備中の告知バナー */
+  .renewal-banner{
+    margin:0 0 28px;padding:22px 26px;
+    background:var(--paper-2);
+    border:1px solid var(--brass);border-left:4px solid var(--brass);
+    border-radius:2px;max-width:640px;
+  }
+  .renewal-banner-title{
+    font-family:inherit;font-weight:700;font-size:17px;
+    color:var(--brass);margin-bottom:10px;letter-spacing:.02em;
+  }
+  .renewal-banner-body{font-size:14px;line-height:1.7;color:var(--ink)}
+  .renewal-banner-body a{color:var(--brass);text-decoration:underline;text-underline-offset:3px;font-weight:600}
+  .renewal-banner-body a:hover{color:var(--navy)}
+  /* 販売停止中の pricing カード */
+  .plan.paused{position:relative;overflow:hidden}
+  .plan.paused::after{
+    content:'新版準備中';
+    position:absolute;top:14px;right:-34px;transform:rotate(30deg);
+    background:var(--brass);color:var(--paper);
+    font-weight:700;font-size:12px;padding:6px 42px;
+    letter-spacing:.15em;z-index:2;
+  }
   @media(max-width:860px){ .hd nav a{display:none} }
 
   /* ── ヒーロー ───────────────── */
@@ -409,7 +440,7 @@
       "url": "https://flexsys-cloud.pages.dev/lp/",
       "author": { "@type": "Organization", "name": "野島技研", "url": "https://nojima-giken.com/" },
       "offers": [
-        { "@type": "Offer", "name": "月額プラン", "price": "980", "priceCurrency": "JPY", "description": "1名用・月額（税込）", "availability": "https://schema.org/InStock" }
+        { "@type": "Offer", "name": "Flexsys Enterprise（4段階プラン制）", "priceCurrency": "JPY", "description": "Solo ¥980 / Business ¥1,980 / Team ¥2,980 / Enterprise ¥9,800（すべて税込・月額）", "availability": "https://schema.org/PreOrder", "availabilityStarts": "2026-08-01" }
       ]
     },
     {
@@ -443,7 +474,7 @@
       <a href="#ai">AIとデータ</a>
       <a href="#price">料金</a>
       <a href="#faq">よくある質問</a>
-      <a href="https://nojima-business-hub.pages.dev/signup" class="btn btn-sm">無料で試す</a>
+      <a href="#" role="button" aria-disabled="true" class="btn btn-sm" title="Flexsys Enterprise を 2026年8月上旬にリリース予定です">お申込停止中</a>
     </nav>
   </div>
 </header>
@@ -461,9 +492,19 @@
         この当たり前の流れが、ソフトの中でも一本につながっていれば、
         同じ顧客名を三度打ち込む必要はありません。
       </p>
+
+      <!-- 2026-07-18: v3 販売停止・v4 Enterprise 準備中の告知バナー -->
+      <div class="renewal-banner">
+        <div class="renewal-banner-title">Flexsys Enterprise は 2026年8月上旬にリリース予定です</div>
+        <div class="renewal-banner-body">
+          現在、新規のお申込は停止しております。<br>
+          ご案内希望の方は<a href="https://nojima-giken.com/business-software/#contact">お問い合わせ</a>ください。
+        </div>
+      </div>
+
       <div class="cta-row">
-        <a href="https://nojima-business-hub.pages.dev/signup" class="btn">📅 14日間、無料で試す</a>
-        <span class="cta-note">月額980円（税込・1名用）／期間中の解約で費用は発生しません</span>
+        <a href="#" role="button" aria-disabled="true" class="btn" title="Flexsys Enterprise を 2026年8月上旬にリリース予定です">📅 お申込一時停止中</a>
+        <span class="cta-note">Flexsys Enterprise（4段階プラン制）にてリリース準備中</span>
       </div>
     </div>
 
@@ -722,23 +763,24 @@
   <div class="wrap">
     <div class="sec-head">
       <span class="sec-num">— 料金 —</span>
-      <h2>シンプルな、月額プラン。</h2>
-      <p class="sec-lede">1名でお使いいただく、フル機能プランです。年払いなし・追加課金なしのわかりやすい設計。</p>
+      <h2>Flexsys Enterprise、2026年8月上旬リリース予定。</h2>
+      <p class="sec-lede">個人事業主から100名以上の企業まで対応する、4段階の料金プラン。すべて税込・14日間無料トライアル付き。</p>
     </div>
 
     <div class="plans plans-single">
-      <div class="plan pick">
-        <h3>月額プラン</h3>
-        <div class="seats">1名でご利用</div>
-        <div class="price"><span class="yen">¥</span><span class="num">980</span><span class="per">/月（税込）</span></div>
-        <div class="price-y">14日間の無料トライアル付き</div>
+      <div class="plan pick paused">
+        <h3>Flexsys Enterprise</h3>
+        <div class="seats">個人事業主〜大企業まで</div>
+        <div class="price" style="font-size:18px;line-height:1.6"><span class="num" style="font-size:22px">4段階の料金プラン</span></div>
+        <div class="price-y">2026年8月上旬リリース予定</div>
         <ul>
-          <li>見積・請求・領収 全機能が使えます</li>
-          <li>顧客管理・作業カレンダー</li>
-          <li>AIアシスタント搭載</li>
-          <li>メールサポート</li>
+          <li>Solo ¥980/月（1〜10名）</li>
+          <li>Business ¥1,980/月（11〜50名）</li>
+          <li>Team ¥2,980/月（51〜100名）</li>
+          <li>Enterprise ¥9,800/月（101名〜）</li>
+          <li>すべて税込／14日間無料トライアル付き</li>
         </ul>
-        <a href="https://nojima-business-hub.pages.dev/signup" class="btn" style="width:100%;font-size:14px">無料で始める</a>
+        <a href="#" role="button" aria-disabled="true" class="btn" style="width:100%;font-size:14px" title="2026年8月上旬にリリース予定です">リリース準備中</a>
       </div>
     </div>
 
@@ -793,10 +835,10 @@
 <!-- ═══ 締め ═══ -->
 <section class="end">
   <div class="wrap narrow">
-    <h2>まずは、14日間<br>無料で試してみてください。</h2>
-    <p>クレジットカードの登録から始まりますが、<br>14日以内に解約すれば費用は一切かかりません。<br>合わなければ、そのまま辞めても大丈夫です。</p>
-    <a href="https://nojima-business-hub.pages.dev/signup" class="btn">📅 14日間、無料で試す</a>
-    <span class="cta-note">月額980円（税込・1名用）／期間中の解約で費用は発生しません</span>
+    <h2>Flexsys Enterprise、<br>2026年8月上旬リリース予定。</h2>
+    <p>「Flexsys」は現在、大幅リニューアルの準備を進めております。<br>新版「Flexsys Enterprise」は、個人事業主から100名以上の企業まで対応する4段階プラン制でリリース予定です。<br>リリース時のご案内をご希望の方はお問い合わせください。</p>
+    <a href="https://nojima-giken.com/business-software/#contact" class="btn">📩 リリース案内を希望する</a>
+    <span class="cta-note">Flexsys Enterprise の詳細はリリース時にご案内いたします</span>
   </div>
 </section>
 
