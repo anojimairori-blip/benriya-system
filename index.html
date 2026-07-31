@@ -4009,11 +4009,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.2';
+const APP_VERSION='v3.38.3';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
-const APP_BUILD_TIME='2026-07-11 21:18 JST';
+const APP_BUILD_TIME='2026-07-31 13:05 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -4240,11 +4240,16 @@ function removeBankAccount(i){
   renderBankAccounts();
 }
 
-function updateDocBankSelect(){
+function updateDocBankSelect(preferId){
   const sel=document.getElementById('doc-bank-select');
   if(!sel)return;
   const banks=settings.bankAccounts||[];
+  const prev=sel.value;
   sel.innerHTML='<option value="">（口座を選択）</option>'+banks.map(b=>`<option value="${escAttr(b.id)}">${escAttr(b.label||b.bank)}｜${escAttr(b.bank||'')} ${escAttr(b.account||'')}</option>`).join('');
+  // v3.38.3: 選択優先度 = 指定値 > 直前の選択 > メイン口座（ラベルに「メイン」を含む口座／無ければ先頭）
+  const mainBank=banks.find(function(b){return String(b.label||'').indexOf('メイン')>=0;})||banks[0];
+  const want=preferId||prev||(mainBank?mainBank.id:'');
+  sel.value=banks.some(function(b){return b.id===want;})?want:'';
   showSelectedBankInfo();
 }
 function showSelectedBankInfo(){
@@ -6890,6 +6895,8 @@ function editDoc(id){
     const s=document.getElementById('doc-staff-select');if(s){buildStaffSelect();s.value=d.staff||'';}
     const btn=document.querySelector(`.doc-type-btn[data-type="${d.type}"]`);
     if(btn) setDocType(d.type,btn);
+    // v3.38.3: 請求書の振込先を復元（未復元だと保存時に空で上書きされ振込先が消える）
+    if(d.type==='請求書') updateDocBankSelect(d.bankSelection||'');
   },50);
   // Reset search
   const q=document.getElementById('cust-search-q');if(q)q.value='';
