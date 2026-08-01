@@ -610,8 +610,8 @@ tr:hover td{background:var(--bg)}
 .preview-doc.doc-invoice .preview-table th{background:var(--doc-color-invoice-light);color:var(--doc-color-invoice);border-bottom:2px solid var(--doc-color-invoice)}
 .preview-doc.doc-receipt .preview-table th{background:var(--doc-color-receipt-light);color:var(--doc-color-receipt);border-bottom:2px solid var(--doc-color-receipt)}
 .preview-doc.doc-quote .grand td{color:#111;border-top:2px solid var(--doc-color-quote)}
-.preview-doc.doc-invoice .grand td{color:var(--doc-color-invoice);border-top:2px solid var(--doc-color-invoice)}
-.preview-doc.doc-receipt .grand td{color:var(--doc-color-receipt);border-top:2px solid var(--doc-color-receipt)}
+.preview-doc.doc-invoice .grand td{color:#111;border-top:2px solid var(--doc-color-invoice)}
+.preview-doc.doc-receipt .grand td{color:#111;border-top:2px solid var(--doc-color-receipt)}
 @media print{
   /* v3.32.57: 請求書/見積書プレビュー印刷の制御は下方の本命ブロックに一本化。
      ここでは @page 余白と窓枠封筒印刷(printing-envelope)のみ定義する。
@@ -894,7 +894,7 @@ select{appearance:auto}
 .preview-doc.doc-receipt .preview-subject .ps-label{color:var(--doc-color-receipt)}
 
 /* 監査ライン（会社名下に小さく） */
-.audit-line{font-size:10px !important;color:#999;margin-top:6px;line-height:1.4}
+.audit-line{font-size:10px !important;color:#444;margin-top:6px;line-height:1.4}
 @media print{
   .preview-subject{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   /* 印刷時は監査情報・スタンプを非表示 */
@@ -912,7 +912,7 @@ select{appearance:auto}
 .preview-notes-bank{padding:8px 10px}
 .preview-notes-text{padding:8px 10px;white-space:pre-wrap;word-break:break-word}
 .preview-notes-bank+.preview-notes-text{border-top:1px solid #CCC}
-.doc-number{font-size:12px;color:#888;margin-bottom:3px}
+.doc-number{font-size:12px;color:#111;margin-bottom:3px}
 .stamp{width:56px;height:56px;border:2px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--red);margin-left:auto;margin-top:10px}
 
 .cust-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
@@ -4009,7 +4009,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.3';
+const APP_VERSION='v3.38.4';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
@@ -4364,7 +4364,7 @@ function _buildEnvelopeHtml(d){
   var _envColor=d.type==='見積書'?'var(--doc-color-quote)':d.type==='領収書'?'var(--doc-color-receipt)':'var(--doc-color-invoice)';
   var html='<div class="envelope-doc" style="width:100%;max-width:100%;font-family:sans-serif;font-size:12px;color:#111;background:white;box-sizing:border-box;padding:8mm 10mm;overflow:hidden">';
   html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5mm;gap:12px">';
-  html+='<div style="width:55%;box-sizing:border-box;overflow-wrap:break-word;word-break:break-word">';
+  html+='<div style="width:calc(55% - 10mm);margin-left:10mm;box-sizing:border-box;overflow-wrap:break-word;word-break:break-word">';
   if(cust.zip)html+='<div style="font-size:12px;margin-bottom:3px">〒'+_escPub(cust.zip)+'</div>';
   if(cust.address)html+='<div style="font-size:12px;line-height:1.7;margin-bottom:5px">'+_escPub(cust.address)+'</div>';
   var _nameLen=(cust.name||d.customer||'').length;
@@ -4378,11 +4378,11 @@ function _buildEnvelopeHtml(d){
   if(s.zip||s.address)html+='<div style="font-size:10px;color:#555;margin-top:2px">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
   if(s.tel)html+='<div style="font-size:10px;color:#555">TEL: '+_escPub(s.tel)+'</div>';
   if(s.email)html+='<div style="font-size:10px;color:#555">'+_escPub(s.email)+'</div>';
-  html+='<div style="margin-top:6px;padding-top:5px;border-top:1px solid #E0E0E0;font-size:10px;color:#555;line-height:1.8">';
-  html+='<div><span style="display:inline-block;width:52px;color:#888">発行日</span>'+_escPub(d.date||'')+'</div>';
-  if(d.deliveryDate)html+='<div><span style="display:inline-block;width:52px;color:#888">納品日</span>'+_escPub(d.deliveryDate)+'</div>';
-  if(d.type==='請求書')html+='<div><span style="display:inline-block;width:52px;color:#888">支払期限</span>'+_escPub(d.dueDate||'未設定')+'</div>';
-  if(d.type==='領収書')html+='<div><span style="display:inline-block;width:52px;color:#888">入金日</span>'+_escPub(d.dueDate||d.date||'')+'</div>';
+  html+='<div style="margin-top:6px;padding-top:5px;border-top:1px solid #E0E0E0;font-size:10px;color:#111;line-height:1.8">';
+  html+='<div><span style="display:inline-block;width:52px;color:#111">発行日</span>'+_escPub(d.date||'')+'</div>';
+  if(d.deliveryDate)html+='<div><span style="display:inline-block;width:52px;color:#111">納品日</span>'+_escPub(d.deliveryDate)+'</div>';
+  if(d.type==='請求書')html+='<div><span style="display:inline-block;width:52px;color:#111">支払期限</span>'+_escPub(d.dueDate||'未設定')+'</div>';
+  if(d.type==='領収書')html+='<div><span style="display:inline-block;width:52px;color:#111">入金日</span>'+_escPub(d.dueDate||d.date||'')+'</div>';
   html+='</div>';
   html+='</div></div>';
   html+='<div style="text-align:center;font-size:20px;font-weight:700;letter-spacing:6px;border-bottom:2px solid '+_envColor+';padding-bottom:4px;margin-bottom:6px;color:'+_envColor+'">'+_escPub(d.type||'')+'</div>';
@@ -7176,7 +7176,7 @@ const _DOC_PRINT_CSS=`
   .preview-doc.doc-quote{ border-top:5px solid var(--doc-color-quote); padding-top:10px; }
   .preview-doc.doc-invoice{ border-top:5px solid var(--doc-color-invoice); padding-top:10px; }
   .preview-doc.doc-receipt{ border-top:5px solid var(--doc-color-receipt); padding-top:10px; }
-  .doc-number{ font-size:12px; color:#888; margin:0 0 3px; }
+  .doc-number{ font-size:12px; color:#111; margin:0 0 3px; }
   .preview-doc h2{ font-size:24px; font-weight:600; text-align:center; margin:6px 0 16px; padding-bottom:9px; border-bottom:2px solid #111; }
   .preview-doc.doc-quote h2{ color:var(--doc-color-quote); border-bottom-color:var(--doc-color-quote); }
   .preview-doc.doc-invoice h2{ color:var(--doc-color-invoice); border-bottom-color:var(--doc-color-invoice); }
@@ -7218,8 +7218,8 @@ const _DOC_PRINT_CSS=`
   .preview-total td{ padding:4px 7px; }
   .preview-total .grand{ font-size:22px; font-weight:700; border-top:2px solid #111; }
   .preview-doc.doc-quote .grand td{ color:#111; border-top:2px solid var(--doc-color-quote); }
-  .preview-doc.doc-invoice .grand td{ color:var(--doc-color-invoice); border-top:2px solid var(--doc-color-invoice); }
-  .preview-doc.doc-receipt .grand td{ color:var(--doc-color-receipt); border-top:2px solid var(--doc-color-receipt); }
+  .preview-doc.doc-invoice .grand td{ color:#111; border-top:2px solid var(--doc-color-invoice); }
+  .preview-doc.doc-receipt .grand td{ color:#111; border-top:2px solid var(--doc-color-receipt); }
   .preview-notes-area{ margin-top:14px; border:1px solid #999; font-size:13px; line-height:1.6; word-break:break-word; page-break-before:avoid; break-before:avoid; }
   .preview-notes-bank{ padding:8px 10px; }
   .preview-notes-text{ padding:8px 10px; white-space:pre-wrap; word-break:break-word; }
@@ -7258,11 +7258,11 @@ function _buildPreviewDocHtml(d){
         <strong class="from-company" style="font-size:13px;display:block">${escAttr(d.staff||s.owner||s.company||'（会社名未設定）')}</strong>
         ${d.staff?`<p class="from-staff" style="margin-top:2px">担当：${escAttr(d.staff)}</p>`:''}
         <p>${escAttr(_getOfficeField(d,'address',s))}</p><p>${escAttr(_getOfficeField(d,'tel',s))}${_getOfficeField(d,'fax',s)?' / FAX:'+escAttr(_getOfficeField(d,'fax',s)):''}</p><p>${escAttr(s.email||'')}</p>
-        <div style="margin-top:8px;padding-top:6px;border-top:1px solid #E0E0E0;font-size:11px;color:#555;line-height:1.8">
-          ${(d.type==='請求書'||d.type==='領収書')?`<div><span style="display:inline-block;width:58px;color:#888">納品日</span>${escAttr(d.deliveryDate||'')}</div>`:(d.deliveryDate?`<div><span style="display:inline-block;width:58px;color:#888">納品日</span>${escAttr(d.deliveryDate)}</div>`:'')}
-          ${d.type==='見積書'?`<div><span style="display:inline-block;width:58px;color:#888">有効期限</span>${escAttr(d.dueDate||'')}</div>`:''}
-          ${d.type==='請求書'?`<div><span style="display:inline-block;width:58px;color:#888">支払期限</span>${escAttr(d.dueDate||'未設定')}</div>`:''}
-          ${d.type==='領収書'?`<div><span style="display:inline-block;width:58px;color:#888">入金日</span>${escAttr(d.dueDate||d.date||'')}</div>`:''}
+        <div style="margin-top:8px;padding-top:6px;border-top:1px solid #E0E0E0;font-size:11px;color:#111;line-height:1.8">
+          ${(d.type==='請求書'||d.type==='領収書')?`<div><span style="display:inline-block;width:58px;color:#111">納品日</span>${escAttr(d.deliveryDate||'')}</div>`:(d.deliveryDate?`<div><span style="display:inline-block;width:58px;color:#111">納品日</span>${escAttr(d.deliveryDate)}</div>`:'')}
+          ${d.type==='見積書'?`<div><span style="display:inline-block;width:58px;color:#111">有効期限</span>${escAttr(d.dueDate||'')}</div>`:''}
+          ${d.type==='請求書'?`<div><span style="display:inline-block;width:58px;color:#111">支払期限</span>${escAttr(d.dueDate||'未設定')}</div>`:''}
+          ${d.type==='領収書'?`<div><span style="display:inline-block;width:58px;color:#111">入金日</span>${escAttr(d.dueDate||d.date||'')}</div>`:''}
         </div>
       </div>
     </div>
@@ -7329,6 +7329,19 @@ function shareDoc(){
 // 🖨️ 書類印刷（v3.32.61: 隠しiframe + 印刷専用HTML 方式）
 // 画面DOMや @media print 競合に依存せず、独立した完結HTMLを iframe に注入して印刷する。
 // 帳票印刷と同じ実証済みパターン。フォント読み込み完了を待ってから印刷（1回目真っ白の防止）。
+// v3.38.4: 印刷用HTMLに現在の書類カラー(設定画面で変更可)を注入する。
+// 従来はベタ書き固定値だったため、色を変更すると画面と印刷で色が食い違っていた。
+function _docColorRootCss(){
+  var cs=null;
+  try{ cs=getComputedStyle(document.documentElement); }catch(e){}
+  function g(n,f){ try{ var v=cs?cs.getPropertyValue(n).trim():''; return v||f; }catch(e){ return f; } }
+  return ':root{--doc-color-quote:'+g('--doc-color-quote','#C49A2D')
+    +';--doc-color-quote-light:'+g('--doc-color-quote-light','#FAF5E5')
+    +';--doc-color-invoice:'+g('--doc-color-invoice','#1A73E8')
+    +';--doc-color-invoice-light:'+g('--doc-color-invoice-light','#E8F0FE')
+    +';--doc-color-receipt:'+g('--doc-color-receipt','#2D5A3D')
+    +';--doc-color-receipt-light:'+g('--doc-color-receipt-light','#E6F2EA')+'}';
+}
 function printDoc(){
   const d=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
   if(!d){ showToast('印刷対象の書類が見つかりません','#C0392B'); return; }
@@ -7347,7 +7360,7 @@ function printDoc(){
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 <style>${_bodyCss}
-:root{--doc-color-quote:#C49A2D;--doc-color-invoice:#1A73E8;--doc-color-receipt:#2D5A3D}
+${_docColorRootCss()}
 @page{size:A4 portrait;margin:0}</style>
 </head>
 <body>${innerHtml}</body>
