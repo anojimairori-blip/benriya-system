@@ -4009,7 +4009,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.4';
+const APP_VERSION='v3.38.5';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
@@ -4373,11 +4373,11 @@ function _buildEnvelopeHtml(d){
   html+='<div style="font-size:'+_nameFontSize+';font-weight:700;letter-spacing:0.5px;margin-bottom:4px;word-break:break-word">'+custName+'<span style="font-size:'+_honorFontSize+';font-weight:400;margin-left:6px;white-space:nowrap">'+custHonorific+'</span></div>';
   html+='</div>';
   html+='<div style="width:42%;text-align:right;box-sizing:border-box;overflow-wrap:break-word;word-break:break-word">';
-  html+='<div style="font-size:11px;color:#555;margin-bottom:8px">NO. '+_escPub(d.number||'')+' / '+_escPub(d.date||'')+'</div>';
+  html+='<div style="font-size:11px;color:#111;margin-bottom:8px">NO. '+_escPub(d.number||'')+' / '+_escPub(d.date||'')+'</div>';
   html+='<div style="margin-bottom:3px">'+logoHtml+'<strong style="font-size:13px;display:block;word-break:break-word">'+_escPub(s.owner||s.company||'')+'</strong></div>';
-  if(s.zip||s.address)html+='<div style="font-size:10px;color:#555;margin-top:2px">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
-  if(s.tel)html+='<div style="font-size:10px;color:#555">TEL: '+_escPub(s.tel)+'</div>';
-  if(s.email)html+='<div style="font-size:10px;color:#555">'+_escPub(s.email)+'</div>';
+  if(s.zip||s.address)html+='<div style="font-size:10px;color:#111;margin-top:2px">〒'+_escPub(s.zip||'')+' '+_escPub(s.address||'')+'</div>';
+  if(s.tel)html+='<div style="font-size:10px;color:#111">TEL: '+_escPub(s.tel)+'</div>';
+  if(s.email)html+='<div style="font-size:10px;color:#111">'+_escPub(s.email)+'</div>';
   html+='<div style="margin-top:6px;padding-top:5px;border-top:1px solid #E0E0E0;font-size:10px;color:#111;line-height:1.8">';
   html+='<div><span style="display:inline-block;width:52px;color:#111">発行日</span>'+_escPub(d.date||'')+'</div>';
   if(d.deliveryDate)html+='<div><span style="display:inline-block;width:52px;color:#111">納品日</span>'+_escPub(d.deliveryDate)+'</div>';
@@ -4399,14 +4399,14 @@ function _buildEnvelopeHtml(d){
   html+='<div style="display:flex;justify-content:flex-end;margin-bottom:4mm">';
   html+='<table style="border-collapse:collapse;min-width:200px">';
   if(d.tax10||d.tax8){
-    html+='<tr><td style="padding:4px 10px;border:none;font-size:13px;color:#555">小計</td><td style="padding:4px 10px;border:none;font-size:13px;text-align:right;color:#555">'+fmt(d.subtotal||0)+'</td></tr>';
-    if(d.tax10)html+='<tr><td style="padding:4px 10px;border:none;font-size:13px;color:#555">消費税 10%</td><td style="padding:4px 10px;border:none;font-size:13px;text-align:right;color:#555">'+fmt(d.tax10)+'</td></tr>';
+    html+='<tr><td style="padding:4px 10px;border:none;font-size:13px;color:#111">小計</td><td style="padding:4px 10px;border:none;font-size:13px;text-align:right;color:#111">'+fmt(d.subtotal||0)+'</td></tr>';
+    if(d.tax10)html+='<tr><td style="padding:4px 10px;border:none;font-size:13px;color:#111">消費税 10%</td><td style="padding:4px 10px;border:none;font-size:13px;text-align:right;color:#111">'+fmt(d.tax10)+'</td></tr>';
   }
   html+='<tr style="background:'+_envColor+';color:white"><td style="padding:10px 12px;border:1px solid '+_envColor+';font-size:16px;font-weight:700">合計（税込）</td>';
   html+='<td style="padding:10px 12px;border:1px solid '+_envColor+';font-size:22px;font-weight:700;text-align:right;letter-spacing:0.5px">'+fmt(d.grandTotal||0)+'</td></tr>';
   html+='</table></div>';
   if(bankHtml){
-    html+='<div style="border-top:1px solid #ccc;padding-top:6px;font-size:11px;color:#555">';
+    html+='<div style="border-top:1px solid #ccc;padding-top:6px;font-size:11px;color:#111">';
     html+=bankHtml;
     html+='</div>';
   }
