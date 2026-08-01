@@ -4011,11 +4011,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.7';
+const APP_VERSION='v3.38.8';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
-const APP_BUILD_TIME='2026-07-31 13:05 JST';
+const APP_BUILD_TIME='2026-08-01 15:40 JST';
 
 // ページ起動時に前回バージョンと比較（即時チェック）
 (function(){
@@ -6848,6 +6848,8 @@ function saveDoc(){
     grandTotal:Math.round(sub+t10+t8),
     createdAt:existing?.createdAt||new Date().toISOString()
   };
+  // v3.38.8: 発行日が空のまま保存されると日付フィルタ(今日/今月等)の一覧から消えるため補完
+  if(!d.date){d.date=today();const _dd=document.getElementById('doc-date');if(_dd)_dd.value=d.date;}
   if(!d.customer&&selectedCustId){const c=customers.find(x=>x.id===selectedCustId);if(c)d.customer=c.name;}
   // 監査情報を保持（既存のcreatedBy/createdAtは維持）
   if(existing){d.createdBy=existing.createdBy;d.createdByName=existing.createdByName;}
@@ -6857,6 +6859,17 @@ function saveDoc(){
   // v3.28.1: N1 保存成功時に下書きをクリア
   if(typeof _clearDocDraft==='function') _clearDocDraft();
   showToast(`${d.type}を保存しました ✓`);
+  // v3.38.8: 現在の日付フィルタ(今日/今月など)で保存書類が一覧に出ない場合に案内
+  // (「編集して保存したら今日タブから消えた」と見失う事故の防止)
+  try{
+    const _pgId={'見積書':'quotes','請求書':'invoices','領収書':'receipts'}[d.type];
+    if(_pgId&&typeof getDfDates==='function'&&typeof dfState!=='undefined'&&dfState[_pgId]&&dfState[_pgId].mode!=='all'){
+      const _r=getDfDates(_pgId);
+      if((_r.from&&d.date<_r.from)||(_r.to&&d.date>_r.to)){
+        showToast('⚠️ 発行日が'+d.date+'のため現在の日付フィルタには表示されません。「すべて」タブで確認できます','#E67E22');
+      }
+    }
+  }catch(_e){}
   return d;
 }
 
@@ -7312,6 +7325,10 @@ function previewDoc(id){
   currentPreviewDocId=id;
   _isEnvelopeMode=false;
   document.getElementById('preview-body').innerHTML=_buildPreviewDocHtml(d);
+  // v3.38.8: 封筒モードで閉じた後に別書類を開くとボタン表示が逆のまま残るバグ修正
+  // (通常プレビューを開いた時は必ず「窓枠封筒」ボタン表示にリセットする)
+  var _be=document.getElementById('btn-envelope');if(_be)_be.style.display='';
+  var _bn=document.getElementById('btn-normal-layout');if(_bn)_bn.style.display='none';
   document.getElementById('preview-modal').classList.add('open');
 }
 
@@ -7480,6 +7497,19 @@ function printPreview(){
   printDoc();
 }
 
+// v3.38.8: Ctrl+P / ⌘P はアプリ画面をそのまま印刷するため、印刷ボタン(printDoc)と
+// 色・レイアウトが食い違っていた(品目見出しが画面色のまま印刷される等)。
+// 書類プレビューを開いている間は同じ印刷経路(printDoc)へ差し替える。
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&(e.key==='p'||e.key==='P')){
+    var _pm=document.getElementById('preview-modal');
+    if(_pm&&_pm.classList.contains('open')){
+      e.preventDefault();
+      printDoc();
+    }
+  }
+});
+
 // 🔗 プレビューから直接共有リンクを発行（送信メニューを開かずに）
 function printEnvelope(){
   document.body.classList.add('printing-envelope');
@@ -7578,8 +7608,22 @@ function buildPdfFilename(d){
 
 async function _generatePdfBlob(){
   // 監査情報・スタンプを一時的に非表示にしてPDF化（印刷時と同じ見た目）
-  const previewDoc=document.querySelector('#preview-body .preview-doc');
-  if(!previewDoc) throw new Error('プレビューが開かれていません');
+  let previewDoc=document.querySelector('#preview-body .preview-doc');
+  let _tempPdfHost=null;
+  if(!previewDoc){
+    // v3.38.8: 窓付き封筒プレビュー中は #preview-body に .envelope-doc しか無く、
+    // 従来はここで「プレビューが開かれていません」エラーになりPDFが一切作れなかった。
+    // PDFは送付用途のため、通常レイアウトを画面外に一時生成してそこから作る。
+    const _d0=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
+    if(_d0){
+      _tempPdfHost=document.createElement('div');
+      _tempPdfHost.style.cssText='position:absolute;left:-10000px;top:0;width:720px;background:#ffffff';
+      _tempPdfHost.innerHTML=_buildPreviewDocHtml(_d0);
+      document.body.appendChild(_tempPdfHost);
+      previewDoc=_tempPdfHost.querySelector('.preview-doc');
+    }
+  }
+  if(!previewDoc){ if(_tempPdfHost)_tempPdfHost.remove(); throw new Error('プレビューが開かれていません'); }
   const hideEls=previewDoc.querySelectorAll('.audit-line, .stamp, .sample-badge');
   const oldDisplay=[];
   hideEls.forEach(el=>{oldDisplay.push(el.style.display); el.style.display='none';});
@@ -7628,6 +7672,7 @@ async function _generatePdfBlob(){
     previewDoc.style.border = _prevBorder;
     previewDoc.style.borderRadius = _prevBorderRadius;
     previewDoc.style.boxShadow = _prevBoxShadow;
+    if(_tempPdfHost)_tempPdfHost.remove(); // v3.38.8: 封筒モード用の一時DOMを掃除
   }
 }
 
