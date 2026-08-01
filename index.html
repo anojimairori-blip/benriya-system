@@ -286,7 +286,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .card:has(>table){overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;min-width:600px}
 /* 封筒レイアウトは自己完結のため外部の min-width:600px を無効化（モバイルはみ出し対策 v3.32.75） */
-.envelope-doc table{min-width:0 !important}
+.envelope-doc table{width:auto;min-width:0}
 th{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.05em;padding:9px 13px;background:var(--surface2);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
 td{padding:10px 13px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
 tr:last-child td{border-bottom:none}
@@ -1031,6 +1031,8 @@ select{appearance:auto}
   .preview-doc.doc-receipt .preview-table th{background:var(--doc-color-receipt-light) !important;color:var(--doc-color-receipt) !important}
   /* 合計欄・見出し・件名の色保持 */
   .preview-doc h2,.preview-doc .preview-subject,.preview-doc .grand td{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+  .envelope-doc,.envelope-doc *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+  .envelope-doc{transform:none !important;transform-origin:initial !important;margin-bottom:0 !important;width:100% !important;max-width:100% !important}
   .preview-doc .preview-total table{margin-left:auto !important;min-width:46% !important}
   .preview-doc .audit-line,.preview-doc .sample-badge{display:none !important}
   /* v3.32.79: @page marginとmodal-body paddingの二重適用で余白が24mm相当になっていた
@@ -4009,7 +4011,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.5';
+const APP_VERSION='v3.38.6';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
@@ -7348,7 +7350,10 @@ function printDoc(){
   // v3.32.74: 封筒モード表示中は封筒レイアウトを印刷（画面=印刷の一致）
   const innerHtml = _isEnvelopeMode ? _buildEnvelopeHtml(d) : _buildPreviewDocHtml(d);
   const _bodyCss = _isEnvelopeMode
-    ? `html,body{margin:0;padding:0;background:white;color:#111;font-family:sans-serif;overflow:hidden}`
+    ? `*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+       html,body{margin:0;padding:0;background:white;color:#111;font-family:sans-serif;overflow:hidden}
+       .envelope-doc table{width:auto;min-width:0}
+       .envelope-doc table th,.envelope-doc table td{-webkit-print-color-adjust:exact;print-color-adjust:exact}`
     : _DOC_PRINT_CSS;
   const docTitle=(d.type||'書類')+'_'+(d.number||'')+'_'+today();
   const printHtml=`<!DOCTYPE html>
