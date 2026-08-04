@@ -1465,7 +1465,13 @@ if(typeof QRCode === 'undefined'){
   // 'calendar' スコープに拡張(v3.25.3)。以前の 'calendar.events' のみでは
   // /users/me/calendarList が 403 Insufficient Permission で失敗していた
   provider.addScope('https://www.googleapis.com/auth/calendar');
-  provider.setCustomParameters({prompt:'consent'});
+  // ★2026-08-04: prompt を 'consent' から 'select_account' に変更。
+  //   'consent' は「承認済みでも毎回同意画面を出せ」という指示のため、
+  //   ログイン後にアプリ画面が出ているのに再度Google承認を求められていた。
+  //   スコープ拡張(v3.25.3)直後の一時措置がそのまま残っていたもの。
+  //   'select_account' ならアカウント選択のみ表示され、同意画面は出ない。
+  //   複数アカウント(本人/相方/デモ用)を使い分けるため、選択画面は残す。
+  provider.setCustomParameters({prompt:'select_account'});
 
   // グローバルに公開
   window._FB = { auth, db, storage, provider, GoogleAuthProvider,
@@ -4011,7 +4017,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.8';
+const APP_VERSION='v3.38.9';
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
@@ -6848,7 +6854,7 @@ function saveDoc(){
     grandTotal:Math.round(sub+t10+t8),
     createdAt:existing?.createdAt||new Date().toISOString()
   };
-  // v3.38.8: 発行日が空のまま保存されると日付フィルタ(今日/今月等)の一覧から消えるため補完
+  // v3.38.9: 発行日が空のまま保存されると日付フィルタ(今日/今月等)の一覧から消えるため補完
   if(!d.date){d.date=today();const _dd=document.getElementById('doc-date');if(_dd)_dd.value=d.date;}
   if(!d.customer&&selectedCustId){const c=customers.find(x=>x.id===selectedCustId);if(c)d.customer=c.name;}
   // 監査情報を保持（既存のcreatedBy/createdAtは維持）
@@ -6859,7 +6865,7 @@ function saveDoc(){
   // v3.28.1: N1 保存成功時に下書きをクリア
   if(typeof _clearDocDraft==='function') _clearDocDraft();
   showToast(`${d.type}を保存しました ✓`);
-  // v3.38.8: 現在の日付フィルタ(今日/今月など)で保存書類が一覧に出ない場合に案内
+  // v3.38.9: 現在の日付フィルタ(今日/今月など)で保存書類が一覧に出ない場合に案内
   // (「編集して保存したら今日タブから消えた」と見失う事故の防止)
   try{
     const _pgId={'見積書':'quotes','請求書':'invoices','領収書':'receipts'}[d.type];
@@ -7325,7 +7331,7 @@ function previewDoc(id){
   currentPreviewDocId=id;
   _isEnvelopeMode=false;
   document.getElementById('preview-body').innerHTML=_buildPreviewDocHtml(d);
-  // v3.38.8: 封筒モードで閉じた後に別書類を開くとボタン表示が逆のまま残るバグ修正
+  // v3.38.9: 封筒モードで閉じた後に別書類を開くとボタン表示が逆のまま残るバグ修正
   // (通常プレビューを開いた時は必ず「窓枠封筒」ボタン表示にリセットする)
   var _be=document.getElementById('btn-envelope');if(_be)_be.style.display='';
   var _bn=document.getElementById('btn-normal-layout');if(_bn)_bn.style.display='none';
@@ -7497,7 +7503,7 @@ function printPreview(){
   printDoc();
 }
 
-// v3.38.8: Ctrl+P / ⌘P はアプリ画面をそのまま印刷するため、印刷ボタン(printDoc)と
+// v3.38.9: Ctrl+P / ⌘P はアプリ画面をそのまま印刷するため、印刷ボタン(printDoc)と
 // 色・レイアウトが食い違っていた(品目見出しが画面色のまま印刷される等)。
 // 書類プレビューを開いている間は同じ印刷経路(printDoc)へ差し替える。
 document.addEventListener('keydown',function(e){
@@ -7611,7 +7617,7 @@ async function _generatePdfBlob(){
   let previewDoc=document.querySelector('#preview-body .preview-doc');
   let _tempPdfHost=null;
   if(!previewDoc){
-    // v3.38.8: 窓付き封筒プレビュー中は #preview-body に .envelope-doc しか無く、
+    // v3.38.9: 窓付き封筒プレビュー中は #preview-body に .envelope-doc しか無く、
     // 従来はここで「プレビューが開かれていません」エラーになりPDFが一切作れなかった。
     // PDFは送付用途のため、通常レイアウトを画面外に一時生成してそこから作る。
     const _d0=currentPreviewDocId?docs.find(x=>x.id===currentPreviewDocId):null;
@@ -7672,7 +7678,7 @@ async function _generatePdfBlob(){
     previewDoc.style.border = _prevBorder;
     previewDoc.style.borderRadius = _prevBorderRadius;
     previewDoc.style.boxShadow = _prevBoxShadow;
-    if(_tempPdfHost)_tempPdfHost.remove(); // v3.38.8: 封筒モード用の一時DOMを掃除
+    if(_tempPdfHost)_tempPdfHost.remove(); // v3.38.9: 封筒モード用の一時DOMを掃除
   }
 }
 
