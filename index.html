@@ -4017,7 +4017,7 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.39.0';
+const APP_VERSION='v3.40.0';
 // ===== 2026-08-26: 閲覧専用モード =====
 // Flexsys Enterprise へ一本化したため、v3 は参照専用とする。
 // 書き込み（Firestore保存）を全面停止。false にすれば元通り書き込める。
@@ -15472,6 +15472,60 @@ function injectHamburgers(){
 }
 
 
+/* ===== v3.40.0 移行のご案内ポップアップ ===== */
+function showMigrationPopup(){
+  if(!READ_ONLY_MODE) return;
+  if(document.getElementById('migModal')) return;
+  // 1日1回だけ自動表示（バナーの「詳細」からはいつでも開ける）
+  try{
+    const today=new Date().toISOString().slice(0,10);
+    if(localStorage.getItem('migPopupShown')===today) return;
+    localStorage.setItem('migPopupShown', today);
+  }catch(e){}
+  openMigrationModal();
+}
+function openMigrationModal(){
+  if(document.getElementById('migModal')) return;
+  const wrap=document.createElement('div');
+  wrap.id='migModal';
+  wrap.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(17,34,61,.55);'
+    +'display:flex;align-items:center;justify-content:center;padding:18px;';
+  wrap.innerHTML=
+    '<div style="background:#fff;max-width:520px;width:100%;border-radius:10px;'
+    +'box-shadow:0 18px 50px rgba(0,0,0,.3);overflow:hidden;font-size:14px;line-height:1.85;">'
+    + '<div style="background:#11223d;color:#fff;padding:15px 20px;font-weight:700;font-size:15px;">'
+    +   'Flexsys Enterprise へ移行しました</div>'
+    + '<div style="padding:20px;color:#1c2b40;">'
+    +   '<p style="margin:0 0 14px;">このFlexsys2026（v3）は<b>閲覧専用</b>になりました。'
+    +   '新規作成・保存・編集はできません。</p>'
+    +   '<p style="margin:0 0 6px;font-weight:700;">今後の業務はこちらをご利用ください</p>'
+    +   '<p style="margin:0 0 16px;"><a href="https://flexsys.nojima-giken.com/" target="_blank" rel="noopener" '
+    +     'style="color:#b88746;font-weight:700;text-decoration:underline;word-break:break-all;">'
+    +     'https://flexsys.nojima-giken.com/</a></p>'
+    +   '<p style="margin:0 0 6px;font-weight:700;">操作マニュアル</p>'
+    +   '<p style="margin:0 0 16px;"><a href="https://nojima-giken.com/manual/" target="_blank" rel="noopener" '
+    +     'style="color:#b88746;text-decoration:underline;word-break:break-all;">'
+    +     'https://nojima-giken.com/manual/</a></p>'
+    +   '<p style="margin:0 0 4px;font-size:13px;color:#555;">'
+    +   '・ログインはメールアドレスとパスワードです（Googleログインではありません）<br>'
+    +   '・過去のデータはこれまでどおり閲覧できます。削除はしません<br>'
+    +   '・ご不明な点は代表 野島までお願いします</p>'
+    + '</div>'
+    + '<div style="padding:0 20px 20px;display:flex;gap:10px;justify-content:flex-end;">'
+    +   '<button type="button" id="migClose" style="padding:9px 18px;border:1px solid #ccc;'
+    +     'background:#fff;border-radius:6px;cursor:pointer;font-size:13px;">閉じる</button>'
+    +   '<a href="https://flexsys.nojima-giken.com/" target="_blank" rel="noopener" '
+    +     'style="padding:9px 20px;background:#b88746;color:#fff;border-radius:6px;'
+    +     'text-decoration:none;font-size:13px;font-weight:700;">Enterprise を開く</a>'
+    + '</div></div>';
+  document.body.appendChild(wrap);
+  const close=()=>wrap.remove();
+  wrap.addEventListener('click', e=>{ if(e.target===wrap) close(); });
+  const btn=document.getElementById('migClose');
+  if(btn) btn.addEventListener('click', close);
+}
+window.openMigrationModal = openMigrationModal;
+
 /* ===== v3.39.0 閲覧専用モード ===== */
 function applyReadOnlyMode(){
   if(!READ_ONLY_MODE) return;
@@ -15484,7 +15538,8 @@ function applyReadOnlyMode(){
     bar.innerHTML='<strong>閲覧専用モード</strong>　'
       +'このFlexsys2026（v3）は参照専用です。新規作成・保存はできません。'
       +'　現在の業務は <a href="https://flexsys.nojima-giken.com/" target="_blank" rel="noopener" '
-      +'style="color:#ffe1a8;text-decoration:underline;">Flexsys Enterprise</a> をご利用ください。';
+      +'style="color:#ffe1a8;text-decoration:underline;">Flexsys Enterprise</a> をご利用ください。'
+      +'　<button type="button" onclick="openMigrationModal()" style="margin-left:6px;padding:2px 10px;border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;border-radius:4px;cursor:pointer;font-size:12px;">詳細</button>';
     document.body.insertBefore(bar, document.body.firstChild);
   }
   // ② 入力系を読み取り専用にする（動的に増える要素にも効くよう繰り返し適用）
@@ -15502,6 +15557,7 @@ function applyReadOnlyMode(){
 
 document.addEventListener('DOMContentLoaded', async ()=>{
   applyReadOnlyMode();
+  showMigrationPopup();
   // 共有リンクアクセスの場合は公開ポータルを表示
   if(typeof checkShareLinkOnLoad==='function'){
     const isShareLink=await checkShareLinkOnLoad();
