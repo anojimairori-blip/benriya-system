@@ -4017,7 +4017,11 @@ let payments=JSON.parse(localStorage.getItem('payments_v6')||'{}');
 let docPhotos=JSON.parse(localStorage.getItem('docPhotos_v6')||'{}');
 let expenses=JSON.parse(localStorage.getItem('expenses_v7')||'[]');
 let bulletins=JSON.parse(localStorage.getItem('bulletins_v1')||'[]');
-const APP_VERSION='v3.38.9';
+const APP_VERSION='v3.39.0';
+// ===== 2026-08-26: 閲覧専用モード =====
+// Flexsys Enterprise へ一本化したため、v3 は参照専用とする。
+// 書き込み（Firestore保存）を全面停止。false にすれば元通り書き込める。
+const READ_ONLY_MODE = true;
 const MASTER_UID='jwG19FxW1XcTME9OcFiJ1QzHXK42'; // 野島技研社内チームのマスターUID（既存データ、変更不可）
 window.HUB_LICENSE = null;
 window.COMPANY_KEY = MASTER_UID; // 既定値。ログイン確定時に resolveCompanyKey() で上書きされる
@@ -10620,6 +10624,11 @@ async function persistNow(){
 }
 
 async function _fbPersist(){
+  // 閲覧専用モード: クラウドへの保存を行わない（v3.39.0）
+  if(READ_ONLY_MODE){
+    console.info('[READ_ONLY] Firestoreへの保存はスキップされました');
+    return { ok:false, readOnly:true, error:'read-only mode' };
+  }
   const F = window._FB;
   if(!F||!currentUser) return { ok:false, error:'not logged in' };
   showSync();
@@ -15462,7 +15471,37 @@ function injectHamburgers(){
   },{passive:true});
 }
 
+
+/* ===== v3.39.0 閲覧専用モード ===== */
+function applyReadOnlyMode(){
+  if(!READ_ONLY_MODE) return;
+  // ① 画面上部に告知バーを出す
+  if(!document.getElementById('roBanner')){
+    const bar=document.createElement('div');
+    bar.id='roBanner';
+    bar.style.cssText='position:sticky;top:0;z-index:99999;background:#8a2b23;color:#fff;'
+      +'padding:9px 14px;font-size:13px;line-height:1.6;text-align:center;letter-spacing:.02em;';
+    bar.innerHTML='<strong>閲覧専用モード</strong>　'
+      +'このFlexsys2026（v3）は参照専用です。新規作成・保存はできません。'
+      +'　現在の業務は <a href="https://flexsys.nojima-giken.com/" target="_blank" rel="noopener" '
+      +'style="color:#ffe1a8;text-decoration:underline;">Flexsys Enterprise</a> をご利用ください。';
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
+  // ② 入力系を読み取り専用にする（動的に増える要素にも効くよう繰り返し適用）
+  const lock=()=>{
+    document.querySelectorAll('input,textarea,select').forEach(el=>{
+      if(el.closest('#roBanner')) return;
+      if(el.type==='search'||el.id==='q'||/search|検索/i.test(el.placeholder||'')) return; // 検索は使える
+      if(el.tagName==='SELECT'||el.type==='checkbox'||el.type==='radio'){ el.disabled=true; }
+      else { el.readOnly=true; }
+    });
+  };
+  lock();
+  setInterval(lock, 1500);
+}
+
 document.addEventListener('DOMContentLoaded', async ()=>{
+  applyReadOnlyMode();
   // 共有リンクアクセスの場合は公開ポータルを表示
   if(typeof checkShareLinkOnLoad==='function'){
     const isShareLink=await checkShareLinkOnLoad();
